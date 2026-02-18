@@ -200,3 +200,9 @@ add_executable(test_network_integration tests/integration/test_network_integrati
 target_include_directories(test_network_integration PRIVATE include)
 target_link_libraries(test_network_integration util ${SDL_LIBRARY})
 add_test(NAME network_integration_tests COMMAND test_network_integration)
+
+# Parity Tests (C++ vs C feature parity)
+add_executable(test_parity tests/integration/test_parity.cpp)
+target_include_directories(test_parity PRIVATE include /home/geoffrey/tnl/include)
+target_link_libraries(test_parity util ${SDL_LIBRARY})
+add_test(NAME parity_tests COMMAND test_parity)

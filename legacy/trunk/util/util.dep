@@ -1,0 +1,85 @@
+console.o: console.cpp ../include/doomdef.h ../include/d_event.h \
+ ../include/command.h ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/console.h ../include/keys.h \
+ ../include/g_game.h ../include/g_input.h ../include/hud.h \
+ ../include/r_data.h ../include/m_fixed.h ../include/z_cache.h \
+ ../include/doomdef.h ../include/dictionary.h ../include/functors.h \
+ ../include/sounds.h ../include/screen.h ../include/v_video.h \
+ ../include/i_video.h ../include/z_zone.h ../include/i_system.h \
+ ../include/w_wad.h
+m_archive.o: m_archive.cpp ../include/doomdef.h ../include/m_archive.h \
+ ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/vect.h ../include/m_fixed.h \
+ ../include/m_swap.h ../include/m_menu.h ../include/r_data.h \
+ ../include/z_cache.h ../include/doomdef.h ../include/dictionary.h \
+ ../include/functors.h ../include/z_zone.h
+m_argv.o: m_argv.cpp ../include/doomdef.h ../include/doomtype.h \
+ /usr/include/SDL/SDL_types.h /usr/include/SDL/SDL_stdinc.h \
+ /usr/include/SDL/SDL_config.h /usr/include/SDL/SDL_platform.h \
+ /usr/include/SDL/begin_code.h /usr/include/SDL/close_code.h \
+ ../include/command.h ../include/doomtype.h
+m_bbox.o: m_bbox.cpp ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/m_bbox.h ../include/m_fixed.h \
+ ../include/doomtype.h ../include/p_maputl.h ../include/r_defs.h \
+ ../include/m_bbox.h ../include/tables.h ../include/vect.h
+md5.o: md5.cpp ../include/md5.h
+m_dll.o: m_dll.cpp ../include/doomdef.h ../include/m_dll.h
+m_misc.o: m_misc.cpp ../include/doomdef.h ../include/command.h \
+ ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/m_misc.h ../include/m_argv.h \
+ ../include/m_swap.h ../include/g_input.h ../include/keys.h \
+ ../include/screen.h ../include/i_video.h ../include/w_wad.h \
+ ../include/z_zone.h ../include/parser.h \
+ ../include/hardware/oglrenderer.hpp ../include/vect.h \
+ ../include/r_defs.h ../include/m_fixed.h ../include/m_bbox.h
+m_random.o: m_random.cpp ../include/doomdef.h ../include/doomtype.h \
+ /usr/include/SDL/SDL_types.h /usr/include/SDL/SDL_stdinc.h \
+ /usr/include/SDL/SDL_config.h /usr/include/SDL/SDL_platform.h \
+ /usr/include/SDL/begin_code.h /usr/include/SDL/close_code.h \
+ ../include/m_random.h ../include/doomtype.h ../include/m_fixed.h
+m_swap.o: m_swap.cpp
+parser.o: parser.cpp ../include/doomdef.h ../include/parser.h \
+ ../include/w_wad.h ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/z_zone.h
+tables.o: tables.cpp ../include/tables.h ../include/doomtype.h \
+ /usr/include/SDL/SDL_types.h /usr/include/SDL/SDL_stdinc.h \
+ /usr/include/SDL/SDL_config.h /usr/include/SDL/SDL_platform.h \
+ /usr/include/SDL/begin_code.h /usr/include/SDL/close_code.h \
+ ../include/vect.h ../include/m_fixed.h
+vfile.o: vfile.cpp ../include/doomdef.h ../include/md5.h \
+ ../include/vfile.h ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/functors.h ../include/z_zone.h
+wad.o: wad.cpp ../include/doomdef.h ../include/m_swap.h \
+ ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/parser.h ../include/dehacked.h \
+ ../include/parser.h ../include/wad.h ../include/vfile.h \
+ ../include/functors.h ../include/z_zone.h
+w_wad.o: w_wad.cpp ../include/doomdef.h ../include/vfile.h \
+ ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/functors.h ../include/wad.h \
+ ../include/vfile.h ../include/w_wad.h ../include/z_zone.h \
+ ../include/m_misc.h
+z_cache.o: z_cache.cpp ../include/doomdef.h ../include/z_cache.h \
+ ../include/doomdef.h ../include/dictionary.h ../include/functors.h \
+ ../include/z_zone.h
+z_zone.o: z_zone.cpp ../include/doomdef.h ../include/z_zone.h \
+ ../include/i_system.h ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/i_video.h

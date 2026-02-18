@@ -22,7 +22,7 @@ CMAKE_AR:FILEPATH=/usr/bin/ar
 
 //Choose the type of build, options are: None Debug Release RelWithDebInfo
 // MinSizeRel ...
-CMAKE_BUILD_TYPE:STRING=
+CMAKE_BUILD_TYPE:STRING=Debug
 
 //Enable/Disable color output during build.
 CMAKE_COLOR_MAKEFILE:BOOL=ON
@@ -298,12 +298,6 @@ SDL_MIXER_INCLUDE_DIR:PATH=/usr/include/SDL
 
 //Path to a library.
 SDL_MIXER_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libSDL_mixer.so
-
-//Path to a library.
-TNL_LIBRARY:FILEPATH=/home/geoffrey/tnl/lib/libtnl.a
-
-//Path to a library.
-TOMCRYPT_LIBRARY:FILEPATH=/home/geoffrey/tnl/lib/libtomcrypt.a
 
 //Path to a file.
 ZLIB_INCLUDE_DIR:PATH=/usr/include

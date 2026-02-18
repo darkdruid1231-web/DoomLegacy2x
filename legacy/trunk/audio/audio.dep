@@ -1,0 +1,23 @@
+qmus2mid.o: qmus2mid.cpp ../include/doomdef.h ../include/i_system.h \
+ ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/m_swap.h ../include/qmus2mid.h
+sounds.o: sounds.cpp ../include/doomdef.h ../include/g_game.h \
+ ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/g_mapinfo.h ../include/parser.h \
+ ../include/functors.h ../include/sounds.h ../include/s_sound.h \
+ ../include/vect.h ../include/m_fixed.h ../include/z_cache.h \
+ ../include/doomdef.h ../include/dictionary.h ../include/functors.h
+s_sndseq.o: s_sndseq.cpp ../include/m_random.h ../include/doomtype.h \
+ /usr/include/SDL/SDL_types.h /usr/include/SDL/SDL_stdinc.h \
+ /usr/include/SDL/SDL_config.h /usr/include/SDL/SDL_platform.h \
+ /usr/include/SDL/begin_code.h /usr/include/SDL/close_code.h \
+ ../include/m_fixed.h ../include/parser.h ../include/g_map.h \
+ ../include/doomdef.h ../include/r_defs.h ../include/m_bbox.h \
+ ../include/g_think.h ../include/vect.h ../include/info.h \
+ ../include/s_sound.h ../include/z_cache.h ../include/dictionary.h \
+ ../include/functors.h ../include/sounds.h ../include/w_wad.h \
+ ../include/z_zone.h

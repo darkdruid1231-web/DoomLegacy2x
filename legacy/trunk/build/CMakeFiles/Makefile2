@@ -63,9 +63,21 @@ CMAKE_BINARY_DIR = /home/geoffrey/doomlegacy-svn/legacy/trunk/build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
+all: CMakeFiles/util.dir/all
 all: CMakeFiles/d2h.dir/all
 all: CMakeFiles/wadtool.dir/all
 all: CMakeFiles/doomlegacy.dir/all
+all: CMakeFiles/test_fixed_t.dir/all
+all: CMakeFiles/test_save_load.dir/all
+all: CMakeFiles/test_serialization.dir/all
+all: CMakeFiles/test_mapinfo.dir/all
+all: CMakeFiles/test_tnl_packets.dir/all
+all: CMakeFiles/test_actor.dir/all
+all: CMakeFiles/test_console.dir/all
+all: CMakeFiles/test_vector.dir/all
+all: CMakeFiles/test_demos.dir/all
+all: CMakeFiles/test_network_integration.dir/all
+all: CMakeFiles/test_parity.dir/all
 all: engine/all
 all: audio/all
 all: video/all
@@ -86,9 +98,21 @@ preinstall: grammars/preinstall
 .PHONY : preinstall
 
 # The main recursive "clean" target.
+clean: CMakeFiles/util.dir/clean
 clean: CMakeFiles/d2h.dir/clean
 clean: CMakeFiles/wadtool.dir/clean
 clean: CMakeFiles/doomlegacy.dir/clean
+clean: CMakeFiles/test_fixed_t.dir/clean
+clean: CMakeFiles/test_save_load.dir/clean
+clean: CMakeFiles/test_serialization.dir/clean
+clean: CMakeFiles/test_mapinfo.dir/clean
+clean: CMakeFiles/test_tnl_packets.dir/clean
+clean: CMakeFiles/test_actor.dir/clean
+clean: CMakeFiles/test_console.dir/clean
+clean: CMakeFiles/test_vector.dir/clean
+clean: CMakeFiles/test_demos.dir/clean
+clean: CMakeFiles/test_network_integration.dir/clean
+clean: CMakeFiles/test_parity.dir/clean
 clean: engine/clean
 clean: audio/clean
 clean: video/clean
@@ -204,6 +228,32 @@ video/clean:
 .PHONY : video/clean
 
 #=============================================================================
+# Target rules for target CMakeFiles/util.dir
+
+# All Build rule for target.
+CMakeFiles/util.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles --progress-num=86,87,88,89,90,91,92,93,94,95,96,97,98 "Built target util"
+.PHONY : CMakeFiles/util.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/util.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 13
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/util.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 0
+.PHONY : CMakeFiles/util.dir/rule
+
+# Convenience name for target.
+util: CMakeFiles/util.dir/rule
+.PHONY : util
+
+# clean rule for target.
+CMakeFiles/util.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/clean
+.PHONY : CMakeFiles/util.dir/clean
+
+#=============================================================================
 # Target rules for target CMakeFiles/d2h.dir
 
 # All Build rule for target.
@@ -236,12 +286,12 @@ CMakeFiles/d2h.dir/clean:
 CMakeFiles/wadtool.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/wadtool.dir/build.make CMakeFiles/wadtool.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/wadtool.dir/build.make CMakeFiles/wadtool.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles --progress-num=98,99,100 "Built target wadtool"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles --progress-num=99,100 "Built target wadtool"
 .PHONY : CMakeFiles/wadtool.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/wadtool.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/wadtool.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 0
 .PHONY : CMakeFiles/wadtool.dir/rule
@@ -259,15 +309,16 @@ CMakeFiles/wadtool.dir/clean:
 # Target rules for target CMakeFiles/doomlegacy.dir
 
 # All Build rule for target.
+CMakeFiles/doomlegacy.dir/all: CMakeFiles/util.dir/all
 CMakeFiles/doomlegacy.dir/all: grammars/CMakeFiles/grammars.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles --progress-num=2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90 "Built target doomlegacy"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles --progress-num=2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66 "Built target doomlegacy"
 .PHONY : CMakeFiles/doomlegacy.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/doomlegacy.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 96
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 84
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/doomlegacy.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 0
 .PHONY : CMakeFiles/doomlegacy.dir/rule
@@ -282,18 +333,304 @@ CMakeFiles/doomlegacy.dir/clean:
 .PHONY : CMakeFiles/doomlegacy.dir/clean
 
 #=============================================================================
+# Target rules for target CMakeFiles/test_fixed_t.dir
+
+# All Build rule for target.
+CMakeFiles/test_fixed_t.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fixed_t.dir/build.make CMakeFiles/test_fixed_t.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fixed_t.dir/build.make CMakeFiles/test_fixed_t.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles --progress-num=77 "Built target test_fixed_t"
+.PHONY : CMakeFiles/test_fixed_t.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/test_fixed_t.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 1
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_fixed_t.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 0
+.PHONY : CMakeFiles/test_fixed_t.dir/rule
+
+# Convenience name for target.
+test_fixed_t: CMakeFiles/test_fixed_t.dir/rule
+.PHONY : test_fixed_t
+
+# clean rule for target.
+CMakeFiles/test_fixed_t.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fixed_t.dir/build.make CMakeFiles/test_fixed_t.dir/clean
+.PHONY : CMakeFiles/test_fixed_t.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/test_save_load.dir
+
+# All Build rule for target.
+CMakeFiles/test_save_load.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_save_load.dir/build.make CMakeFiles/test_save_load.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_save_load.dir/build.make CMakeFiles/test_save_load.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles --progress-num=81,82 "Built target test_save_load"
+.PHONY : CMakeFiles/test_save_load.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/test_save_load.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 2
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_save_load.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 0
+.PHONY : CMakeFiles/test_save_load.dir/rule
+
+# Convenience name for target.
+test_save_load: CMakeFiles/test_save_load.dir/rule
+.PHONY : test_save_load
+
+# clean rule for target.
+CMakeFiles/test_save_load.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_save_load.dir/build.make CMakeFiles/test_save_load.dir/clean
+.PHONY : CMakeFiles/test_save_load.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/test_serialization.dir
+
+# All Build rule for target.
+CMakeFiles/test_serialization.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_serialization.dir/build.make CMakeFiles/test_serialization.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_serialization.dir/build.make CMakeFiles/test_serialization.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles --progress-num=83 "Built target test_serialization"
+.PHONY : CMakeFiles/test_serialization.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/test_serialization.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 1
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_serialization.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 0
+.PHONY : CMakeFiles/test_serialization.dir/rule
+
+# Convenience name for target.
+test_serialization: CMakeFiles/test_serialization.dir/rule
+.PHONY : test_serialization
+
+# clean rule for target.
+CMakeFiles/test_serialization.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_serialization.dir/build.make CMakeFiles/test_serialization.dir/clean
+.PHONY : CMakeFiles/test_serialization.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/test_mapinfo.dir
+
+# All Build rule for target.
+CMakeFiles/test_mapinfo.dir/all: CMakeFiles/util.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_mapinfo.dir/build.make CMakeFiles/test_mapinfo.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_mapinfo.dir/build.make CMakeFiles/test_mapinfo.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles --progress-num=78 "Built target test_mapinfo"
+.PHONY : CMakeFiles/test_mapinfo.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/test_mapinfo.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 14
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_mapinfo.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 0
+.PHONY : CMakeFiles/test_mapinfo.dir/rule
+
+# Convenience name for target.
+test_mapinfo: CMakeFiles/test_mapinfo.dir/rule
+.PHONY : test_mapinfo
+
+# clean rule for target.
+CMakeFiles/test_mapinfo.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_mapinfo.dir/build.make CMakeFiles/test_mapinfo.dir/clean
+.PHONY : CMakeFiles/test_mapinfo.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/test_tnl_packets.dir
+
+# All Build rule for target.
+CMakeFiles/test_tnl_packets.dir/all: CMakeFiles/util.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tnl_packets.dir/build.make CMakeFiles/test_tnl_packets.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tnl_packets.dir/build.make CMakeFiles/test_tnl_packets.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles --progress-num=84 "Built target test_tnl_packets"
+.PHONY : CMakeFiles/test_tnl_packets.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/test_tnl_packets.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 14
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_tnl_packets.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 0
+.PHONY : CMakeFiles/test_tnl_packets.dir/rule
+
+# Convenience name for target.
+test_tnl_packets: CMakeFiles/test_tnl_packets.dir/rule
+.PHONY : test_tnl_packets
+
+# clean rule for target.
+CMakeFiles/test_tnl_packets.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tnl_packets.dir/build.make CMakeFiles/test_tnl_packets.dir/clean
+.PHONY : CMakeFiles/test_tnl_packets.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/test_actor.dir
+
+# All Build rule for target.
+CMakeFiles/test_actor.dir/all: CMakeFiles/util.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_actor.dir/build.make CMakeFiles/test_actor.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_actor.dir/build.make CMakeFiles/test_actor.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles --progress-num=73 "Built target test_actor"
+.PHONY : CMakeFiles/test_actor.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/test_actor.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 14
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_actor.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 0
+.PHONY : CMakeFiles/test_actor.dir/rule
+
+# Convenience name for target.
+test_actor: CMakeFiles/test_actor.dir/rule
+.PHONY : test_actor
+
+# clean rule for target.
+CMakeFiles/test_actor.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_actor.dir/build.make CMakeFiles/test_actor.dir/clean
+.PHONY : CMakeFiles/test_actor.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/test_console.dir
+
+# All Build rule for target.
+CMakeFiles/test_console.dir/all: CMakeFiles/util.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_console.dir/build.make CMakeFiles/test_console.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_console.dir/build.make CMakeFiles/test_console.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles --progress-num=74 "Built target test_console"
+.PHONY : CMakeFiles/test_console.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/test_console.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 14
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_console.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 0
+.PHONY : CMakeFiles/test_console.dir/rule
+
+# Convenience name for target.
+test_console: CMakeFiles/test_console.dir/rule
+.PHONY : test_console
+
+# clean rule for target.
+CMakeFiles/test_console.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_console.dir/build.make CMakeFiles/test_console.dir/clean
+.PHONY : CMakeFiles/test_console.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/test_vector.dir
+
+# All Build rule for target.
+CMakeFiles/test_vector.dir/all: CMakeFiles/util.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_vector.dir/build.make CMakeFiles/test_vector.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_vector.dir/build.make CMakeFiles/test_vector.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles --progress-num=85 "Built target test_vector"
+.PHONY : CMakeFiles/test_vector.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/test_vector.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 14
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_vector.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 0
+.PHONY : CMakeFiles/test_vector.dir/rule
+
+# Convenience name for target.
+test_vector: CMakeFiles/test_vector.dir/rule
+.PHONY : test_vector
+
+# clean rule for target.
+CMakeFiles/test_vector.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_vector.dir/build.make CMakeFiles/test_vector.dir/clean
+.PHONY : CMakeFiles/test_vector.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/test_demos.dir
+
+# All Build rule for target.
+CMakeFiles/test_demos.dir/all: CMakeFiles/util.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_demos.dir/build.make CMakeFiles/test_demos.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_demos.dir/build.make CMakeFiles/test_demos.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles --progress-num=75,76 "Built target test_demos"
+.PHONY : CMakeFiles/test_demos.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/test_demos.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 15
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_demos.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 0
+.PHONY : CMakeFiles/test_demos.dir/rule
+
+# Convenience name for target.
+test_demos: CMakeFiles/test_demos.dir/rule
+.PHONY : test_demos
+
+# clean rule for target.
+CMakeFiles/test_demos.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_demos.dir/build.make CMakeFiles/test_demos.dir/clean
+.PHONY : CMakeFiles/test_demos.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/test_network_integration.dir
+
+# All Build rule for target.
+CMakeFiles/test_network_integration.dir/all: CMakeFiles/util.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_network_integration.dir/build.make CMakeFiles/test_network_integration.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_network_integration.dir/build.make CMakeFiles/test_network_integration.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles --progress-num=79 "Built target test_network_integration"
+.PHONY : CMakeFiles/test_network_integration.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/test_network_integration.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 14
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_network_integration.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 0
+.PHONY : CMakeFiles/test_network_integration.dir/rule
+
+# Convenience name for target.
+test_network_integration: CMakeFiles/test_network_integration.dir/rule
+.PHONY : test_network_integration
+
+# clean rule for target.
+CMakeFiles/test_network_integration.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_network_integration.dir/build.make CMakeFiles/test_network_integration.dir/clean
+.PHONY : CMakeFiles/test_network_integration.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/test_parity.dir
+
+# All Build rule for target.
+CMakeFiles/test_parity.dir/all: CMakeFiles/util.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_parity.dir/build.make CMakeFiles/test_parity.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_parity.dir/build.make CMakeFiles/test_parity.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles --progress-num=80 "Built target test_parity"
+.PHONY : CMakeFiles/test_parity.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/test_parity.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 14
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_parity.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 0
+.PHONY : CMakeFiles/test_parity.dir/rule
+
+# Convenience name for target.
+test_parity: CMakeFiles/test_parity.dir/rule
+.PHONY : test_parity
+
+# clean rule for target.
+CMakeFiles/test_parity.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_parity.dir/build.make CMakeFiles/test_parity.dir/clean
+.PHONY : CMakeFiles/test_parity.dir/clean
+
+#=============================================================================
 # Target rules for target grammars/CMakeFiles/grammars.dir
 
 # All Build rule for target.
 grammars/CMakeFiles/grammars.dir/all:
 	$(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/depend
 	$(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles --progress-num=91,92,93,94,95,96,97 "Built target grammars"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles --progress-num=67,68,69,70,71,72 "Built target grammars"
 .PHONY : grammars/CMakeFiles/grammars.dir/all
 
 # Build rule for subdir invocation for target.
 grammars/CMakeFiles/grammars.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 7
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 6
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 grammars/CMakeFiles/grammars.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/doomlegacy-svn/legacy/trunk/build/CMakeFiles 0
 .PHONY : grammars/CMakeFiles/grammars.dir/rule

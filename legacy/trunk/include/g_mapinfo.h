@@ -77,12 +77,12 @@ public:
   /// current state of the corresponding Map
   enum mapstate_e
     {
-      MAP_UNLOADED = 0, ///< not loaded, "me" should be NULL
-      MAP_RUNNING,      ///< currently running, "me" is valid
-      MAP_INSTASIS,     ///< presently halted, but "me" is still valid
-      MAP_RESET,        ///< (single player) player has died, the map should be reset
-      MAP_FINISHED,     ///< Map will be saved or closed after the tick, but currently "me" is still valid
-      MAP_SAVED         ///< "me" should be NULL, the Map is saved on disk
+      MAP_UNLOADED = -1, ///< not loaded, "me" should be NULL
+      MAP_RUNNING = 0,   ///< currently running, "me" is valid
+      MAP_INSTASIS,      ///< presently halted, but "me" is still valid
+      MAP_RESET,         ///< (single player) player has died, the map should be reset
+      MAP_FINISHED,      ///< Map will be saved or closed after the tick, but currently "me" is still valid
+      MAP_SAVED          ///< "me" should be NULL, the Map is saved on disk
     };
 
   mapstate_e   state;

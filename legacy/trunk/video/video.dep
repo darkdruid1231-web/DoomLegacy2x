@@ -1,0 +1,188 @@
+jpeg.o: jpeg.cpp ../include/doomdef.h ../include/r_data.h \
+ ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/m_fixed.h ../include/z_cache.h \
+ ../include/doomdef.h ../include/dictionary.h ../include/functors.h \
+ ../include/screen.h ../include/w_wad.h ../include/z_zone.h
+png.o: png.cpp ../include/doomdef.h ../include/r_data.h \
+ ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/m_fixed.h ../include/z_cache.h \
+ ../include/doomdef.h ../include/dictionary.h ../include/functors.h \
+ ../include/w_wad.h ../include/z_zone.h
+r_anim.o: r_anim.cpp ../include/doomdef.h ../include/doomdata.h \
+ ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/g_game.h ../include/r_data.h \
+ ../include/m_fixed.h ../include/z_cache.h ../include/doomdef.h \
+ ../include/dictionary.h ../include/functors.h ../include/r_defs.h \
+ ../include/m_bbox.h ../include/parser.h ../include/m_swap.h \
+ ../include/m_random.h ../include/w_wad.h ../include/z_zone.h
+r_draw16.o: r_draw16.cpp ../include/doomtype.h \
+ /usr/include/SDL/SDL_types.h /usr/include/SDL/SDL_stdinc.h \
+ /usr/include/SDL/SDL_config.h /usr/include/SDL/SDL_platform.h \
+ /usr/include/SDL/begin_code.h /usr/include/SDL/close_code.h \
+ ../include/r_draw.h ../include/doomdef.h ../include/m_fixed.h \
+ ../include/doomtype.h ../include/screen.h ../include/r_render.h \
+ ../include/r_main.h ../include/r_defs.h ../include/m_bbox.h \
+ ../include/tables.h ../include/vect.h
+r_draw8.o: r_draw8.cpp ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/r_draw.h ../include/doomdef.h \
+ ../include/m_fixed.h ../include/doomtype.h ../include/screen.h \
+ ../include/r_render.h ../include/r_main.h ../include/r_defs.h \
+ ../include/m_bbox.h ../include/tables.h ../include/vect.h
+r_draw.o: r_draw.cpp ../include/doomdef.h ../include/command.h \
+ ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/g_game.h ../include/hud.h \
+ ../include/m_random.h ../include/m_fixed.h ../include/r_data.h \
+ ../include/z_cache.h ../include/doomdef.h ../include/dictionary.h \
+ ../include/functors.h ../include/r_draw.h ../include/screen.h \
+ ../include/v_video.h ../include/w_wad.h ../include/z_zone.h \
+ ../include/i_video.h ../include/hardware/oglrenderer.hpp \
+ ../include/vect.h ../include/r_defs.h ../include/m_bbox.h
+r_font.o: r_font.cpp ../include/console.h ../include/doomtype.h \
+ /usr/include/SDL/SDL_types.h /usr/include/SDL/SDL_stdinc.h \
+ /usr/include/SDL/SDL_config.h /usr/include/SDL/SDL_platform.h \
+ /usr/include/SDL/begin_code.h /usr/include/SDL/close_code.h \
+ ../include/keys.h ../include/g_game.h ../include/r_data.h \
+ ../include/m_fixed.h ../include/z_cache.h ../include/doomdef.h \
+ ../include/dictionary.h ../include/functors.h ../include/screen.h \
+ ../include/v_video.h ../include/i_video.h ../include/w_wad.h \
+ ../include/z_zone.h
+r_plane.o: r_plane.cpp ../include/doomdef.h ../include/console.h \
+ ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/keys.h ../include/g_game.h \
+ ../include/g_map.h ../include/doomdef.h ../include/r_defs.h \
+ ../include/m_fixed.h ../include/m_bbox.h ../include/g_think.h \
+ ../include/vect.h ../include/info.h ../include/r_render.h \
+ ../include/r_main.h ../include/screen.h ../include/tables.h \
+ ../include/r_defs.h ../include/r_data.h ../include/z_cache.h \
+ ../include/dictionary.h ../include/functors.h ../include/r_draw.h \
+ ../include/r_plane.h ../include/r_segs.h ../include/r_splats.h \
+ ../include/r_sky.h ../include/v_video.h ../include/w_wad.h \
+ ../include/z_zone.h
+r_render.o: r_render.cpp ../include/doomdef.h ../include/r_render.h \
+ ../include/m_fixed.h ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/r_main.h ../include/r_defs.h \
+ ../include/m_bbox.h ../include/screen.h ../include/tables.h \
+ ../include/vect.h ../include/r_draw.h ../include/doomdef.h \
+ ../include/r_data.h ../include/z_cache.h ../include/dictionary.h \
+ ../include/functors.h ../include/g_map.h ../include/g_think.h \
+ ../include/info.h
+r_segs.o: r_segs.cpp ../include/doomdef.h ../include/command.h \
+ ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/cvars.h ../include/console.h \
+ ../include/keys.h ../include/r_render.h ../include/m_fixed.h \
+ ../include/r_main.h ../include/r_defs.h ../include/m_bbox.h \
+ ../include/screen.h ../include/tables.h ../include/vect.h \
+ ../include/r_data.h ../include/z_cache.h ../include/doomdef.h \
+ ../include/dictionary.h ../include/functors.h ../include/r_bsp.h \
+ ../include/r_draw.h ../include/r_plane.h ../include/r_segs.h \
+ ../include/r_sky.h ../include/r_splats.h ../include/r_things.h \
+ ../include/p_spec.h ../include/g_think.h ../include/w_wad.h \
+ ../include/z_zone.h
+r_sky.o: r_sky.cpp ../include/doomdef.h ../include/r_sky.h \
+ ../include/r_data.h ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/m_fixed.h ../include/z_cache.h \
+ ../include/doomdef.h ../include/dictionary.h ../include/functors.h
+r_splats.o: r_splats.cpp ../include/doomdef.h ../include/g_map.h \
+ ../include/doomdef.h ../include/r_defs.h ../include/m_fixed.h \
+ ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/m_bbox.h ../include/g_think.h \
+ ../include/vect.h ../include/info.h ../include/r_render.h \
+ ../include/r_main.h ../include/screen.h ../include/tables.h \
+ ../include/r_data.h ../include/z_cache.h ../include/dictionary.h \
+ ../include/functors.h ../include/r_main.h ../include/r_splats.h
+screen.o: screen.cpp ../include/doomdef.h ../include/screen.h \
+ ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/v_video.h ../include/doomdef.h \
+ ../include/g_game.h ../include/console.h ../include/keys.h \
+ ../include/command.h ../include/am_map.h ../include/m_fixed.h \
+ ../include/hud.h ../include/m_argv.h ../include/i_video.h \
+ ../include/r_data.h ../include/z_cache.h ../include/dictionary.h \
+ ../include/functors.h ../include/r_draw.h ../include/screen.h \
+ ../include/r_main.h ../include/r_defs.h ../include/m_bbox.h \
+ ../include/tables.h ../include/vect.h ../include/w_wad.h \
+ ../include/z_zone.h
+v_video.o: v_video.cpp ../include/doomdef.h ../include/console.h \
+ ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/keys.h ../include/command.h \
+ ../include/r_data.h ../include/m_fixed.h ../include/z_cache.h \
+ ../include/doomdef.h ../include/dictionary.h ../include/functors.h \
+ ../include/r_draw.h ../include/screen.h ../include/v_video.h \
+ ../include/screen.h ../include/i_video.h ../include/z_zone.h \
+ ../include/hardware/oglrenderer.hpp ../include/vect.h \
+ ../include/r_defs.h ../include/m_bbox.h
+hwr_bsp.o: hardware/hwr_bsp.cpp ../include/doomdef.h \
+ ../include/hardware/hwr_bsp.h ../include/r_defs.h ../include/m_fixed.h \
+ ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/m_bbox.h ../include/z_zone.h \
+ ../include/hardware/hwr_states.h ../include/hardware/hwr_geometry.h \
+ ../include/hardware/hwr_states.h ../include/hardware/hwr_render.h \
+ ../include/hardware/../r_render.h ../include/hardware/../m_fixed.h \
+ ../include/hardware/../r_main.h ../include/hardware/../r_defs.h \
+ ../include/hardware/../screen.h ../include/hardware/../doomtype.h \
+ ../include/hardware/../tables.h ../include/hardware/../vect.h \
+ ../include/console.h ../include/keys.h ../include/command.h \
+ ../include/cvars.h ../include/m_bbox.h ../include/r_render.h \
+ ../include/r_main.h ../include/r_bsp.h ../include/r_defs.h \
+ ../include/i_video.h
+hwr_geometry.o: hardware/hwr_geometry.cpp \
+ ../include/hardware/hwr_geometry.h ../include/hardware/hwr_states.h \
+ ../include/doomdef.h
+hwr_states.o: hardware/hwr_states.cpp ../include/hardware/hwr_states.h
+hw_trick.o: hardware/hw_trick.cpp ../include/doomdef.h \
+ ../include/command.h ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/g_game.h ../include/r_render.h \
+ ../include/m_fixed.h ../include/r_main.h ../include/r_defs.h \
+ ../include/m_bbox.h ../include/screen.h ../include/tables.h \
+ ../include/vect.h ../include/r_data.h ../include/z_cache.h \
+ ../include/doomdef.h ../include/dictionary.h ../include/functors.h \
+ ../include/i_system.h
+oglhelpers.o: hardware/oglhelpers.cpp ../include/command.h \
+ ../include/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../include/r_data.h ../include/m_fixed.h \
+ ../include/z_cache.h ../include/doomdef.h ../include/dictionary.h \
+ ../include/functors.h ../include/doomdef.h \
+ ../include/hardware/oglhelpers.hpp ../include/doomtype.h \
+ ../include/i_video.h ../include/m_bbox.h ../include/p_maputl.h \
+ ../include/r_defs.h ../include/m_bbox.h ../include/tables.h \
+ ../include/vect.h ../include/r_defs.h
+oglshaders.o: hardware/oglshaders.cpp ../include/hardware/oglshaders.h \
+ ../include/z_cache.h ../include/doomdef.h ../include/dictionary.h \
+ ../include/functors.h ../include/doomdef.h ../include/g_map.h \
+ ../include/r_defs.h ../include/m_fixed.h ../include/doomtype.h \
+ /usr/include/SDL/SDL_types.h /usr/include/SDL/SDL_stdinc.h \
+ /usr/include/SDL/SDL_config.h /usr/include/SDL/SDL_platform.h \
+ /usr/include/SDL/begin_code.h /usr/include/SDL/close_code.h \
+ ../include/m_bbox.h ../include/g_think.h ../include/vect.h \
+ ../include/info.h ../include/w_wad.h ../include/z_zone.h \
+ ../include/hardware/oglrenderer.hpp ../include/vect.h \
+ ../include/r_defs.h

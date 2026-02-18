@@ -65,6 +65,16 @@ CMAKE_BINARY_DIR = /home/geoffrey/doomlegacy-svn/legacy/trunk/build
 #=============================================================================
 # Targets provided globally by CMake.
 
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running tests..."
+	/usr/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+.PHONY : test/fast
+
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "No interactive CMake dialog available..."
@@ -117,6 +127,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named util
+
+# Build rule for target.
+util: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 util
+.PHONY : util
+
+# fast build rule for target.
+util/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/build
+.PHONY : util/fast
+
+#=============================================================================
 # Target rules for targets named d2h
 
 # Build rule for target.
@@ -154,6 +177,149 @@ doomlegacy: cmake_check_build_system
 doomlegacy/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/build
 .PHONY : doomlegacy/fast
+
+#=============================================================================
+# Target rules for targets named test_fixed_t
+
+# Build rule for target.
+test_fixed_t: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_fixed_t
+.PHONY : test_fixed_t
+
+# fast build rule for target.
+test_fixed_t/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fixed_t.dir/build.make CMakeFiles/test_fixed_t.dir/build
+.PHONY : test_fixed_t/fast
+
+#=============================================================================
+# Target rules for targets named test_save_load
+
+# Build rule for target.
+test_save_load: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_save_load
+.PHONY : test_save_load
+
+# fast build rule for target.
+test_save_load/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_save_load.dir/build.make CMakeFiles/test_save_load.dir/build
+.PHONY : test_save_load/fast
+
+#=============================================================================
+# Target rules for targets named test_serialization
+
+# Build rule for target.
+test_serialization: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_serialization
+.PHONY : test_serialization
+
+# fast build rule for target.
+test_serialization/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_serialization.dir/build.make CMakeFiles/test_serialization.dir/build
+.PHONY : test_serialization/fast
+
+#=============================================================================
+# Target rules for targets named test_mapinfo
+
+# Build rule for target.
+test_mapinfo: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_mapinfo
+.PHONY : test_mapinfo
+
+# fast build rule for target.
+test_mapinfo/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_mapinfo.dir/build.make CMakeFiles/test_mapinfo.dir/build
+.PHONY : test_mapinfo/fast
+
+#=============================================================================
+# Target rules for targets named test_tnl_packets
+
+# Build rule for target.
+test_tnl_packets: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_tnl_packets
+.PHONY : test_tnl_packets
+
+# fast build rule for target.
+test_tnl_packets/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tnl_packets.dir/build.make CMakeFiles/test_tnl_packets.dir/build
+.PHONY : test_tnl_packets/fast
+
+#=============================================================================
+# Target rules for targets named test_actor
+
+# Build rule for target.
+test_actor: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_actor
+.PHONY : test_actor
+
+# fast build rule for target.
+test_actor/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_actor.dir/build.make CMakeFiles/test_actor.dir/build
+.PHONY : test_actor/fast
+
+#=============================================================================
+# Target rules for targets named test_console
+
+# Build rule for target.
+test_console: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_console
+.PHONY : test_console
+
+# fast build rule for target.
+test_console/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_console.dir/build.make CMakeFiles/test_console.dir/build
+.PHONY : test_console/fast
+
+#=============================================================================
+# Target rules for targets named test_vector
+
+# Build rule for target.
+test_vector: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_vector
+.PHONY : test_vector
+
+# fast build rule for target.
+test_vector/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_vector.dir/build.make CMakeFiles/test_vector.dir/build
+.PHONY : test_vector/fast
+
+#=============================================================================
+# Target rules for targets named test_demos
+
+# Build rule for target.
+test_demos: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_demos
+.PHONY : test_demos
+
+# fast build rule for target.
+test_demos/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_demos.dir/build.make CMakeFiles/test_demos.dir/build
+.PHONY : test_demos/fast
+
+#=============================================================================
+# Target rules for targets named test_network_integration
+
+# Build rule for target.
+test_network_integration: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_network_integration
+.PHONY : test_network_integration
+
+# fast build rule for target.
+test_network_integration/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_network_integration.dir/build.make CMakeFiles/test_network_integration.dir/build
+.PHONY : test_network_integration/fast
+
+#=============================================================================
+# Target rules for targets named test_parity
+
+# Build rule for target.
+test_parity: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_parity
+.PHONY : test_parity
+
+# fast build rule for target.
+test_parity/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_parity.dir/build.make CMakeFiles/test_parity.dir/build
+.PHONY : test_parity/fast
 
 #=============================================================================
 # Target rules for targets named grammars
@@ -2208,6 +2374,270 @@ net/sv_main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/net/sv_main.cpp.s
 .PHONY : net/sv_main.cpp.s
 
+tests/integration/test_demos.o: tests/integration/test_demos.cpp.o
+.PHONY : tests/integration/test_demos.o
+
+# target to build an object file
+tests/integration/test_demos.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_demos.dir/build.make CMakeFiles/test_demos.dir/tests/integration/test_demos.cpp.o
+.PHONY : tests/integration/test_demos.cpp.o
+
+tests/integration/test_demos.i: tests/integration/test_demos.cpp.i
+.PHONY : tests/integration/test_demos.i
+
+# target to preprocess a source file
+tests/integration/test_demos.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_demos.dir/build.make CMakeFiles/test_demos.dir/tests/integration/test_demos.cpp.i
+.PHONY : tests/integration/test_demos.cpp.i
+
+tests/integration/test_demos.s: tests/integration/test_demos.cpp.s
+.PHONY : tests/integration/test_demos.s
+
+# target to generate assembly for a file
+tests/integration/test_demos.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_demos.dir/build.make CMakeFiles/test_demos.dir/tests/integration/test_demos.cpp.s
+.PHONY : tests/integration/test_demos.cpp.s
+
+tests/integration/test_network_integration.o: tests/integration/test_network_integration.cpp.o
+.PHONY : tests/integration/test_network_integration.o
+
+# target to build an object file
+tests/integration/test_network_integration.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_network_integration.dir/build.make CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.o
+.PHONY : tests/integration/test_network_integration.cpp.o
+
+tests/integration/test_network_integration.i: tests/integration/test_network_integration.cpp.i
+.PHONY : tests/integration/test_network_integration.i
+
+# target to preprocess a source file
+tests/integration/test_network_integration.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_network_integration.dir/build.make CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.i
+.PHONY : tests/integration/test_network_integration.cpp.i
+
+tests/integration/test_network_integration.s: tests/integration/test_network_integration.cpp.s
+.PHONY : tests/integration/test_network_integration.s
+
+# target to generate assembly for a file
+tests/integration/test_network_integration.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_network_integration.dir/build.make CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.s
+.PHONY : tests/integration/test_network_integration.cpp.s
+
+tests/integration/test_parity.o: tests/integration/test_parity.cpp.o
+.PHONY : tests/integration/test_parity.o
+
+# target to build an object file
+tests/integration/test_parity.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_parity.dir/build.make CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.o
+.PHONY : tests/integration/test_parity.cpp.o
+
+tests/integration/test_parity.i: tests/integration/test_parity.cpp.i
+.PHONY : tests/integration/test_parity.i
+
+# target to preprocess a source file
+tests/integration/test_parity.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_parity.dir/build.make CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.i
+.PHONY : tests/integration/test_parity.cpp.i
+
+tests/integration/test_parity.s: tests/integration/test_parity.cpp.s
+.PHONY : tests/integration/test_parity.s
+
+# target to generate assembly for a file
+tests/integration/test_parity.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_parity.dir/build.make CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.s
+.PHONY : tests/integration/test_parity.cpp.s
+
+tests/integration/test_save_load.o: tests/integration/test_save_load.cpp.o
+.PHONY : tests/integration/test_save_load.o
+
+# target to build an object file
+tests/integration/test_save_load.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_save_load.dir/build.make CMakeFiles/test_save_load.dir/tests/integration/test_save_load.cpp.o
+.PHONY : tests/integration/test_save_load.cpp.o
+
+tests/integration/test_save_load.i: tests/integration/test_save_load.cpp.i
+.PHONY : tests/integration/test_save_load.i
+
+# target to preprocess a source file
+tests/integration/test_save_load.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_save_load.dir/build.make CMakeFiles/test_save_load.dir/tests/integration/test_save_load.cpp.i
+.PHONY : tests/integration/test_save_load.cpp.i
+
+tests/integration/test_save_load.s: tests/integration/test_save_load.cpp.s
+.PHONY : tests/integration/test_save_load.s
+
+# target to generate assembly for a file
+tests/integration/test_save_load.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_save_load.dir/build.make CMakeFiles/test_save_load.dir/tests/integration/test_save_load.cpp.s
+.PHONY : tests/integration/test_save_load.cpp.s
+
+tests/integration/test_serialization.o: tests/integration/test_serialization.cpp.o
+.PHONY : tests/integration/test_serialization.o
+
+# target to build an object file
+tests/integration/test_serialization.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_serialization.dir/build.make CMakeFiles/test_serialization.dir/tests/integration/test_serialization.cpp.o
+.PHONY : tests/integration/test_serialization.cpp.o
+
+tests/integration/test_serialization.i: tests/integration/test_serialization.cpp.i
+.PHONY : tests/integration/test_serialization.i
+
+# target to preprocess a source file
+tests/integration/test_serialization.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_serialization.dir/build.make CMakeFiles/test_serialization.dir/tests/integration/test_serialization.cpp.i
+.PHONY : tests/integration/test_serialization.cpp.i
+
+tests/integration/test_serialization.s: tests/integration/test_serialization.cpp.s
+.PHONY : tests/integration/test_serialization.s
+
+# target to generate assembly for a file
+tests/integration/test_serialization.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_serialization.dir/build.make CMakeFiles/test_serialization.dir/tests/integration/test_serialization.cpp.s
+.PHONY : tests/integration/test_serialization.cpp.s
+
+tests/unit/test_actor.o: tests/unit/test_actor.cpp.o
+.PHONY : tests/unit/test_actor.o
+
+# target to build an object file
+tests/unit/test_actor.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_actor.dir/build.make CMakeFiles/test_actor.dir/tests/unit/test_actor.cpp.o
+.PHONY : tests/unit/test_actor.cpp.o
+
+tests/unit/test_actor.i: tests/unit/test_actor.cpp.i
+.PHONY : tests/unit/test_actor.i
+
+# target to preprocess a source file
+tests/unit/test_actor.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_actor.dir/build.make CMakeFiles/test_actor.dir/tests/unit/test_actor.cpp.i
+.PHONY : tests/unit/test_actor.cpp.i
+
+tests/unit/test_actor.s: tests/unit/test_actor.cpp.s
+.PHONY : tests/unit/test_actor.s
+
+# target to generate assembly for a file
+tests/unit/test_actor.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_actor.dir/build.make CMakeFiles/test_actor.dir/tests/unit/test_actor.cpp.s
+.PHONY : tests/unit/test_actor.cpp.s
+
+tests/unit/test_console.o: tests/unit/test_console.cpp.o
+.PHONY : tests/unit/test_console.o
+
+# target to build an object file
+tests/unit/test_console.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_console.dir/build.make CMakeFiles/test_console.dir/tests/unit/test_console.cpp.o
+.PHONY : tests/unit/test_console.cpp.o
+
+tests/unit/test_console.i: tests/unit/test_console.cpp.i
+.PHONY : tests/unit/test_console.i
+
+# target to preprocess a source file
+tests/unit/test_console.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_console.dir/build.make CMakeFiles/test_console.dir/tests/unit/test_console.cpp.i
+.PHONY : tests/unit/test_console.cpp.i
+
+tests/unit/test_console.s: tests/unit/test_console.cpp.s
+.PHONY : tests/unit/test_console.s
+
+# target to generate assembly for a file
+tests/unit/test_console.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_console.dir/build.make CMakeFiles/test_console.dir/tests/unit/test_console.cpp.s
+.PHONY : tests/unit/test_console.cpp.s
+
+tests/unit/test_fixed_t.o: tests/unit/test_fixed_t.cpp.o
+.PHONY : tests/unit/test_fixed_t.o
+
+# target to build an object file
+tests/unit/test_fixed_t.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fixed_t.dir/build.make CMakeFiles/test_fixed_t.dir/tests/unit/test_fixed_t.cpp.o
+.PHONY : tests/unit/test_fixed_t.cpp.o
+
+tests/unit/test_fixed_t.i: tests/unit/test_fixed_t.cpp.i
+.PHONY : tests/unit/test_fixed_t.i
+
+# target to preprocess a source file
+tests/unit/test_fixed_t.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fixed_t.dir/build.make CMakeFiles/test_fixed_t.dir/tests/unit/test_fixed_t.cpp.i
+.PHONY : tests/unit/test_fixed_t.cpp.i
+
+tests/unit/test_fixed_t.s: tests/unit/test_fixed_t.cpp.s
+.PHONY : tests/unit/test_fixed_t.s
+
+# target to generate assembly for a file
+tests/unit/test_fixed_t.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fixed_t.dir/build.make CMakeFiles/test_fixed_t.dir/tests/unit/test_fixed_t.cpp.s
+.PHONY : tests/unit/test_fixed_t.cpp.s
+
+tests/unit/test_mapinfo.o: tests/unit/test_mapinfo.cpp.o
+.PHONY : tests/unit/test_mapinfo.o
+
+# target to build an object file
+tests/unit/test_mapinfo.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_mapinfo.dir/build.make CMakeFiles/test_mapinfo.dir/tests/unit/test_mapinfo.cpp.o
+.PHONY : tests/unit/test_mapinfo.cpp.o
+
+tests/unit/test_mapinfo.i: tests/unit/test_mapinfo.cpp.i
+.PHONY : tests/unit/test_mapinfo.i
+
+# target to preprocess a source file
+tests/unit/test_mapinfo.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_mapinfo.dir/build.make CMakeFiles/test_mapinfo.dir/tests/unit/test_mapinfo.cpp.i
+.PHONY : tests/unit/test_mapinfo.cpp.i
+
+tests/unit/test_mapinfo.s: tests/unit/test_mapinfo.cpp.s
+.PHONY : tests/unit/test_mapinfo.s
+
+# target to generate assembly for a file
+tests/unit/test_mapinfo.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_mapinfo.dir/build.make CMakeFiles/test_mapinfo.dir/tests/unit/test_mapinfo.cpp.s
+.PHONY : tests/unit/test_mapinfo.cpp.s
+
+tests/unit/test_tnl_packets.o: tests/unit/test_tnl_packets.cpp.o
+.PHONY : tests/unit/test_tnl_packets.o
+
+# target to build an object file
+tests/unit/test_tnl_packets.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tnl_packets.dir/build.make CMakeFiles/test_tnl_packets.dir/tests/unit/test_tnl_packets.cpp.o
+.PHONY : tests/unit/test_tnl_packets.cpp.o
+
+tests/unit/test_tnl_packets.i: tests/unit/test_tnl_packets.cpp.i
+.PHONY : tests/unit/test_tnl_packets.i
+
+# target to preprocess a source file
+tests/unit/test_tnl_packets.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tnl_packets.dir/build.make CMakeFiles/test_tnl_packets.dir/tests/unit/test_tnl_packets.cpp.i
+.PHONY : tests/unit/test_tnl_packets.cpp.i
+
+tests/unit/test_tnl_packets.s: tests/unit/test_tnl_packets.cpp.s
+.PHONY : tests/unit/test_tnl_packets.s
+
+# target to generate assembly for a file
+tests/unit/test_tnl_packets.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tnl_packets.dir/build.make CMakeFiles/test_tnl_packets.dir/tests/unit/test_tnl_packets.cpp.s
+.PHONY : tests/unit/test_tnl_packets.cpp.s
+
+tests/unit/test_vector.o: tests/unit/test_vector.cpp.o
+.PHONY : tests/unit/test_vector.o
+
+# target to build an object file
+tests/unit/test_vector.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_vector.dir/build.make CMakeFiles/test_vector.dir/tests/unit/test_vector.cpp.o
+.PHONY : tests/unit/test_vector.cpp.o
+
+tests/unit/test_vector.i: tests/unit/test_vector.cpp.i
+.PHONY : tests/unit/test_vector.i
+
+# target to preprocess a source file
+tests/unit/test_vector.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_vector.dir/build.make CMakeFiles/test_vector.dir/tests/unit/test_vector.cpp.i
+.PHONY : tests/unit/test_vector.cpp.i
+
+tests/unit/test_vector.s: tests/unit/test_vector.cpp.s
+.PHONY : tests/unit/test_vector.s
+
+# target to generate assembly for a file
+tests/unit/test_vector.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_vector.dir/build.make CMakeFiles/test_vector.dir/tests/unit/test_vector.cpp.s
+.PHONY : tests/unit/test_vector.cpp.s
+
 tools/d2h.o: tools/d2h.cpp.o
 .PHONY : tools/d2h.o
 
@@ -2261,7 +2691,7 @@ util/command.o: util/command.cpp.o
 
 # target to build an object file
 util/command.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/command.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/command.cpp.o
 .PHONY : util/command.cpp.o
 
 util/command.i: util/command.cpp.i
@@ -2269,7 +2699,7 @@ util/command.i: util/command.cpp.i
 
 # target to preprocess a source file
 util/command.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/command.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/command.cpp.i
 .PHONY : util/command.cpp.i
 
 util/command.s: util/command.cpp.s
@@ -2277,7 +2707,7 @@ util/command.s: util/command.cpp.s
 
 # target to generate assembly for a file
 util/command.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/command.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/command.cpp.s
 .PHONY : util/command.cpp.s
 
 util/console.o: util/console.cpp.o
@@ -2285,7 +2715,7 @@ util/console.o: util/console.cpp.o
 
 # target to build an object file
 util/console.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/console.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/console.cpp.o
 .PHONY : util/console.cpp.o
 
 util/console.i: util/console.cpp.i
@@ -2293,7 +2723,7 @@ util/console.i: util/console.cpp.i
 
 # target to preprocess a source file
 util/console.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/console.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/console.cpp.i
 .PHONY : util/console.cpp.i
 
 util/console.s: util/console.cpp.s
@@ -2301,7 +2731,7 @@ util/console.s: util/console.cpp.s
 
 # target to generate assembly for a file
 util/console.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/console.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/console.cpp.s
 .PHONY : util/console.cpp.s
 
 util/dehacked.o: util/dehacked.cpp.o
@@ -2309,7 +2739,7 @@ util/dehacked.o: util/dehacked.cpp.o
 
 # target to build an object file
 util/dehacked.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/dehacked.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/dehacked.cpp.o
 .PHONY : util/dehacked.cpp.o
 
 util/dehacked.i: util/dehacked.cpp.i
@@ -2317,7 +2747,7 @@ util/dehacked.i: util/dehacked.cpp.i
 
 # target to preprocess a source file
 util/dehacked.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/dehacked.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/dehacked.cpp.i
 .PHONY : util/dehacked.cpp.i
 
 util/dehacked.s: util/dehacked.cpp.s
@@ -2325,7 +2755,7 @@ util/dehacked.s: util/dehacked.cpp.s
 
 # target to generate assembly for a file
 util/dehacked.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/dehacked.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/dehacked.cpp.s
 .PHONY : util/dehacked.cpp.s
 
 util/m_archive.o: util/m_archive.cpp.o
@@ -2333,7 +2763,7 @@ util/m_archive.o: util/m_archive.cpp.o
 
 # target to build an object file
 util/m_archive.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_archive.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_archive.cpp.o
 .PHONY : util/m_archive.cpp.o
 
 util/m_archive.i: util/m_archive.cpp.i
@@ -2341,7 +2771,7 @@ util/m_archive.i: util/m_archive.cpp.i
 
 # target to preprocess a source file
 util/m_archive.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_archive.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_archive.cpp.i
 .PHONY : util/m_archive.cpp.i
 
 util/m_archive.s: util/m_archive.cpp.s
@@ -2349,7 +2779,7 @@ util/m_archive.s: util/m_archive.cpp.s
 
 # target to generate assembly for a file
 util/m_archive.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_archive.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_archive.cpp.s
 .PHONY : util/m_archive.cpp.s
 
 util/m_argv.o: util/m_argv.cpp.o
@@ -2357,7 +2787,7 @@ util/m_argv.o: util/m_argv.cpp.o
 
 # target to build an object file
 util/m_argv.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_argv.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_argv.cpp.o
 .PHONY : util/m_argv.cpp.o
 
 util/m_argv.i: util/m_argv.cpp.i
@@ -2365,7 +2795,7 @@ util/m_argv.i: util/m_argv.cpp.i
 
 # target to preprocess a source file
 util/m_argv.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_argv.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_argv.cpp.i
 .PHONY : util/m_argv.cpp.i
 
 util/m_argv.s: util/m_argv.cpp.s
@@ -2373,7 +2803,7 @@ util/m_argv.s: util/m_argv.cpp.s
 
 # target to generate assembly for a file
 util/m_argv.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_argv.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_argv.cpp.s
 .PHONY : util/m_argv.cpp.s
 
 util/m_bbox.o: util/m_bbox.cpp.o
@@ -2381,7 +2811,7 @@ util/m_bbox.o: util/m_bbox.cpp.o
 
 # target to build an object file
 util/m_bbox.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_bbox.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_bbox.cpp.o
 .PHONY : util/m_bbox.cpp.o
 
 util/m_bbox.i: util/m_bbox.cpp.i
@@ -2389,7 +2819,7 @@ util/m_bbox.i: util/m_bbox.cpp.i
 
 # target to preprocess a source file
 util/m_bbox.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_bbox.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_bbox.cpp.i
 .PHONY : util/m_bbox.cpp.i
 
 util/m_bbox.s: util/m_bbox.cpp.s
@@ -2397,7 +2827,7 @@ util/m_bbox.s: util/m_bbox.cpp.s
 
 # target to generate assembly for a file
 util/m_bbox.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_bbox.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_bbox.cpp.s
 .PHONY : util/m_bbox.cpp.s
 
 util/m_dll.o: util/m_dll.cpp.o
@@ -2405,7 +2835,7 @@ util/m_dll.o: util/m_dll.cpp.o
 
 # target to build an object file
 util/m_dll.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_dll.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_dll.cpp.o
 .PHONY : util/m_dll.cpp.o
 
 util/m_dll.i: util/m_dll.cpp.i
@@ -2413,7 +2843,7 @@ util/m_dll.i: util/m_dll.cpp.i
 
 # target to preprocess a source file
 util/m_dll.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_dll.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_dll.cpp.i
 .PHONY : util/m_dll.cpp.i
 
 util/m_dll.s: util/m_dll.cpp.s
@@ -2421,7 +2851,7 @@ util/m_dll.s: util/m_dll.cpp.s
 
 # target to generate assembly for a file
 util/m_dll.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_dll.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_dll.cpp.s
 .PHONY : util/m_dll.cpp.s
 
 util/m_fixed.o: util/m_fixed.cpp.o
@@ -2429,7 +2859,7 @@ util/m_fixed.o: util/m_fixed.cpp.o
 
 # target to build an object file
 util/m_fixed.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_fixed.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_fixed.cpp.o
 .PHONY : util/m_fixed.cpp.o
 
 util/m_fixed.i: util/m_fixed.cpp.i
@@ -2437,7 +2867,7 @@ util/m_fixed.i: util/m_fixed.cpp.i
 
 # target to preprocess a source file
 util/m_fixed.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_fixed.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_fixed.cpp.i
 .PHONY : util/m_fixed.cpp.i
 
 util/m_fixed.s: util/m_fixed.cpp.s
@@ -2445,7 +2875,7 @@ util/m_fixed.s: util/m_fixed.cpp.s
 
 # target to generate assembly for a file
 util/m_fixed.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_fixed.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_fixed.cpp.s
 .PHONY : util/m_fixed.cpp.s
 
 util/m_misc.o: util/m_misc.cpp.o
@@ -2453,7 +2883,7 @@ util/m_misc.o: util/m_misc.cpp.o
 
 # target to build an object file
 util/m_misc.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_misc.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_misc.cpp.o
 .PHONY : util/m_misc.cpp.o
 
 util/m_misc.i: util/m_misc.cpp.i
@@ -2461,7 +2891,7 @@ util/m_misc.i: util/m_misc.cpp.i
 
 # target to preprocess a source file
 util/m_misc.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_misc.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_misc.cpp.i
 .PHONY : util/m_misc.cpp.i
 
 util/m_misc.s: util/m_misc.cpp.s
@@ -2469,7 +2899,7 @@ util/m_misc.s: util/m_misc.cpp.s
 
 # target to generate assembly for a file
 util/m_misc.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_misc.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_misc.cpp.s
 .PHONY : util/m_misc.cpp.s
 
 util/m_random.o: util/m_random.cpp.o
@@ -2477,7 +2907,7 @@ util/m_random.o: util/m_random.cpp.o
 
 # target to build an object file
 util/m_random.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_random.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_random.cpp.o
 .PHONY : util/m_random.cpp.o
 
 util/m_random.i: util/m_random.cpp.i
@@ -2485,7 +2915,7 @@ util/m_random.i: util/m_random.cpp.i
 
 # target to preprocess a source file
 util/m_random.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_random.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_random.cpp.i
 .PHONY : util/m_random.cpp.i
 
 util/m_random.s: util/m_random.cpp.s
@@ -2493,7 +2923,7 @@ util/m_random.s: util/m_random.cpp.s
 
 # target to generate assembly for a file
 util/m_random.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_random.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_random.cpp.s
 .PHONY : util/m_random.cpp.s
 
 util/m_swap.o: util/m_swap.cpp.o
@@ -2501,7 +2931,7 @@ util/m_swap.o: util/m_swap.cpp.o
 
 # target to build an object file
 util/m_swap.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_swap.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_swap.cpp.o
 .PHONY : util/m_swap.cpp.o
 
 util/m_swap.i: util/m_swap.cpp.i
@@ -2509,7 +2939,7 @@ util/m_swap.i: util/m_swap.cpp.i
 
 # target to preprocess a source file
 util/m_swap.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_swap.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_swap.cpp.i
 .PHONY : util/m_swap.cpp.i
 
 util/m_swap.s: util/m_swap.cpp.s
@@ -2517,7 +2947,7 @@ util/m_swap.s: util/m_swap.cpp.s
 
 # target to generate assembly for a file
 util/m_swap.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/m_swap.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/m_swap.cpp.s
 .PHONY : util/m_swap.cpp.s
 
 util/md5.o: util/md5.cpp.o
@@ -2525,8 +2955,8 @@ util/md5.o: util/md5.cpp.o
 
 # target to build an object file
 util/md5.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/md5.cpp.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/wadtool.dir/build.make CMakeFiles/wadtool.dir/util/md5.cpp.o
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/md5.cpp.o
 .PHONY : util/md5.cpp.o
 
 util/md5.i: util/md5.cpp.i
@@ -2534,8 +2964,8 @@ util/md5.i: util/md5.cpp.i
 
 # target to preprocess a source file
 util/md5.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/md5.cpp.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/wadtool.dir/build.make CMakeFiles/wadtool.dir/util/md5.cpp.i
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/md5.cpp.i
 .PHONY : util/md5.cpp.i
 
 util/md5.s: util/md5.cpp.s
@@ -2543,8 +2973,8 @@ util/md5.s: util/md5.cpp.s
 
 # target to generate assembly for a file
 util/md5.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/md5.cpp.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/wadtool.dir/build.make CMakeFiles/wadtool.dir/util/md5.cpp.s
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/md5.cpp.s
 .PHONY : util/md5.cpp.s
 
 util/mnemonics.o: util/mnemonics.cpp.o
@@ -2552,7 +2982,7 @@ util/mnemonics.o: util/mnemonics.cpp.o
 
 # target to build an object file
 util/mnemonics.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/mnemonics.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/mnemonics.cpp.o
 .PHONY : util/mnemonics.cpp.o
 
 util/mnemonics.i: util/mnemonics.cpp.i
@@ -2560,7 +2990,7 @@ util/mnemonics.i: util/mnemonics.cpp.i
 
 # target to preprocess a source file
 util/mnemonics.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/mnemonics.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/mnemonics.cpp.i
 .PHONY : util/mnemonics.cpp.i
 
 util/mnemonics.s: util/mnemonics.cpp.s
@@ -2568,7 +2998,7 @@ util/mnemonics.s: util/mnemonics.cpp.s
 
 # target to generate assembly for a file
 util/mnemonics.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/mnemonics.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/mnemonics.cpp.s
 .PHONY : util/mnemonics.cpp.s
 
 util/parser.o: util/parser.cpp.o
@@ -2576,7 +3006,7 @@ util/parser.o: util/parser.cpp.o
 
 # target to build an object file
 util/parser.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/parser.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/parser.cpp.o
 .PHONY : util/parser.cpp.o
 
 util/parser.i: util/parser.cpp.i
@@ -2584,7 +3014,7 @@ util/parser.i: util/parser.cpp.i
 
 # target to preprocess a source file
 util/parser.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/parser.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/parser.cpp.i
 .PHONY : util/parser.cpp.i
 
 util/parser.s: util/parser.cpp.s
@@ -2592,7 +3022,7 @@ util/parser.s: util/parser.cpp.s
 
 # target to generate assembly for a file
 util/parser.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/parser.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/parser.cpp.s
 .PHONY : util/parser.cpp.s
 
 util/tables.o: util/tables.cpp.o
@@ -2600,7 +3030,7 @@ util/tables.o: util/tables.cpp.o
 
 # target to build an object file
 util/tables.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/tables.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/tables.cpp.o
 .PHONY : util/tables.cpp.o
 
 util/tables.i: util/tables.cpp.i
@@ -2608,7 +3038,7 @@ util/tables.i: util/tables.cpp.i
 
 # target to preprocess a source file
 util/tables.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/tables.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/tables.cpp.i
 .PHONY : util/tables.cpp.i
 
 util/tables.s: util/tables.cpp.s
@@ -2616,7 +3046,7 @@ util/tables.s: util/tables.cpp.s
 
 # target to generate assembly for a file
 util/tables.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/tables.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/tables.cpp.s
 .PHONY : util/tables.cpp.s
 
 util/vfile.o: util/vfile.cpp.o
@@ -2624,7 +3054,7 @@ util/vfile.o: util/vfile.cpp.o
 
 # target to build an object file
 util/vfile.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/vfile.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/vfile.cpp.o
 .PHONY : util/vfile.cpp.o
 
 util/vfile.i: util/vfile.cpp.i
@@ -2632,7 +3062,7 @@ util/vfile.i: util/vfile.cpp.i
 
 # target to preprocess a source file
 util/vfile.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/vfile.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/vfile.cpp.i
 .PHONY : util/vfile.cpp.i
 
 util/vfile.s: util/vfile.cpp.s
@@ -2640,7 +3070,7 @@ util/vfile.s: util/vfile.cpp.s
 
 # target to generate assembly for a file
 util/vfile.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/vfile.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/vfile.cpp.s
 .PHONY : util/vfile.cpp.s
 
 util/w_wad.o: util/w_wad.cpp.o
@@ -2648,7 +3078,7 @@ util/w_wad.o: util/w_wad.cpp.o
 
 # target to build an object file
 util/w_wad.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/w_wad.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/w_wad.cpp.o
 .PHONY : util/w_wad.cpp.o
 
 util/w_wad.i: util/w_wad.cpp.i
@@ -2656,7 +3086,7 @@ util/w_wad.i: util/w_wad.cpp.i
 
 # target to preprocess a source file
 util/w_wad.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/w_wad.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/w_wad.cpp.i
 .PHONY : util/w_wad.cpp.i
 
 util/w_wad.s: util/w_wad.cpp.s
@@ -2664,7 +3094,7 @@ util/w_wad.s: util/w_wad.cpp.s
 
 # target to generate assembly for a file
 util/w_wad.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/w_wad.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/w_wad.cpp.s
 .PHONY : util/w_wad.cpp.s
 
 util/wad.o: util/wad.cpp.o
@@ -2672,7 +3102,7 @@ util/wad.o: util/wad.cpp.o
 
 # target to build an object file
 util/wad.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/wad.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/wad.cpp.o
 .PHONY : util/wad.cpp.o
 
 util/wad.i: util/wad.cpp.i
@@ -2680,7 +3110,7 @@ util/wad.i: util/wad.cpp.i
 
 # target to preprocess a source file
 util/wad.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/wad.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/wad.cpp.i
 .PHONY : util/wad.cpp.i
 
 util/wad.s: util/wad.cpp.s
@@ -2688,7 +3118,7 @@ util/wad.s: util/wad.cpp.s
 
 # target to generate assembly for a file
 util/wad.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/wad.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/wad.cpp.s
 .PHONY : util/wad.cpp.s
 
 util/z_cache.o: util/z_cache.cpp.o
@@ -2696,7 +3126,7 @@ util/z_cache.o: util/z_cache.cpp.o
 
 # target to build an object file
 util/z_cache.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/z_cache.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/z_cache.cpp.o
 .PHONY : util/z_cache.cpp.o
 
 util/z_cache.i: util/z_cache.cpp.i
@@ -2704,7 +3134,7 @@ util/z_cache.i: util/z_cache.cpp.i
 
 # target to preprocess a source file
 util/z_cache.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/z_cache.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/z_cache.cpp.i
 .PHONY : util/z_cache.cpp.i
 
 util/z_cache.s: util/z_cache.cpp.s
@@ -2712,7 +3142,7 @@ util/z_cache.s: util/z_cache.cpp.s
 
 # target to generate assembly for a file
 util/z_cache.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/z_cache.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/z_cache.cpp.s
 .PHONY : util/z_cache.cpp.s
 
 util/z_zone.o: util/z_zone.cpp.o
@@ -2720,7 +3150,7 @@ util/z_zone.o: util/z_zone.cpp.o
 
 # target to build an object file
 util/z_zone.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/z_zone.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/z_zone.cpp.o
 .PHONY : util/z_zone.cpp.o
 
 util/z_zone.i: util/z_zone.cpp.i
@@ -2728,7 +3158,7 @@ util/z_zone.i: util/z_zone.cpp.i
 
 # target to preprocess a source file
 util/z_zone.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/z_zone.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/z_zone.cpp.i
 .PHONY : util/z_zone.cpp.i
 
 util/z_zone.s: util/z_zone.cpp.s
@@ -2736,7 +3166,7 @@ util/z_zone.s: util/z_zone.cpp.s
 
 # target to generate assembly for a file
 util/z_zone.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/util/z_zone.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/util.dir/build.make CMakeFiles/util.dir/util/z_zone.cpp.s
 .PHONY : util/z_zone.cpp.s
 
 video/hardware/md3.o: video/hardware/md3.cpp.o
@@ -3299,9 +3729,22 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... test"
 	@echo "... d2h"
 	@echo "... doomlegacy"
 	@echo "... grammars"
+	@echo "... test_actor"
+	@echo "... test_console"
+	@echo "... test_demos"
+	@echo "... test_fixed_t"
+	@echo "... test_mapinfo"
+	@echo "... test_network_integration"
+	@echo "... test_parity"
+	@echo "... test_save_load"
+	@echo "... test_serialization"
+	@echo "... test_tnl_packets"
+	@echo "... test_vector"
+	@echo "... util"
 	@echo "... wadtool"
 	@echo "... audio/qmus2mid.o"
 	@echo "... audio/qmus2mid.i"
@@ -3558,6 +4001,39 @@ help:
 	@echo "... net/sv_main.o"
 	@echo "... net/sv_main.i"
 	@echo "... net/sv_main.s"
+	@echo "... tests/integration/test_demos.o"
+	@echo "... tests/integration/test_demos.i"
+	@echo "... tests/integration/test_demos.s"
+	@echo "... tests/integration/test_network_integration.o"
+	@echo "... tests/integration/test_network_integration.i"
+	@echo "... tests/integration/test_network_integration.s"
+	@echo "... tests/integration/test_parity.o"
+	@echo "... tests/integration/test_parity.i"
+	@echo "... tests/integration/test_parity.s"
+	@echo "... tests/integration/test_save_load.o"
+	@echo "... tests/integration/test_save_load.i"
+	@echo "... tests/integration/test_save_load.s"
+	@echo "... tests/integration/test_serialization.o"
+	@echo "... tests/integration/test_serialization.i"
+	@echo "... tests/integration/test_serialization.s"
+	@echo "... tests/unit/test_actor.o"
+	@echo "... tests/unit/test_actor.i"
+	@echo "... tests/unit/test_actor.s"
+	@echo "... tests/unit/test_console.o"
+	@echo "... tests/unit/test_console.i"
+	@echo "... tests/unit/test_console.s"
+	@echo "... tests/unit/test_fixed_t.o"
+	@echo "... tests/unit/test_fixed_t.i"
+	@echo "... tests/unit/test_fixed_t.s"
+	@echo "... tests/unit/test_mapinfo.o"
+	@echo "... tests/unit/test_mapinfo.i"
+	@echo "... tests/unit/test_mapinfo.s"
+	@echo "... tests/unit/test_tnl_packets.o"
+	@echo "... tests/unit/test_tnl_packets.i"
+	@echo "... tests/unit/test_tnl_packets.s"
+	@echo "... tests/unit/test_vector.o"
+	@echo "... tests/unit/test_vector.i"
+	@echo "... tests/unit/test_vector.s"
 	@echo "... tools/d2h.o"
 	@echo "... tools/d2h.i"
 	@echo "... tools/d2h.s"

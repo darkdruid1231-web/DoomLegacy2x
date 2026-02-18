@@ -1,0 +1,35 @@
+# CMake generated Testfile for 
+# Source directory: /home/geoffrey/doomlegacy-svn/legacy/trunk
+# Build directory: /home/geoffrey/doomlegacy-svn/legacy/trunk/build
+# 
+# This file includes the relevant testing commands required for 
+# testing this directory and lists subdirectories to be tested as well.
+add_test(fixed_t_tests "/home/geoffrey/doomlegacy-svn/legacy/trunk/build/test_fixed_t")
+set_tests_properties(fixed_t_tests PROPERTIES  _BACKTRACE_TRIPLES "/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;148;add_test;/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;0;")
+add_test(save_load_tests "/home/geoffrey/doomlegacy-svn/legacy/trunk/build/test_save_load")
+set_tests_properties(save_load_tests PROPERTIES  _BACKTRACE_TRIPLES "/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;158;add_test;/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;0;")
+add_test(serialization_tests "/home/geoffrey/doomlegacy-svn/legacy/trunk/build/test_serialization")
+set_tests_properties(serialization_tests PROPERTIES  _BACKTRACE_TRIPLES "/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;164;add_test;/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;0;")
+add_test(mapinfo_tests "/home/geoffrey/doomlegacy-svn/legacy/trunk/build/test_mapinfo")
+set_tests_properties(mapinfo_tests PROPERTIES  _BACKTRACE_TRIPLES "/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;170;add_test;/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;0;")
+add_test(tnl_packet_tests "/home/geoffrey/doomlegacy-svn/legacy/trunk/build/test_tnl_packets")
+set_tests_properties(tnl_packet_tests PROPERTIES  _BACKTRACE_TRIPLES "/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;175;add_test;/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;0;")
+add_test(actor_tests "/home/geoffrey/doomlegacy-svn/legacy/trunk/build/test_actor")
+set_tests_properties(actor_tests PROPERTIES  _BACKTRACE_TRIPLES "/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;180;add_test;/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;0;")
+add_test(console_tests "/home/geoffrey/doomlegacy-svn/legacy/trunk/build/test_console")
+set_tests_properties(console_tests PROPERTIES  _BACKTRACE_TRIPLES "/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;185;add_test;/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;0;")
+add_test(vector_tests "/home/geoffrey/doomlegacy-svn/legacy/trunk/build/test_vector")
+set_tests_properties(vector_tests PROPERTIES  _BACKTRACE_TRIPLES "/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;190;add_test;/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;0;")
+add_test(demo_tests "/home/geoffrey/doomlegacy-svn/legacy/trunk/build/test_demos")
+set_tests_properties(demo_tests PROPERTIES  _BACKTRACE_TRIPLES "/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;196;add_test;/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;0;")
+add_test(network_integration_tests "/home/geoffrey/doomlegacy-svn/legacy/trunk/build/test_network_integration")
+set_tests_properties(network_integration_tests PROPERTIES  _BACKTRACE_TRIPLES "/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;202;add_test;/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;0;")
+add_test(parity_tests "/home/geoffrey/doomlegacy-svn/legacy/trunk/build/test_parity")
+set_tests_properties(parity_tests PROPERTIES  _BACKTRACE_TRIPLES "/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;208;add_test;/home/geoffrey/doomlegacy-svn/legacy/trunk/CMakeLists.txt;0;")
+subdirs("engine")
+subdirs("audio")
+subdirs("video")
+subdirs("util")
+subdirs("net")
+subdirs("interface")
+subdirs("grammars")

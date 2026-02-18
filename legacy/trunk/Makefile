@@ -333,7 +333,7 @@ endif
 # Test Targets
 #============================================================================
 
-.PHONY: test smoke_test test_fixed_t
+.PHONY: test smoke_test test_fixed_t test_save_load test_mapinfo test_tnl_packets all_tests
 
 # Run all tests: smoke test + unit tests
 test: $(exename)
@@ -342,13 +342,30 @@ test: $(exename)
 	@echo "========================================"
 	@echo ""
 	@echo "[Smoke Tests]"
-	@./scripts/smoke_test.sh && echo "✓ Smoke tests passed" || (echo "✗ Smoke tests FAILED"; exit 1)
+	@./scripts/smoke_test.sh && echo "Smoke tests passed" || (echo "Smoke tests FAILED"; exit 1)
 	@echo ""
 	@echo "[Unit Tests]"
 	@if [ -f build/test_fixed_t ]; then \
-		./build/test_fixed_t && echo "✓ fixed_t tests passed" || (echo "✗ fixed_t tests FAILED"; exit 1); \
+		./build/test_fixed_t && echo "fixed_t tests passed" || (echo "fixed_t tests FAILED"; exit 1); \
 	else \
 		echo "Warning: test_fixed_t not built (run 'cmake build && make -C build test_fixed_t' first)"; \
+	fi
+	@if [ -f build/test_mapinfo ]; then \
+		./build/test_mapinfo && echo "mapinfo tests passed" || (echo "mapinfo tests FAILED"; exit 1); \
+	else \
+		echo "Warning: test_mapinfo not built"; \
+	fi
+	@if [ -f build/test_tnl_packets ]; then \
+		./build/test_tnl_packets && echo "tnl_packet tests passed" || (echo "tnl_packet tests FAILED"; exit 1); \
+	else \
+		echo "Warning: test_tnl_packets not built"; \
+	fi
+	@echo ""
+	@echo "[Integration Tests]"
+	@if [ -f build/test_save_load ]; then \
+		./build/test_save_load && echo "save_load tests passed" || (echo "save_load tests FAILED"; exit 1); \
+	else \
+		echo "Warning: test_save_load not built"; \
 	fi
 	@echo ""
 	@echo "========================================"
@@ -368,3 +385,36 @@ test_fixed_t:
 		cmake -B build && cmake --build build --target test_fixed_t; \
 		./build/test_fixed_t; \
 	fi
+
+# Run save/load integration tests
+test_save_load:
+	@if [ -f build/test_save_load ]; then \
+		./build/test_save_load; \
+	else \
+		echo "Building test_save_load..."; \
+		cmake -B build && cmake --build build --target test_save_load; \
+		./build/test_save_load; \
+	fi
+
+# Run mapinfo unit tests
+test_mapinfo:
+	@if [ -f build/test_mapinfo ]; then \
+		./build/test_mapinfo; \
+	else \
+		echo "Building test_mapinfo..."; \
+		cmake -B build && cmake --build build --target test_mapinfo; \
+		./build/test_mapinfo; \
+	fi
+
+# Run TNL packet unit tests
+test_tnl_packets:
+	@if [ -f build/test_tnl_packets ]; then \
+		./build/test_tnl_packets; \
+	else \
+		echo "Building test_tnl_packets..."; \
+		cmake -B build && cmake --build build --target test_tnl_packets; \
+		./build/test_tnl_packets; \
+	fi
+
+# Alias for running all tests
+all_tests: test

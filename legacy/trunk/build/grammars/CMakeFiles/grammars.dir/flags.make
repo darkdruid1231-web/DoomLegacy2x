@@ -6,5 +6,5 @@ CXX_DEFINES = -DFN_CDECL="" -DQSORT_CALLBACK="" -DSDL -DTNL_LITTLE_ENDIAN -D_TNL
 
 CXX_INCLUDES = -I/usr/include/SDL -I/home/geoffrey/doomlegacy-svn/legacy/trunk/include -I/home/geoffrey/tnl/include -I/home/geoffrey/doomlegacy-svn/legacy/trunk/grammars
 
-CXX_FLAGS =   -std=c++98 -fpermissive -w
+CXX_FLAGS = -g   -std=c++0x -fpermissive -w
 

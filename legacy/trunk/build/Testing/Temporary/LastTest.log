@@ -1,0 +1,136 @@
+Start testing: Feb 17 20:40 MST
+----------------------------------------------------------
+11/11 Testing: parity_tests
+11/11 Test: parity_tests
+Command: "/home/geoffrey/doomlegacy-svn/legacy/trunk/build/test_parity"
+Directory: /home/geoffrey/doomlegacy-svn/legacy/trunk/build
+"parity_tests" start time: Feb 17 20:40 MST
+Output:
+----------------------------------------------------------
+========================================
+C++ vs C Parity Tests
+Reference: legacy_one/trunk/src/
+========================================
+
+These tests verify C++ implementation matches C version.
+FAILING tests indicate missing parity - implement to match C.
+
+[Fixed-Point Math Tests]
+Reference: legacy_one/src/m_fixed.c
+  fixed_add basic ... PASS
+  fixed_subtract basic ... PASS
+  fixed_multiply ... PASS
+  fixed_divide ... PASS
+  fixed_operators ... PASS
+  fixed_fracbits precision ... PASS
+  fixed_min_max constants ... PASS
+
+[TICmd Tests]
+Reference: legacy_one/src/d_ticcmd.h
+  ticcmd_structure ... PASS
+  BT_ATTACK=1 ... PASS
+  BT_USE=2 ... PASS
+  BT_JUMP=4 ... PASS
+  BT_FLYDOWN=8 ... PASS
+
+[Actor/Monster Tests]
+Reference: legacy_one/src/info.c, p_enemy.c
+
+  [MT_* mobjtype_t constants - expected values from legacy_one]
+  MT_PLAYER should = 0
+  MT_POSSESSED should = 1
+  MT_SHOTGUY should = 2
+  MT_CHAINGUY should = 3
+  [Requires info.h with MT_* definitions]
+PASS
+PASS
+PASS
+FAIL: MT_CHAINGUY must equal 3
+    Expected: 3 (0x3)
+    Got:      a (0xa)
+
+  [MF_* mobjflag_t constants - expected values from legacy_one]
+  MF_SOLID should = 0x0001
+  MF_SHOOTABLE should = 0x0002
+  MF_NOGRAVITY should = 0x0008
+  [Requires g_actor.h with MF_* definitions]
+FAIL: MF_SOLID must equal 0x0001
+    Expected: 1 (0x1)
+    Got:      4 (0x4)
+
+  [MF2_* mobjflag2_t constants - expected values from legacy_one]
+  MF2_LOGRAV should = 0x0001
+  MF2_WINDTHRUST should = 0x0002
+  [Requires g_actor.h with MF2_* definitions]
+PASS
+PASS
+  MF2_* parity check ... PASS
+
+[Map Parsing Tests]
+Reference: legacy_one/src/g_mapinfo.c
+
+  [MAP_* constants - expected values from legacy_one]
+  MAP_UNLOADED should = -1
+  MAP_RUNNING should = 0
+  [Requires g_mapinfo.h with MAP_* definitions]
+PASS
+PASS
+  MAP_* parity check ... PASS
+
+  [CLUSTER_* constants - expected values from legacy_one]
+  CLUSTER_UNDEFINED should = -1
+  CLUSTER_EXTERNAL_TEXTURES should = 1
+  CLUSTER_FOG should = 2
+  [Requires g_mapinfo.h with CLUSTER_* definitions]
+  CLUSTER_* parity check ... FAIL: CLUSTER_* not tested - need g_mapinfo.h include
+
+[Console/UI Tests]
+Reference: legacy_one/src/console.c
+
+  [COLOR_* constants - expected values from legacy_one]
+  COLOR_BLACK should = 0
+  COLOR_WHITE should = 7
+  COLOR_RED should = 8
+  COLOR_GREEN should = 9
+  COLOR_BLUE should = 10
+  [Requires console.h with COLOR_* definitions]
+  COLOR_* parity check ... FAIL: COLOR_* not tested - need console.h include
+
+[Save/Load Tests]
+Reference: legacy_one/src/savegame.c
+
+  [SAVE_VERSION constant - expected value from legacy_one]
+  SAVE_VERSION should = 139
+  [Requires savegame.h with SAVE_VERSION definition]
+  SAVE_VERSION parity check ... FAIL: SAVE_VERSION not tested - need savegame.h include
+
+[Demo Recording Tests]
+Reference: legacy_one/src/d_main.c
+
+  [DEMOMARKER_* constants - expected values from legacy_one]
+  DEMOMARKER_PLAYER should = 0
+  DEMOMARKER_TOTAL should = 1
+  DEMOMARKER_END should = 255
+  [Requires d_main.h with DEMOMARKER_* definitions]
+PASS
+PASS
+PASS
+  DEMOMARKER_* parity check ... PASS
+
+========================================
+Results: 11/34 passed, 5 FAILED
+========================================
+
+IMPLEMENTATION ROADMAP:
+----------------------
+Failed tests indicate C++ constants missing or incorrect.
+Add/update headers to match legacy_one C values.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Failed.
+"parity_tests" end time: Feb 17 20:40 MST
+"parity_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Feb 17 20:40 MST
