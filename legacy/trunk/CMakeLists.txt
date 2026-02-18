@@ -147,12 +147,8 @@ target_include_directories(test_fixed_t PRIVATE include)
 target_link_libraries(test_fixed_t ${SDL_LIBRARY})
 add_test(NAME fixed_t_tests COMMAND test_fixed_t)
 
-# Unit tests (all unit tests)
-file(GLOB UNIT_TEST_SOURCES "tests/unit/*.cpp")
-add_executable(run_tests ${UNIT_TEST_SOURCES})
-target_include_directories(run_tests PRIVATE include)
-target_link_libraries(run_tests ${SDL_LIBRARY})
-add_test(NAME unit_tests COMMAND run_tests)
+# Note: The run_tests target was removed because each unit test file has its own main()
+# Individual unit tests are covered by their own executables below
 
 # Integration tests for save/load serialization (excluding standalone tests)
 file(GLOB INTEGRATION_TEST_SOURCES "tests/integration/test_save_load.cpp")
@@ -177,3 +173,30 @@ add_executable(test_tnl_packets tests/unit/test_tnl_packets.cpp)
 target_include_directories(test_tnl_packets PRIVATE include)
 target_link_libraries(test_tnl_packets util ${SDL_LIBRARY})
 add_test(NAME tnl_packet_tests COMMAND test_tnl_packets)
+
+add_executable(test_actor tests/unit/test_actor.cpp)
+target_include_directories(test_actor PRIVATE include)
+target_link_libraries(test_actor util ${SDL_LIBRARY})
+add_test(NAME actor_tests COMMAND test_actor)
+
+add_executable(test_console tests/unit/test_console.cpp)
+target_include_directories(test_console PRIVATE include)
+target_link_libraries(test_console util ${SDL_LIBRARY})
+add_test(NAME console_tests COMMAND test_console)
+
+add_executable(test_vector tests/unit/test_vector.cpp)
+target_include_directories(test_vector PRIVATE include)
+target_link_libraries(test_vector util ${SDL_LIBRARY})
+add_test(NAME vector_tests COMMAND test_vector)
+
+# Demo Recording Tests
+add_executable(test_demos tests/integration/test_demos.cpp)
+target_include_directories(test_demos PRIVATE include)
+target_link_libraries(test_demos util ${SDL_LIBRARY})
+add_test(NAME demo_tests COMMAND test_demos)
+
+# Network Integration Tests
+add_executable(test_network_integration tests/integration/test_network_integration.cpp)
+target_include_directories(test_network_integration PRIVATE include)
+target_link_libraries(test_network_integration util ${SDL_LIBRARY})
+add_test(NAME network_integration_tests COMMAND test_network_integration)
