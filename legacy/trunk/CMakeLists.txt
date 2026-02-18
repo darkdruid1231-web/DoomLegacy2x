@@ -45,19 +45,31 @@ include_directories(${OPENGL_INCLUDE_DIR})
 # Then OpenTNL.
 #set(HAS_TNL_HEADER 1)
 #message("TNL: ${HAS_TNL_HEADER}")
-find_library(TNL_LIBRARY tnl)
+if(EXISTS "/home/geoffrey/tnl/lib/libtnl.a")
+    set(TNL_LIBRARY "/home/geoffrey/tnl/lib/libtnl.a")
+else()
+    find_library(TNL_LIBRARY tnl)
+endif()
 if(${TNL_LIBRARY} STREQUAL "TNL_LIBRARY-NOTFOUND")
     message(FATAL_ERROR "TNL library not found.")
 endif()
-find_library(TOMCRYPT_LIBRARY tomcrypt)
+if(EXISTS "/home/geoffrey/tnl/lib/libtomcrypt.a")
+    set(TOMCRYPT_LIBRARY "/home/geoffrey/tnl/lib/libtomcrypt.a")
+else()
+    find_library(TOMCRYPT_LIBRARY tomcrypt)
+endif()
 if(${TOMCRYPT_LIBRARY} STREQUAL "TOMCRYPT_LIBRARY-NOTFOUND")
     message(FATAL_ERROR "Tomcrypt library not found.")
 endif()
 
 check_include_file_cxx("tnl/tnl.h" HAS_TNL_HEADER)
-#if("${HAS_TNL_HEADER}" STREQUAL "")
-#    message(FATAL_ERROR "TNL headers not found.")
-#endif()
+if(NOT ${HAS_TNL_HEADER})
+    if(EXISTS "/home/geoffrey/tnl/tnl/tnl.h")
+        include_directories(/home/geoffrey/tnl)
+    else()
+        message(FATAL_ERROR "TNL headers not found.")
+    endif()
+endif()
 
 # Graphics
 find_package(PNG REQUIRED)
@@ -96,20 +108,29 @@ add_definitions(-DQSORT_CALLBACK=)
 process_subdir(engine)
 process_subdir(audio)
 process_subdir(video)
-process_subdir(util)
+add_subdirectory(util)  # Add util first to get its SRC_FILES
+
+# Build util as a static library
+get_directory_property(UTIL_SRC_FILES DIRECTORY util DEFINITION SRC_FILES)
+# Prepend util/ to source file names
+set(UTIL_SRCS "")
+foreach(src ${UTIL_SRC_FILES})
+    list(APPEND UTIL_SRCS "util/${src}")
+endforeach()
+add_library(util STATIC ${UTIL_SRCS})
+target_include_directories(util PUBLIC ${CMAKE_SOURCE_DIR}/include)
+
 process_subdir(net)
 process_subdir(interface)
 
 # grammars is a special directory.
 add_subdirectory(grammars)
 
-
 add_executable(d2h tools/d2h.cpp)
 add_executable(wadtool tools/wadtool.cpp util/md5.cpp)
-#add_executable(convert_deh tools/convert_deh.cpp util/mnemonics.cpp)
 
 add_executable(doomlegacy ${LEGACY_SRC})
-target_link_libraries(doomlegacy grammars
+target_link_libraries(doomlegacy grammars util
 ${SDL_LIBRARY} ${SDLMIXER_LIBRARY}
 ${OPENGL_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES}
 ${TNL_LIBRARY} ${TOMCRYPT_LIBRARY})
@@ -133,8 +154,26 @@ target_include_directories(run_tests PRIVATE include)
 target_link_libraries(run_tests ${SDL_LIBRARY})
 add_test(NAME unit_tests COMMAND run_tests)
 
-# Optional: Integration tests (when implemented)
-# add_executable(run_integration_tests tests/integration/*.cpp)
-# target_include_directories(run_integration_tests PRIVATE include)
-# target_link_libraries(run_integration_tests doomlegacy ${SDL_LIBRARY} ${TNL_LIBRARY})
-# add_test(NAME integration_tests COMMAND run_integration_tests)
+# Integration tests for save/load serialization (excluding standalone tests)
+file(GLOB INTEGRATION_TEST_SOURCES "tests/integration/test_save_load.cpp")
+add_executable(test_save_load ${INTEGRATION_TEST_SOURCES})
+target_include_directories(test_save_load PRIVATE include)
+target_link_libraries(test_save_load ${SDL_LIBRARY})
+add_test(NAME save_load_tests COMMAND test_save_load)
+
+# Basic data serialization tests
+add_executable(test_serialization tests/integration/test_serialization.cpp)
+target_include_directories(test_serialization PRIVATE include)
+target_link_libraries(test_serialization ${SDL_LIBRARY})
+add_test(NAME serialization_tests COMMAND test_serialization)
+
+# Individual unit tests
+add_executable(test_mapinfo tests/unit/test_mapinfo.cpp)
+target_include_directories(test_mapinfo PRIVATE include)
+target_link_libraries(test_mapinfo ${SDL_LIBRARY})
+add_test(NAME mapinfo_tests COMMAND test_mapinfo)
+
+add_executable(test_tnl_packets tests/unit/test_tnl_packets.cpp)
+target_include_directories(test_tnl_packets PRIVATE include)
+target_link_libraries(test_tnl_packets ${SDL_LIBRARY})
+add_test(NAME tnl_packet_tests COMMAND test_tnl_packets)
