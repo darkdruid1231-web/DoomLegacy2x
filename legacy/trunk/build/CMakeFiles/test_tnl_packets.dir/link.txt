@@ -1,1 +1,1 @@
-/usr/bin/c++ -g -rdynamic CMakeFiles/test_tnl_packets.dir/tests/unit/test_tnl_packets.cpp.o -o test_tnl_packets  libutil.a -Wl,-Bstatic -lSDLmain -Wl,-Bdynamic -lSDL 
+/usr/bin/c++ -rdynamic CMakeFiles/test_tnl_packets.dir/tests/unit/test_tnl_packets.cpp.o -o test_tnl_packets  libutil.a -Wl,-Bstatic -lSDLmain -Wl,-Bdynamic -lSDL 

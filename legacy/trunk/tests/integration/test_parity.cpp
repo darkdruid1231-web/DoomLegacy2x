@@ -34,6 +34,7 @@
 #include "info.h"
 #include "g_actor.h"
 #include "g_mapinfo.h"
+#include "savegame.h"
 
 using namespace std;
 
@@ -298,9 +299,13 @@ void test_mapcluster_constants_parity() {
     cout << "  CLUSTER_EXTERNAL_TEXTURES should = 1" << endl;
     cout << "  CLUSTER_FOG should = 2" << endl;
     cout << "  [Requires g_mapinfo.h with CLUSTER_* definitions]" << endl;
-    
+
+    CHECK_EQ(CLUSTER_UNDEFINED, -1, "CLUSTER_UNDEFINED must equal -1");
+    CHECK_EQ(CLUSTER_EXTERNAL_TEXTURES, 1, "CLUSTER_EXTERNAL_TEXTURES must equal 1");
+    CHECK_EQ(CLUSTER_FOG, 2, "CLUSTER_FOG must equal 2");
+
     TEST("CLUSTER_* parity check");
-    FAIL("CLUSTER_* not tested - need g_mapinfo.h include");
+    PASS();
 }
 
 //============================================================================
@@ -335,9 +340,11 @@ void test_savegame_constants_parity() {
     cout << "  [SAVE_VERSION constant - expected value from legacy_one]" << endl;
     cout << "  SAVE_VERSION should = 139" << endl;
     cout << "  [Requires savegame.h with SAVE_VERSION definition]" << endl;
-    
+
+    CHECK_EQ(SAVE_VERSION, 139, "SAVE_VERSION must equal 139");
+
     TEST("SAVE_VERSION parity check");
-    FAIL("SAVE_VERSION not tested - need savegame.h include");
+    PASS();
 }
 
 //============================================================================

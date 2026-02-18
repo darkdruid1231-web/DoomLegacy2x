@@ -36,6 +36,15 @@
 using namespace std;
 
 
+/// \brief Cluster type constants for map clustering
+enum clustertype_e
+{
+  CLUSTER_UNDEFINED = -1,         ///< No cluster features defined
+  CLUSTER_EXTERNAL_TEXTURES = 1,  ///< Map uses external texture definitions
+  CLUSTER_FOG = 2                 ///< Map has fog effects enabled
+};
+
+
 /// \brief A deferred or "queued" ACS script in a currently inactive Map.
 struct acs_deferred_t
 {

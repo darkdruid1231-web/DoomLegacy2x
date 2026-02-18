@@ -217,6 +217,7 @@ CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.o: \
  /home/geoffrey/doomlegacy-svn/legacy/trunk/include/g_damage.h \
  /home/geoffrey/doomlegacy-svn/legacy/trunk/include/info.h \
  /home/geoffrey/doomlegacy-svn/legacy/trunk/include/g_mapinfo.h \
+ /home/geoffrey/doomlegacy-svn/legacy/trunk/include/savegame.h \
  /home/geoffrey/doomlegacy-svn/legacy/trunk/include/console.h \
  /usr/include/c++/13/deque /usr/include/c++/13/bits/stl_deque.h \
  /usr/include/c++/13/bits/deque.tcc \

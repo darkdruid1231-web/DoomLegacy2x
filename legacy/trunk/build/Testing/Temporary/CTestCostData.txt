@@ -1,14 +1,3 @@
-fixed_t_tests 21 0.00010803
-unit_tests 0 0
-save_load_tests 18 0.000101306
-serialization_tests 22 6.65612e-05
-mapinfo_tests 20 7.34061e-05
-tnl_packet_tests 20 7.33517e-05
-actor_tests 10 0.000150797
-console_tests 11 0.000132544
-vector_tests 11 0.000135959
-demo_tests 6 0.000248598
-network_integration_tests 5 0.000309397
-parity_tests 1 0
+parity_tests 0 0
 ---
 parity_tests

@@ -15,6 +15,7 @@ CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.o: /home/geoffrey/d
   /home/geoffrey/doomlegacy-svn/legacy/trunk/include/info.h \
   /home/geoffrey/doomlegacy-svn/legacy/trunk/include/keys.h \
   /home/geoffrey/doomlegacy-svn/legacy/trunk/include/m_fixed.h \
+  /home/geoffrey/doomlegacy-svn/legacy/trunk/include/savegame.h \
   /home/geoffrey/doomlegacy-svn/legacy/trunk/include/vect.h \
   /home/geoffrey/doomlegacy-svn/legacy/trunk/include/w_wad.h \
   /home/geoffrey/tnl/include/tnl/tnl.h \
@@ -340,16 +341,6 @@ CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.o: /home/geoffrey/d
 
 /usr/include/c++/13/bits/locale_facets.tcc:
 
-/home/geoffrey/doomlegacy-svn/legacy/trunk/include/keys.h:
-
-/usr/include/c++/13/bits/refwrap.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h:
-
-/home/geoffrey/tnl/include/tnl/tnlAssert.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
-
 /home/geoffrey/doomlegacy-svn/legacy/trunk/include/d_main.h:
 
 /usr/include/c++/13/system_error:
@@ -394,14 +385,6 @@ CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.o: /home/geoffrey/d
 
 /usr/include/c++/13/bits/localefwd.h:
 
-/home/geoffrey/tnl/include/tnl/tnlPlatform.h:
-
-/usr/include/x86_64-linux-gnu/bits/flt-eval-method.h:
-
-/usr/include/c++/13/bits/streambuf_iterator.h:
-
-/usr/include/c++/13/ostream:
-
 /usr/include/c++/13/bits/streambuf.tcc:
 
 /home/geoffrey/doomlegacy-svn/legacy/trunk/tests/integration/test_parity.cpp:
@@ -438,6 +421,16 @@ CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.o: /home/geoffrey/d
 
 /home/geoffrey/doomlegacy-svn/legacy/trunk/include/command.h:
 
+/usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h:
+
+/home/geoffrey/tnl/include/tnl/tnlAssert.h:
+
+/home/geoffrey/doomlegacy-svn/legacy/trunk/include/keys.h:
+
+/usr/include/c++/13/bits/refwrap.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
+
 /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:
 
 /home/geoffrey/tnl/include/tnl/tnl.h:
@@ -453,6 +446,28 @@ CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.o: /home/geoffrey/d
 /usr/include/wctype.h:
 
 /usr/include/sched.h:
+
+/usr/include/x86_64-linux-gnu/c++/13/bits/ctype_base.h:
+
+/usr/include/SDL/SDL_types.h:
+
+/usr/include/c++/13/debug/debug.h:
+
+/usr/include/linux/errno.h:
+
+/usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h:
+
+/usr/include/x86_64-linux-gnu/bits/flt-eval-method.h:
+
+/usr/include/c++/13/bits/streambuf_iterator.h:
+
+/home/geoffrey/tnl/include/tnl/tnlPlatform.h:
+
+/usr/include/c++/13/ostream:
+
+/usr/include/c++/13/bits/cpp_type_traits.h:
+
+/usr/include/x86_64-linux-gnu/bits/types.h:
 
 /home/geoffrey/tnl/include/tnl/tnlNetObject.h:
 
@@ -488,6 +503,22 @@ CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.o: /home/geoffrey/d
 
 /home/geoffrey/doomlegacy-svn/legacy/trunk/include/doomtype.h:
 
+/usr/include/c++/13/bits/exception.h:
+
+/usr/include/c++/13/streambuf:
+
+/usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
+
+/usr/include/x86_64-linux-gnu/bits/uintn-identity.h:
+
+/usr/include/c++/13/bits/cxxabi_init_exception.h:
+
+/usr/include/c++/13/typeinfo:
+
+/usr/include/x86_64-linux-gnu/sys/select.h:
+
+/usr/include/c++/13/cwchar:
+
 /home/geoffrey/tnl/include/tnl/tnlBitSet.h:
 
 /usr/include/c++/13/bits/exception_defines.h:
@@ -512,6 +543,8 @@ CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.o: /home/geoffrey/d
 
 /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
 
+/home/geoffrey/doomlegacy-svn/legacy/trunk/include/savegame.h:
+
 /usr/include/c++/13/ext/alloc_traits.h:
 
 /usr/include/c++/13/new:
@@ -531,18 +564,6 @@ CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.o: /home/geoffrey/d
 /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h:
 
 /usr/include/SDL/SDL_platform.h:
-
-/usr/include/SDL/SDL_types.h:
-
-/usr/include/c++/13/debug/debug.h:
-
-/usr/include/linux/errno.h:
-
-/usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h:
-
-/usr/include/c++/13/bits/cpp_type_traits.h:
-
-/usr/include/x86_64-linux-gnu/bits/types.h:
 
 /usr/include/SDL/begin_code.h:
 
@@ -579,18 +600,6 @@ CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.o: /home/geoffrey/d
 /usr/include/x86_64-linux-gnu/bits/endian.h:
 
 /usr/include/x86_64-linux-gnu/gnu/stubs.h:
-
-/usr/include/c++/13/bits/cxxabi_init_exception.h:
-
-/usr/include/c++/13/typeinfo:
-
-/usr/include/c++/13/bits/exception.h:
-
-/usr/include/c++/13/streambuf:
-
-/usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
-
-/usr/include/x86_64-linux-gnu/bits/uintn-identity.h:
 
 /home/geoffrey/doomlegacy-svn/legacy/trunk/include/g_think.h:
 
@@ -718,10 +727,6 @@ CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.o: /home/geoffrey/d
 
 /usr/include/x86_64-linux-gnu/bits/sched.h:
 
-/usr/include/c++/13/cwchar:
-
-/usr/include/x86_64-linux-gnu/sys/select.h:
-
 /usr/include/x86_64-linux-gnu/bits/types/FILE.h:
 
 /usr/include/x86_64-linux-gnu/bits/struct_mutex.h:
@@ -781,8 +786,6 @@ CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.o: /home/geoffrey/d
 /usr/include/x86_64-linux-gnu/bits/wordsize.h:
 
 /usr/include/x86_64-linux-gnu/c++/13/bits/atomic_word.h:
-
-/usr/include/x86_64-linux-gnu/c++/13/bits/ctype_base.h:
 
 /usr/include/c++/13/bits/char_traits.h:
 

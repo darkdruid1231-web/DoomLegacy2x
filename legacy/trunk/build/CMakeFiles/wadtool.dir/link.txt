@@ -1,1 +1,1 @@
-/usr/bin/c++ -g -rdynamic CMakeFiles/wadtool.dir/tools/wadtool.cpp.o CMakeFiles/wadtool.dir/util/md5.cpp.o -o wadtool 
+/usr/bin/c++ -rdynamic CMakeFiles/wadtool.dir/tools/wadtool.cpp.o CMakeFiles/wadtool.dir/util/md5.cpp.o -o wadtool 

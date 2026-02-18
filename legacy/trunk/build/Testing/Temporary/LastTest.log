@@ -1,10 +1,10 @@
-Start testing: Feb 17 20:40 MST
+Start testing: Feb 17 21:03 MST
 ----------------------------------------------------------
 11/11 Testing: parity_tests
 11/11 Test: parity_tests
 Command: "/home/geoffrey/doomlegacy-svn/legacy/trunk/build/test_parity"
 Directory: /home/geoffrey/doomlegacy-svn/legacy/trunk/build
-"parity_tests" start time: Feb 17 20:40 MST
+"parity_tests" start time: Feb 17 21:03 MST
 Output:
 ----------------------------------------------------------
 ========================================
@@ -45,9 +45,8 @@ Reference: legacy_one/src/info.c, p_enemy.c
 PASS
 PASS
 PASS
-FAIL: MT_CHAINGUY must equal 3
-    Expected: 3 (0x3)
-    Got:      a (0xa)
+PASS
+  MT_* parity check ... PASS
 
   [MF_* mobjflag_t constants - expected values from legacy_one]
   MF_SOLID should = 0x0001
@@ -90,11 +89,15 @@ Reference: legacy_one/src/console.c
   [COLOR_* constants - expected values from legacy_one]
   COLOR_BLACK should = 0
   COLOR_WHITE should = 7
-  COLOR_RED should = 8
-  COLOR_GREEN should = 9
-  COLOR_BLUE should = 10
-  [Requires console.h with COLOR_* definitions]
-  COLOR_* parity check ... FAIL: COLOR_* not tested - need console.h include
+  COLOR_RED should = 4
+  COLOR_GREEN should = 2
+  COLOR_BLUE should = 1
+PASS
+PASS
+PASS
+PASS
+PASS
+  COLOR_* parity check ... PASS
 
 [Save/Load Tests]
 Reference: legacy_one/src/savegame.c
@@ -118,7 +121,7 @@ PASS
   DEMOMARKER_* parity check ... PASS
 
 ========================================
-Results: 11/34 passed, 5 FAILED
+Results: 13/40 passed, 3 FAILED
 ========================================
 
 IMPLEMENTATION ROADMAP:
@@ -129,8 +132,8 @@ Add/update headers to match legacy_one C values.
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Failed.
-"parity_tests" end time: Feb 17 20:40 MST
+"parity_tests" end time: Feb 17 21:03 MST
 "parity_tests" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-End testing: Feb 17 20:40 MST
+End testing: Feb 17 21:03 MST

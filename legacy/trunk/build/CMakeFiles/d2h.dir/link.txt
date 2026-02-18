@@ -1,1 +1,1 @@
-/usr/bin/c++ -g -rdynamic CMakeFiles/d2h.dir/tools/d2h.cpp.o -o d2h 
+/usr/bin/c++ -rdynamic CMakeFiles/d2h.dir/tools/d2h.cpp.o -o d2h 

@@ -1,1 +1,1 @@
-/usr/bin/c++ -g -rdynamic CMakeFiles/test_mapinfo.dir/tests/unit/test_mapinfo.cpp.o -o test_mapinfo  libutil.a -Wl,-Bstatic -lSDLmain -Wl,-Bdynamic -lSDL 
+/usr/bin/c++ -rdynamic CMakeFiles/test_mapinfo.dir/tests/unit/test_mapinfo.cpp.o -o test_mapinfo  libutil.a -Wl,-Bstatic -lSDLmain -Wl,-Bdynamic -lSDL 
