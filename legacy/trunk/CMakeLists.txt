@@ -113,3 +113,22 @@ target_link_libraries(doomlegacy grammars
 ${SDL_LIBRARY} ${SDLMIXER_LIBRARY}
 ${OPENGL_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES}
 ${TNL_LIBRARY} ${TOMCRYPT_LIBRARY})
+
+#============================================================================
+# Test Suite Configuration
+#============================================================================
+
+enable_testing()
+
+# Unit tests
+file(GLOB UNIT_TEST_SOURCES "tests/unit/*.cpp")
+add_executable(run_tests ${UNIT_TEST_SOURCES})
+target_include_directories(run_tests PRIVATE include)
+target_link_libraries(run_tests ${SDL_LIBRARY})
+add_test(NAME unit_tests COMMAND run_tests)
+
+# Optional: Integration tests (when implemented)
+# add_executable(run_integration_tests tests/integration/*.cpp)
+# target_include_directories(run_integration_tests PRIVATE include)
+# target_link_libraries(run_integration_tests doomlegacy ${SDL_LIBRARY} ${TNL_LIBRARY})
+# add_test(NAME integration_tests COMMAND run_integration_tests)
