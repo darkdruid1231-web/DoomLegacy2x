@@ -877,7 +877,7 @@ void Actor::ZMovement()
 		   thing->Top() <= Feet() + MAXSTEP)
 	    {
 	      // stepped on it TODO not correct, we may have large relative z speed too
-#warning TODO step up on things
+// TODO step up on things
 	      /*
 	      p->player->viewheight -= thing->Top() - Feet();
 	      p->player->deltaviewheight = (cv_viewheight.value - p->player->viewheight) >> 3;
