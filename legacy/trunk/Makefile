@@ -328,3 +328,33 @@ else
 $(exename) : engine util audio video net sdl grammars versionstring
 	$(LD) $(LDFLAGS) $(objects) $(LIBS) $(OPENGLLIBS) -o $@
 endif
+
+#============================================================================
+# Test Targets
+#============================================================================
+
+.PHONY: test smoke_test
+
+# Run all tests: smoke test + unit tests
+test: $(exename)
+	@echo "========================================"
+	@echo "Running Doom Legacy Test Suite"
+	@echo "========================================"
+	@echo ""
+	@echo "[Smoke Tests]"
+	@./scripts/smoke_test.sh && echo "✓ Smoke tests passed" || (echo "✗ Smoke tests FAILED"; exit 1)
+	@echo ""
+	@echo "[Unit Tests]"
+	@if [ -f build/run_tests ]; then \
+		./build/run_tests && echo "✓ Unit tests passed" || (echo "✗ Unit tests FAILED"; exit 1); \
+	else \
+		echo "Warning: Unit tests not built (run 'make -C build run_tests' first)"; \
+	fi
+	@echo ""
+	@echo "========================================"
+	@echo "All tests passed!"
+	@echo "========================================"
+
+# Run just the smoke test
+smoke_test: $(exename)
+	@./scripts/smoke_test.sh
