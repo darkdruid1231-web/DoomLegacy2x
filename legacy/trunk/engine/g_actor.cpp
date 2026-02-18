@@ -876,12 +876,13 @@ void Actor::ZMovement()
 	  else if ((flags & MF_PLAYER) && // only players climb voluntarily on other things
 		   thing->Top() <= Feet() + MAXSTEP)
 	    {
-	      // stepped on it TODO not correct, we may have large relative z speed too
-// TODO step up on things
-	      /*
-	      p->player->viewheight -= thing->Top() - Feet();
-	      p->player->deltaviewheight = (cv_viewheight.value - p->player->viewheight) >> 3;
-	      */
+	      // stepped on it - smooth step up onto the thing
+	      PlayerPawn *pp = Inherits<PlayerPawn>();
+	      if (pp && pp->player)
+		{
+		  pp->player->viewheight -= thing->Top() - Feet();
+		  pp->player->deltaviewheight = (cv_viewheight.value - pp->player->viewheight) >> 3;
+		}
 	      pos.z = thing->Top();
 	      vel.z = thing->vel.z;
 
