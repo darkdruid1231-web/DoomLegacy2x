@@ -170,10 +170,10 @@ add_test(NAME serialization_tests COMMAND test_serialization)
 # Individual unit tests
 add_executable(test_mapinfo tests/unit/test_mapinfo.cpp)
 target_include_directories(test_mapinfo PRIVATE include)
-target_link_libraries(test_mapinfo ${SDL_LIBRARY})
+target_link_libraries(test_mapinfo util ${SDL_LIBRARY})
 add_test(NAME mapinfo_tests COMMAND test_mapinfo)
 
 add_executable(test_tnl_packets tests/unit/test_tnl_packets.cpp)
 target_include_directories(test_tnl_packets PRIVATE include)
-target_link_libraries(test_tnl_packets ${SDL_LIBRARY})
+target_link_libraries(test_tnl_packets util ${SDL_LIBRARY})
 add_test(NAME tnl_packet_tests COMMAND test_tnl_packets)
