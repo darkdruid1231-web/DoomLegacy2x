@@ -333,7 +333,7 @@ endif
 # Test Targets
 #============================================================================
 
-.PHONY: test smoke_test
+.PHONY: test smoke_test test_fixed_t
 
 # Run all tests: smoke test + unit tests
 test: $(exename)
@@ -345,10 +345,10 @@ test: $(exename)
 	@./scripts/smoke_test.sh && echo "✓ Smoke tests passed" || (echo "✗ Smoke tests FAILED"; exit 1)
 	@echo ""
 	@echo "[Unit Tests]"
-	@if [ -f build/run_tests ]; then \
-		./build/run_tests && echo "✓ Unit tests passed" || (echo "✗ Unit tests FAILED"; exit 1); \
+	@if [ -f build/test_fixed_t ]; then \
+		./build/test_fixed_t && echo "✓ fixed_t tests passed" || (echo "✗ fixed_t tests FAILED"; exit 1); \
 	else \
-		echo "Warning: Unit tests not built (run 'make -C build run_tests' first)"; \
+		echo "Warning: test_fixed_t not built (run 'cmake build && make -C build test_fixed_t' first)"; \
 	fi
 	@echo ""
 	@echo "========================================"
@@ -358,3 +358,13 @@ test: $(exename)
 # Run just the smoke test
 smoke_test: $(exename)
 	@./scripts/smoke_test.sh
+
+# Run just the fixed_t unit tests
+test_fixed_t:
+	@if [ -f build/test_fixed_t ]; then \
+		./build/test_fixed_t; \
+	else \
+		echo "Building test_fixed_t..."; \
+		cmake -B build && cmake --build build --target test_fixed_t; \
+		./build/test_fixed_t; \
+	fi

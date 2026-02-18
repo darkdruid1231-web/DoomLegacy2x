@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //
-// $Id: test_fixed_t.cpp 1 2026-02-17 $
+// $Id$
 //
 // Copyright (C) 2026 by Doom Legacy Team.
 //
@@ -23,6 +23,7 @@
 #include <cassert>
 #include <cmath>
 #include <string>
+#include <limits>
 #include "m_fixed.h"
 
 using namespace std;
@@ -52,16 +53,19 @@ static string last_failure;
     if (!(cond)) FAIL(msg); \
 } while(0)
 
+#define CHECK_CLOSE(actual, expected, tol) do { \
+    if (std::abs((actual) - (expected)) > (tol)) { \
+        FAIL("Value " + to_string(actual) + " not within " + to_string(tol) + " of " + to_string(expected)); \
+    } \
+} while(0)
+
 //============================================================================
 // Constructor Tests
 //============================================================================
 
 void test_default_constructor() {
     TEST("default_constructor");
-    // Note: defaulted constructor doesn't initialize - this is intentional
-    // for performance in the legacy codebase
     fixed_t f;
-    // Just verify the type is correct and can be assigned
     f = fixed_t(0);
     CHECK(f.value() == 0, "assigned value should be 0");
     PASS();
@@ -322,7 +326,6 @@ void test_right_shift_assignment() {
 
 void test_limits() {
     TEST("limits");
-    // Test the constant values directly
     CHECK(fixed_t::FMAX == 32767, "FMAX should be 32767");
     CHECK(fixed_t::FMIN == -32768, "FMIN should be -32768");
     CHECK(fixed_t::UNIT == 65536, "UNIT should be 65536");
@@ -402,6 +405,60 @@ void test_logical_not() {
 }
 
 //============================================================================
+// Precision Tests
+//============================================================================
+
+void test_precision_half() {
+    TEST("precision_half");
+    fixed_t a(0.5f);
+    CHECK(std::abs(a.value() - (fixed_t::UNIT / 2)) <= 1, "0.5 precision failed");
+    PASS();
+}
+
+void test_precision_quarter() {
+    TEST("precision_quarter");
+    fixed_t a(0.25f);
+    CHECK(std::abs(a.value() - (fixed_t::UNIT / 4)) <= 1, "0.25 precision failed");
+    PASS();
+}
+
+void test_precision_small() {
+    TEST("precision_small");
+    fixed_t a(0.001f);
+    CHECK(a.value() > 0, "small positive value should be > 0");
+    CHECK(a.value() < (fixed_t::UNIT / 10), "0.001 should be less than 0.1");
+    PASS();
+}
+
+//============================================================================
+// Negative Value Tests
+//============================================================================
+
+void test_negative_addition() {
+    TEST("negative_addition");
+    fixed_t a(-5), b(3);
+    fixed_t c = a + b;
+    CHECK(c.value() == (-2 << fixed_t::FBITS), "-5 + 3 should be -2");
+    PASS();
+}
+
+void test_negative_multiplication() {
+    TEST("negative_multiplication");
+    fixed_t a(-4), b(2);
+    fixed_t c = a * b;
+    CHECK(c.value() == (-8 << fixed_t::FBITS), "-4 * 2 should be -8");
+    PASS();
+}
+
+void test_negative_division() {
+    TEST("negative_division");
+    fixed_t a(-20), b(4);
+    fixed_t c = a / b;
+    CHECK(c.value() == (-5 << fixed_t::FBITS), "-20 / 4 should be -5");
+    PASS();
+}
+
+//============================================================================
 // Main
 //============================================================================
 
@@ -464,6 +521,16 @@ int main() {
 
     cout << "\n[Logical Tests]" << endl;
     test_logical_not();
+
+    cout << "\n[Precision Tests]" << endl;
+    test_precision_half();
+    test_precision_quarter();
+    test_precision_small();
+
+    cout << "\n[Negative Value Tests]" << endl;
+    test_negative_addition();
+    test_negative_multiplication();
+    test_negative_division();
 
     cout << "\n========================================" << endl;
     cout << "Results: " << tests_passed << "/" << tests_run << " tests passed" << endl;

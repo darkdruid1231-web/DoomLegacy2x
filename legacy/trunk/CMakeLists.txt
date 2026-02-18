@@ -120,7 +120,13 @@ ${TNL_LIBRARY} ${TOMCRYPT_LIBRARY})
 
 enable_testing()
 
-# Unit tests
+# Individual fixed_t test (Phase 1 foundation)
+add_executable(test_fixed_t tests/unit/test_fixed_t.cpp)
+target_include_directories(test_fixed_t PRIVATE include)
+target_link_libraries(test_fixed_t ${SDL_LIBRARY})
+add_test(NAME fixed_t_tests COMMAND test_fixed_t)
+
+# Unit tests (all unit tests)
 file(GLOB UNIT_TEST_SOURCES "tests/unit/*.cpp")
 add_executable(run_tests ${UNIT_TEST_SOURCES})
 target_include_directories(run_tests PRIVATE include)

@@ -1,7 +1,7 @@
 #!/bin/bash
 #-----------------------------------------------------------------------------
 #
-# $Id: smoke_test.sh 1 2026-02-17 $
+# $Id$
 #
 # Copyright (C) 2026 by Doom Legacy Team.
 #
@@ -17,8 +17,8 @@
 #
 #-----------------------------------------------------------------------------
 
-# \file
-# \brief Smoke test script for Doom Legacy build verification.
+/// \file
+/// \brief Smoke test script for Doom Legacy build verification.
 
 set -e
 
@@ -30,39 +30,31 @@ echo "Doom Legacy Smoke Test"
 echo "========================================"
 
 # Test 1: Binary exists
-echo "[1/4] Checking binary exists..."
+echo "[1/3] Checking binary exists..."
 if [ ! -f "${BUILD_DIR}/doomlegacy" ]; then
     echo "FAIL: Binary not found at ${BUILD_DIR}/doomlegacy"
     exit 1
 fi
 echo "  ✓ Binary exists"
 
-# Test 2: Binary is executable
-echo "[2/4] Checking binary is executable..."
-if [ ! -x "${BUILD_DIR}/doomlegacy" ]; then
-    echo "FAIL: Binary is not executable"
+# Test 2: Binary responds to --help flag (validates startup)
+echo "[2/3] Checking --help flag..."
+if "${BUILD_DIR}/doomlegacy" --help > /dev/null 2>&1; then
+    echo "  ✓ Help flag accepted"
+else
+    echo "FAIL: Binary failed to respond to --help"
     exit 1
 fi
-echo "  ✓ Binary is executable"
 
-# Test 3: Binary responds to version flag
-echo "[3/4] Checking version flag..."
-VERSION_OUTPUT=$("${BUILD_DIR}/doomlegacy" --version 2>&1 || true)
-if [ -z "$VERSION_OUTPUT" ]; then
-    # Try alternative flag
-    VERSION_OUTPUT=$("${BUILD_DIR}/doomlegacy" -version 2>&1 || true)
-fi
-if [ -z "$VERSION_OUTPUT" ]; then
-    echo "  ⚠ Warning: Version check returned empty (may be normal)"
+# Test 3: Check exit code
+echo "[3/3] Checking exit code..."
+EXIT_CODE=0
+"${BUILD_DIR}/doomlegacy" --help > /dev/null 2>&1 || EXIT_CODE=$?
+if [ $EXIT_CODE -eq 0 ]; then
+    echo "  ✓ Exit code is 0"
 else
-    echo "  ✓ Version check passed: ${VERSION_OUTPUT}"
-fi
-
-# Test 4: Binary help (if available)
-echo "[4/4] Checking help output..."
-HELP_OUTPUT=$("${BUILD_DIR}/doomlegacy" --help 2>&1 || true)
-if [ -n "$HELP_OUTPUT" ]; then
-    echo "  ✓ Help output available"
+    echo "FAIL: Binary exited with code $EXIT_CODE"
+    exit 1
 fi
 
 echo ""
