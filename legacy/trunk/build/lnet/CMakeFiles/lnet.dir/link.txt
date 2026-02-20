@@ -1,0 +1,2 @@
+C:\msys64\mingw64\bin\ar.exe qc ..\liblnet.a CMakeFiles/lnet.dir/enet_net.cpp.obj
+C:\msys64\mingw64\bin\ranlib.exe ..\liblnet.a

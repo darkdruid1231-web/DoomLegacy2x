@@ -1,3 +1,3 @@
 file(REMOVE_RECURSE
-  "libgrammars.a"
+  "../libgrammars.a"
 )

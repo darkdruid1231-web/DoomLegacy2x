@@ -1,7 +1,9 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/test_tnl_packets.dir/tests/unit/test_tnl_packets.cpp.o"
-  "CMakeFiles/test_tnl_packets.dir/tests/unit/test_tnl_packets.cpp.o.d"
-  "test_tnl_packets"
+  "CMakeFiles/test_tnl_packets.dir/tests/unit/test_tnl_packets.cpp.obj"
+  "CMakeFiles/test_tnl_packets.dir/tests/unit/test_tnl_packets.cpp.obj.d"
+  "libtest_tnl_packets.dll.a"
+  "test_tnl_packets.exe"
+  "test_tnl_packets.exe.manifest"
   "test_tnl_packets.pdb"
 )
 

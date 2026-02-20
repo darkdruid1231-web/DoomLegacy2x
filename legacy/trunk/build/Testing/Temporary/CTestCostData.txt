@@ -1,3 +1,20 @@
 parity_tests 0 0
+fixed_t_tests 6 0.000321484
+save_load_tests 0 0
+serialization_tests 6 0.000240664
+mapinfo_tests 0 0
+tnl_packet_tests 6 0.000257823
+actor_tests 6 0.000253666
+console_tests 6 0.000240507
+vector_tests 6 0.000324336
+demo_tests 0 0
+network_integration_tests 6 0.000270904
+console_colors_tests 8 0.000181333
+save_load_unit_tests 8 0.000192861
+mapinfo_constants_tests 6 0.000247909
+mobj_tests 0 0
+demos_integration_tests 8 0.000185679
+save_load_integration_tests 2 0.000716409
+mapinfo_integration_tests 0 0
 ---
 parity_tests

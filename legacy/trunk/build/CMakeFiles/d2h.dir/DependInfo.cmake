@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/geoffrey/doomlegacy-svn/legacy/trunk/tools/d2h.cpp" "CMakeFiles/d2h.dir/tools/d2h.cpp.o" "gcc" "CMakeFiles/d2h.dir/tools/d2h.cpp.o.d"
+  "C:/Users/Geoffrey/Desktop/Doom/doomlegacy/doomlegacy-svn/legacy/trunk/tools/d2h.cpp" "CMakeFiles/d2h.dir/tools/d2h.cpp.obj" "gcc" "CMakeFiles/d2h.dir/tools/d2h.cpp.obj.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

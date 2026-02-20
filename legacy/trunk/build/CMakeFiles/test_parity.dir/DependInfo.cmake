@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/geoffrey/doomlegacy-svn/legacy/trunk/tests/integration/test_parity.cpp" "CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.o" "gcc" "CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.o.d"
+  "C:/Users/Geoffrey/Desktop/Doom/doomlegacy/doomlegacy-svn/legacy/trunk/tests/integration/test_parity.cpp" "CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.obj" "gcc" "CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.obj.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

@@ -1,7 +1,9 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/test_console.dir/tests/unit/test_console.cpp.o"
-  "CMakeFiles/test_console.dir/tests/unit/test_console.cpp.o.d"
-  "test_console"
+  "CMakeFiles/test_console.dir/tests/unit/test_console.cpp.obj"
+  "CMakeFiles/test_console.dir/tests/unit/test_console.cpp.obj.d"
+  "libtest_console.dll.a"
+  "test_console.exe"
+  "test_console.exe.manifest"
   "test_console.pdb"
 )
 

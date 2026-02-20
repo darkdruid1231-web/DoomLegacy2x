@@ -8,8 +8,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/geoffrey/doomlegacy-svn/legacy/trunk/tools/wadtool.cpp" "CMakeFiles/wadtool.dir/tools/wadtool.cpp.o" "gcc" "CMakeFiles/wadtool.dir/tools/wadtool.cpp.o.d"
-  "/home/geoffrey/doomlegacy-svn/legacy/trunk/util/md5.cpp" "CMakeFiles/wadtool.dir/util/md5.cpp.o" "gcc" "CMakeFiles/wadtool.dir/util/md5.cpp.o.d"
+  "C:/Users/Geoffrey/Desktop/Doom/doomlegacy/doomlegacy-svn/legacy/trunk/tools/wadtool.cpp" "CMakeFiles/wadtool.dir/tools/wadtool.cpp.obj" "gcc" "CMakeFiles/wadtool.dir/tools/wadtool.cpp.obj.d"
+  "C:/Users/Geoffrey/Desktop/Doom/doomlegacy/doomlegacy-svn/legacy/trunk/util/md5.cpp" "CMakeFiles/wadtool.dir/util/md5.cpp.obj" "gcc" "CMakeFiles/wadtool.dir/util/md5.cpp.obj.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

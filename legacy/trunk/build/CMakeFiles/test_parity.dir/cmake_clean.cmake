@@ -1,7 +1,9 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.o"
-  "CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.o.d"
-  "test_parity"
+  "CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.obj"
+  "CMakeFiles/test_parity.dir/tests/integration/test_parity.cpp.obj.d"
+  "libtest_parity.dll.a"
+  "test_parity.exe"
+  "test_parity.exe.manifest"
   "test_parity.pdb"
 )
 

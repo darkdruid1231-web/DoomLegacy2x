@@ -1,0 +1,42 @@
+[  1%] Generating ntexture.parser.c, ntexture.parser.h
+[  1%] Building CXX object CMakeFiles/wadtool.dir/tools/wadtool.cpp.obj
+[  2%] Building CXX object CMakeFiles/util.dir/util/command.cpp.obj
+[  2%] Building CXX object CMakeFiles/d2h.dir/tools/d2h.cpp.obj
+[  2%] Building CXX object lnet/CMakeFiles/lnet.dir/enet_net.cpp.obj
+[  2%] Building CXX object CMakeFiles/test_fixed_t.dir/tests/unit/test_fixed_t.cpp.obj
+[  3%] Building CXX object lnet/CMakeFiles/test_enet_net.dir/test_enet_net.cpp.obj
+[  3%] Building CXX object CMakeFiles/test_serialization.dir/tests/integration/test_serialization.cpp.obj
+mingw32-make[2]: *** [CMakeFiles\d2h.dir\build.make:79: CMakeFiles/d2h.dir/tools/d2h.cpp.obj] Error 1
+mingw32-make[2]: *** [CMakeFiles\util.dir\build.make:79: CMakeFiles/util.dir/util/command.cpp.obj] Error 1
+mingw32-make[1]: *** [CMakeFiles\Makefile2:352: CMakeFiles/d2h.dir/all] Error 2
+mingw32-make[1]: *** Waiting for unfinished jobs....
+mingw32-make[1]: *** [CMakeFiles\Makefile2:320: CMakeFiles/util.dir/all] Error 2
+mingw32-make[2]: *** [CMakeFiles\wadtool.dir\build.make:79: CMakeFiles/wadtool.dir/tools/wadtool.cpp.obj] Error 1
+mingw32-make[1]: *** [CMakeFiles\Makefile2:384: CMakeFiles/wadtool.dir/all] Error 2
+mingw32-make[2]: *** [CMakeFiles\test_fixed_t.dir\build.make:79: CMakeFiles/test_fixed_t.dir/tests/unit/test_fixed_t.cpp.obj] Error 1
+mingw32-make[1]: *** [CMakeFiles\Makefile2:450: CMakeFiles/test_fixed_t.dir/all] Error 2
+mingw32-make[2]: *** [CMakeFiles\test_serialization.dir\build.make:79: CMakeFiles/test_serialization.dir/tests/integration/test_serialization.cpp.obj] Error 1
+mingw32-make[1]: *** [CMakeFiles\Makefile2:514: CMakeFiles/test_serialization.dir/all] Error 2
+[  3%] Building CXX object lnet/CMakeFiles/test_enet_net.dir/enet_net.cpp.obj
+mingw32-make[2]: *** [lnet\CMakeFiles\lnet.dir\build.make:79: lnet/CMakeFiles/lnet.dir/enet_net.cpp.obj] Error 1
+mingw32-make[1]: *** [CMakeFiles\Makefile2:834: lnet/CMakeFiles/lnet.dir/all] Error 2
+[  3%] Generating decorate.parser.c, decorate.parser.h
+[  3%] Generating ntexture.lexer.c
+[  4%] Generating decorate.lexer.c
+mingw32-make[2]: *** [lnet\CMakeFiles\test_enet_net.dir\build.make:79: lnet/CMakeFiles/test_enet_net.dir/test_enet_net.cpp.obj] Error 1
+mingw32-make[2]: *** Waiting for unfinished jobs....
+mingw32-make[2]: *** [lnet\CMakeFiles\test_enet_net.dir\build.make:94: lnet/CMakeFiles/test_enet_net.dir/enet_net.cpp.obj] Error 1
+mingw32-make[1]: *** [CMakeFiles\Makefile2:866: lnet/CMakeFiles/test_enet_net.dir/all] Error 2
+[  4%] Building CXX object grammars/CMakeFiles/grammars.dir/ntexture.lexer.c.obj
+[  5%] Building CXX object grammars/CMakeFiles/grammars.dir/parser_driver.cpp.obj
+[  6%] Building CXX object grammars/CMakeFiles/grammars.dir/decorate.lexer.c.obj
+[  6%] Building CXX object grammars/CMakeFiles/grammars.dir/ntexture.parser.c.obj
+[  7%] Building CXX object grammars/CMakeFiles/grammars.dir/decorate.parser.c.obj
+mingw32-make[2]: *** [grammars\CMakeFiles\grammars.dir\build.make:105: grammars/CMakeFiles/grammars.dir/parser_driver.cpp.obj] Error 1
+mingw32-make[2]: *** Waiting for unfinished jobs....
+mingw32-make[2]: *** [grammars\CMakeFiles\grammars.dir\build.make:120: grammars/CMakeFiles/grammars.dir/ntexture.lexer.c.obj] Error 1
+mingw32-make[2]: *** [grammars\CMakeFiles\grammars.dir\build.make:135: grammars/CMakeFiles/grammars.dir/decorate.lexer.c.obj] Error 1
+mingw32-make[2]: *** [grammars\CMakeFiles\grammars.dir\build.make:150: grammars/CMakeFiles/grammars.dir/ntexture.parser.c.obj] Error 1
+mingw32-make[2]: *** [grammars\CMakeFiles\grammars.dir\build.make:165: grammars/CMakeFiles/grammars.dir/decorate.parser.c.obj] Error 1
+mingw32-make[1]: *** [CMakeFiles\Makefile2:930: grammars/CMakeFiles/grammars.dir/all] Error 2
+mingw32-make: *** [Makefile:100: all] Error 2

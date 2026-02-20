@@ -1,7 +1,9 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.o"
-  "CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.o.d"
-  "test_network_integration"
+  "CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.obj"
+  "CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.obj.d"
+  "libtest_network_integration.dll.a"
+  "test_network_integration.exe"
+  "test_network_integration.exe.manifest"
   "test_network_integration.pdb"
 )
 

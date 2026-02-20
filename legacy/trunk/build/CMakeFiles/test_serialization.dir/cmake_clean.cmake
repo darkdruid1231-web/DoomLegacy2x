@@ -1,7 +1,9 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/test_serialization.dir/tests/integration/test_serialization.cpp.o"
-  "CMakeFiles/test_serialization.dir/tests/integration/test_serialization.cpp.o.d"
-  "test_serialization"
+  "CMakeFiles/test_serialization.dir/tests/integration/test_serialization.cpp.obj"
+  "CMakeFiles/test_serialization.dir/tests/integration/test_serialization.cpp.obj.d"
+  "libtest_serialization.dll.a"
+  "test_serialization.exe"
+  "test_serialization.exe.manifest"
   "test_serialization.pdb"
 )
 

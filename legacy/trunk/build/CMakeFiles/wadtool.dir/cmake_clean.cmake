@@ -1,9 +1,11 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/wadtool.dir/tools/wadtool.cpp.o"
-  "CMakeFiles/wadtool.dir/tools/wadtool.cpp.o.d"
-  "CMakeFiles/wadtool.dir/util/md5.cpp.o"
-  "CMakeFiles/wadtool.dir/util/md5.cpp.o.d"
-  "wadtool"
+  "CMakeFiles/wadtool.dir/tools/wadtool.cpp.obj"
+  "CMakeFiles/wadtool.dir/tools/wadtool.cpp.obj.d"
+  "CMakeFiles/wadtool.dir/util/md5.cpp.obj"
+  "CMakeFiles/wadtool.dir/util/md5.cpp.obj.d"
+  "libwadtool.dll.a"
+  "wadtool.exe"
+  "wadtool.exe.manifest"
   "wadtool.pdb"
 )
 
