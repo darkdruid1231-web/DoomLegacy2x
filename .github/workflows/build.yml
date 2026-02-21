@@ -1,0 +1,39 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+            cmake \
+            g++ \
+            libsdl2-dev \
+            libsdl2-mixer-dev \
+            libpng-dev \
+            libjpeg-dev \
+            libenet-dev \
+            flex \
+            lemon
+
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build
+      run: cmake --build build --parallel
+
+    - name: Run Tests
+      working-directory: build
+      run: ctest --output-on-failure --verbose
