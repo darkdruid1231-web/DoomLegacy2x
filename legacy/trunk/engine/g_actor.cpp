@@ -322,6 +322,50 @@ void Actor::unpackUpdate(GhostConnection *connection, BitStream *stream)
 }
 
 
+/// ISerializer-based serialization (TNL-independent)
+void Actor::serialize(DoomLegacy::ISerializer& s, Uint32 mask)
+{
+  if (s.isWriting())
+    {
+      // Writing: pack data using ISerializer
+      if (mask & M_MOVE)
+	{
+	  // as often as possible
+	  pos.Pack(s);
+	  vel.Pack(s);
+	  s.write(static_cast<uint32_t>(yaw >> (32-ACTOR_AR)), ACTOR_AR);
+	  s.write(static_cast<uint32_t>(pitch >> (32-ACTOR_AR)), ACTOR_AR);
+	}
+
+      // TODO: M_PRES and M_ANIM would need presentation serialization
+      // For now, just handle M_MOVE which is the most critical
+
+      // TODO: floorclip, team, etc.
+    }
+  else
+    {
+      // Reading: unpack data using ISerializer
+      if (mask & M_MOVE)
+	{
+	  // movement data
+	  apos.Unpack(s);
+	  avel.Unpack(s);
+	  yaw = static_cast<angle_t>(s.readUInt32() << (32-ACTOR_AR));
+	  pitch = static_cast<angle_t>(s.readUInt32() << (32-ACTOR_AR));
+	}
+    }
+}
+
+
+/// ISerializer-based deserialization (TNL-independent)
+void Actor::deserialize(DoomLegacy::ISerializer& s)
+{
+  // Deserialize with full mask (M_EVERYTHING)
+  serialize(s, M_MOVE);
+  // TODO: handle M_PRES and M_ANIM when presentation serialization is added
+}
+
+
 
 /// Interpolate movement
 void Actor::ClientThink()

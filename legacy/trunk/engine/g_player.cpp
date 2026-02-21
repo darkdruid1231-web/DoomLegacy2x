@@ -21,6 +21,7 @@
 /// \brief PlayerInfo class implementation
 
 #include "tnl/tnlNetObject.h"
+#include "core/ISerializer.h"
 #include "doomdef.h"
 #include "command.h"
 #include "cvars.h"
@@ -149,6 +150,44 @@ void PlayerOptions::Read(BitStream *stream)
     stream->read(&weaponpref[i]);
 
   stream->read(&messagefilter);
+}
+
+
+/// Write player preferences to ISerializer (TNL-independent)
+void PlayerOptions::Write(DoomLegacy::ISerializer& s)
+{
+  s.writeString(name.c_str());
+  s.write(static_cast<int32_t>(ptype));
+  s.write(static_cast<int32_t>(color));
+  s.write(static_cast<int32_t>(skin));
+
+  s.writeBool(autoaim);
+  s.writeBool(originalweaponswitch);
+  for (int i=0; i<NUMWEAPONS; i++)
+    s.write(static_cast<int32_t>(weaponpref[i]));
+
+  s.write(static_cast<int32_t>(messagefilter));
+}
+
+/// Read player preferences from ISerializer (TNL-independent)
+void PlayerOptions::Read(DoomLegacy::ISerializer& s)
+{
+  std::string temp;
+  s.readString(temp);
+  if (temp.length() > 31)
+    temp[31] = '\0'; // limit name length
+  name = temp;
+
+  ptype = static_cast<int>(s.readInt32());
+  color = static_cast<int>(s.readInt32());
+  skin = static_cast<int>(s.readInt32());
+
+  autoaim = s.readBool();
+  originalweaponswitch = s.readBool();
+  for (int i=0; i<NUMWEAPONS; i++)
+    weaponpref[i] = static_cast<unsigned char>(s.readInt32());
+
+  messagefilter = static_cast<int>(s.readInt32());
 }
 
 
@@ -428,6 +467,79 @@ void PlayerInfo::unpackUpdate(GhostConnection *c, BitStream *stream)
     }
 
 
+}
+
+
+/// Serialize PlayerInfo to ISerializer (TNL-independent)
+void PlayerInfo::Serialize(DoomLegacy::ISerializer& s)
+{
+  // Identity (name, number, team)
+  s.writeString(name.c_str());
+  s.write(static_cast<int32_t>(number));
+  s.write(static_cast<int32_t>(team));
+
+  // Player state
+  s.write(static_cast<int32_t>(playerstate));
+  s.writeBool(spectator);
+
+  // Score data
+  s.write(static_cast<int32_t>(score));
+  s.write(static_cast<int32_t>(kills));
+  s.write(static_cast<int32_t>(items));
+  s.write(static_cast<int32_t>(secrets));
+  s.write(static_cast<int32_t>(time));
+
+  // View data
+  // Note: fixed_t needs special handling - convert to/from float
+  s.writeFloat(static_cast<float>(viewz));
+  s.writeFloat(static_cast<float>(viewheight));
+  s.writeFloat(static_cast<float>(deltaviewheight));
+
+  // HUD/feedback data
+  s.write(static_cast<int32_t>(palette));
+  s.write(static_cast<int32_t>(damagecount));
+  s.write(static_cast<int32_t>(bonuscount));
+  s.write(static_cast<int32_t>(itemuse));
+
+  // Options (delegate to PlayerOptions)
+  options.Write(s);
+}
+
+/// Deserialize PlayerInfo from ISerializer (TNL-independent)
+void PlayerInfo::Unserialize(DoomLegacy::ISerializer& s)
+{
+  std::string temp;
+
+  // Identity
+  s.readString(temp);
+  name = temp;
+  number = static_cast<int>(s.readInt32());
+  team = static_cast<int>(s.readInt32());
+
+  // Player state
+  playerstate = static_cast<playerstate_t>(s.readInt32());
+  spectator = s.readBool();
+
+  // Score data
+  score = static_cast<int>(s.readInt32());
+  kills = static_cast<int>(s.readInt32());
+  items = static_cast<int>(s.readInt32());
+  secrets = static_cast<int>(s.readInt32());
+  time = static_cast<int>(s.readInt32());
+
+  // View data
+  viewz = static_cast<fixed_t>(s.readFloat());
+  viewheight = static_cast<fixed_t>(s.readFloat());
+  deltaviewheight = static_cast<fixed_t>(s.readFloat());
+
+  // HUD/feedback data
+  palette = static_cast<int>(s.readInt32());
+  damagecount = static_cast<int>(s.readInt32());
+  bonuscount = static_cast<int>(s.readInt32());
+  itemuse = static_cast<int>(s.readInt32());
+
+  // Options (delegate to PlayerOptions)
+  options.Read(s);
 }
 
 

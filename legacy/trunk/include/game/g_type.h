@@ -22,6 +22,7 @@
 
 #include <string>
 #include "tnl/tnlNetObject.h"
+#include "core/ISerializer.h"
 
 using namespace std;
 using namespace TNL;
@@ -64,6 +65,10 @@ public:
   /// called when server accepts client connection
   virtual void WriteServerInfo(BitStream &s);
   virtual void ReadServerInfo(BitStream &s);
+
+  /// ISerializer overloads for TNL-free serialization
+  virtual void WriteServerInfo(DoomLegacy::ISerializer &s);
+  virtual void ReadServerInfo(DoomLegacy::ISerializer &s);
 
   //----- in game -----
 

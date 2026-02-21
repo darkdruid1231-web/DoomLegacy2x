@@ -27,6 +27,7 @@
 #include "tnl/tnlNetObject.h"
 #include "m_fixed.h"  // Basics.
 #include "vect.h"
+#include "core/ISerializer.h"
 #include "g_think.h"  // We need the Thinker stuff.
 #include "g_damage.h" // and damage types
 #include "info.h"     // mobjtype_t
@@ -230,6 +231,10 @@ class Actor : public Thinker, public NetObject
   virtual void onGhostRemove();
   virtual U32 packUpdate(GhostConnection *c, U32 updateMask, BitStream *s);
   virtual void unpackUpdate(GhostConnection *c, BitStream *s);
+
+  // ISerializer-based serialization (TNL-independent)
+  virtual void serialize(DoomLegacy::ISerializer& s, Uint32 mask);
+  virtual void deserialize(DoomLegacy::ISerializer& s);
 
 public:
   /// Ghosting flags
