@@ -100,6 +100,29 @@ jobs:
         Cflags: -I${includedir}/SDL2
         EOF
 
+    - name: Download ENet for Windows
+      run: |
+        mkdir -p /tmp/enet
+        cd /tmp/enet
+        wget -q https://github.com/lsalzman/enet/releases/download/v1.3.17/enet-1.3.17-win32.zip
+        unzip -q enet-1.3.17-win32.zip
+        sudo cp -r /tmp/enet/include/* /usr/x86_64-w64-mingw32/include/
+        sudo cp /tmp/enet/libenet/libenet.a /usr/x86_64-w64-mingw32/lib/ || true
+
+        # Create pkg-config for ENet
+        cat << 'EOF' | sudo tee /usr/x86_64-w64-mingw32/lib/pkgconfig/enet.pc
+        prefix=/usr/x86_64-w64-mingw32
+        exec_prefix=${prefix}
+        libdir=${exec_prefix}/lib
+        includedir=${prefix}/include
+        
+        Name: ENet
+        Description: Reliable UDP networking library
+        Version: 1.3.17
+        Libs: -L${libdir} -lenet
+        Cflags: -I${includedir}
+        EOF
+
     - name: Configure for Windows
       env:
         PKG_CONFIG_PATH: /usr/x86_64-w64-mingw32/lib/pkgconfig
