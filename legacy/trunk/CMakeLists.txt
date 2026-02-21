@@ -34,102 +34,69 @@ endif()
 
 # External libraries. First SDL.
 find_package(SDL REQUIRED)
-find_package(SDL_mixer REQUIRED)
-include_directories(${SDL_INCLUDE_DIR} ${SDL_MIXER_DIR})
+option(USE_SOUND "Enable sound support" ON)
+if(USE_SOUND)
+    find_package(SDL_mixer REQUIRED)
+    add_definitions("-DUSE_SOUND")
+endif()
+include_directories(${SDL_INCLUDE_DIR} ${SDL_MIXER_INCLUDE_DIR})
 add_definitions("-DSDL")
 
 # OpenGL
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
-# Then OpenTNL.
-#set(HAS_TNL_HEADER 1)
-#message("TNL: ${HAS_TNL_HEADER}")
-
-# Look for TNL in multiple locations: system, local tnl/ directory, or hardcoded path
-set(TNL_LIBRARY "TNL_LIBRARY-NOTFOUND")
-set(TOMCRYPT_LIBRARY "TOMCRYPT_LIBRARY-NOTFOUND")
-
-# Try local tnl directory first (Windows development)
-if(EXISTS "${CMAKE_SOURCE_DIR}/tnl/libtnl.a")
-    set(TNL_LIBRARY "${CMAKE_SOURCE_DIR}/tnl/libtnl.a")
-    set(TOMCRYPT_LIBRARY "${CMAKE_SOURCE_DIR}/tnl/libtomcrypt.a")
+# ENet for modern networking
+if(USE_MODERN_NETWORKING)
+    include_directories(${ENET_INCLUDE_DIR})
 endif()
 
-# Try Linux path
-if(NOT TNL_LIBRARY AND EXISTS "/home/geoffrey/tnl/lib/libtnl.a")
-    set(TNL_LIBRARY "/home/geoffrey/tnl/lib/libtnl.a")
-    set(TOMCRYPT_LIBRARY "/home/geoffrey/tnl/lib/libtomcrypt.a")
-endif()
+# Networking - Use lnet (modern) or TNL (legacy)
+option(USE_MODERN_NETWORKING "Use lnet for modern networking" ON)
 
-# Try system library (including MSYS2 MinGW)
-if(NOT TNL_LIBRARY)
-    find_library(TNL_LIBRARY tnl)
-    find_library(TOMCRYPT_LIBRARY tomcrypt PATHS /c/msys64/mingw64/lib)
-endif()
-
-# If TNL library not found, build from source
-if(TNL_LIBRARY STREQUAL "TNL_LIBRARY-NOTFOUND")
-    message(STATUS "Building TNL from source...")
-
-    # Collect TNL source files (minimal set for basic functionality)
-    set(TNL_SOURCES
-        ${CMAKE_SOURCE_DIR}/tnl/assert.cpp
-        ${CMAKE_SOURCE_DIR}/tnl/bitStream.cpp
-        ${CMAKE_SOURCE_DIR}/tnl/byteBuffer.cpp
-        ${CMAKE_SOURCE_DIR}/tnl/connectionStringTable.cpp
-        ${CMAKE_SOURCE_DIR}/tnl/dataChunker.cpp
-        ${CMAKE_SOURCE_DIR}/tnl/huffmanStringProcessor.cpp
-        ${CMAKE_SOURCE_DIR}/tnl/log.cpp
-        ${CMAKE_SOURCE_DIR}/tnl/netBase.cpp
-        ${CMAKE_SOURCE_DIR}/tnl/netConnection.cpp
-        ${CMAKE_SOURCE_DIR}/tnl/netInterface.cpp
-        ${CMAKE_SOURCE_DIR}/tnl/netObject.cpp
-        ${CMAKE_SOURCE_DIR}/tnl/netStringTable.cpp
-        ${CMAKE_SOURCE_DIR}/tnl/platform.cpp
-        ${CMAKE_SOURCE_DIR}/tnl/rpc.cpp
-        ${CMAKE_SOURCE_DIR}/tnl/tnlMethodDispatch.cpp
-        ${CMAKE_SOURCE_DIR}/tnl/journal.cpp
-        ${CMAKE_SOURCE_DIR}/tnl/udp.cpp
-        ${CMAKE_SOURCE_DIR}/tnl/vector.cpp
-    )
-
-    # Add lib directory for linking
-    link_directories(/c/msys64/mingw64/lib)
-
-    # Create compatibility header for mycrypt.h -> tomcrypt.h
-    file(WRITE "${CMAKE_BINARY_DIR}/mycrypt.h" [[
-#include <tomcrypt.h>
-]])
-
-    add_library(tnl STATIC ${TNL_SOURCES})
-    target_include_directories(tnl PUBLIC ${CMAKE_SOURCE_DIR}/tnl ${CMAKE_BINARY_DIR} /c/msys64/mingw64/include /mingw64/include)
-    target_link_libraries(tnl tomcrypt)
-    set(TNL_LIBRARY "tnl")
+if(USE_MODERN_NETWORKING)
+    message(STATUS "Using lnet for modern networking")
+    
+    # Find ENet library
+    if(NOT ENET_INCLUDE_DIR OR NOT ENET_LIBRARY)
+        # Default locations
+        set(ENET_INCLUDE_DIR "/tmp/enet-mingw/include" CACHE PATH "ENet include directory")
+        set(ENET_LIBRARY "/tmp/enet-mingw/lib/libenet.a" CACHE FILEPATH "ENet library")
+    endif()
+    
+    # Create imported ENet target
+    add_library(enet STATIC IMPORTED)
+    set_target_properties(enet PROPERTIES IMPORTED_LOCATION "${ENET_LIBRARY}")
+    target_include_directories(enet INTERFACE "${ENET_INCLUDE_DIR}")
 else()
-    message(STATUS "Using pre-built TNL library: ${TNL_LIBRARY}")
+    message(STATUS "Using legacy TNL networking")
+    # TNL (legacy)
+    if(EXISTS "/home/geoffrey/tnl/lib/libtnl.a")
+        set(TNL_LIBRARY "/home/geoffrey/tnl/lib/libtnl.a")
+    else()
+        find_library(TNL_LIBRARY tnl)
+    endif()
+    if(${TNL_LIBRARY} STREQUAL "TNL_LIBRARY-NOTFOUND")
+        message(FATAL_ERROR "TNL library not found.")
+    endif()
+    if(EXISTS "/home/geoffrey/tnl/lib/libtomcrypt.a")
+        set(TOMCRYPT_LIBRARY "/home/geoffrey/tnl/lib/libtomcrypt.a")
+    else()
+        find_library(TOMCRYPT_LIBRARY tomcrypt)
+    endif()
+    if(${TOMCRYPT_LIBRARY} STREQUAL "TOMCRYPT_LIBRARY-NOTFOUND")
+        message(FATAL_ERROR "Tomcrypt library not found.")
+    endif()
+    
+    check_include_file_cxx("tnl/tnl.h" HAS_TNL_HEADER)
+    if(NOT ${HAS_TNL_HEADER})
+        if(EXISTS "/home/geoffrey/tnl/tnl/tnl.h")
+            include_directories(/home/geoffrey/tnl)
+        else()
+            message(FATAL_ERROR "TNL headers not found.")
+        endif()
+    endif()
 endif()
-
-if(TOMCRYPT_LIBRARY STREQUAL "TOMCRYPT_LIBRARY-NOTFOUND")
-    message(STATUS "Tomcrypt library not found, continuing without it...")
-    set(TOMCRYPT_LIBRARY "")
-endif()
-
-# Check for TNL headers in multiple locations
-set(TNL_INCLUDE_DIR "")
-check_include_file_cxx("tnl/tnl.h" HAS_TNL_HEADER_LOCAL)
-if(HAS_TNL_HEADER_LOCAL)
-    set(TNL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}")
-endif()
-
-if(NOT TNL_INCLUDE_DIR AND EXISTS "/home/geoffrey/tnl/tnl/tnl.h")
-    set(TNL_INCLUDE_DIR "/home/geoffrey/tnl")
-endif()
-
-# Always use the source directory for TNL headers since we have the source
-set(TNL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}")
-
-include_directories(include ${TNL_INCLUDE_DIR} /c/msys64/mingw64/include)
 
 # Graphics
 find_package(PNG REQUIRED)
@@ -156,9 +123,16 @@ macro(process_subdir dirname)
     append_subdir_files(SRC_FILES LEGACY_SRC ${dirname})
 endmacro()
 
-include_directories(include ${TNL_INCLUDE_DIR})
-add_definitions(-DTNL_LITTLE_ENDIAN)
-add_definitions(-D_TNL_X86_)
+include_directories(include)
+include_directories(tnl)
+include_directories(lnet)
+
+if(NOT USE_MODERN_NETWORKING)
+    include_directories(/home/geoffrey/tnl/include)
+    add_definitions(-DTNL_LITTLE_ENDIAN)
+    add_definitions(-D_TNL_X86_)
+endif()
+
 add_definitions(-DFN_CDECL=)
 add_definitions(-Di386)
 add_definitions(-Dlinux)
@@ -166,9 +140,12 @@ add_definitions(-D__GNUC__)
 add_definitions(-DQSORT_CALLBACK=)
 
 process_subdir(engine)
-process_subdir(audio)
+if(USE_SOUND)
+    process_subdir(audio)
+endif()
 process_subdir(video)
 add_subdirectory(util)  # Add util first to get its SRC_FILES
+add_subdirectory(lnet)  # Add lnet for modern networking
 
 # Build util as a static library
 get_directory_property(UTIL_SRC_FILES DIRECTORY util DEFINITION SRC_FILES)
@@ -186,11 +163,27 @@ process_subdir(interface)
 # grammars is a special directory.
 add_subdirectory(grammars)
 
+add_executable(d2h tools/d2h.cpp)
+add_executable(wadtool tools/wadtool.cpp util/md5.cpp)
+
 add_executable(doomlegacy ${LEGACY_SRC})
-target_link_libraries(doomlegacy grammars util
-${SDL_LIBRARY} ${SDLMIXER_LIBRARY}
-${OPENGL_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES}
-${TNL_LIBRARY} ${TOMCRYPT_LIBRARY})
+if(WIN32)
+  target_link_libraries(doomlegacy grammars util
+  ${SDL_LIBRARY} ${SDLMIXER_LIBRARY}
+  ${OPENGL_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES}
+  ws2_32 mswsock winmm)
+else()
+  target_link_libraries(doomlegacy grammars util
+  ${SDL_LIBRARY} ${SDLMIXER_LIBRARY}
+  ${OPENGL_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES}
+  pthread)
+endif()
+
+if(USE_MODERN_NETWORKING)
+    target_link_libraries(doomlegacy lnet)
+else()
+    target_link_libraries(doomlegacy ${TNL_LIBRARY} ${TOMCRYPT_LIBRARY})
+endif()
 
 #============================================================================
 # Test Suite Configuration
@@ -207,12 +200,11 @@ add_test(NAME fixed_t_tests COMMAND test_fixed_t)
 # Note: The run_tests target was removed because each unit test file has its own main()
 # Individual unit tests are covered by their own executables below
 
-# Integration tests for save/load serialization (excluding standalone tests)
-file(GLOB INTEGRATION_TEST_SOURCES "tests/integration/test_save_load.cpp")
-add_executable(test_save_load ${INTEGRATION_TEST_SOURCES})
-target_include_directories(test_save_load PRIVATE include)
-target_link_libraries(test_save_load ${SDL_LIBRARY})
-add_test(NAME save_load_tests COMMAND test_save_load)
+# Save/Load Unit Tests (renamed to avoid conflict)
+add_executable(test_save_load_unit tests/unit/test_save_load.cpp)
+target_include_directories(test_save_load_unit PRIVATE include)
+target_link_libraries(test_save_load_unit util ${SDL_LIBRARY})
+add_test(NAME save_load_unit_tests COMMAND test_save_load_unit)
 
 # Basic data serialization tests
 add_executable(test_serialization tests/integration/test_serialization.cpp)
@@ -220,11 +212,11 @@ target_include_directories(test_serialization PRIVATE include)
 target_link_libraries(test_serialization ${SDL_LIBRARY})
 add_test(NAME serialization_tests COMMAND test_serialization)
 
-# Individual unit tests
-add_executable(test_mapinfo tests/unit/test_mapinfo.cpp)
-target_include_directories(test_mapinfo PRIVATE include)
-target_link_libraries(test_mapinfo util ${SDL_LIBRARY})
-add_test(NAME mapinfo_tests COMMAND test_mapinfo)
+# MapInfo Unit Tests
+add_executable(test_mapinfo_constants tests/unit/test_mapinfo_constants.cpp)
+target_include_directories(test_mapinfo_constants PRIVATE include)
+target_link_libraries(test_mapinfo_constants util ${SDL_LIBRARY})
+add_test(NAME mapinfo_constants_tests COMMAND test_mapinfo_constants)
 
 add_executable(test_tnl_packets tests/unit/test_tnl_packets.cpp)
 target_include_directories(test_tnl_packets PRIVATE include)
@@ -246,11 +238,11 @@ target_include_directories(test_vector PRIVATE include)
 target_link_libraries(test_vector util ${SDL_LIBRARY})
 add_test(NAME vector_tests COMMAND test_vector)
 
-# Demo Recording Tests
-add_executable(test_demos tests/integration/test_demos.cpp)
-target_include_directories(test_demos PRIVATE include)
-target_link_libraries(test_demos util ${SDL_LIBRARY})
-add_test(NAME demo_tests COMMAND test_demos)
+# Demo Integration Tests
+add_executable(test_demos_integration tests/integration/test_demos.cpp)
+target_include_directories(test_demos_integration PRIVATE include)
+target_link_libraries(test_demos_integration util ${SDL_LIBRARY})
+add_test(NAME demos_integration_tests COMMAND test_demos_integration)
 
 # Network Integration Tests
 add_executable(test_network_integration tests/integration/test_network_integration.cpp)
@@ -260,6 +252,14 @@ add_test(NAME network_integration_tests COMMAND test_network_integration)
 
 # Parity Tests (C++ vs C feature parity)
 add_executable(test_parity tests/integration/test_parity.cpp)
-target_include_directories(test_parity PRIVATE include ${TNL_INCLUDE_DIR})
+target_include_directories(test_parity PRIVATE include /home/geoffrey/tnl/include)
 target_link_libraries(test_parity util ${SDL_LIBRARY})
 add_test(NAME parity_tests COMMAND test_parity)
+
+# Console Colors Unit Tests
+add_executable(test_console_colors tests/unit/test_console_colors.cpp)
+target_include_directories(test_console_colors PRIVATE include)
+target_link_libraries(test_console_colors util ${SDL_LIBRARY})
+add_test(NAME console_colors_tests COMMAND test_console_colors)
+
+# Save/Load Unit Tests (renamed to avoid conflict)

@@ -10,6 +10,7 @@ g_map.cpp
 g_player.cpp
 g_team.cpp
 g_think.cpp
+singleplayer_stubs.cpp
 g_actor.cpp
 g_pawn.cpp
 g_decorate.cpp

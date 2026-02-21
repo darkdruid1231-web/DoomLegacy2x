@@ -26,8 +26,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "doomtype.h"
-
-namespace TNL { class BitStream; };
+#include "lnet.h"
 
 
 /// \brief Class for 16.16 fixed point arithmetic
@@ -61,7 +60,7 @@ public:
   /// Constructors.
   /// Explicit constructors are only used when the call exactly matches them, i.e.
   /// the compliler never adds an implicit cast for the input arguments.
-  explicit inline fixed_t() {}
+  inline fixed_t() {}
   inline fixed_t(int a) { val = a << FBITS; }
   inline fixed_t(float f)
   {
@@ -216,11 +215,11 @@ public:
   inline fixed_t& setvalue(value_t v) { val = v; return *this; }
 
 
-  /// OpenTNL packing method
-  void Pack(TNL::BitStream *s);
+  /// lnet packing method
+  void Pack(lnet::BitStream&s);
 
-  /// OpenTNL unpacking method
-  void Unpack(TNL::BitStream *s);
+  /// lnet unpacking method
+  void Unpack(lnet::BitStream&s);
 };
 
 
