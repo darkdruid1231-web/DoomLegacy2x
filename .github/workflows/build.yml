@@ -25,6 +25,7 @@ jobs:
             libpng-dev \
             libjpeg-dev \
             libenet-dev \
+            libglu1-mesa-dev \
             flex \
             lemon
         # Create SDL symlink if missing (code uses SDL/SDL.h)

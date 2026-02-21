@@ -22,6 +22,8 @@
 /// \brief Zone Memory Allocation. Neat. Obsolete.
 
 #include <vector>
+#include <cstdlib>
+#include <cstring>
 
 #include "doomdef.h"
 #include "z_zone.h"

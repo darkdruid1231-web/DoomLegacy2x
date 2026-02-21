@@ -28,15 +28,15 @@
 /// smallest possible increment
 fixed_t fixed_epsilon(1/float(fixed_t::UNIT));
 
-/// OpenTNL packing method
-void fixed_t::Pack(TNL::BitStream *s)
+/// lnet packing method
+void fixed_t::Pack(lnet::BitStream &s)
 {
   // TODO: save some bandwidth
-  s->writeInt(val, 32);
+  s.write(val);
 }
 
-/// OpenTNL unpacking method
-void fixed_t::Unpack(TNL::BitStream *s)
+/// lnet unpacking method
+void fixed_t::Unpack(lnet::BitStream &s)
 {
-  val = s->readInt(32);
+  val = s.readInt32();
 }
