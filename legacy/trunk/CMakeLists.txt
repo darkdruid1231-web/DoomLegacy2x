@@ -62,9 +62,6 @@ include_directories(${SDL2_INCLUDE_DIRS} ${SDL2MIXER_INCLUDE_DIRS})
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
-# Include stub headers for TNL compatibility (works with both lnet and TNL modes)
-include_directories(${CMAKE_SOURCE_DIR}/include_stubs)
-
 # ENet for modern networking
 option(USE_MODERN_NETWORKING "Use lnet for modern networking" ON)
 
