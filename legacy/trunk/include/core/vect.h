@@ -26,7 +26,7 @@
 #include <math.h>
 //#include<iostream>
 
-namespace TNL { class BitStream; };
+#include "core/ISerializer.h"
 
 /// \brief Simple template class for three-vectors
 ///
@@ -150,16 +150,16 @@ public:
   }
 
 
-  /// OpenTNL packing method
-  inline void Pack(TNL::BitStream *s)
+  /// Serialization method using ISerializer abstraction
+  inline void Pack(DoomLegacy::ISerializer& s)
   {
     x.Pack(s);
     y.Pack(s);
     z.Pack(s);
   }
 
-  /// OpenTNL unpacking method
-  inline void Unpack(TNL::BitStream *s)
+  /// Deserialization method using ISerializer abstraction
+  inline void Unpack(DoomLegacy::ISerializer& s)
   {
     x.Unpack(s);
     y.Unpack(s);
