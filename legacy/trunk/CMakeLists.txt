@@ -44,13 +44,18 @@ else()
 endif()
 
 # External libraries. First SDL.
-find_package(SDL REQUIRED)
+# Use pkg-config for SDL2 (more reliable across platforms)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(SDL2 REQUIRED sdl2)
 option(USE_SOUND "Enable sound support" ON)
 if(USE_SOUND)
-    find_package(SDL_mixer REQUIRED)
-    # USE_SOUND definition added via target_compile_definitions below
+    pkg_check_modules(SDL2MIXER sdl2mixer)
+    if(NOT SDL2MIXER_FOUND)
+        message(STATUS "SDL2_mixer not found, disabling sound")
+        set(USE_SOUND OFF)
+    endif()
 endif()
-include_directories(${SDL_INCLUDE_DIR} ${SDL_MIXER_INCLUDE_DIR})
+include_directories(${SDL2_INCLUDE_DIRS} ${SDL2MIXER_INCLUDE_DIRS})
 # SDL definition added via target_compile_definitions below
 
 # OpenGL
@@ -273,12 +278,12 @@ endif()
 
 if(WIN32)
   target_link_libraries(doomlegacy grammars util
-  ${SDL_LIBRARY} ${SDLMIXER_LIBRARY}
+  ${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES}
   ${OPENGL_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES}
   ws2_32 mswsock winmm)
 else()
   target_link_libraries(doomlegacy grammars util
-  ${SDL_LIBRARY} ${SDLMIXER_LIBRARY}
+  ${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES}
   ${OPENGL_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES}
   pthread)
 endif()
@@ -320,7 +325,7 @@ enable_testing()
 # Individual fixed_t test (legacy framework)
 add_executable(test_fixed_t tests/unit/test_fixed_t.cpp)
 target_include_directories(test_fixed_t PRIVATE include)
-target_link_libraries(test_fixed_t ${SDL_LIBRARY})
+target_link_libraries(test_fixed_t ${SDL2_LIBRARIES})
 add_test(NAME fixed_t_tests COMMAND test_fixed_t)
 
 # Individual fixed_t test using Catch2 (Phase 1 - new framework)
@@ -335,29 +340,29 @@ add_test(NAME fixed_t_catch2_tests COMMAND test_fixed_catch2)
 # Save/Load Integration Tests
 add_executable(test_save_load_unit tests/integration/test_save_load.cpp)
 target_include_directories(test_save_load_unit PRIVATE include)
-target_link_libraries(test_save_load_unit util ${SDL_LIBRARY})
+target_link_libraries(test_save_load_unit util ${SDL2_LIBRARIES})
 add_test(NAME save_load_unit_tests COMMAND test_save_load_unit)
 
 # Basic data serialization tests
 add_executable(test_serialization tests/integration/test_serialization.cpp)
 target_include_directories(test_serialization PRIVATE include)
-target_link_libraries(test_serialization ${SDL_LIBRARY})
+target_link_libraries(test_serialization ${SDL2_LIBRARIES})
 add_test(NAME serialization_tests COMMAND test_serialization)
 
 # MapInfo Unit Tests - source file not present
 # add_executable(test_mapinfo_constants tests/unit/test_mapinfo_constants.cpp)
 # target_include_directories(test_mapinfo_constants PRIVATE include)
-# target_link_libraries(test_mapinfo_constants util ${SDL_LIBRARY})
+# target_link_libraries(test_mapinfo_constants util ${SDL2_LIBRARIES})
 # add_test(NAME mapinfo_constants_tests COMMAND test_mapinfo_constants)
 
 add_executable(test_tnl_packets tests/unit/test_tnl_packets.cpp)
 target_include_directories(test_tnl_packets PRIVATE include)
-target_link_libraries(test_tnl_packets util ${SDL_LIBRARY})
+target_link_libraries(test_tnl_packets util ${SDL2_LIBRARIES})
 add_test(NAME tnl_packet_tests COMMAND test_tnl_packets)
 
 add_executable(test_actor tests/unit/test_actor.cpp)
 target_include_directories(test_actor PRIVATE include)
-target_link_libraries(test_actor util ${SDL_LIBRARY})
+target_link_libraries(test_actor util ${SDL2_LIBRARIES})
 add_test(NAME actor_tests COMMAND test_actor)
 
 # Component pattern tests using Catch2 (dependency injection, thinkable components)
@@ -368,36 +373,36 @@ add_test(NAME component_tests COMMAND test_components)
 
 add_executable(test_console tests/unit/test_console.cpp)
 target_include_directories(test_console PRIVATE include)
-target_link_libraries(test_console util ${SDL_LIBRARY})
+target_link_libraries(test_console util ${SDL2_LIBRARIES})
 add_test(NAME console_tests COMMAND test_console)
 
 add_executable(test_vector tests/unit/test_vector.cpp)
 target_include_directories(test_vector PRIVATE include)
-target_link_libraries(test_vector util ${SDL_LIBRARY})
+target_link_libraries(test_vector util ${SDL2_LIBRARIES})
 add_test(NAME vector_tests COMMAND test_vector)
 
 # Demo Integration Tests
 add_executable(test_demos_integration tests/integration/test_demos.cpp)
 target_include_directories(test_demos_integration PRIVATE include)
-target_link_libraries(test_demos_integration util ${SDL_LIBRARY})
+target_link_libraries(test_demos_integration util ${SDL2_LIBRARIES})
 add_test(NAME demos_integration_tests COMMAND test_demos_integration)
 
 # Network Integration Tests
 add_executable(test_network_integration tests/integration/test_network_integration.cpp)
 target_include_directories(test_network_integration PRIVATE include)
-target_link_libraries(test_network_integration util ${SDL_LIBRARY})
+target_link_libraries(test_network_integration util ${SDL2_LIBRARIES})
 add_test(NAME network_integration_tests COMMAND test_network_integration)
 
 # Parity Tests (C++ vs C feature parity)
 add_executable(test_parity tests/integration/test_parity.cpp)
 target_include_directories(test_parity PRIVATE include /home/geoffrey/tnl/include)
-target_link_libraries(test_parity util ${SDL_LIBRARY})
+target_link_libraries(test_parity util ${SDL2_LIBRARIES})
 add_test(NAME parity_tests COMMAND test_parity)
 
 # Console Colors Unit Tests - source file not present
 # add_executable(test_console_colors tests/unit/test_console_colors.cpp)
 # target_include_directories(test_console_colors PRIVATE include)
-# target_link_libraries(test_console_colors util ${SDL_LIBRARY})
+# target_link_libraries(test_console_colors util ${SDL2_LIBRARIES})
 # add_test(NAME console_colors_tests COMMAND test_console_colors)
 
 # Save/Load Unit Tests (renamed to avoid conflict)
