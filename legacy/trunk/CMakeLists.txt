@@ -31,12 +31,14 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_STANDARD 11)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     set(CMAKE_CXX_EXTENSIONS OFF)
-    # Keep -fpermissive for backward compatibility with legacy code
-    add_compile_options(-fpermissive)
+    # Keep -fpermissive and -w for backward compatibility with legacy code
+    add_compile_options(-fpermissive -w)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_CXX_STANDARD 11)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     set(CMAKE_CXX_EXTENSIONS OFF)
+    # Clang compatibility
+    add_compile_options(-w)
 else()
     message(FATAL_ERROR "Only GNU C++ and Clang are supported at the moment.")
 endif()
