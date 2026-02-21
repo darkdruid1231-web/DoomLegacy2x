@@ -153,8 +153,8 @@ else()
     # Include stub headers if TNL not available
     include_directories(${CMAKE_SOURCE_DIR}/include_stubs)
     
-    # Skip TNL library if USE_MODERN_NETWORKING is explicitly OFF (for Windows cross-compile)
-    if(NOT USE_MODERN_NETWORKING STREQUAL "OFF")
+    # Skip TNL library finding when networking is disabled (Windows cross-compile)
+    if(USE_NETWORKING)
     # TNL (legacy)
     if(EXISTS "/home/geoffrey/tnl/lib/libtnl.a")
         set(TNL_LIBRARY "/home/geoffrey/tnl/lib/libtnl.a")
@@ -172,7 +172,7 @@ else()
     if(${TOMCRYPT_LIBRARY} STREQUAL "TOMCRYPT_LIBRARY-NOTFOUND")
         message(FATAL_ERROR "Tomcrypt library not found.")
     endif()
-    endif()
+    endif()  # USE_NETWORKING
     
     check_include_file_cxx("tnl/tnl.h" HAS_TNL_HEADER)
     if(NOT ${HAS_TNL_HEADER})
