@@ -47,27 +47,84 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 # ENet for modern networking
-if(USE_MODERN_NETWORKING)
-    include_directories(${ENET_INCLUDE_DIR})
-endif()
-
-# Networking - Use lnet (modern) or TNL (legacy)
 option(USE_MODERN_NETWORKING "Use lnet for modern networking" ON)
 
 if(USE_MODERN_NETWORKING)
     message(STATUS "Using lnet for modern networking")
     
-    # Find ENet library
-    if(NOT ENET_INCLUDE_DIR OR NOT ENET_LIBRARY)
-        # Default locations
-        set(ENET_INCLUDE_DIR "/tmp/enet-mingw/include" CACHE PATH "ENet include directory")
-        set(ENET_LIBRARY "/tmp/enet-mingw/lib/libenet.a" CACHE FILEPATH "ENet library")
+    # Try to find ENet using CMake's find_package (works if ENet provides CMake config)
+    # First attempt with QUIET - if found, it sets ENet_FOUND
+    find_package(ENet 1.3 QUIET)
+    
+    if(ENet_FOUND)
+        message(STATUS "Found ENet via CMake: ${ENet_VERSION}")
+        include_directories(${ENET_INCLUDE_DIRS})
+        set(ENET_LIBRARY ${ENET_LIBRARIES})
+    else()
+        # Try pkg-config as fallback (most common way to find ENet)
+        find_package(PkgConfig QUIET)
+        if(PkgConfig_FOUND)
+            pkg_check_modules(PC_ENET QUIET libenet>=1.3)
+            if(PC_ENET_FOUND)
+                message(STATUS "Found ENet via pkg-config: ${PC_ENET_VERSION}")
+                include_directories(${PC_ENET_INCLUDE_DIRS})
+                set(ENET_LIBRARY ${PC_ENET_LIBRARIES})
+                set(ENET_FOUND TRUE)
+            endif()
+        endif()
     endif()
     
-    # Create imported ENet target
+    if(NOT ENET_FOUND)
+        message(STATUS "ENet not found in system paths, checking common locations...")
+        
+        # Try platform-specific default locations
+        if(WIN32)
+            # Common Windows ENet install locations
+            set(ENET_SEARCH_PATHS 
+                "C:/enet-mingw"
+                "C:/Program Files/enet"
+                "${CMAKE_SOURCE_DIR}/../enet-mingw"
+                "${CMAKE_SOURCE_DIR}/enet-mingw")
+            find_path(ENET_INCLUDE_DIR NAMES enet/enet.h PATHS ${ENET_SEARCH_PATHS} PATH_SUFFIXES include)
+            find_library(ENET_LIBRARY NAMES enet PATHS ${ENET_SEARCH_PATHS} PATH_SUFFIXES lib)
+        else()
+            # Linux/Unix common locations
+            set(ENET_SEARCH_PATHS 
+                "/usr"
+                "/usr/local"
+                "${CMAKE_SOURCE_DIR}/../enet"
+                "${CMAKE_SOURCE_DIR}/enet")
+            find_path(ENET_INCLUDE_DIR NAMES enet.h PATHS ${ENET_SEARCH_PATHS} PATH_SUFFIXES include)
+            find_library(ENET_LIBRARY NAMES enet PATHS ${ENET_SEARCH_PATHS} PATH_SUFFIXES lib)
+        endif()
+        
+        if(ENET_INCLUDE_DIR AND ENET_LIBRARY)
+            message(STATUS "Found ENet at: include=${ENET_INCLUDE_DIR}, library=${ENET_LIBRARY}")
+            include_directories(${ENET_INCLUDE_DIR})
+            set(ENET_FOUND TRUE)
+        endif()
+    endif()
+    
+    if(NOT ENET_FOUND)
+        message(FATAL_ERROR 
+            "ENet 1.3 or later not found.\n"
+            "Please install ENet or set ENET_INCLUDE_DIR and ENET_LIBRARY manually.\n"
+            "On Windows, you can download from: https://github.com/lsalzman/enet/releases\n"
+            "On Linux, install via: sudo apt-get install libenet-dev (Debian) or sudo yum install enet-devel (RHEL)")
+    endif()
+    
+    # Create imported ENet target with proper Windows linking
     add_library(enet STATIC IMPORTED)
-    set_target_properties(enet PROPERTIES IMPORTED_LOCATION "${ENET_LIBRARY}")
-    target_include_directories(enet INTERFACE "${ENET_INCLUDE_DIR}")
+    set_target_properties(enet PROPERTIES 
+        IMPORTED_LOCATION "${ENET_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${ENET_INCLUDE_DIR}")
+    
+    # ENet on Windows requires ws2_32 (Winsock) and potentially winmm
+    if(WIN32)
+        set_target_properties(enet PROPERTIES 
+            IMPORTED_LINK_DEPENDENT_LIBRARIES "ws2_32;winmm")
+        message(STATUS "ENet Windows dependencies: ws2_32, winmm")
+    endif()
 else()
     message(STATUS "Using legacy TNL networking")
     # TNL (legacy)
@@ -125,7 +182,7 @@ endmacro()
 
 include_directories(include)
 include_directories(tnl)
-include_directories(lnet)
+# include_directories(lnet)  # disabled: directory not present
 
 if(NOT USE_MODERN_NETWORKING)
     include_directories(/home/geoffrey/tnl/include)
@@ -145,7 +202,7 @@ if(USE_SOUND)
 endif()
 process_subdir(video)
 add_subdirectory(util)  # Add util first to get its SRC_FILES
-add_subdirectory(lnet)  # Add lnet for modern networking
+# add_subdirectory(lnet)  # Add lnet for modern networking - disabled: directory not present
 
 # Build util as a static library
 get_directory_property(UTIL_SRC_FILES DIRECTORY util DEFINITION SRC_FILES)
@@ -200,8 +257,8 @@ add_test(NAME fixed_t_tests COMMAND test_fixed_t)
 # Note: The run_tests target was removed because each unit test file has its own main()
 # Individual unit tests are covered by their own executables below
 
-# Save/Load Unit Tests (renamed to avoid conflict)
-add_executable(test_save_load_unit tests/unit/test_save_load.cpp)
+# Save/Load Integration Tests
+add_executable(test_save_load_unit tests/integration/test_save_load.cpp)
 target_include_directories(test_save_load_unit PRIVATE include)
 target_link_libraries(test_save_load_unit util ${SDL_LIBRARY})
 add_test(NAME save_load_unit_tests COMMAND test_save_load_unit)
@@ -212,11 +269,11 @@ target_include_directories(test_serialization PRIVATE include)
 target_link_libraries(test_serialization ${SDL_LIBRARY})
 add_test(NAME serialization_tests COMMAND test_serialization)
 
-# MapInfo Unit Tests
-add_executable(test_mapinfo_constants tests/unit/test_mapinfo_constants.cpp)
-target_include_directories(test_mapinfo_constants PRIVATE include)
-target_link_libraries(test_mapinfo_constants util ${SDL_LIBRARY})
-add_test(NAME mapinfo_constants_tests COMMAND test_mapinfo_constants)
+# MapInfo Unit Tests - source file not present
+# add_executable(test_mapinfo_constants tests/unit/test_mapinfo_constants.cpp)
+# target_include_directories(test_mapinfo_constants PRIVATE include)
+# target_link_libraries(test_mapinfo_constants util ${SDL_LIBRARY})
+# add_test(NAME mapinfo_constants_tests COMMAND test_mapinfo_constants)
 
 add_executable(test_tnl_packets tests/unit/test_tnl_packets.cpp)
 target_include_directories(test_tnl_packets PRIVATE include)
@@ -256,10 +313,10 @@ target_include_directories(test_parity PRIVATE include /home/geoffrey/tnl/includ
 target_link_libraries(test_parity util ${SDL_LIBRARY})
 add_test(NAME parity_tests COMMAND test_parity)
 
-# Console Colors Unit Tests
-add_executable(test_console_colors tests/unit/test_console_colors.cpp)
-target_include_directories(test_console_colors PRIVATE include)
-target_link_libraries(test_console_colors util ${SDL_LIBRARY})
-add_test(NAME console_colors_tests COMMAND test_console_colors)
+# Console Colors Unit Tests - source file not present
+# add_executable(test_console_colors tests/unit/test_console_colors.cpp)
+# target_include_directories(test_console_colors PRIVATE include)
+# target_link_libraries(test_console_colors util ${SDL_LIBRARY})
+# add_test(NAME console_colors_tests COMMAND test_console_colors)
 
 # Save/Load Unit Tests (renamed to avoid conflict)
