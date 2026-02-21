@@ -64,7 +64,8 @@ jobs:
             gcc-mingw-w64-x86-64 \
             cmake \
             wget \
-            unzip
+            unzip \
+            lemon
 
     - name: Download SDL2 for Windows
       run: |
