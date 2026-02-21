@@ -501,7 +501,7 @@ bool D_DoomMain()
   if (M_CheckParm("--help") || M_CheckParm("-h"))
     {
       printf("%s\n", D_MakeTitleString(LEGACY_VERSION_BANNER));
-      printf("Usage: legacy [-opengl] [-iwad xxx.wad] [-file pwad.wad stuff.zip ...]\n");
+      printf("Usage: legacy [-opengl] [-iwad xxx.wad] [-file pwad.wad stuff.zip ...] [-warp <map>] [-skill <1-5>]\n");
       return false;
     }
 
@@ -647,8 +647,9 @@ bool D_DoomMain()
   bool autostart = public_server; // server starts automatically
   int  episode = 1;
   skill_t sk = sk_medium;
+  int warp_map = 0;  // 0 means no warp specified
 
-  // get skill / episode
+  // get skill / episode / warp (map number)
 
   int p = M_CheckParm("-skill");
   if (p && M_IsNextParm())
@@ -664,11 +665,34 @@ bool D_DoomMain()
       autostart = true;
     }
 
+  // -warp <mapnumber>: skip directly to specified map, skipping menus
+  p = M_CheckParm("-warp");
+  if (p && M_IsNextParm())
+    {
+      // Warp directly to the specified map number
+      warp_map = atoi(myargv[p+1]);
+      if (warp_map > 0)
+        {
+          autostart = true;
+        }
+    }
+
   p = M_CheckParm("-loadgame");
   if (p && M_IsNextParm())
     COM.AppendText(va("load %d\n", atoi(myargv[p+1])));
   else if (autostart)
-    BeginGame(episode, sk, public_server);
+    {
+      if (warp_map > 0)
+        {
+          // Direct warp to specific map - bypass the newgame command
+          game.SV_SpawnServer(false);
+          game.SV_StartGame(sk, warp_map, 0);
+        }
+      else
+        {
+          BeginGame(episode, sk, public_server);
+        }
+    }
   else
     game.StartIntro(); // start up intro loop
 
