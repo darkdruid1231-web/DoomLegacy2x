@@ -31,6 +31,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_STANDARD 11)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     set(CMAKE_CXX_EXTENSIONS OFF)
+    # Keep -fpermissive for backward compatibility with legacy code
+    add_compile_options(-fpermissive)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_CXX_STANDARD 11)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -286,16 +288,44 @@ else()
 endif()
 
 #============================================================================
+# Catch2 Test Framework
+#============================================================================
+
+# Try to find system Catch2 first
+find_package(Catch2 QUIET)
+
+if(NOT Catch2_FOUND)
+    # Fetch Catch2 from GitHub if not found
+    include(FetchContent)
+    FetchContent_Declare(
+        catch2
+        GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+        GIT_TAG v3.7.1
+    )
+    # FetchContent_MakeAvailable sets up the target
+    FetchContent_MakeAvailable(catch2)
+    message(STATUS "Catch2 fetched via FetchContent")
+else()
+    message(STATUS "Catch2 found: ${Catch2_VERSION}")
+endif()
+
+#============================================================================
 # Test Suite Configuration
 #============================================================================
 
 enable_testing()
 
-# Individual fixed_t test (Phase 1 foundation)
+# Individual fixed_t test (legacy framework)
 add_executable(test_fixed_t tests/unit/test_fixed_t.cpp)
 target_include_directories(test_fixed_t PRIVATE include)
 target_link_libraries(test_fixed_t ${SDL_LIBRARY})
 add_test(NAME fixed_t_tests COMMAND test_fixed_t)
+
+# Individual fixed_t test using Catch2 (Phase 1 - new framework)
+add_executable(test_fixed_catch2 tests/unit/test_fixed_catch2.cpp)
+target_include_directories(test_fixed_catch2 PRIVATE include)
+target_link_libraries(test_fixed_catch2 PRIVATE Catch2::Catch2WithMain)
+add_test(NAME fixed_t_catch2_tests COMMAND test_fixed_catch2)
 
 # Note: The run_tests target was removed because each unit test file has its own main()
 # Individual unit tests are covered by their own executables below
