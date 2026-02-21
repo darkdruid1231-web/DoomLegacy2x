@@ -320,6 +320,9 @@ Material *window_background; // used to fill the space around the viewport
 
 void R_InitViewBorder()
 {
+  CONS_Printf("R_InitViewBorder: start\n");
+
+  // Try to load textures but handle failures gracefully
   const char *Doom_borders[] = {"BRDR_T", "BRDR_B", "BRDR_L", "BRDR_R", "BRDR_TL", "BRDR_TR", "BRDR_BL", "BRDR_BR"};
   const char *Raven_borders[] = {"BORDT", "BORDB", "BORDL", "BORDR", "BORDTL", "BORDTR", "BORDBL", "BORDBR"};
   const char **bname;
@@ -351,6 +354,7 @@ void R_InitViewBorder()
       // DOOM border patch.
       window_background = materials.Get("FLOOR7_2", TEX_floor);
     }
+  CONS_Printf("R_InitViewBorder: done\n");
 }
 
 
@@ -373,6 +377,10 @@ void R_FillBackScreen()
     return;
 
   Material *t = window_background;
+
+  // Skip if no background material loaded
+  if (!t)
+    return;
 
   for (y=0; y<vid.height; y += t->worldheight)
     for (x=0; x<vid.width; x += t->worldwidth)

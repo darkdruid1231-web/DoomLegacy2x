@@ -375,7 +375,10 @@ void R_ExecuteSetViewSize()
   //added:01-02-98:aspect ratio is now correct, added an 'projectiony'
   //      since the scale is not always the same between horiz. & vert.
   projection  = centerxfrac;
-  projectiony = ((vid.height*centerx*BASEVIDWIDTH)/BASEVIDHEIGHT)/vid.width;
+  if (vid.width > 0 && BASEVIDHEIGHT > 0)
+    projectiony = ((vid.height*centerx*BASEVIDWIDTH)/BASEVIDHEIGHT)/vid.width;
+  else
+    projectiony = 0;
 
   //
   // no more low detail mode, it used to setup the right drawer routines
@@ -586,35 +589,55 @@ void R_Init()
   //TestAnims();
 
   // Read texture animations, insert them into the cache, replacing the originals.
+  CONS_Printf("R_Init: reading ANIMDEFS/ANIMATED\n");
   if (R_Read_ANIMDEFS(fc.FindNumForName("ANIMDEFS")) < 0)
     R_Read_ANIMATED(fc.FindNumForName("ANIMATED"));
 
   // prepare the window border textures
+  CONS_Printf("R_Init: R_InitViewBorder\n");
   R_InitViewBorder();
 
   // setsizeneeded is set true, the viewport params will be recalculated before next rendering.
+  CONS_Printf("R_Init: R_SetViewSize\n");
   R_SetViewSize();
+  CONS_Printf("R_Init: R_SetViewSize done\n");
 
   // load lightlevel colormaps and Boom extra colormaps
+  CONS_Printf("R_Init: R_InitColormaps\n");
   R_InitColormaps();
+  CONS_Printf("R_Init: R_InitColormaps done\n");
 
   // initialize sw renderer lightlevel tables (colormaps...)
+  CONS_Printf("R_Init: R_InitLightTables\n");
   R_InitLightTables();
 
   // load playercolor translation colormaps
+  CONS_Printf("R_Init: R_InitTranslationTables\n");
   R_InitTranslationTables();
 
   // load or create translucency tables
+  CONS_Printf("R_Init: R_InitTranslucencyTables\n");
   R_InitTranslucencyTables();
 
+  CONS_Printf("R_Init: R_InitDrawNodes\n");
   R_InitDrawNodes();
 
   framecount = 0;
 
   // load crosshairs
-  int startlump = fc.GetNumForName("CROSHAI1");
-  for (int i=0; i<HU_CROSSHAIRS; i++)
-    crosshair[i] = materials.GetLumpnum(startlump + i);
+  CONS_Printf("R_Init: loading crosshairs\n");
+  int startlump = fc.FindNumForName("CROSHAI1");
+  if (startlump >= 0)
+    {
+      for (int i=0; i<HU_CROSSHAIRS; i++)
+        crosshair[i] = materials.GetLumpnum(startlump + i);
+    }
+  else
+    {
+      for (int i=0; i<HU_CROSSHAIRS; i++)
+        crosshair[i] = NULL;
+    }
+  CONS_Printf("R_Init: done\n");
 }
 
 
@@ -666,7 +689,7 @@ void Rend::R_SetupFrame(PlayerInfo *player)
 
   if ( rendermode == render_soft )
     {
-      // clip it in the case we are looking a hardware 90° full aiming
+      // clip it in the case we are looking a hardware 90ï¿½ full aiming
       // (lmps, nework and use F12...)
       aimingangle = G_ClipAimingPitch(aimingangle);
 

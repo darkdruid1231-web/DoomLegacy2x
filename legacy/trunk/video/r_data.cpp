@@ -25,7 +25,9 @@
 #include <png.h>
 
 #define GL_GLEXT_PROTOTYPES 1
+#include <GL/gl.h>
 #include <GL/glu.h>
+#include <GL/glext.h>
 
 #include "doomdef.h"
 #include "doomdata.h"
@@ -1062,7 +1064,7 @@ Material *material_cache_t::Get8char(const char *name, material_class_t mode)
 Material *material_cache_t::Get(const char *name, material_class_t mode)
 {
   // "No texture" marker.
-  if (name[0] == '-')
+  if (!name || name[0] == '-')
     return NULL;
 
   Material *t;
@@ -1091,7 +1093,8 @@ Material *material_cache_t::Get(const char *name, material_class_t mode)
 	  {
 	    // Not found there either, try loading on demand
 	    Texture *tex = textures.Load(name);
-	    t = BuildMaterial(tex, lod_tex); // wasteful...
+	    if (tex)
+	      t = BuildMaterial(tex, lod_tex); // wasteful...
 	  }
       break;
     }
@@ -1116,7 +1119,8 @@ Material *material_cache_t::Get(const char *name, material_class_t mode)
   if (t->AddRef())
     {
       // a "link" to default_item
-      default_item->AddRef();
+      if (default_item)
+        default_item->AddRef();
       // CONS_Printf("Def. material used for '%s'\n", name);
       return default_item;
     }
@@ -1958,6 +1962,7 @@ static int R_TransmapNumForName(const char *name)
 
 void R_InitTranslucencyTables()
 {
+  CONS_Printf("R_InitTranslucencyTables: start\n");
   if (devparm)
     CONS_Printf(" Loading translucency tables.\n");
 
@@ -1981,9 +1986,19 @@ void R_InitTranslucencyTables()
   if (lump >= 0)
     fc.ReadLump(lump, transtables[0]);
   else if (game.mode >= gm_heretic)
-    fc.ReadLump(fc.GetNumForName("TINTTAB"), transtables[0]);
+    {
+      lump = fc.FindNumForName("TINTTAB");
+      if (lump >= 0)
+        fc.ReadLump(lump, transtables[0]);
+    }
   else
-    fc.ReadLump(fc.GetNumForName("TRANSMED"), transtables[0]); // in legacy.wad
+    {
+      lump = fc.FindNumForName("TRANSMED"); // in legacy.wad
+      if (lump >= 0)
+        fc.ReadLump(lump, transtables[0]);
+    }
+
+  CONS_Printf("R_InitTranslucencyTables: loaded first table\n");
 
   if (game.mode >= gm_heretic)
     {
@@ -1993,16 +2008,22 @@ void R_InitTranslucencyTables()
     }
   else
     {
-      // we can use the transmaps in legacy.wad
+      // we can use the transmaps in legacy.wad - but check if they exist
       for (i=1; i<5; i++)
 	transtables[i] = static_cast<byte*>(Z_MallocAlign(tr_size, PU_STATIC, 0, 16));
 
-      fc.ReadLump(fc.GetNumForName("TRANSMOR"), transtables[1]);
-      fc.ReadLump(fc.GetNumForName("TRANSHI"),  transtables[2]);
-      fc.ReadLump(fc.GetNumForName("TRANSFIR"), transtables[3]);
-      fc.ReadLump(fc.GetNumForName("TRANSFX1"), transtables[4]);
+      int lump;
+      lump = fc.FindNumForName("TRANSMOR");
+      if (lump >= 0) fc.ReadLump(lump, transtables[1]);
+      lump = fc.FindNumForName("TRANSHI");
+      if (lump >= 0) fc.ReadLump(lump, transtables[2]);
+      lump = fc.FindNumForName("TRANSFIR");
+      if (lump >= 0) fc.ReadLump(lump, transtables[3]);
+      lump = fc.FindNumForName("TRANSFX1");
+      if (lump >= 0) fc.ReadLump(lump, transtables[4]);
     }
 
+  CONS_Printf("R_InitTranslucencyTables: done\n");
   num_transtables = 5;
 
 

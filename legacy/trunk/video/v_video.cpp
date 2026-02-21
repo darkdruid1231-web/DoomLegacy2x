@@ -138,7 +138,13 @@ void Material::Draw(float x, float y, int scrn)
 void PatchTexture::Draw(byte *dest_tl, byte *dest_tr, byte *dest_bl,
 			fixed_t col, fixed_t row, fixed_t colfrac, fixed_t rowfrac, int flags)
 {
+  // Defensive: check for null patch data
+  if (!patch_data)
+    return;
+
   patch_t *p = GeneratePatch();
+  if (!p)
+    return;
 
   for ( ; dest_tl < dest_tr; col += colfrac, dest_tl++)
     {
@@ -402,6 +408,18 @@ void V_DrawFadeConsBack(float x1, float y1, float x2, float y2)
       //FIXME OGLRenderer::FadeScreenMenuBack(0x00500000, y2);
       return;
     }
+
+  // Defensive: check for uninitialized video or console
+  if (!vid.screens[0] || !greenmap || vid.width <= 0 || vid.height <= 0)
+    return;
+
+  // Clamp coordinates to screen bounds
+  if (x1 < 0) x1 = 0;
+  if (y1 < 0) y1 = 0;
+  if (x2 > vid.width) x2 = vid.width;
+  if (y2 > vid.height) y2 = vid.height;
+  if (x1 >= x2 || y1 >= y2)
+    return;
 
   if (vid.BytesPerPixel == 1)
     {

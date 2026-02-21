@@ -123,16 +123,35 @@ Video::Video()
 //  by setting the setmodeneeded to a value >0
 void Video::SetMode()
 {
+  CONS_Printf("Video::SetMode: called, setmodeneeded=%d\n", setmodeneeded);
   if (game.dedicated)
     return;
 
   if (!setmodeneeded)
-    return;   //should never happen
+    {
+      CONS_Printf("Video::SetMode: early return, setmodeneeded=0\n");
+      return;   //should never happen
+    }
 
   I_SetVideoMode(--setmodeneeded);
   SetPalette(0);
 
   //  setup the right draw routines for either 8bpp or 16bpp
+  // Handle 0 bpp as fallback to 8bpp (SDL initialization quirk)
+  if (BytesPerPixel == 0)
+    {
+      CONS_Printf("warning: SDL returned 0 bpp, defaulting to 8bpp\n");
+      BytesPerPixel = 1;
+    }
+
+  // Handle 0 width/height (fallback to 320x200)
+  if (width == 0 || height == 0)
+    {
+      CONS_Printf("warning: SDL returned 0x0 resolution, defaulting to 320x200\n");
+      width = 320;
+      height = 200;
+    }
+
   if (BytesPerPixel == 1)
     {
       colfunc = basecolfunc = R_DrawColumn_8;
@@ -160,7 +179,10 @@ void Video::SetMode()
 
   setmodeneeded = 0;
 
+  CONS_Printf("R_Init: calling Recalc...\n");
   Recalc();
+  CONS_Printf("R_Init: done\n");
+  CONS_Printf("Video::SetMode: about to return from Recalc\n");
 }
 
 void R_Init8to16();
@@ -196,6 +218,7 @@ void Video::Startup()
 
   //Recalc();
   SetMode();
+  CONS_Printf("Video::Startup: SetMode done\n");
 }
 
 
@@ -207,6 +230,7 @@ void ASMCALL ASM_PatchRowBytes(int rowbytes);
 // Called after the video mode has changed
 void Video::Recalc()
 {
+  CONS_Printf("Video::Recalc: start\n");
   rowbytes = width * BytesPerPixel;
 
 #ifdef USEASM
@@ -257,6 +281,7 @@ void Video::Recalc()
 
   // fuzzoffsets for the 'spectre' effect,... this is a quick hack
   R_RecalcFuzzOffsets();
+  CONS_Printf("Video::Recalc: after fuzzoffsets\n");
 
   // r_plane stuff : visplanes, openings, floorclip, ceilingclip, spanstart,
   //                 spanstop, yslope, distscale, cachedheight, cacheddistance,
@@ -269,6 +294,7 @@ void Video::Recalc()
   // scr_viewsize doesn't change, neither detailLevel, but the pixels
   // per screenblock is different now, since we've changed resolution.
   R_SetViewSize();
+  CONS_Printf("Video::Recalc: after SetViewSize\n");
 
   con.recalc = true;
 
@@ -296,6 +322,12 @@ void Video::CheckDefaultMode()
   p = M_CheckParm("-height");
   if (p && p < myargc-1)
     scr_forcey = atoi(myargv[p+1]);
+
+  // Handle uninitialized resolution (when config file not found)
+  if (cv_scr_width.value == 0)
+    cv_scr_width.value = 320;
+  if (cv_scr_height.value == 0)
+    cv_scr_height.value = 200;
 
   if (scr_forcex && scr_forcey)
     {

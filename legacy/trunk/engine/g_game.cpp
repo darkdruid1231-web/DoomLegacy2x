@@ -34,8 +34,10 @@
 #include "g_input.h"
 #include "g_type.h"
 
+#ifndef SINGLEPLAYER
 #include "n_interface.h"
 #include "n_connection.h"
+#endif
 
 #include "d_event.h"
 #include "d_items.h"
@@ -141,7 +143,7 @@ void D_PageDrawer(const char *lumpname)
   // and the pic is only scaled to integer multiples (x2, x3...)
   if (rendermode == render_soft)
     {
-      if ((vid.width>BASEVIDWIDTH) || (vid.height>BASEVIDHEIGHT) )
+      if (window_background && ((vid.width>BASEVIDWIDTH) || (vid.height>BASEVIDHEIGHT) ))
         {
           for (float y=0; y<vid.height; y += window_background->worldheight)
             for (float x=0; x<vid.width; x += window_background->worldwidth)
@@ -149,14 +151,16 @@ void D_PageDrawer(const char *lumpname)
         }
     }
 
-  vid.scaledofs = vid.centerofs; // centering the scaled picture 
+  vid.scaledofs = vid.centerofs; // centering the scaled picture
   Material *t = materials.Get(lumpname);
-  t->Draw(0, 0, V_SCALE);
+  if (t)
+    t->Draw(0, 0, V_SCALE);
 
   if (game.mode >= gm_heretic && game.demosequence == 0 && game.pagetic <= 140)
     {
       t = materials.Get("ADVISOR");
-      t->Draw(4, 160, V_SCALE);
+      if (t)
+        t->Draw(4, 160, V_SCALE);
     }
   vid.scaledofs = 0;
 }
@@ -630,9 +634,11 @@ bool GameInfo::RemovePlayer(int num)
 
   // NOTE the player has already been removed from any Maps
 
+#ifndef SINGLEPLAYER
   if (p->connection)
     net->Kick(p);
   else
+#endif
     {
       // must be local
       vector<PlayerInfo *>::iterator j;
