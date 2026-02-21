@@ -74,42 +74,42 @@ if(USE_NETWORKING)
     
     if(USE_MODERN_NETWORKING)
         message(STATUS "Using lnet for modern networking")
-    
-    # Try to find ENet using CMake's find_package (works if ENet provides CMake config)
-    # First attempt with QUIET - if found, it sets ENet_FOUND
-    find_package(ENet 1.3 QUIET)
-    
-    if(ENet_FOUND)
-        message(STATUS "Found ENet via CMake: ${ENet_VERSION}")
-        include_directories(${ENET_INCLUDE_DIRS})
-        set(ENET_LIBRARY ${ENET_LIBRARIES})
-    else()
-        # Try pkg-config as fallback (most common way to find ENet)
-        find_package(PkgConfig QUIET)
-        if(PkgConfig_FOUND)
-            pkg_check_modules(PC_ENET QUIET libenet>=1.3)
-            if(PC_ENET_FOUND)
-                message(STATUS "Found ENet via pkg-config: ${PC_ENET_VERSION}")
-                include_directories(${PC_ENET_INCLUDE_DIRS})
-                set(ENET_LIBRARY ${PC_ENET_LIBRARIES})
-                set(ENET_FOUND TRUE)
+        
+        # Try to find ENet using CMake's find_package (works if ENet provides CMake config)
+        # First attempt with QUIET - if found, it sets ENet_FOUND
+        find_package(ENet 1.3 QUIET)
+        
+        if(ENet_FOUND)
+            message(STATUS "Found ENet via CMake: ${ENet_VERSION}")
+            include_directories(${ENET_INCLUDE_DIRS})
+            set(ENET_LIBRARY ${ENET_LIBRARIES})
+        else()
+            # Try pkg-config as fallback (most common way to find ENet)
+            find_package(PkgConfig QUIET)
+            if(PkgConfig_FOUND)
+                pkg_check_modules(PC_ENET QUIET libenet>=1.3)
+                if(PC_ENET_FOUND)
+                    message(STATUS "Found ENet via pkg-config: ${PC_ENET_VERSION}")
+                    include_directories(${PC_ENET_INCLUDE_DIRS})
+                    set(ENET_LIBRARY ${PC_ENET_LIBRARIES})
+                    set(ENET_FOUND TRUE)
+                endif()
             endif()
         endif()
-    endif()
-    
-    if(NOT ENET_FOUND)
-        message(STATUS "ENet not found in system paths, checking common locations...")
         
-        # Try platform-specific default locations
-        if(WIN32)
-            # Common Windows ENet install locations
-            set(ENET_SEARCH_PATHS 
-                "C:/enet-mingw"
-                "C:/Program Files/enet"
-                "${CMAKE_SOURCE_DIR}/../enet-mingw"
-                "${CMAKE_SOURCE_DIR}/enet-mingw")
-            find_path(ENET_INCLUDE_DIR NAMES enet/enet.h PATHS ${ENET_SEARCH_PATHS} PATH_SUFFIXES include)
-            find_library(ENET_LIBRARY NAMES enet PATHS ${ENET_SEARCH_PATHS} PATH_SUFFIXES lib)
+        if(NOT ENET_FOUND)
+            message(STATUS "ENet not found in system paths, checking common locations...")
+            
+            # Try platform-specific default locations
+            if(WIN32)
+                # Common Windows ENet install locations
+                set(ENET_SEARCH_PATHS 
+                    "C:/enet-mingw"
+                    "C:/Program Files/enet"
+                    "${CMAKE_SOURCE_DIR}/../enet-mingw"
+                    "${CMAKE_SOURCE_DIR}/enet-mingw")
+                find_path(ENET_INCLUDE_DIR NAMES enet/enet.h PATHS ${ENET_SEARCH_PATHS} PATH_SUFFIXES include)
+                find_library(ENET_LIBRARY NAMES enet PATHS ${ENET_SEARCH_PATHS} PATH_SUFFIXES lib)
         else()
             # Linux/Unix common locations
             set(ENET_SEARCH_PATHS 
@@ -182,7 +182,8 @@ else()
             message(FATAL_ERROR "TNL headers not found.")
         endif()
     endif()
-endif()
+    endif()  # USE_MODERN_NETWORKING
+endif()  # USE_NETWORKING
 
 # Graphics
 find_package(PNG REQUIRED)
