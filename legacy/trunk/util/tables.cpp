@@ -37,9 +37,13 @@
 ///  tantoangle[i]  == atan(i/SLOPERANGE) * (2^32 / (2*pi))
 
 #include <math.h>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 #include "tables.h"
 
-
+// FloatBobOffsets table - used for weapon bobbing
 const fixed_t FloatBobOffsets[64];
 
 void GenerateTables()

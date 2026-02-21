@@ -42,6 +42,8 @@
 
 #include "hardware/md3.h"
 
+using namespace lnet;
+
 //==========================================================================
 //                         Global functions
 //==========================================================================
@@ -648,37 +650,37 @@ void presentation_t::operator delete(void *mem)
 }
 
 
-void spritepres_t::Pack(BitStream *s)
+void spritepres_t::Pack(lnet::BitStream &s)
 {
-  s->writeInt(info->GetMobjType(), 16); // DActorInfo defines the spritepres
-  s->writeInt(color, 8);
+  s.writeInt(info->GetMobjType(), 16); // DActorInfo defines the spritepres
+  s.writeInt(color, 8);
   PackAnim(s);
   // flags and lastupdate need not be sent
 }
 
 /// replaces Unpack()
-spritepres_t::spritepres_t(BitStream *s)
+spritepres_t::spritepres_t(lnet::BitStream &s)
 {
-  int temp = s->readInt(16);
+  int temp = s.readInt(16);
   info = aid[mobjtype_t(temp)];
-  color = s->readInt(8);
+  color = s.readInt(8);
 
   spr = NULL;
   UnpackAnim(s);
 }
 
 
-void spritepres_t::PackAnim(BitStream *s)
+void spritepres_t::PackAnim(lnet::BitStream &s)
 {
-  s->writeInt(animseq, 8);
-  s->writeInt(state - states, 16);
+  s.writeInt(animseq, 8);
+  s.writeInt(state - states, 16);
 }
 
 
-void spritepres_t::UnpackAnim(BitStream *s)
+void spritepres_t::UnpackAnim(lnet::BitStream &s)
 {
-  animseq = animseq_e(s->readInt(8));
-  SetFrame(&states[s->readInt(16)]);
+  animseq = animseq_e(s.readInt(8));
+  SetFrame(&states[s.readInt(16)]);
 }
 
 
