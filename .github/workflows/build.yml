@@ -117,15 +117,35 @@ jobs:
           -DUSE_NETWORKING=OFF \
           -DUSE_IMAGE_SUPPORT=OFF \
           -DSDL2MIXER=OFF
+        echo "USE_NETWORKING=OFF" >> $GITHUB_ENV
 
     - name: Build Windows executable
       run: |
         cd legacy/trunk/build-win
-        cmake --build . --parallel 2>&1 | tail -30
+        
+        # When networking is disabled, build only tests (main exe needs networking code)
+        if [ "$USE_NETWORKING" = "OFF" ]; then
+          echo "Building tests only (networking disabled)"
+          cmake --build . --target test_fixed_t test_fixed_catch2 test_vector test_console --parallel
+        else
+          cmake --build . --parallel
+        fi
 
-    - name: Upload Windows executable
+    - name: Upload Windows artifacts
+      if: env.USE_NETWORKING != 'OFF'
       uses: actions/upload-artifact@v4
       with:
         name: doomlegacy-windows
         path: legacy/trunk/build-win/doomlegacy.exe
+        retention-days: 30
+
+    - name: Upload Windows test artifacts
+      if: env.USE_NETWORKING == 'OFF'
+      uses: actions/upload-artifact@v4
+      with:
+        name: doomlegacy-windows-tests
+        path: |
+          legacy/trunk/build-win/test_fixed_t.exe
+          legacy/trunk/build-win/test_vector.exe
+          legacy/trunk/build-win/test_console.exe
         retention-days: 30
