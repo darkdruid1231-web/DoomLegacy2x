@@ -19,9 +19,23 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
+# Critical: Skip adding host system include paths during cross-compilation
+# This prevents the compiler from finding Linux headers like /usr/include/wchar.h
+set(CMAKE_INCLUDE_FLAG_CXX "-I")
+set(CMAKE_INCLUDE_FLAG_C "-I")
+set(CMAKE_DISABLE_SYSROOT_PATHS TRUE)
+
+# Use sysroot to ensure we only use MinGW headers
+set(CMAKE_SYSROOT /usr/x86_64-w64-mingw32)
+
 # Windows-specific settings
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 
 # Disable RPATH
 set(CMAKE_SKIP_RPATH TRUE)
+
+# Force pkg-config to use cross-compilation paths
+set(PKG_CONFIG_EXECUTABLE /usr/bin/pkg-config)
+set(PKG_CONFIG_SYSROOT_DIR /usr/x86_64-w64-mingw32)
+set(PKG_CONFIG_PREFIX /usr/x86_64-w64-mingw32)
