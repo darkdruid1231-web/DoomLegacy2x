@@ -72,17 +72,17 @@ jobs:
         mkdir -p /tmp/sdl2
         cd /tmp/sdl2
         
-        # SDL2 - use correct release URL (SDL2 not SDL3)
-        wget -q https://github.com/libsdl-org/SDL/releases/download/release-2.32.10/SDL2-2.32.10-win32-x64.zip
-        unzip -q SDL2-2.32.10-win32-x64.zip
+        # SDL2 - download development libraries for MinGW (includes headers)
+        wget -q https://github.com/libsdl-org/SDL/releases/download/release-2.32.10/SDL2-devel-2.32.10-mingw.tar.gz
+        tar -xzf SDL2-devel-2.32.10-mingw.tar.gz
         
         # Create Windows sysroot
         sudo mkdir -p /usr/x86_64-w64-mingw32
-        sudo cp -r /tmp/sdl2/* /usr/x86_64-w64-mingw32/
+        sudo cp -r /tmp/sdl2/SDL2-2.32.10/x86_64-w64-mingw32/* /usr/x86_64-w64-mingw32/
         
         # Copy SDL2.dll to expected location
         sudo mkdir -p /usr/x86_64-w64-mingw32/bin
-        sudo cp /tmp/sdl2/SDL2.dll /usr/x86_64-w64-mingw32/bin/
+        sudo cp /tmp/sdl2/SDL2-2.32.10/x86_64-w64-mingw32/bin/SDL2.dll /usr/x86_64-w64-mingw32/bin/
 
     - name: Create SDL2 config for MinGW
       run: |
