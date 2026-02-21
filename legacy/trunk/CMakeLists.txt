@@ -1,5 +1,5 @@
+cmake_minimum_required(VERSION 3.16)
 project(doomlegacy C CXX)
-cmake_minimum_required(VERSION 2.8.0)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
@@ -21,15 +21,22 @@ set(DL_VERSION "${CF_VERSION_MAJOR}.${CF_VERSION_MINOR}.${CF_VERSION_PATCH}")
 INCLUDE(CheckCXXCompilerFlag)
 INCLUDE(CheckIncludeFileCXX)
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-    set(c0flag "-std=c++0x -fpermissive -w")
-    CHECK_CXX_COMPILER_FLAG(${c0flag} HAS_C0X)
-    if(NOT ${HAS_C0X})
-        message(FATAL_ERROR "Your compiler does not support c++0x features. Can not build.")
+# Modern compiler detection - CMAKE_COMPILER_IS_GNUCXX was removed in CMake 3.6+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    # Check for C++11 support
+    CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+    if(NOT COMPILER_SUPPORTS_CXX11)
+        message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER_ID} has no C++11 support. Please use a newer GCC version.")
     endif()
-    add_definitions(${c0flag})
+    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)
 else()
-    message(FATAL_ERROR "Only GNU C++ is supported at the moment.")
+    message(FATAL_ERROR "Only GNU C++ and Clang are supported at the moment.")
 endif()
 
 # External libraries. First SDL.
@@ -37,10 +44,10 @@ find_package(SDL REQUIRED)
 option(USE_SOUND "Enable sound support" ON)
 if(USE_SOUND)
     find_package(SDL_mixer REQUIRED)
-    add_definitions("-DUSE_SOUND")
+    # USE_SOUND definition added via target_compile_definitions below
 endif()
 include_directories(${SDL_INCLUDE_DIR} ${SDL_MIXER_INCLUDE_DIR})
-add_definitions("-DSDL")
+# SDL definition added via target_compile_definitions below
 
 # OpenGL
 find_package(OpenGL REQUIRED)
@@ -181,20 +188,17 @@ macro(process_subdir dirname)
 endmacro()
 
 include_directories(include)
+include_directories(include/core)
 include_directories(tnl)
 # include_directories(lnet)  # disabled: directory not present
 
 if(NOT USE_MODERN_NETWORKING)
     include_directories(/home/geoffrey/tnl/include)
-    add_definitions(-DTNL_LITTLE_ENDIAN)
-    add_definitions(-D_TNL_X86_)
+    # TNL definitions added via target_compile_definitions below
 endif()
 
-add_definitions(-DFN_CDECL=)
-add_definitions(-Di386)
-add_definitions(-Dlinux)
-add_definitions(-D__GNUC__)
-add_definitions(-DQSORT_CALLBACK=)
+# Platform-specific definitions - now using target_compile_definitions below
+# (removed add_definitions here)
 
 process_subdir(engine)
 if(USE_SOUND)
@@ -214,6 +218,22 @@ endforeach()
 add_library(util STATIC ${UTIL_SRCS})
 target_include_directories(util PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
+# Apply platform-specific definitions to util (required for TNL headers)
+target_compile_definitions(util PRIVATE
+    FN_CDECL=
+    i386
+    linux
+    __GNUC__
+    QSORT_CALLBACK=
+)
+
+if(NOT USE_MODERN_NETWORKING)
+    target_compile_definitions(util PRIVATE
+        TNL_LITTLE_ENDIAN
+        _TNL_X86_
+    )
+endif()
+
 process_subdir(net)
 process_subdir(interface)
 
@@ -224,6 +244,29 @@ add_executable(d2h tools/d2h.cpp)
 add_executable(wadtool tools/wadtool.cpp util/md5.cpp)
 
 add_executable(doomlegacy ${LEGACY_SRC})
+
+# Modern target-based definitions (replacing deprecated add_definitions)
+target_compile_definitions(doomlegacy PRIVATE
+    SDL
+    FN_CDECL=
+    i386
+    linux
+    __GNUC__
+    QSORT_CALLBACK=
+)
+
+# Conditional definitions
+if(USE_SOUND)
+    target_compile_definitions(doomlegacy PRIVATE USE_SOUND)
+endif()
+
+if(NOT USE_MODERN_NETWORKING)
+    target_compile_definitions(doomlegacy PRIVATE
+        TNL_LITTLE_ENDIAN
+        _TNL_X86_
+    )
+endif()
+
 if(WIN32)
   target_link_libraries(doomlegacy grammars util
   ${SDL_LIBRARY} ${SDLMIXER_LIBRARY}
