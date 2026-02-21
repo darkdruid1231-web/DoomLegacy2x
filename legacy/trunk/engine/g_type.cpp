@@ -23,6 +23,8 @@
 #include "tnl/tnlBitStream.h"
 #include "tnl/tnlGhostConnection.h"
 
+#include "core/ISerializer.h"
+
 #include "n_interface.h"
 #include "n_connection.h"
 
@@ -62,6 +64,39 @@ void GameType::ReadServerInfo(BitStream &s)
   consvar_t::LoadNetVars(s);
 
   //void ReadNetInfo(BitStream &s)
+  S32 n;
+  s.read(&n); // number of files
+
+  bool dl;
+  char name[128];
+  S32 size;
+  byte md5[16];
+
+  for (int i=0; i<n; i++)
+    {
+      s.read(&dl);  // downloadable?
+      s.readString(name);
+      s.read(&size);
+      s.read(16, md5);
+    }
+
+  s.readString(name); // HACK, mapinfo lump name
+  game.mapinfo_lump = name;
+}
+
+// ISerializer overloads - TNL-free serialization
+void GameType::WriteServerInfo(DoomLegacy::ISerializer &s)
+{
+  consvar_t::SaveNetVars(s);
+  fc.WriteNetInfo(s); // file names, sizes and md5 sums
+  s.writeString(game.mapinfo_lump.c_str()); // HACK
+}
+
+void GameType::ReadServerInfo(DoomLegacy::ISerializer &s)
+{
+  consvar_t::LoadNetVars(s);
+
+  //void ReadNetInfo(ISerializer &s)
   S32 n;
   s.read(&n); // number of files
 

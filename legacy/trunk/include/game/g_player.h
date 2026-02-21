@@ -29,6 +29,7 @@
 #include <deque>
 #include <string>
 #include "tnl/tnlNetObject.h"
+#include "core/ISerializer.h"
 #include "doomtype.h"
 #include "d_ticcmd.h"
 #include "d_items.h"
@@ -88,6 +89,10 @@ public:
 
   void Write(class BitStream *stream);
   void Read(class BitStream *stream);
+
+  // ISerializer-based methods (TNL-independent)
+  void Write(DoomLegacy::ISerializer& s);
+  void Read(DoomLegacy::ISerializer& s);
 };
 
 
@@ -217,6 +222,10 @@ public:
 
   int Serialize(class LArchive &a);
   int Unserialize(LArchive &a);
+
+  // ISerializer-based methods (TNL-independent)
+  void Serialize(DoomLegacy::ISerializer& s);
+  void Unserialize(DoomLegacy::ISerializer& s);
 
   void SavePawn();
   void LoadPawn();
