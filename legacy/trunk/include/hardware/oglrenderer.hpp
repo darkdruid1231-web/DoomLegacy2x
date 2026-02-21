@@ -23,8 +23,15 @@
 #ifndef oglrenderer_hpp_
 #define oglrenderer_hpp_
 
+#ifdef USE_SDL2
 #include<SDL/SDL.h>
+#endif
 #include<GL/gl.h>
+
+// Provide a dummy type when SDL is not available
+#ifndef SDL_Surface
+struct SDL_Surface {};
+#endif
 #include<GL/glu.h>
 
 #include"vect.h"

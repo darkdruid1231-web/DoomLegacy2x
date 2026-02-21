@@ -28,6 +28,13 @@
 #include "doomtype.h"
 #include "m_random.h"
 
+#ifdef _WIN32
+// drand48() is not available on Windows, provide a replacement
+static double drand48(void) {
+    return (double)rand() / (double)RAND_MAX;
+}
+#endif
+
 //
 // M_Random
 // Returns a 0-255 number
