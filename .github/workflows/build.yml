@@ -119,13 +119,11 @@ jobs:
         wget -q https://github.com/lsalzman/enet/archive/refs/tags/v1.3.17.tar.gz -O enet-src.tar.gz
         tar -xzf enet-src.tar.gz
         cd enet-1.3.17
-        # Copy toolchain file to /tmp for easier path handling
-        cp $GITHUB_WORKSPACE/legacy/trunk/cmake/mingw-w64-x86_64.cmake /tmp/
-        # Use CMake to build ENet for MinGW (no configure script)
+        # Build ENet for MinGW using direct compiler settings (no toolchain file needed)
         rm -rf build
         mkdir build
         cd build
-        cmake .. -DCMAKE_TOOLCHAIN_FILE=/tmp/mingw-w64-x86_64.cmake -DCMAKE_INSTALL_PREFIX=/usr/x86_64-w64-mingw32
+        cmake .. -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++ -DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres -DCMAKE_INSTALL_PREFIX=/usr/x86_64-w64-mingw32 -DBUILD_SHARED_LIBS=OFF
         make -j4
         sudo cp include/enet/*.h /usr/x86_64-w64-mingw32/include/
         sudo cp libenet.a /usr/x86_64-w64-mingw32/lib/
