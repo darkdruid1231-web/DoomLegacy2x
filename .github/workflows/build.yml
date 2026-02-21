@@ -122,30 +122,22 @@ jobs:
         mkdir -p build-win
         cd build-win
         
-        # Cross-compile with MinGW - disable networking and image support for Windows
+        # Cross-compile with MinGW - disable SDL2 and image support for Windows
         cmake .. \
           -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw-w64-x86_64.cmake \
           -DCMAKE_BUILD_TYPE=Release \
-          -DUSE_NETWORKING=OFF \
           -DUSE_SDL2=OFF \
           -DUSE_IMAGE_SUPPORT=OFF \
           -DSDL2MIXER=OFF
-        echo "USE_NETWORKING=OFF" >> $GITHUB_ENV
 
     - name: Build Windows executable
       run: |
         cd legacy/trunk/build-win
         
-        # When networking is disabled, build only tests (main exe needs networking code)
-        if [ "$USE_NETWORKING" = "OFF" ]; then
-          echo "Building tests only (networking disabled)"
-          cmake --build . --target test_fixed_t test_fixed_catch2 test_vector test_console --parallel
-        else
-          cmake --build . --parallel
-        fi
+        # Always build the main exe (plus tests)
+        cmake --build . --parallel
 
     - name: Upload Windows artifacts
-      if: env.USE_NETWORKING != 'OFF'
       uses: actions/upload-artifact@v4
       with:
         name: doomlegacy-windows
@@ -153,7 +145,6 @@ jobs:
         retention-days: 30
 
     - name: Upload Windows test artifacts
-      if: env.USE_NETWORKING == 'OFF'
       uses: actions/upload-artifact@v4
       with:
         name: doomlegacy-windows-tests
