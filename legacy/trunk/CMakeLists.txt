@@ -62,14 +62,18 @@ include_directories(${SDL2_INCLUDE_DIRS} ${SDL2MIXER_INCLUDE_DIRS})
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
+# Option to disable networking entirely (for platforms without networking support)
+option(USE_NETWORKING "Enable networking support" ON)
+
 # Include TNL stub headers for compatibility
 include_directories(${CMAKE_SOURCE_DIR}/include_stubs)
 
 # ENet for modern networking
-option(USE_MODERN_NETWORKING "Use lnet for modern networking" ON)
-
-if(USE_MODERN_NETWORKING)
-    message(STATUS "Using lnet for modern networking")
+if(USE_NETWORKING)
+    option(USE_MODERN_NETWORKING "Use lnet for modern networking" ON)
+    
+    if(USE_MODERN_NETWORKING)
+        message(STATUS "Using lnet for modern networking")
     
     # Try to find ENet using CMake's find_package (works if ENet provides CMake config)
     # First attempt with QUIET - if found, it sets ENet_FOUND
@@ -149,6 +153,8 @@ else()
     # Include stub headers if TNL not available
     include_directories(${CMAKE_SOURCE_DIR}/include_stubs)
     
+    # Skip TNL library if USE_MODERN_NETWORKING is explicitly OFF (for Windows cross-compile)
+    if(NOT USE_MODERN_NETWORKING STREQUAL "OFF")
     # TNL (legacy)
     if(EXISTS "/home/geoffrey/tnl/lib/libtnl.a")
         set(TNL_LIBRARY "/home/geoffrey/tnl/lib/libtnl.a")
@@ -165,6 +171,7 @@ else()
     endif()
     if(${TOMCRYPT_LIBRARY} STREQUAL "TOMCRYPT_LIBRARY-NOTFOUND")
         message(FATAL_ERROR "Tomcrypt library not found.")
+    endif()
     endif()
     
     check_include_file_cxx("tnl/tnl.h" HAS_TNL_HEADER)
