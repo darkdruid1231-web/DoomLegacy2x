@@ -27,6 +27,7 @@
 #include <math.h>
 #include "doomtype.h"
 #include "lnet.h"
+#include "core/ISerializer.h"
 
 
 /// \brief Class for 16.16 fixed point arithmetic
@@ -215,11 +216,12 @@ public:
   inline fixed_t& setvalue(value_t v) { val = v; return *this; }
 
 
-  /// lnet packing method
-  void Pack(lnet::BitStream&s);
+  /// Serialization method - uses ISerializer abstraction
+  /// This allows packing without depending on specific networking code
+  void Pack(DoomLegacy::ISerializer& s);
 
-  /// lnet unpacking method
-  void Unpack(lnet::BitStream&s);
+  /// Deserialization method
+  void Unpack(DoomLegacy::ISerializer& s);
 };
 
 
