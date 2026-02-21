@@ -7,7 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  # Linux build with tests
+  linux-build:
     runs-on: ubuntu-latest
 
     steps:
@@ -45,3 +46,82 @@ jobs:
       run: |
         cd legacy/trunk/build
         ctest --output-on-failure -R "fixed_t|vector|console|save_load" || true
+
+  # Windows cross-compilation
+  windows-build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install MinGW cross-compiler and tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+            mingw-w64-x86-64 \
+            cmake \
+            wget \
+            unzip
+
+    - name: Download SDL2 for Windows
+      run: |
+        mkdir -p /tmp/sdl2
+        cd /tmp/sdl2
+        
+        # SDL2
+        wget -q https://github.com/libsdl-org/SDL/releases/download/release-2.30.10/SDL2-2.30.10-win32-x86_64.zip
+        unzip -q SDL2-2.30.10-win32-x86_64.zip
+        
+        # Create Windows sysroot
+        sudo mkdir -p /usr/x86_64-w64-mingw32
+        sudo cp -r SDL2-2.30.10-x86_64/* /usr/x86_64-w64-mingw32/
+        
+        # Copy SDL2.dll to expected location
+        sudo mkdir -p /usr/x86_64-w64-mingw32/bin
+        sudo cp /tmp/sdl2/SDL2-2.30.10-x86_64/SDL2.dll /usr/x86_64-w64-mingw32/bin/
+
+    - name: Create SDL2 config for MinGW
+      run: |
+        # Create a fake pkg-config for SDL2 targeting Windows
+        sudo mkdir -p /usr/x86_64-w64-mingw32/lib/pkgconfig
+        cat << 'EOF' | sudo tee /usr/x86_64-w64-mingw32/lib/pkgconfig/sdl2.pc
+        prefix=/usr/x86_64-w64-mingw32
+        exec_prefix=${prefix}
+        libdir=${exec_prefix}/lib
+        includedir=${prefix}/include
+        
+        Name: SDL2
+        Description: Simple DirectMedia Layer
+        Version: 2.30.10
+        Libs: -L${libdir} -lSDL2
+        Cflags: -I${includedir}/SDL2
+        EOF
+
+    - name: Configure for Windows
+      env:
+        PKG_CONFIG_PATH: /usr/x86_64-w64-mingw32/lib/pkgconfig
+      run: |
+        cd legacy/trunk
+        rm -rf build-win
+        mkdir -p build-win
+        cd build-win
+        
+        # Cross-compile with MinGW
+        cmake .. \
+          -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw-w64-x86_64.cmake \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DUSE_MODERN_NETWORKING=ON \
+          -DSDL2MIXER=OFF
+
+    - name: Build Windows executable
+      run: |
+        cd legacy/trunk/build-win
+        cmake --build . --parallel 2>&1 | tail -30
+
+    - name: Upload Windows executable
+      uses: actions/upload-artifact@v4
+      with:
+        name: doomlegacy-windows
+        path: legacy/trunk/build-win/doomlegacy.exe
+        retention-days: 30
