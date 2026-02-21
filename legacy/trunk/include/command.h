@@ -27,6 +27,7 @@
 #include <stdio.h>
 
 #include "doomtype.h"
+#include "core/ISerializer.h"
 
 using namespace std;
 
@@ -209,6 +210,12 @@ public:
   static void SaveNetVars(TNL::BitStream &s);
   /// load all CV_NETVAR variables from a buffer
   static void LoadNetVars(TNL::BitStream &s);
+  
+  /// save all CV_NETVAR variables using abstraction (TNL-independent)
+  static void SaveNetVars(DoomLegacy::ISerializer &s);
+  /// load all CV_NETVAR variables using abstraction (TNL-independent)
+  static void LoadNetVars(DoomLegacy::ISerializer &s);
+  
   /// received a new value for a netvar
   static void GotNetVar(unsigned short id, const char *str);
 };

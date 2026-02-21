@@ -928,6 +928,36 @@ void consvar_t::LoadNetVars(TNL::BitStream &s)
       }
 }
 
+// write the netvars into a buffer using ISerializer abstraction
+void consvar_t::SaveNetVars(DoomLegacy::ISerializer &s)
+{
+  for (consvar_t *cvar = cvar_list; cvar; cvar = cvar->next)
+    if (cvar->flags & CV_NETVAR)
+      {
+	s.write(cvar->netid);
+        s.writeString(cvar->str);
+      }
+}
+
+// read the netvars from a buffer using ISerializer abstraction
+void consvar_t::LoadNetVars(DoomLegacy::ISerializer &s)
+{
+  for (consvar_t *cvar = cvar_list; cvar; cvar = cvar->next)
+    if (cvar->flags & CV_NETVAR)
+      {
+	// the for loop is just used for count
+	unsigned short id;
+	id = s.readUInt16();
+	char temp[256];
+        // Read string into std::string first, then copy to buffer
+        std::string str;
+        s.readString(str);
+        strncpy(temp, str.c_str(), sizeof(temp) - 1);
+        temp[sizeof(temp) - 1] = '\0';
+	GotNetVar(id, temp);
+      }
+}
+
 
 // as if "<varname> <value>" is entered at the console
 void consvar_t::Set(const char *s)
