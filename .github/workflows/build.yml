@@ -77,11 +77,11 @@ jobs:
         
         # Create Windows sysroot
         sudo mkdir -p /usr/x86_64-w64-mingw32
-        sudo cp -r SDL2-2.32.10-x64/* /usr/x86_64-w64-mingw32/
+        sudo cp -r /tmp/sdl2/* /usr/x86_64-w64-mingw32/
         
         # Copy SDL2.dll to expected location
         sudo mkdir -p /usr/x86_64-w64-mingw32/bin
-        sudo cp /tmp/sdl2/SDL2-2.32.10-x64/SDL2.dll /usr/x86_64-w64-mingw32/bin/
+        sudo cp /tmp/sdl2/SDL2.dll /usr/x86_64-w64-mingw32/bin/
 
     - name: Create SDL2 config for MinGW
       run: |
