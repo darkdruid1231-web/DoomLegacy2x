@@ -125,7 +125,7 @@ jobs:
         sudo cp include/enet/*.h /usr/x86_64-w64-mingw32/include/
         sudo cp .libs/libenet.a /usr/x86_64-w64-mingw32/lib/libenet.a
 
-    - name: Create SDL2 config for MinGW
+    - name: Configure CMake for MinGW
       env:
         PKG_CONFIG_PATH: /usr/x86_64-w64-mingw32/lib/pkgconfig
       run: |
@@ -140,7 +140,8 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release \
           -DUSE_SDL2=OFF \
           -DUSE_IMAGE_SUPPORT=OFF \
-          -DSDL2MIXER=OFF
+          -DSDL2MIXER=OFF \
+          -DCMAKE_VERBOSE_MAKEFILE=ON
 
     - name: Build Windows executable
       run: |
