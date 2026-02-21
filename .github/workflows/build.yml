@@ -107,7 +107,8 @@ jobs:
         wget -q https://github.com/madler/zlib/archive/refs/tags/v1.2.11.tar.gz -O zlib-src.tar.gz
         tar -xzf zlib-src.tar.gz
         cd zlib-1.2.11
-        CC=x86_64-w64-mingw32-gcc ./configure --prefix=/usr/x86_64-w64-mingw32
+        # Use --static to avoid building shared library which requires -lc (not available for MinGW)
+        CC=x86_64-w64-mingw32-gcc ./configure --prefix=/usr/x86_64-w64-mingw32 --static
         make -j4
         sudo cp zlib.h zconf.h /usr/x86_64-w64-mingw32/include/
         sudo cp libz.a /usr/x86_64-w64-mingw32/lib/
