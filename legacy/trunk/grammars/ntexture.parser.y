@@ -44,6 +44,7 @@
 %type num {float}
 
 %include {
+#include <cctype>
 #include "i_video.h"
 #include "z_zone.h"
 #include "parser_driver.h"

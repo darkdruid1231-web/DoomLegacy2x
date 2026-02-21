@@ -143,6 +143,9 @@ if(USE_MODERN_NETWORKING)
     endif()
 else()
     message(STATUS "Using legacy TNL networking")
+    # Include stub headers if TNL not available
+    include_directories(${CMAKE_SOURCE_DIR}/include_stubs)
+    
     # TNL (legacy)
     if(EXISTS "/home/geoffrey/tnl/lib/libtnl.a")
         set(TNL_LIBRARY "/home/geoffrey/tnl/lib/libtnl.a")
