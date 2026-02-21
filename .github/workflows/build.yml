@@ -29,7 +29,7 @@ jobs:
             lemon
 
     - name: Configure CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -S legacy/trunk -DUSE_MODERN_NETWORKING=ON
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -S legacy/trunk -DUSE_MODERN_NETWORKING=OFF
 
     - name: Build
       run: cmake --build build --parallel
