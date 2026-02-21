@@ -27,6 +27,8 @@ jobs:
             libenet-dev \
             flex \
             lemon
+        # Create SDL symlink if missing (code uses SDL/SDL.h)
+        sudo ln -sf /usr/include/SDL2 /usr/include/SDL || true
 
     - name: Configure and Build
       run: |
