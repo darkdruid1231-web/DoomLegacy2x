@@ -360,6 +360,12 @@ target_include_directories(test_actor PRIVATE include)
 target_link_libraries(test_actor util ${SDL_LIBRARY})
 add_test(NAME actor_tests COMMAND test_actor)
 
+# Component pattern tests using Catch2 (dependency injection, thinkable components)
+add_executable(test_components tests/unit/test_components.cpp)
+target_include_directories(test_components PRIVATE include)
+target_link_libraries(test_components PRIVATE Catch2::Catch2WithMain)
+add_test(NAME component_tests COMMAND test_components)
+
 add_executable(test_console tests/unit/test_console.cpp)
 target_include_directories(test_console PRIVATE include)
 target_link_libraries(test_console util ${SDL_LIBRARY})
