@@ -100,30 +100,7 @@ jobs:
         Cflags: -I${includedir}/SDL2
         EOF
 
-    - name: Download ENet for Windows
-      run: |
-        mkdir -p /tmp/enet
-        cd /tmp/enet
-        wget -q https://github.com/lsalzman/enet/releases/download/v1.3.17/enet-1.3.17-win32.zip
-        unzip -q enet-1.3.17-win32.zip
-        sudo cp -r /tmp/enet/include/* /usr/x86_64-w64-mingw32/include/
-        sudo cp /tmp/enet/libenet/libenet.a /usr/x86_64-w64-mingw32/lib/ || true
-
-        # Create pkg-config for ENet
-        cat << 'EOF' | sudo tee /usr/x86_64-w64-mingw32/lib/pkgconfig/enet.pc
-        prefix=/usr/x86_64-w64-mingw32
-        exec_prefix=${prefix}
-        libdir=${exec_prefix}/lib
-        includedir=${prefix}/include
-        
-        Name: ENet
-        Description: Reliable UDP networking library
-        Version: 1.3.17
-        Libs: -L${libdir} -lenet
-        Cflags: -I${includedir}
-        EOF
-
-    - name: Configure for Windows
+    - name: Create SDL2 config for MinGW
       env:
         PKG_CONFIG_PATH: /usr/x86_64-w64-mingw32/lib/pkgconfig
       run: |
@@ -132,11 +109,11 @@ jobs:
         mkdir -p build-win
         cd build-win
         
-        # Cross-compile with MinGW
+        # Cross-compile with MinGW - disable networking for now
         cmake .. \
           -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw-w64-x86_64.cmake \
           -DCMAKE_BUILD_TYPE=Release \
-          -DUSE_MODERN_NETWORKING=ON \
+          -DUSE_MODERN_NETWORKING=OFF \
           -DSDL2MIXER=OFF
 
     - name: Build Windows executable
