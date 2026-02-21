@@ -27,20 +27,9 @@ jobs:
             libenet-dev \
             flex \
             lemon
-    
-    - name: Install TNL library (legacy networking)
-      run: |
-        # Clone and build TNL for legacy networking support
-        cd /tmp
-        git clone --depth 1 https://github.com/lichdr/TNL.git
-        cd TNL
-        make -j2
-        sudo cp -r include/tnl /usr/local/include/
-        sudo cp lib/libtnl.a /usr/local/lib/ || true
-        sudo cp lib/libtomcrypt.a /usr/local/lib/ || true
 
     - name: Configure CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -S legacy/trunk -DUSE_MODERN_NETWORKING=OFF
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -S legacy/trunk -DUSE_MODERN_NETWORKING=ON
 
     - name: Build
       run: cmake --build build --parallel
