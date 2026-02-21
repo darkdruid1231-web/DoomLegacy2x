@@ -28,15 +28,15 @@
 /// smallest possible increment
 fixed_t fixed_epsilon(1/float(fixed_t::UNIT));
 
-/// lnet packing method
-void fixed_t::Pack(lnet::BitStream &s)
+/// Serialization using ISerializer abstraction
+void fixed_t::Pack(DoomLegacy::ISerializer &s)
 {
   // TODO: save some bandwidth
-  s.write(val);
+  s.write(static_cast<uint32_t>(val));
 }
 
-/// lnet unpacking method
-void fixed_t::Unpack(lnet::BitStream &s)
+/// Deserialization using ISerializer abstraction
+void fixed_t::Unpack(DoomLegacy::ISerializer &s)
 {
   val = s.readInt32();
 }
