@@ -63,6 +63,9 @@ else()
     message(STATUS "SDL2 disabled")
     # Create dummy SDL2 definitions for code that checks for SDL
     add_compile_definitions(SDL_DISABLE_ASSERTIONS)
+    # Set empty libraries when SDL2 is disabled
+    set(SDL2_LIBRARIES "")
+    set(SDL2MIXER_LIBRARIES "")
 endif()
 # SDL definition added via target_compile_definitions below
 
