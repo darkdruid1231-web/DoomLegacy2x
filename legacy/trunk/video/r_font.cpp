@@ -186,6 +186,10 @@ float rasterfont_t::DrawCharacter(float x, float y, int c, int flags)
     return 4; // render a little space for unknown chars in DrawString
 
   Material *m = font[c - start];
+  // Defensive: check for null material (font not fully loaded)
+  if (!m)
+    return 4;
+
   m->Draw(x, y, flags);
 
   return m->worldwidth;
