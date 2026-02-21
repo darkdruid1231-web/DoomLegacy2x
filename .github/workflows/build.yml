@@ -109,11 +109,12 @@ jobs:
         mkdir -p build-win
         cd build-win
         
-        # Cross-compile with MinGW - disable networking for Windows
+        # Cross-compile with MinGW - disable networking and image support for Windows
         cmake .. \
           -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw-w64-x86_64.cmake \
           -DCMAKE_BUILD_TYPE=Release \
           -DUSE_NETWORKING=OFF \
+          -DUSE_IMAGE_SUPPORT=OFF \
           -DSDL2MIXER=OFF
 
     - name: Build Windows executable

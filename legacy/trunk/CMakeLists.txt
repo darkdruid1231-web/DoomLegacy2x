@@ -65,6 +65,9 @@ include_directories(${OPENGL_INCLUDE_DIR})
 # Option to disable networking entirely (for platforms without networking support)
 option(USE_NETWORKING "Enable networking support" ON)
 
+# Option to disable image support (for Windows cross-compilation without image libs)
+option(USE_IMAGE_SUPPORT "Enable image (PNG/JPEG) support" ON)
+
 # Include TNL stub headers for compatibility
 include_directories(${CMAKE_SOURCE_DIR}/include_stubs)
 
@@ -185,10 +188,14 @@ else()
     endif()  # USE_MODERN_NETWORKING
 endif()  # USE_NETWORKING
 
-# Graphics
+# Graphics - PNG/JPEG support (can be disabled for Windows cross-compilation)
+if(USE_IMAGE_SUPPORT)
 find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
 include_directories(${PNG_INCLUDE_DIR} ${JPEG_INCLUDE_DIR})
+else()
+message(STATUS "Image support disabled (USE_IMAGE_SUPPORT=OFF)")
+endif()
 
 # Flex and lemon
 find_package(FLEX REQUIRED)
@@ -290,15 +297,21 @@ if(NOT USE_MODERN_NETWORKING)
     )
 endif()
 
+# Build image libraries list conditionally
+set(IMAGE_LIBRARIES "")
+if(USE_IMAGE_SUPPORT)
+    set(IMAGE_LIBRARIES ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
+endif()
+
 if(WIN32)
   target_link_libraries(doomlegacy grammars util
   ${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES}
-  ${OPENGL_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES}
+  ${OPENGL_LIBRARIES} ${IMAGE_LIBRARIES}
   ws2_32 mswsock winmm)
 else()
   target_link_libraries(doomlegacy grammars util
   ${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES}
-  ${OPENGL_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES}
+  ${OPENGL_LIBRARIES} ${IMAGE_LIBRARIES}
   pthread)
 endif()
 
