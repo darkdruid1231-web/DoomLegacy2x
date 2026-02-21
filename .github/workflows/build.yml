@@ -29,7 +29,7 @@ jobs:
             lemon
 
     - name: Configure CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -S legacy/trunk
 
     - name: Build
       run: cmake --build build --parallel

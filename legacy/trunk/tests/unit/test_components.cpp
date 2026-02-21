@@ -69,6 +69,7 @@ public:
     virtual ~IRenderable() = default;
     virtual void render() = 0;
     virtual bool isVisible() const = 0;
+    virtual int getRenderCount() const = 0;
 };
 
 // Concrete renderable component
@@ -92,7 +93,7 @@ public:
         visible_ = visible;
     }
 
-    int getRenderCount() const {
+    int getRenderCount() const override {
         return renderCount_;
     }
 };
@@ -302,7 +303,10 @@ TEST_CASE("Null render component handling", "[component][null]") {
 TEST_CASE("Multiple actors in collection", "[component][multiple]") {
     Game game;
     
-    // Add multiple actors
+    // Set main actor first
+    game.setActor(std::make_unique<Actor>());
+    
+    // Add multiple actors to collection
     game.addActor(std::make_unique<Actor>());
     game.addActor(std::make_unique<Actor>());
     game.addActor(std::make_unique<Actor>());
