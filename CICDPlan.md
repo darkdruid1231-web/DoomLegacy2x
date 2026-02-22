@@ -413,3 +413,28 @@ The phased approach allows for incremental implementation, starting with basic b
 
 *Document Version: 1.0*
 *Last Updated: 2026-02-21*
+
+---
+
+## Windows Build Requirements
+
+### Cross-Compile (Recommended)
+The `windows-build` job uses Linux with MinGW cross-compiler - this is the **recommended** approach and always works.
+
+```bash
+# Install dependencies on Ubuntu/Debian
+apt-get install mingw-w64
+
+# Cross-compile
+cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw-w64-x86_64.cmake
+```
+
+### Native MSYS2 Build
+Native Windows builds via MSYS2 require **GCC 13** (not GCC 15+). GCC 15 has a known bug with MinGW Windows SDK headers causing intrinsics redefinition errors.
+
+```bash
+# In MSYS2, install GCC 13
+pacman -S mingw-w64-x86_64-gcc=13
+```
+
+The `windows-native-build` job in CI is currently disabled due to this GCC 15 bug.
