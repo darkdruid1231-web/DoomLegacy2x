@@ -192,7 +192,7 @@ jobs:
           mingw-w64-x86_64-SDL2
           mingw-w64-x86_64-libpng
           mingw-w64-x86_64-libjpeg-turbo
-          mingw-w64-x86_64-glu
+          mingw-w64-x86_64-opengl
           mingw-w64-x86_64-enet
           flex
           lemon
