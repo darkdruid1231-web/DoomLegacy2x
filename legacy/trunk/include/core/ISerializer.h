@@ -66,6 +66,12 @@ public:
     virtual size_t getBitPosition() const = 0;
     virtual void clear() = 0;
     virtual bool isAtEnd() const = 0;
+
+    /// Returns true if this serializer is in write mode (packing),
+    /// false if it is in read mode (unpacking).
+    /// Serialization methods that handle both directions (e.g. Actor::serialize)
+    /// use this to branch between read and write operations.
+    virtual bool isWriting() const = 0;
 };
 
 /**
@@ -75,8 +81,12 @@ public:
  */
 class InMemorySerializer : public ISerializer {
 public:
-    InMemorySerializer() : buffer(), bitPos(0) {}
-    explicit InMemorySerializer(size_t reserve) : buffer(), bitPos(0) { buffer.reserve(reserve); }
+    /// Default constructor: write/pack mode.
+    InMemorySerializer() : buffer(), bitPos(0), writing_(true) {}
+    /// Pre-allocate buffer; write mode by default.
+    explicit InMemorySerializer(size_t reserve) : buffer(), bitPos(0), writing_(true) { buffer.reserve(reserve); }
+    /// Explicit direction constructor.
+    static InMemorySerializer forReading() { InMemorySerializer s; s.writing_ = false; return s; }
     
     // Write methods
     void write(const void* data, size_t bits) override {
@@ -137,14 +147,19 @@ public:
     size_t getBitPosition() const override { return bitPos; }
     void clear() override { buffer.clear(); bitPos = 0; }
     bool isAtEnd() const override { return (bitPos >> 3) >= buffer.size(); }
-    
+    bool isWriting() const override { return writing_; }
+
     // Access
     const std::vector<uint8_t>& getBuffer() const { return buffer; }
     std::vector<uint8_t>& getBuffer() { return buffer; }
-    
+
+    /// Helper: reset to the beginning of the buffer for reading
+    void rewindForReading() { bitPos = 0; writing_ = false; }
+
 private:
     std::vector<uint8_t> buffer;
     size_t bitPos;
+    bool writing_;
 };
 
 } // namespace DoomLegacy
