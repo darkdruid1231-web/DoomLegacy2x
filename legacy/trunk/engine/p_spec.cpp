@@ -317,11 +317,11 @@ fixed_t sector_t::FindShortestUpperAround()
       if (twoSided(i))
 	{
 	  side_t *side = getSide(i, 0);
-	  if (side->toptexture > 0)
+	  if (side->toptexture != nullptr)
 	    if (side->toptexture->worldheight < minsize)
 	      minsize = side->toptexture->worldheight;
 	  side = getSide(i, 1);
-	  if (side->toptexture > 0)
+	  if (side->toptexture != nullptr)
 	    if (side->toptexture->worldheight < minsize)
 	      minsize = side->toptexture->worldheight;
 	}
@@ -933,7 +933,7 @@ void Map::AddFakeFloor(sector_t* sec, sector_t* sec2, line_t* master, int flags)
 
   if (flags & FF_TRANSLUCENT)
     {
-      if (master->sideptr[0]->toptexture > 0)
+      if (master->sideptr[0]->toptexture != nullptr)
 	ffloor->alpha = 0; // FIXME NOW master->sideptr[0]->toptexture;
       else
 	ffloor->alpha = 0x70;

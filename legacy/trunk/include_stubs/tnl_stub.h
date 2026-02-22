@@ -356,4 +356,10 @@ public:
 // Stub returns nullptr; postNetEvent() is a no-op so this is safe.
 #define TNL_RPC_CONSTRUCT_NETEVENT(conn, rpc, args) (static_cast<TNL::NetEvent*>(nullptr))
 
+// TNL object registration macros — used at file scope in engine .cpp files
+// (e.g. TNL_IMPLEMENT_NETOBJECT(PlayerInfo), TNL_IMPLEMENT_CLASS(GameType))
+// Real TNL uses these to register classes with the netobject manager; stub as no-ops.
+#define TNL_IMPLEMENT_NETOBJECT(cls)
+#define TNL_IMPLEMENT_CLASS(cls)
+
 #endif // TNL_STUB_H

@@ -287,9 +287,12 @@ add_executable(wadtool tools/wadtool.cpp util/md5.cpp)
 add_executable(doomlegacy ${LEGACY_SRC})
 
 # Modern target-based definitions (replacing deprecated add_definitions)
+# NOTE: Do NOT redefine __GNUC__ here — it's a compiler built-in and redefining it
+# to a different value (e.g., 1) breaks version checks like:
+#   #if __GNUC__ >= 4  →  #if 1 >= 4  (false)
+# which then uses broken legacy code paths.
 target_compile_definitions(doomlegacy PRIVATE
     FN_CDECL=
-    __GNUC__
     QSORT_CALLBACK=
 )
 
