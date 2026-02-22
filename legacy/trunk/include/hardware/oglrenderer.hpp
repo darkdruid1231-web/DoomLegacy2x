@@ -30,6 +30,8 @@
 # define _XSAVEINTRIN_H_INCLUDED 1
 # define _XGETBV_DEFINED 1
 # define __CPUID_H 1
+// Workaround for GCC 13 + MinGW-w64 __cpuidex redeclaration issue
+# define __GNUC_GNU_INLINE__ 1
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wattributes"
 #endif
