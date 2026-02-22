@@ -5,6 +5,12 @@
 
 /// \file
 /// \brief Console for Doom LEGACY
+#ifdef __MINGW32__
+// Fix GCC 13+ / MinGW-w64 header conflict: prevent GCC from declaring its own _xgetbv
+// Let MinGW-w64's intrin-impl.h provide the unsigned version
+# define __XSAVEINTRIN_H
+# define _XGETBV_DEFINED
+#endif
 #ifdef _WIN32
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wredundant-decls"
@@ -36,15 +42,6 @@
 #include "i_system.h"
 #include "w_wad.h"
 
-// GCC 13+ / MinGW-w64 _xgetbv conflict workaround
-#ifdef __MINGW32__
-#undef _xgetbv
-static inline long long _xgetbv(unsigned int index) {
-    unsigned int eax, edx;
-    __asm__ __volatile__ ("xgetbv" : "=a"(eax), "=d"(edx) : "c"(index));
-    return ((long long)edx << 32) | eax;
-}
-#endif
 
 /// returns the number of bytes in the UTF-8 char beginning at p
 static int utf8_numbytes(const char *p)
