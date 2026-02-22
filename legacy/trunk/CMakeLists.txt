@@ -296,6 +296,13 @@ target_compile_definitions(doomlegacy PRIVATE
     QSORT_CALLBACK=
 )
 
+# _USE_MATH_DEFINES: required on Windows (MSVC / MinGW / MSYS2) to expose M_PI
+# and other POSIX math constants from <math.h>/<cmath>.  Must be defined before
+# those headers are included — passing it as a compile definition guarantees that.
+if(WIN32)
+    target_compile_definitions(doomlegacy PRIVATE _USE_MATH_DEFINES)
+endif()
+
 # SDL define only when SDL2 is actually enabled (otherwise doomtype.h tries to
 # include SDL_types.h which won't be in the include path)
 if(USE_SDL2)
