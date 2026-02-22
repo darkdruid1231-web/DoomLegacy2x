@@ -23,6 +23,13 @@
 #ifndef r_data_h
 #define r_data_h 1
 
+// Fix GCC 13+ / MinGW-w64 header conflict: prevent GCC from declaring its own _xgetbv
+// Let MinGW-w64's intrin-impl.h provide the unsigned version
+#ifdef __MINGW32__
+# define __XSAVEINTRIN_H
+# define _XGETBV_DEFINED
+#endif
+
 #include <GL/gl.h>
 // OpenGL 1.2+ / ARB extension constants absent from the Windows 1.1 header.
 // Define them here so all video files that include r_data.h pick them up.
