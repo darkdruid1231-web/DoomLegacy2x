@@ -77,6 +77,9 @@ public:
     void writeUInt(uint32_t v, int bits) { write(&v, bits); }
     void writeUInt32(uint32_t val, int bits = 32) { write(&val, bits); }
     void writeBool(bool val) { write(&val, 1); }
+    
+    // Flag write (writes 1 bit, 1 for true, 0 for false)
+    void writeFlag(bool val) { writeBool(val); }
     void writeString(const char* str) {
         size_t len = str ? strlen(str) + 1 : 0;
         writeUInt32((uint32_t)len, 16);
@@ -103,6 +106,9 @@ public:
     int32_t  readInt(int bits)  { int32_t  v; read(&v, bits); return v; }
     uint32_t readUInt(int bits) { uint32_t v; read(&v, bits); return v; }
     bool readBool() { bool v; read(&v, 1); return v; }
+    
+    // Flag read (reads 1 bit)
+    bool readFlag() { return readBool(); }
     void readString(std::string& str) {
         uint32_t len = readUInt32();
         if (len > 0 && len < 65536) {
@@ -277,6 +283,7 @@ public:
     void  setNetInterface(NetInterface* i) { mNetInterface = i; }
     int   getGhostIndex()  const           { return mGhostIndex; }
     void  setGhostIndex(int idx)           { mGhostIndex = idx; }
+    int   getGhostIndex()  const           { return mGhostIndex; }
 
 protected:
     // Engine code accesses mNetFlags directly (e.g. mNetFlags.set(Ghostable))
@@ -324,7 +331,8 @@ public:
     virtual void onGhostRemoved(NetObject*) {}
     virtual void onGhostUpdate(NetObject*)  {}
 
-    // Methods called by engine code
+    // resolveGhost - resolve a ghost by index
+    NetObject* resolveGhost(int /*ghostIndex*/) { return nullptr; }
     // isGhostAvailable(obj) — is obj already being ghosted to this connection?
     bool isGhostAvailable(NetObject* /*obj*/ = nullptr) const { return false; }
     void postNetEvent(NetEvent* /*e*/) {}
