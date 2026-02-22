@@ -120,11 +120,14 @@ jobs:
         wget -q https://github.com/lsalzman/enet/archive/refs/tags/v1.3.17.tar.gz -O enet.tar.gz
         tar -xzf enet.tar.gz
         cd enet-1.3.17
-        # Compile with MinGW
-        x86_64-w64-mingw32-gcc -c -O2 -Iinclude callbacks.c compress.c host.c list.c packet.c peer.c protocol.c win32.c
-        x86_64-w64-mingw32-ar rcs libenet.a *.o
+        # Compile each source file individually
+        mkdir -p lib
+        for f in callbacks compress host list packet peer protocol win32; do
+          x86_64-w64-mingw32-gcc -c -O2 -Iinclude ${f}.c -o lib/${f}.o
+        done
+        x86_64-w64-mingw32-ar rcs lib/libenet.a lib/*.o
         sudo cp include/enet/*.h /usr/x86_64-w64-mingw32/include/
-        sudo cp libenet.a /usr/x86_64-w64-mingw32/lib/
+        sudo cp lib/libenet.a /usr/x86_64-w64-mingw32/lib/
 
     - name: Configure CMake for MinGW
       env:
@@ -135,13 +138,13 @@ jobs:
         mkdir -p build-win
         cd build-win
         
-        # Cross-compile with MinGW - enable networking using MSYS2 ENet
+        # Cross-compile with MinGW - enable networking with manually compiled ENet
         cmake .. \
           -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw-w64-x86_64.cmake \
           -DCMAKE_BUILD_TYPE=Release \
           -DUSE_SDL2=OFF \
           -DUSE_IMAGE_SUPPORT=OFF \
-          -DUSE_NETWORKING=OFF \
+          -DUSE_NETWORKING=ON \
           -DSDL2MIXER=OFF \
           -DENET_INCLUDE_DIR=/usr/x86_64-w64-mingw32/include \
           -DENET_LIBRARY=/usr/x86_64-w64-mingw32/lib/libenet.a
@@ -150,8 +153,8 @@ jobs:
       run: |
         cd legacy/trunk/build-win
         
-        # Build tests only (networking disabled)
-        cmake --build . --target test_fixed_t test_vector test_console --parallel
+        # Build main executable with networking
+        cmake --build . --target doomlegacy --parallel
 
     - name: Upload Windows artifacts
       uses: actions/upload-artifact@v4
