@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.16)
 project(doomlegacy C CXX)
 
 # Global compile options
-# -fpermissive: suppress GCC 15 / MinGW intrinsics redefinition warnings (toolchain bug in Windows SDK headers)
-add_compile_options(-fpermissive)
+# -w: suppress all warnings (including GCC 15 / MinGW intrinsics redefinition)
+# -fpermissive: allow implicit conversions, etc.
+add_compile_options(-w -fpermissive)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
