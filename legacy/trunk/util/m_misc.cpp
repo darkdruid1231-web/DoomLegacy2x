@@ -1,10 +1,14 @@
 // $Id: m_misc.cpp 616 2010-03-23 05:15:47Z smite-meister $
 #ifdef __MINGW32__
-#pragma GCC system_header
-#include <intrin.h>
+// GCC 13+ declares _xgetbv as signed long long in xsaveintrin.h;
+// MinGW-w64 wants unsigned __int64. Block GCC version.
+#define __XSAVEINTRIN_H
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wattributes"
 #pragma GCC diagnostic ignored "-Wredundant-decls"
+// Force MinGW-w64 intrinsics (unsigned version)
+#include <intrin.h>
+#pragma GCC diagnostic pop
 #endif
 
 //
