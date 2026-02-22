@@ -189,20 +189,23 @@ jobs:
         install: >-
           mingw-w64-x86_64-gcc
           mingw-w64-x86_64-cmake
+          mingw-w64-x86_64-make
           mingw-w64-x86_64-SDL2
           mingw-w64-x86_64-libpng
           mingw-w64-x86_64-libjpeg-turbo
           mingw-w64-x86_64-enet
+          mingw-w64-x86_64-libgl
           flex
           lemon
 
     - name: Configure and Build
       run: |
+        export PATH="/c/msys64/mingw64/bin:/c/msys64/usr/bin:$PATH"
         cd legacy/trunk
         rm -rf build-win-native
         mkdir -p build-win-native
         cd build-win-native
-        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
+        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_MAKE_PROGRAM=C:/msys64/mingw64/bin/mingw32-make.exe
         cmake --build . --parallel
 
     - name: Upload Windows native artifact
