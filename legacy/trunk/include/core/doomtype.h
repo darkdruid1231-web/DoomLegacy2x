@@ -33,7 +33,9 @@
 #  define _XGETBV_DEFINED
 # endif
 
-# include <windows.h>
+// Don't include windows.h early - causes intrinsics conflict with GCC 13+
+// If Windows types are needed, include windows.h in specific files that need it
+// typedef uint32_t DWORD;  // example replacement if needed
 # define ASMCALL __cdecl
 #else
 # define ASMCALL
