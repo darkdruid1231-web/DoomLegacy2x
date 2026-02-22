@@ -162,7 +162,9 @@ jobs:
           -DUSE_SDL2=OFF \
           -DUSE_IMAGE_SUPPORT=OFF \
           -DUSE_NETWORKING=ON \
-          -DSDL2MIXER=OFF
+          -DSDL2MIXER=OFF \
+          -DENET_INCLUDE_DIR=/usr/x86_64-w64-mingw32/include \
+          -DENET_LIBRARY=/usr/x86_64-w64-mingw32/lib/libenet.a
 
     - name: Build Windows executable
       run: |
