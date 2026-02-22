@@ -26,6 +26,12 @@
 
 // Standard library differences
 #ifdef __WIN32__
+// Fix GCC 13+ / MinGW-w64 header conflict with intrinsics
+// Include these before <windows.h> to avoid _xgetbv / __cpuidex conflicts
+# include <xsaveintrin.h>
+# include <cpuid.h>
+# include <immintrin.h>
+
 # include <windows.h>
 # define ASMCALL __cdecl
 #else
