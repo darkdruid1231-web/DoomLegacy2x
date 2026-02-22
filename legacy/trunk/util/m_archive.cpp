@@ -1,17 +1,10 @@
 #include "m_archive.h"
-// Fix GCC 13+ / MinGW-w64 header conflict - stronger block
 #ifdef __MINGW32__
-// Prevent GCC from including xsaveintrin.h (and its signed _xgetbv)
-#define __XSAVEINTRIN_H
-// Also block cpuid.h if needed (for __cpuidex)
-#define __CPUID_H
-// Suppress warnings
+#pragma GCC system_header
+#include <intrin.h>
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wattributes"
 #pragma GCC diagnostic ignored "-Wredundant-decls"
-// Force MinGW intrin.h early
-#include <intrin.h>
-#pragma GCC diagnostic pop
 #endif
 
 #include "m_swap.h"
