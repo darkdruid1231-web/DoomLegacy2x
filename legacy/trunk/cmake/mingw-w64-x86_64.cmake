@@ -26,7 +26,8 @@ set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
 # Windows-specific link flags: bundle libgcc/libstdc++ statically so the
 # produced .exe doesn't require extra DLLs at runtime.
-set(CMAKE_CXX_FLAGS     "${CMAKE_CXX_FLAGS}     -static-libgcc -static-libstdc++ -Wno-attributes")
+set(CMAKE_C_FLAGS       "${CMAKE_C_FLAGS}       -Wno-missing-attributes")
+set(CMAKE_CXX_FLAGS     "${CMAKE_CXX_FLAGS}     -static-libgcc -static-libstdc++ -Wno-missing-attributes")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 
 # No RPATH on Windows
