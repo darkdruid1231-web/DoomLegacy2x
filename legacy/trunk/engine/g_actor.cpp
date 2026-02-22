@@ -216,6 +216,12 @@ void Actor::onGhostRemove()
 
 
 
+// packUpdate / unpackUpdate are the TNL ghost-sync methods.  They use
+// TNL::BitStream* directly and are never invoked in stub builds.  Guard them
+// so stub compilation succeeds; the ISerializer-based serialize() below is
+// the build-agnostic equivalent.
+#ifndef TNL_STUB_BUILD
+
 /// This is the function the server uses to ghost Actor data to clients.
 U32 Actor::packUpdate(GhostConnection *c, U32 mask, class BitStream *stream)
 {
@@ -320,6 +326,8 @@ void Actor::unpackUpdate(GhostConnection *connection, BitStream *stream)
       m->me->SpawnActor(this, 0); // link the ghost to the correct Map
     }
 }
+
+#endif // TNL_STUB_BUILD
 
 
 /// ISerializer-based serialization (TNL-independent)
