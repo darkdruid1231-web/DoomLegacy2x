@@ -19,6 +19,15 @@
 //   Archive class implementation
 //
 //-----------------------------------------------------------------------------
+// Fix GCC 13+ / MinGW-w64 header conflict
+#ifdef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wredundant-decls"
+#pragma GCC diagnostic ignored "-Wattributes"
+#include <intrin.h>
+#pragma GCC diagnostic pop
+#endif
+
 
 #include <string>
 #include <zlib.h>

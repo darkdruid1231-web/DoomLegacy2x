@@ -34,7 +34,8 @@
 # endif
 
 // Don't include windows.h early - causes intrinsics conflict with GCC 13+
-// Provide portable Win32 type replacements instead
+// Provide portable Win32 type replacements only for non-Windows builds
+#ifndef _WIN32
 #include <stdint.h>
 typedef uint8_t BYTE;
 typedef uint16_t WORD;
@@ -42,7 +43,8 @@ typedef uint32_t DWORD;
 typedef int32_t LONG;
 typedef uint32_t ULONG;
 typedef int BOOL;
-// Only include windows.h in files that truly need Windows APIs
+#endif
+// On Windows, let MinGW provide these types
 
 # define ASMCALL __cdecl
 #else
