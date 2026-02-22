@@ -24,6 +24,17 @@
 #define r_data_h 1
 
 #include <GL/gl.h>
+// GL_BGR / GL_BGRA / GL_CLAMP_TO_EDGE are OpenGL 1.2+ constants absent from
+// the Windows 1.1 header.  Define them here so all video files get them.
+#ifndef GL_BGR
+#  define GL_BGR  0x80E0
+#endif
+#ifndef GL_BGRA
+#  define GL_BGRA 0x80E1
+#endif
+#ifndef GL_CLAMP_TO_EDGE
+#  define GL_CLAMP_TO_EDGE 0x812F
+#endif
 #include <vector>
 #include <set>
 
