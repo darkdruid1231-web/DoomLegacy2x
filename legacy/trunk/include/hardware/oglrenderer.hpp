@@ -28,6 +28,17 @@
 #endif
 #include<GL/gl.h>
 
+// On Windows, <GL/gl.h> only covers OpenGL 1.1.  Declare the 1.4 point
+// parameter functions explicitly — they are exported by opengl32.dll.
+#if defined(_WIN32) && !defined(GL_POINT_PARAMETERS_DECLARED)
+#  define GL_POINT_PARAMETERS_DECLARED 1
+#  ifndef APIENTRY
+#    define APIENTRY __stdcall
+#  endif
+   extern "C" void APIENTRY glPointParameterf(GLenum pname, GLfloat param);
+   extern "C" void APIENTRY glPointParameterfv(GLenum pname, const GLfloat *params);
+#endif
+
 // Provide a dummy type when SDL is not available
 #ifndef SDL_Surface
 struct SDL_Surface {};
