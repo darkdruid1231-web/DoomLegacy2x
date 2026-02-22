@@ -21,6 +21,12 @@
 /// \file
 /// \brief This zone is for loading and unloading of Doom Legacy DLLs only.
 
+// Fix GCC 13+ / MinGW-w64 header conflict: prevent GCC from declaring its own _xgetbv
+// Let MinGW-w64's intrin-impl.h provide the unsigned version
+#ifdef __MINGW32__
+# define __XSAVEINTRIN_H
+# define _XGETBV_DEFINED
+#endif
 
 // Why oh why can't there be just one standard DLL system inteface?!?
 #ifdef __WIN32__
