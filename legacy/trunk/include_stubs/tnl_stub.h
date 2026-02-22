@@ -1,4 +1,6 @@
 // Comprehensive TNL stub header for build compatibility
+// Provides no-op implementations of TNL types/macros so the engine compiles
+// without the real TNL library (used on Windows / MSYS2 / cross-compile builds).
 #ifndef TNL_STUB_H
 #define TNL_STUB_H
 
@@ -8,31 +10,35 @@
 #include <vector>
 #include <cstdio>
 
+// ============================================================
 // Basic types
+// ============================================================
 namespace TNL {
-typedef uint8_t U8;
+typedef uint8_t  U8;
 typedef uint16_t U16;
 typedef uint32_t U32;
 typedef uint64_t U64;
-typedef int8_t S8;
-typedef int16_t S16;
-typedef int32_t S32;
-typedef int64_t S64;
-typedef float F32;
-typedef double F64;
+typedef int8_t   S8;
+typedef int16_t  S16;
+typedef int32_t  S32;
+typedef int64_t  S64;
+typedef float    F32;
+typedef double   F64;
 
 // BIT macro
 #define BIT(n) (1 << (n))
 
+// ============================================================
 // Assert stubs
+// ============================================================
 #define TNLAssert(expr, msg)
 #define TNLAssertMacro(expr, msg)
 
-inline void assertHandler(const char* expr, const char* file, int line, const char* msg) {
-    std::fprintf(stderr, "Assertion failed: %s at %s:%d\n", expr, file, line);
-}
+inline void assertHandler(const char*, const char*, int, const char*) {}
 
+// ============================================================
 // NetClassRep
+// ============================================================
 class NetClassRep {
 public:
     const char* className;
@@ -41,48 +47,43 @@ public:
     NetClassRep() : className(nullptr), group(0), bit(0) {}
 };
 
+// ============================================================
 // BitStream stub
+// ============================================================
 class BitStream {
 public:
-    BitStream() : buffer(), currentBit(0), ownBuffer(true) {}
+    BitStream() : currentBit(0), ownBuffer(true) {}
     explicit BitStream(size_t size) : buffer(size), currentBit(0), ownBuffer(true) {}
-    BitStream(void* data, size_t size, bool own) : buffer(), currentBit(0), ownBuffer(own) {
-        if (data && size) {
+    BitStream(void* data, size_t size, bool own) : currentBit(0), ownBuffer(own) {
+        if (data && size)
             buffer.assign(static_cast<uint8_t*>(data), static_cast<uint8_t*>(data) + size);
-        }
     }
     ~BitStream() {}
-    
+
     // Write methods
     void write(const void* data, size_t bits) {
         const uint8_t* src = static_cast<const uint8_t*>(data);
         size_t bytes = (bits + 7) >> 3;
-        for (size_t i = 0; i < bytes; i++) {
-            buffer.push_back(src[i]);
-        }
+        for (size_t i = 0; i < bytes; i++) buffer.push_back(src[i]);
     }
-    void write(uint8_t val) { write(&val, 8); }
-    void write(int8_t val) { write(&val, 8); }
+    void write(uint8_t  val) { write(&val, 8); }
+    void write(int8_t   val) { write(&val, 8); }
     void write(uint16_t val) { write(&val, 16); }
-    void write(int16_t val) { write(&val, 16); }
+    void write(int16_t  val) { write(&val, 16); }
     void write(uint32_t val) { write(&val, 32); }
-    void write(int32_t val) { write(&val, 32); }
-    void writeFloat(float val) { write(&val, 32); }
-    void writeString(const char* str) {
-        if (str) {
-            size_t len = strlen(str) + 1;
-            writeUInt32(len, 16);
-            write(str, len * 8);
-        } else {
-            writeUInt32(0, 16);
-        }
-    }
-    void writeInt(int32_t value, int bits) { write(&value, bits); }
-    void writeUInt(uint32_t value, int bits) { write(&value, bits); }
+    void write(int32_t  val) { write(&val, 32); }
+    void writeFloat(float val)  { write(&val, 32); }
+    void writeInt(int32_t  v, int bits) { write(&v, bits); }
+    void writeUInt(uint32_t v, int bits) { write(&v, bits); }
     void writeUInt32(uint32_t val, int bits = 32) { write(&val, bits); }
     void writeBool(bool val) { write(&val, 1); }
-    
-    // Read methods  
+    void writeString(const char* str) {
+        size_t len = str ? strlen(str) + 1 : 0;
+        writeUInt32((uint32_t)len, 16);
+        if (len) write(str, len * 8);
+    }
+
+    // Read methods
     void read(void* data, size_t bits) {
         uint8_t* dest = static_cast<uint8_t*>(data);
         size_t bytes = (bits + 7) >> 3;
@@ -91,17 +92,17 @@ public:
             currentBit += 8;
         }
     }
-    template<typename T>
-    void read(T* dest) { read(dest, sizeof(T) * 8); }
-    uint8_t readUInt8() { uint8_t v; read(&v, 8); return v; }
-    int8_t readInt8() { int8_t v; read(&v, 8); return v; }
+    template<typename T> void read(T* dest) { read(dest, sizeof(T) * 8); }
+    uint8_t  readUInt8()  { uint8_t  v; read(&v, 8);  return v; }
+    int8_t   readInt8()   { int8_t   v; read(&v, 8);  return v; }
     uint16_t readUInt16() { uint16_t v; read(&v, 16); return v; }
-    int16_t readInt16() { int16_t v; read(&v, 16); return v; }
+    int16_t  readInt16()  { int16_t  v; read(&v, 16); return v; }
     uint32_t readUInt32() { uint32_t v; read(&v, 32); return v; }
-    int32_t readInt32() { int32_t v; read(&v, 32); return v; }
-    float readFloat() { float v; read(&v, 32); return v; }
-    int32_t readInt(int bits) { int32_t v; read(&v, bits); return v; }
+    int32_t  readInt32()  { int32_t  v; read(&v, 32); return v; }
+    float    readFloat()  { float    v; read(&v, 32); return v; }
+    int32_t  readInt(int bits)  { int32_t  v; read(&v, bits); return v; }
     uint32_t readUInt(int bits) { uint32_t v; read(&v, bits); return v; }
+    bool readBool() { bool v; read(&v, 1); return v; }
     void readString(std::string& str) {
         uint32_t len = readUInt32();
         if (len > 0 && len < 65536) {
@@ -114,59 +115,98 @@ public:
     }
     void readString(char* dest) {
         uint32_t len = readUInt32();
-        if (len > 0 && len < 65536) {
-            read(dest, len * 8);
-        }
+        if (len > 0 && len < 65536) read(dest, len * 8);
     }
-    bool readBool() { bool v; read(&v, 1); return v; }
-    
-    // Position
-    void setBitPosition(size_t bit) { currentBit = bit; }
-    size_t getBitPosition() const { return currentBit; }
-    void setBytePosition(size_t pos) { currentBit = pos * 8; }
-    size_t getBytePosition() const { return currentBit >> 3; }
-    void clear() { buffer.clear(); currentBit = 0; }
-    void reset() { currentBit = 0; }
-    bool isAtEnd() const { return (currentBit >> 3) >= buffer.size(); }
-    uint8_t* getBuffer() { return buffer.data(); }
+
+    // Position helpers
+    void   setBitPosition(size_t bit) { currentBit = bit; }
+    size_t getBitPosition() const     { return currentBit; }
+    void   setBytePosition(size_t p)  { currentBit = p * 8; }
+    size_t getBytePosition() const    { return currentBit >> 3; }
+    void   clear()  { buffer.clear(); currentBit = 0; }
+    void   reset()  { currentBit = 0; }
+    bool   isAtEnd() const { return (currentBit >> 3) >= buffer.size(); }
+    uint8_t*       getBuffer()       { return buffer.data(); }
     const uint8_t* getBuffer() const { return buffer.data(); }
-    
+
 private:
     std::vector<uint8_t> buffer;
     size_t currentBit;
-    bool ownBuffer;
+    bool   ownBuffer;
 };
 
+// ============================================================
 // Forward declarations
+// ============================================================
 class NetInterface;
 class NetObject;
 class NetConnection;
+class NetEvent;        // forward-declared so GhostConnection can use it
 
-// Address stub
+// ============================================================
+// Address / Nonce stubs
+// ============================================================
 class Address {
 public:
     Address() : port(0) {}
-    Address(const char* ip, uint16_t p) : ipStr(ip), port(p) {}
+    Address(const char* ip, uint16_t p) : ipStr(ip ? ip : ""), port(p) {}
     std::string ipStr;
     uint16_t port;
 };
 
-// Nonce stub
 class Nonce {
 public:
     Nonce() {}
     Nonce(const uint8_t*, size_t) {}
 };
 
-// Packet types
-const U32 FirstValidInfoPacketId = 100;
+// ============================================================
+// Packet / connection constants
+// ============================================================
+const U32 FirstValidInfoPacketId  = 100;
+const U32 NetClassGroupGameMask   = 0xFFFFFFFFu;
 
+// ============================================================
+// TerminationReason enum (used in NetConnection callbacks)
+// ============================================================
+enum TerminationReason {
+    ReasonTimedOut = 0,
+    ReasonIdle,
+    ReasonSelfDisconnect,
+    ReasonRemoteDisconnect,
+    ReasonDuplicateId,
+    ReasonConnectsCancelled,
+    ReasonConnectionError,
+    ReasonMaxConnections,
+    ReasonDisconnectPacket,
+    ReasonMaxReasonCount
+};
+
+// ============================================================
+// RPC pointer types used in RPC signatures
+// ============================================================
+typedef const char*             StringPtr;
+typedef std::vector<uint8_t>*   ByteBufferPtr;
+
+// ============================================================
+// NetEvent stub (target of postNetEvent / TNL_RPC_CONSTRUCT_NETEVENT)
+// ============================================================
+class NetEvent {
+public:
+    NetEvent() {}
+    virtual ~NetEvent() {}
+};
+
+// ============================================================
 // NetConnection stub
+// ============================================================
 class NetConnection {
 public:
     NetConnection() : mInterface(nullptr), mState(0), mConnectId(0) {}
     virtual ~NetConnection() {}
+
     enum PacketType { PT_ServerPing = 0 };
+
     virtual void connect(const char*, uint16_t) {}
     virtual void disconnect() {}
     virtual void update() {}
@@ -174,39 +214,45 @@ public:
     virtual void onPacketReceived(uint8_t, BitStream*) {}
     virtual void onConnect() {}
     virtual void onDisconnect() {}
-    int getState() const { return mState; }
-    void setState(int s) { mState = s; }
-    NetInterface* getInterface() { return mInterface; }
-    void setInterface(NetInterface* iface) { mInterface = iface; }
-    uint32_t getConnectId() const { return mConnectId; }
-    void setConnectId(uint32_t id) { mConnectId = id; }
+
+    int          getState()      const { return mState; }
+    void         setState(int s)       { mState = s; }
+    NetInterface* getInterface()       { return mInterface; }
+    void         setInterface(NetInterface* i) { mInterface = i; }
+    uint32_t     getConnectId()  const { return mConnectId; }
+    void         setConnectId(uint32_t id)    { mConnectId = id; }
+
 private:
     NetInterface* mInterface;
-    int mState;
-    uint32_t mConnectId;
+    int           mState;
+    uint32_t      mConnectId;
 };
 
+// ============================================================
 // NetObject stub
+// ============================================================
 class NetObject {
 public:
     NetObject() : mNetInterface(nullptr), mGhostIndex(0) {}
     virtual ~NetObject() {}
-    virtual void onGhostAdded() {}
-    virtual void onGhostRemoved() {}
+    virtual void onGhostAdded()            {}
+    virtual void onGhostRemoved()          {}
     virtual void onGhostUpdate(BitStream*) {}
-    virtual void onGhostReceive(BitStream*) {}
-    virtual void packUpdate(BitStream*) {}
-    virtual bool unpackUpdate(BitStream*) { return true; }
-    NetInterface* getNetInterface() { return mNetInterface; }
-    void setNetInterface(NetInterface* iface) { mNetInterface = iface; }
-    int getGhostIndex() const { return mGhostIndex; }
-    void setGhostIndex(int idx) { mGhostIndex = idx; }
+    virtual void onGhostReceive(BitStream*){}
+    virtual void packUpdate(BitStream*)    {}
+    virtual bool unpackUpdate(BitStream*)  { return true; }
+    NetInterface* getNetInterface()        { return mNetInterface; }
+    void  setNetInterface(NetInterface* i) { mNetInterface = i; }
+    int   getGhostIndex()  const           { return mGhostIndex; }
+    void  setGhostIndex(int idx)           { mGhostIndex = idx; }
 private:
     NetInterface* mNetInterface;
-    int mGhostIndex;
+    int           mGhostIndex;
 };
 
+// ============================================================
 // NetInterface stub
+// ============================================================
 class NetInterface {
 public:
     NetInterface() {}
@@ -220,29 +266,66 @@ public:
     virtual void onDisconnect(NetConnection*) {}
     virtual void onConnectionRejected(NetConnection*, const char*) {}
     void setMaxConnections(int) {}
-    int getMaxConnections() const { return 0; }
-    NetConnection* getConnection(int) { return nullptr; }
-    int getConnectionCount() const { return 0; }
+    int  getMaxConnections()     const { return 0; }
+    int  getConnectionCount()    const { return 0; }
+    NetConnection* getConnection(int)  { return nullptr; }
 };
 
+// ============================================================
 // GhostConnection stub
+// ============================================================
 class GhostConnection : public NetConnection {
 public:
     GhostConnection() {}
     virtual ~GhostConnection() {}
-    void addGhost(NetObject*) {}
+
+    // Ghost management
+    void addGhost(NetObject*)    {}
     void removeGhost(NetObject*) {}
     void updateGhost(NetObject*) {}
-    virtual void onGhostAdded(NetObject*) {}
+    virtual void onGhostAdded(NetObject*)   {}
     virtual void onGhostRemoved(NetObject*) {}
-    virtual void onGhostUpdate(NetObject*) {}
+    virtual void onGhostUpdate(NetObject*)  {}
+
+    // Methods called by engine code
+    bool isGhostAvailable() const { return false; }
+    void postNetEvent(NetEvent* /*e*/) {}
+
+    // Connection lifecycle virtuals (declared in n_connection.h via override)
+    virtual void onConnectionEstablished() {}
+    virtual void onStartGhosting()         {}
+    virtual void onEndGhosting()           {}
+
+    // Connect request/accept virtuals (LConnection overrides these)
+    virtual void writeConnectRequest(BitStream*) {}
+    virtual bool readConnectRequest(BitStream*, const char**) { return true; }
+    virtual void writeConnectAccept(BitStream*) {}
+    virtual bool readConnectAccept(BitStream*, const char**) { return true; }
+
+    // Termination callbacks (LConnection overrides these)
+    virtual void onConnectTerminated(TerminationReason, const char*) {}
+    virtual void onConnectionTerminated(TerminationReason, const char*) {}
 };
 
-// RPC stubs
-#define TNL_DECLARE_RPC(name, params)
-#define TNL_IMPLEMENT_RPC(cls, name, params)
+} // namespace TNL
+
+// ============================================================
+// RPC / NetEvent macros  (outside namespace — they are text substitutions)
+// ============================================================
+
+// TNL_DECLARE_RPC: expand to an inline virtual no-op method so the method
+// actually exists on the class (needed for s2cEnterMap, c2sIntermissionDone, etc.)
+#define TNL_DECLARE_RPC(name, params) virtual void name params {}
+
+// TNL_IMPLEMENT_RPC: out-of-class implementation body — stub as no-op.
+// Variadic because the real macro takes 8 arguments.
+#define TNL_IMPLEMENT_RPC(...)
+
+// TNL_DECLARE_NET_EVENT: declare a NetEvent subclass — stub as no-op.
 #define TNL_DECLARE_NET_EVENT(cls)
 
-} // namespace TNL
+// TNL_RPC_CONSTRUCT_NETEVENT: builds a NetEvent* to pass to postNetEvent().
+// Stub returns nullptr; postNetEvent() is a no-op so this is safe.
+#define TNL_RPC_CONSTRUCT_NETEVENT(conn, rpc, args) (static_cast<TNL::NetEvent*>(nullptr))
 
 #endif // TNL_STUB_H

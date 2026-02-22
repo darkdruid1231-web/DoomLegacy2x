@@ -288,13 +288,23 @@ add_executable(doomlegacy ${LEGACY_SRC})
 
 # Modern target-based definitions (replacing deprecated add_definitions)
 target_compile_definitions(doomlegacy PRIVATE
-    SDL
     FN_CDECL=
-    i386
-    linux
     __GNUC__
     QSORT_CALLBACK=
 )
+
+# SDL define only when SDL2 is actually enabled (otherwise doomtype.h tries to
+# include SDL_types.h which won't be in the include path)
+if(USE_SDL2)
+    target_compile_definitions(doomlegacy PRIVATE SDL)
+endif()
+
+# Platform-specific defines: only set linux/i386 on actual Linux builds
+# These must NOT be set on Windows (MSYS2 / MinGW cross-compile) because they
+# cause doomtype.h and platform detection code to assume a Linux environment
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_compile_definitions(doomlegacy PRIVATE linux i386)
+endif()
 
 # Conditional definitions
 if(USE_SOUND)
