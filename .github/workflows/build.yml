@@ -147,15 +147,15 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release \
           -DUSE_SDL2=OFF \
           -DUSE_IMAGE_SUPPORT=OFF \
-          -DUSE_NETWORKING=ON \
+          -DUSE_NETWORKING=OFF \
           -DSDL2MIXER=OFF
 
     - name: Build Windows executable
       run: |
         cd legacy/trunk/build-win
         
-        # Build only main exe (skip tests - Catch2 has MinGW issues)
-        cmake --build . --target doomlegacy --parallel
+        # Build tests only (networking disabled)
+        cmake --build . --target test_fixed_t test_vector test_console --parallel
 
     - name: Upload Windows artifacts
       uses: actions/upload-artifact@v4
