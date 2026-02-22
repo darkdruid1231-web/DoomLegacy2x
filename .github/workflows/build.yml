@@ -199,7 +199,7 @@ jobs:
           flex
           lemon
 
-    - name: Configure and Build (full exe - DEBUG)
+    - name: Configure and Build (test targets)
       shell: msys2 {0}
       run: |
         export PATH="/c/msys64/mingw64/bin:$PATH"
@@ -208,8 +208,9 @@ jobs:
         mkdir -p build-win-native
         cd build-win-native
         cmake .. -DCMAKE_BUILD_TYPE=Release
-        # TEMP: try full exe build to find remaining errors
-        cmake --build . --parallel 2>&1 | head -200
+        # Build test targets only — the full game requires additional code fixes
+        # tracked in notes/doom-legacy-windows-exe-plan.md
+        cmake --build . --target test_fixed_t test_fixed_catch2 test_vector test_console test_actor test_save_load_unit --parallel
 
     - name: Upload Windows native test artifacts
       uses: actions/upload-artifact@v4
