@@ -1,12 +1,4 @@
 // GNU General Public License for more details.
-#ifdef __MINGW32__
-#undef _xgetbv
-static inline unsigned long long _xgetbv(unsigned int index) {
-    unsigned long long eax, edx;
-    __asm__ __volatile__ ("xgetbv" : "=a" (eax), "=d" (edx) : "c" (index));
-    return (edx << 32) | eax;
-}
-#endif
 
 //
 //-----------------------------------------------------------------------------
