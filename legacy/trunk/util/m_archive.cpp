@@ -15,6 +15,7 @@
 #include "m_menu.h" // for message boxes
 #include "r_data.h"
 #include "z_zone.h"
+#include <zlib.h>
 
 
 /*

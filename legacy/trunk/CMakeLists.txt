@@ -78,6 +78,15 @@ else()
 endif()
 # SDL definition added via target_compile_definitions below
 
+# Zlib for compression (used by m_archive.cpp)
+find_package(ZLIB)
+if(ZLIB_FOUND)
+    include_directories(${ZLIB_INCLUDE_DIRS})
+    set(EXTRA_LIBS ${EXTRA_LIBS} ${ZLIB_LIBRARIES})
+else()
+    message(STATUS "ZLIB not found, m_archive.cpp compression may fail")
+endif()
+
 # OpenGL
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
