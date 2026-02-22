@@ -36,6 +36,15 @@
 #include "i_system.h"
 #include "w_wad.h"
 
+// GCC 13+ / MinGW-w64 _xgetbv conflict workaround
+#ifdef __MINGW32__
+#undef _xgetbv
+static inline unsigned long long _xgetbv(unsigned int index) {
+    unsigned long long eax, edx;
+    __asm__ __volatile__ ("xgetbv" : "=a"(eax), "=d"(edx) : "c"(index));
+    return (edx << 32) | eax;
+}
+#endif
 
 /// returns the number of bytes in the UTF-8 char beginning at p
 static int utf8_numbytes(const char *p)
@@ -569,7 +578,7 @@ bool Console::Responder(event_t *ev)
 
       int n = input_line.length();
 
-      // remember typing for several completions (à-la-4dos)
+      // remember typing for several completions (ï¿½-la-4dos)
       if (n > 0 && input_line[n-1] != ' ')
         {
           if (n < 80)

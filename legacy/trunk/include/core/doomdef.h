@@ -24,17 +24,6 @@
 #ifndef doomdef_h
 #define doomdef_h 1
 
-// GCC 13+ / MinGW-w64 _xgetbv conflict workaround
-#ifdef __MINGW32__
-#undef _xgetbv
-static inline unsigned long long _xgetbv(unsigned int index) {
-    unsigned long long eax, edx;
-    __asm__ __volatile__ ("xgetbv" : "=a"(eax), "=d"(edx) : "c"(index));
-    return (edx << 32) | eax;
-}
-#endif
-
-
 /// version control
 extern const int  LEGACY_VERSION;
 extern const int  LEGACY_REVISION;
