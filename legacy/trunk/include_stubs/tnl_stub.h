@@ -117,6 +117,16 @@ public:
         uint32_t len = readUInt32();
         if (len > 0 && len < 65536) read(dest, len * 8);
     }
+    // Overload with max buffer size (reads up to max-1 chars, null-terminates)
+    void readString(char* dest, size_t maxLen) {
+        uint32_t len = readUInt32();
+        if (len > 0 && len < 65536 && len < maxLen) {
+            read(dest, len * 8);
+            dest[len] = '\0';
+        } else {
+            if (maxLen > 0) dest[0] = '\0';
+        }
+    }
 
     // Position helpers
     void   setBitPosition(size_t bit) { currentBit = bit; }
