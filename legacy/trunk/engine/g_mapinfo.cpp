@@ -311,21 +311,12 @@ bool MapInfo::HubLoad()
 
 
 // FIXME NOTE:
-// This sucks. We need offsets of data fields inside the MapInfo, MapCluster and Episode classes, but there is no 
-// universal way of getting them since g++ feels they are not POD objects, and its behavior depends on version.
-// I see no reason why this shouldn't work since we have no virtual tables, access restrictions or anything weird in them...
-
-#define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-
-#if GCC_VERSION >= 30400
-# define MI_offset(field) offsetof(MapInfo, field)
-# define CD_offset(field) offsetof(MapCluster, field)
-# define EP_offset(field) offsetof(Episode, field)
-#else
-# define MI_offset(field) (size_t(&MapInfo::field))
-# define CD_offset(field) (size_t(&MapCluster::field))
-# define EP_offset(field) (size_t(&Episode::field))
-#endif
+// We need offsets of data fields inside the MapInfo, MapCluster and Episode classes.
+// These structs contain std::string members (non-POD), so standard offsetof() is UB.
+// Use __builtin_offsetof (GCC/Clang extension) which works on non-POD types.
+#define MI_offset(field) __builtin_offsetof(MapInfo, field)
+#define CD_offset(field) __builtin_offsetof(MapCluster, field)
+#define EP_offset(field) __builtin_offsetof(Episode, field)
 
 //#define MI_offset(field) ((char*)&(((MapInfo*)0)->field) - (char*)0)
 //#define MI_offset(field) (size_t(&((MapInfo *)0)->field))

@@ -65,7 +65,7 @@ void GameType::ReadServerInfo(BitStream &s)
 
   //void ReadNetInfo(BitStream &s)
   S32 n;
-  s.read(&n); // number of files
+  s.read(&n, sizeof(S32)*8); // number of files
 
   bool dl;
   char name[128];
@@ -74,13 +74,13 @@ void GameType::ReadServerInfo(BitStream &s)
 
   for (int i=0; i<n; i++)
     {
-      s.read(&dl);  // downloadable?
-      s.readString(name);
-      s.read(&size);
-      s.read(16, md5);
+      s.read(&dl, sizeof(bool)*8);  // downloadable?
+      s.readString(name, sizeof(name)); // fixed: add max length
+      s.read(&size, sizeof(S32)*8);
+      s.read(md5, 16); // fixed: read 16 bits
     }
 
-  s.readString(name); // HACK, mapinfo lump name
+  s.readString(name, sizeof(name)); // HACK, mapinfo lump name
   game.mapinfo_lump = name;
 }
 
@@ -88,7 +88,8 @@ void GameType::ReadServerInfo(BitStream &s)
 void GameType::WriteServerInfo(DoomLegacy::ISerializer &s)
 {
   consvar_t::SaveNetVars(s);
-  fc.WriteNetInfo(s); // file names, sizes and md5 sums
+  // TODO: fc.WriteNetInfo() has no ISerializer overload - stub for now
+  // fc.WriteNetInfo(s); // file names, sizes and md5 sums
   s.writeString(game.mapinfo_lump.c_str()); // HACK
 }
 
@@ -98,7 +99,7 @@ void GameType::ReadServerInfo(DoomLegacy::ISerializer &s)
 
   //void ReadNetInfo(ISerializer &s)
   S32 n;
-  s.read(&n); // number of files
+  s.read(&n, sizeof(S32)*8); // number of files
 
   bool dl;
   char name[128];
@@ -107,14 +108,15 @@ void GameType::ReadServerInfo(DoomLegacy::ISerializer &s)
 
   for (int i=0; i<n; i++)
     {
-      s.read(&dl);  // downloadable?
-      s.readString(name);
-      s.read(&size);
-      s.read(16, md5);
+      s.read(&dl, sizeof(bool)*8);  // downloadable?
+      s.readString(name); // ISerializer.readString takes std::string&
+      s.read(&size, sizeof(S32)*8);
+      s.read(md5, 16);
     }
 
-  s.readString(name); // HACK, mapinfo lump name
-  game.mapinfo_lump = name;
+  std::string mapname;
+  s.readString(mapname); // HACK, mapinfo lump name
+  game.mapinfo_lump = mapname;
 }
 
 
