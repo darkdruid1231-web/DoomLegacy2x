@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 project(doomlegacy C CXX)
 
+# Global compile options
+# -fpermissive: suppress GCC 15 / MinGW intrinsics redefinition warnings (toolchain bug in Windows SDK headers)
+add_compile_options(-fpermissive)
+
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 if(WIN32)
@@ -258,9 +262,6 @@ foreach(src ${UTIL_SRC_FILES})
 endforeach()
 add_library(util STATIC ${UTIL_SRCS})
 target_include_directories(util PUBLIC ${CMAKE_SOURCE_DIR}/include)
-
-# Suppress GCC 15 / MinGW intrinsics redefinition warnings (toolchain bug)
-target_compile_options(util PRIVATE -fpermissive)
 
 # Apply platform-specific definitions to util (required for TNL headers)
 target_compile_definitions(util PRIVATE
