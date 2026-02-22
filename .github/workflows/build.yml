@@ -113,24 +113,8 @@ jobs:
         sudo cp zlib.h zconf.h /usr/x86_64-w64-mingw32/include/
         sudo cp libz.a /usr/x86_64-w64-mingw32/lib/
 
-    - name: Download and install ENet for MinGW
-      run: |
-        cd /tmp
-        # Download ENet 1.3.17 source for headers
-        wget -q https://github.com/lsalzman/enet/archive/refs/tags/v1.3.17.tar.gz -O enet-src.tar.gz
-        tar -xzf enet-src.tar.gz
-        # Install headers
-        sudo cp enet-1.3.17/include/enet/*.h /usr/x86_64-w64-mingw32/include/
-        
-        # Download pre-built ENet Windows DLL and convert to MinGW format
-        wget -q https://github.com/lsalzman/enet/releases/download/1.3.17/enet-1.3.17.zip -O enet-win.zip
-        unzip -q enet-win.zip
-        # Install DLL
-        sudo cp enet-1.3.17/libenet.dll /usr/x86_64-w64-mingw32/bin/
-        # Convert MSVC import library to MinGW format
-        pexports enet-1.3.17/libenet.dll > enet.def
-        dlltool -D libenet.dll -d enet.def -l /usr/x86_64-w64-mingw32/lib/libenet.a
-        sudo cp /usr/x86_64-w64-mingw32/lib/libenet.a /usr/x86_64-w64-mingw32/lib/
+    # ENet not needed for Windows (USE_NETWORKING=OFF)
+    # Skipping ENet download step
 
     - name: Configure CMake for MinGW
       env:
