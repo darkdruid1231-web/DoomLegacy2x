@@ -1,3 +1,0 @@
-C:\msys64\mingw64\bin\cmake.exe -E rm -f CMakeFiles\doomlegacy.dir/objects.a
-C:\msys64\mingw64\bin\ar.exe qc CMakeFiles\doomlegacy.dir/objects.a @CMakeFiles\doomlegacy.dir\objects1.rsp
-C:\msys64\mingw64\bin\c++.exe -Wl,--whole-archive CMakeFiles\doomlegacy.dir/objects.a -Wl,--no-whole-archive -o doomlegacy.exe -Wl,--out-implib,libdoomlegacy.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\doomlegacy.dir\linkLibs.rsp
