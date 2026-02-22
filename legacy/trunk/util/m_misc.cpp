@@ -1,6 +1,14 @@
 // Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
+// Fix GCC 13+ / MinGW-w64 header conflict: include MinGW intrin.h first
+// to provide unsigned _xgetbv before any other headers pull in GCC's version
+#ifdef _WIN32
+#include <intrin.h>
+#endif
+
+//-----------------------------------------------------------------------------
+//
 // $Id: m_misc.cpp 616 2010-03-23 05:15:47Z smite-meister $
 //
 // Copyright (C) 1993-1996 by id Software, Inc.
