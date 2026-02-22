@@ -239,7 +239,7 @@ jobs:
         cd build-win-native
         cmake .. -DCMAKE_BUILD_TYPE=Release
         # TEMP: try full exe build to find remaining errors
-        cmake --build . --parallel 2>&1 | head -250
+        cmake --build . --parallel 2>&1 | head -500
 
     - name: Upload Windows native test artifacts
       uses: actions/upload-artifact@v4

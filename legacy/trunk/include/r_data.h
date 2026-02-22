@@ -24,8 +24,8 @@
 #define r_data_h 1
 
 #include <GL/gl.h>
-// GL_BGR / GL_BGRA / GL_CLAMP_TO_EDGE are OpenGL 1.2+ constants absent from
-// the Windows 1.1 header.  Define them here so all video files get them.
+// OpenGL 1.2+ / ARB extension constants absent from the Windows 1.1 header.
+// Define them here so all video files that include r_data.h pick them up.
 #ifndef GL_BGR
 #  define GL_BGR  0x80E0
 #endif
@@ -34,6 +34,19 @@
 #endif
 #ifndef GL_CLAMP_TO_EDGE
 #  define GL_CLAMP_TO_EDGE 0x812F
+#endif
+// GL_ARB_point_parameters / OpenGL 1.4 constants
+#ifndef GL_POINT_SIZE_MIN
+#  define GL_POINT_SIZE_MIN             0x8126
+#endif
+#ifndef GL_POINT_SIZE_MAX
+#  define GL_POINT_SIZE_MAX             0x8127
+#endif
+#ifndef GL_POINT_FADE_THRESHOLD_SIZE
+#  define GL_POINT_FADE_THRESHOLD_SIZE  0x8128
+#endif
+#ifndef GL_POINT_DISTANCE_ATTENUATION
+#  define GL_POINT_DISTANCE_ATTENUATION 0x8129
 #endif
 #include <vector>
 #include <set>
