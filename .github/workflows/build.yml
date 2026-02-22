@@ -172,6 +172,11 @@ jobs:
         mkdir -p build-win
         cd build-win
         
+        # Unset conflicting include paths to prevent Linux header leakage
+        unset C_INCLUDE_PATH
+        unset CPLUS_INCLUDE_PATH
+        unset INCLUDE
+
         # Cross-compile with MinGW.
         # USE_SDL2=OFF: avoids pkg-config cross-sysroot complexities; core test
         # targets (fixed_t, vector, etc.) don't need SDL directly.
