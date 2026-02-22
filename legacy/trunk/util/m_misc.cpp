@@ -46,6 +46,8 @@
 #ifdef __MINGW32__
 # define __XSAVEINTRIN_H
 # define _XGETBV_DEFINED
+# pragma GCC diagnostic ignored "-Wattributes"
+# pragma GCC diagnostic ignored "-Wconflicting-declarations"
 #endif
 
 #include "hardware/oglrenderer.hpp"
