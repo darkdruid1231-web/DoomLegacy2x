@@ -23,11 +23,18 @@
 #ifndef oglrenderer_hpp_
 #define oglrenderer_hpp_
 
-#ifdef USE_SDL2
-// SDL1 -> SDL2 compatibility shims for legacy renderer code
-#include<SDL2/SDL.h>
+// SDL2 headers - use SDL2/SDL.h on MSYS2/MinGW or SDL/SDL.h fallback
+// SDL1 code (USE_SDL2 not defined) falls back to same headers for compatibility
+#if __has_include(<SDL2/SDL.h>)
+#  include <SDL2/SDL.h>
+#elif __has_include(<SDL/SDL.h>)
+#  include <SDL/SDL.h>
+#else
+#  error "SDL2 headers not found"
+#endif
 
-// SDL1 constants mapped to SDL2 equivalents
+// SDL1 -> SDL2 compatibility shims for legacy renderer code
+// These map SDL1 constants to SDL2 equivalents when using SDL2
 #ifndef SDL_SWSURFACE
 #  define SDL_SWSURFACE 0
 #endif
@@ -42,10 +49,6 @@
 #endif
 #ifndef SDL_GL_SwapBuffers
 #  define SDL_GL_SwapBuffers SDL_GL_SwapWindow
-#endif
-
-#else
-#include<SDL/SDL.h>
 #endif
 
 #include<GL/gl.h>
