@@ -25,6 +25,10 @@
 
 #include "doomtype.h"
 
+// Forward-declare TNL::BitStream so Pack/Unpack method signatures compile
+// without requiring the full TNL (or stub) headers in every translation unit.
+namespace TNL { class BitStream; }
+
 
 //========================================================
 //                     Presentations
