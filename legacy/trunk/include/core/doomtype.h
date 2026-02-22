@@ -30,6 +30,7 @@
 // Let MinGW-w64's intrin-impl.h provide the unsigned version (what SDL expects)
 # ifdef __MINGW32__
 #  define __XSAVEINTRIN_H
+#  define _XGETBV_DEFINED
 # endif
 
 # include <windows.h>
