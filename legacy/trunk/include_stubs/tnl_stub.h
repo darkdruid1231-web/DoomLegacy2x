@@ -283,7 +283,6 @@ public:
     void  setNetInterface(NetInterface* i) { mNetInterface = i; }
     int   getGhostIndex()  const           { return mGhostIndex; }
     void  setGhostIndex(int idx)           { mGhostIndex = idx; }
-    int   getGhostIndex()  const           { return mGhostIndex; }
 
 protected:
     // Engine code accesses mNetFlags directly (e.g. mNetFlags.set(Ghostable))
