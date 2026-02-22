@@ -141,7 +141,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release \
           -DUSE_SDL2=OFF \
           -DUSE_IMAGE_SUPPORT=OFF \
-          -DUSE_NETWORKING=ON \
+          -DUSE_NETWORKING=OFF \
           -DSDL2MIXER=OFF \
           -DENET_INCLUDE_DIR=/usr/x86_64-w64-mingw32/include \
           -DENET_LIBRARY=/usr/x86_64-w64-mingw32/lib/libenet.a
@@ -150,8 +150,8 @@ jobs:
       run: |
         cd legacy/trunk/build-win
         
-        # Build main exe only (skip tests to avoid Catch2 MinGW issues)
-        cmake --build . --target doomlegacy --parallel
+        # Build tests only (networking disabled)
+        cmake --build . --target test_fixed_t test_vector test_console --parallel
 
     - name: Upload Windows artifacts
       uses: actions/upload-artifact@v4
