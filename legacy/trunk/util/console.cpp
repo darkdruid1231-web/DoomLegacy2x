@@ -1,9 +1,11 @@
 // GNU General Public License for more details.
 #ifdef __MINGW32__
-// GCC 13 declares signed _xgetbv; MinGW-w64 wants unsigned.
-// Block GCC's header via its guard + force MinGW version.
-#define __XSAVEINTRIN_H
-#include <intrin.h>
+#undef _xgetbv
+static inline unsigned long long _xgetbv(unsigned int index) {
+    unsigned long long eax, edx;
+    __asm__ __volatile__ ("xgetbv" : "=a" (eax), "=d" (edx) : "c" (index));
+    return (edx << 32) | eax;
+}
 #endif
 
 //
