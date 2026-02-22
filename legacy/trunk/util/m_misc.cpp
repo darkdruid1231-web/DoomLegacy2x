@@ -43,15 +43,6 @@
 
 #include "hardware/oglrenderer.hpp"
 
-// GCC 13+ / MinGW-w64 _xgetbv conflict workaround
-#ifdef __MINGW32__
-#undef _xgetbv
-static inline long long _xgetbv(unsigned int index) {
-    unsigned int eax, edx;
-    __asm__ __volatile__ ("xgetbv" : "=a"(eax), "=d"(edx) : "c"(index));
-    return ((long long)edx << 32) | eax;
-}
-#endif
 
 // ==========================================================================
 //                         FILE INPUT / OUTPUT
