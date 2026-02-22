@@ -26,10 +26,10 @@
 
 // Standard library differences
 #ifdef __WIN32__
-// Fix GCC 13+ / MinGW-w64 header conflict with intrinsics
-// Include MinGW-w64's intrin.h which handles declarations properly
-# ifdef __GNUC__
-#  include <intrin.h>
+// Fix GCC 13+ / MinGW-w64 header conflict: prevent GCC from declaring its own _xgetbv
+// Let MinGW-w64's intrin.h provide the proper unsigned version
+# ifdef __MINGW32__
+#  define _XGETBV_H
 # endif
 
 # include <windows.h>
