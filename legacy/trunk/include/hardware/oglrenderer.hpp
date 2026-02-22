@@ -64,11 +64,8 @@
    extern "C" void APIENTRY glPointParameterfv(GLenum pname, const GLfloat *params);
 #endif
 
-// Provide a dummy type when SDL headers are not available
-#if !defined(SDL_SURFACE_DEFINED) && !defined(SDL_Surface)
-struct SDL_Surface {};
-#define SDL_SURFACE_DEFINED
-#endif
+// SDL surface struct is always provided by SDL headers (1 or 2).
+// Don't define a dummy - rely on SDL headers being present.
 #include<GL/glu.h>
 
 #include"vect.h"
