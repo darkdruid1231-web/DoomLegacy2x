@@ -51,6 +51,12 @@ public:
     
     void writeFloat(float val) { writeBits(&val, 32); }
     float readFloat() { float v; readBits(&v, 32); return v; }
+
+    // TNL-compatible bit-width int read/write
+    void    writeInt(int32_t val, size_t bits)  { writeBits(&val, bits); }
+    void    writeInt(uint32_t val, size_t bits) { writeBits(&val, bits); }
+    int32_t readInt(size_t bits)  { int32_t  v = 0; readBits(&v, bits); return v; }
+    uint32_t readUInt(size_t bits) { uint32_t v = 0; readBits(&v, bits); return v; }
     
     void writeString(const char* str) {
         if (str) {
