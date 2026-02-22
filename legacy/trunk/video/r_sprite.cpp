@@ -22,6 +22,7 @@
 /// \brief Sprites and sprite presentations.
 
 #include "doomdef.h"
+#include "lnet.h"  // lnet::BitStream for Pack/Unpack
 
 #include "g_actor.h"
 #include "g_decorate.h"

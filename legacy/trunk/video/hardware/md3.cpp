@@ -26,6 +26,7 @@
 #include <GL/gl.h>
 
 #include "doomtype.h"
+#include "lnet.h"  // lnet::BitStream for Pack/Unpack stubs
 #include "g_actor.h"
 #include "g_map.h"
 
@@ -809,20 +810,20 @@ bool modelpres_t::Draw(const Actor *p)
 
 
 // TODO netcode for MD3 models
-void modelpres_t::Pack(TNL::BitStream *s)
+void modelpres_t::Pack(lnet::BitStream &s)
 {
 }
 
-void modelpres_t::Unpack(TNL::BitStream *s)
-{
-}
-
-
-void modelpres_t::PackAnim(TNL::BitStream *s)
+void modelpres_t::Unpack(lnet::BitStream &s)
 {
 }
 
 
-void modelpres_t::UnpackAnim(TNL::BitStream *s)
+void modelpres_t::PackAnim(lnet::BitStream &s)
+{
+}
+
+
+void modelpres_t::UnpackAnim(lnet::BitStream &s)
 {
 }

@@ -25,9 +25,9 @@
 
 #include "doomtype.h"
 
-// Forward-declare TNL::BitStream so Pack/Unpack method signatures compile
-// without requiring the full TNL (or stub) headers in every translation unit.
-namespace TNL { class BitStream; }
+// Forward-declare lnet::BitStream for Pack/Unpack method signatures.
+// r_sprite.cpp was migrated to lnet; md3.cpp stubs follow the same convention.
+namespace lnet { class BitStream; }
 
 
 //========================================================
@@ -86,10 +86,10 @@ public:
   static presentation_t *Unserialize(LArchive &a);
 
   /// Netcode
-  virtual void   Pack(class TNL::BitStream *s) = 0;
-  virtual void Unpack(class TNL::BitStream *s) = 0;
-  virtual void   PackAnim(class TNL::BitStream *s) = 0;
-  virtual void UnpackAnim(class TNL::BitStream *s) = 0;
+  virtual void   Pack(lnet::BitStream &s) = 0;
+  virtual void Unpack(lnet::BitStream &s) = 0;
+  virtual void   PackAnim(lnet::BitStream &s) = 0;
+  virtual void UnpackAnim(lnet::BitStream &s) = 0;
 };
 
 

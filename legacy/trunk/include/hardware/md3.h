@@ -307,10 +307,10 @@ public:
   virtual int  Marshal(LArchive &a);
 
   /// Netcode
-  virtual void   Pack(class TNL::BitStream *s);
-  virtual void Unpack(class TNL::BitStream *s);
-  virtual void   PackAnim(class TNL::BitStream *s);
-  virtual void UnpackAnim(class TNL::BitStream *s);
+  virtual void   Pack(lnet::BitStream &s);
+  virtual void Unpack(lnet::BitStream &s);
+  virtual void   PackAnim(lnet::BitStream &s);
+  virtual void UnpackAnim(lnet::BitStream &s);
 };
 
 
