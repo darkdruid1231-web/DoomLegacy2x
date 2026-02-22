@@ -26,8 +26,8 @@
 // Fix GCC 13+ / MinGW-w64 header conflict: prevent GCC from declaring its own _xgetbv
 // Let MinGW-w64's intrin-impl.h provide the unsigned version
 #ifdef __MINGW32__
-# define __XSAVEINTRIN_H
-# define _XGETBV_DEFINED
+# define _XSAVEINTRIN_H_INCLUDED 1
+# define _XGETBV_DEFINED 1
 #endif
 
 // SDL2 headers - use SDL2/SDL.h on MSYS2/MinGW or SDL/SDL.h fallback
