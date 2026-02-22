@@ -116,35 +116,21 @@ jobs:
     - name: Download and install ENet for MinGW
       run: |
         cd /tmp
+        # Download ENet 1.3.17 source for headers
         wget -q https://github.com/lsalzman/enet/archive/refs/tags/v1.3.17.tar.gz -O enet-src.tar.gz
         tar -xzf enet-src.tar.gz
-        cd enet-1.3.17
-        # Build ENet for MinGW manually (avoid CMake's Linux-specific flag issues)
-        # Compile each ENet source file individually, then archive
-        mkdir -p lib
-        for src in callbacks compress host list packet peer protocol win32; do
-          x86_64-w64-mingw32-gcc -c -O2 -Wall ${src}.c -Iinclude -o lib/${src}.o
-        done
-        # Archive into static library
-        x86_64-w64-mingw32-ar rcs lib/libenet.a lib/*.o
-        # Install headers and library
-        sudo cp include/enet/*.h /usr/x86_64-w64-mingw32/include/
-        sudo cp lib/libenet.a /usr/x86_64-w64-mingw32/lib/
+        # Install headers
+        sudo cp enet-1.3.17/include/enet/*.h /usr/x86_64-w64-mingw32/include/
         
-        # Create pkg-config for ENet
-        sudo mkdir -p /usr/x86_64-w64-mingw32/lib/pkgconfig
-        cat << 'EOF' | sudo tee /usr/x86_64-w64-mingw32/lib/pkgconfig/libenet.pc
-        prefix=/usr/x86_64-w64-mingw32
-        exec_prefix=${prefix}
-        libdir=${exec_prefix}/lib
-        includedir=${prefix}/include
-        
-        Name: libenet
-        Description: ENet Networking Library
-        Version: 1.3.17
-        Libs: -L${libdir} -lenet
-        Cflags: -I${includedir}
-        EOF
+        # Download pre-built ENet Windows DLL and convert to MinGW format
+        wget -q https://github.com/lsalzman/enet/releases/download/1.3.17/enet-1.3.17.zip -O enet-win.zip
+        unzip -q enet-win.zip
+        # Install DLL
+        sudo cp enet-1.3.17/libenet.dll /usr/x86_64-w64-mingw32/bin/
+        # Convert MSVC import library to MinGW format
+        pexports enet-1.3.17/libenet.dll > enet.def
+        dlltool -D libenet.dll -d enet.def -l /usr/x86_64-w64-mingw32/lib/libenet.a
+        sudo cp /usr/x86_64-w64-mingw32/lib/libenet.a /usr/x86_64-w64-mingw32/lib/
 
     - name: Configure CMake for MinGW
       env:
