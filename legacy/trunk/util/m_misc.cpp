@@ -1,18 +1,15 @@
-// Emacs style mode select   -*- C++ -*-
-//-----------------------------------------------------------------------------
-//
-// Fix GCC 13+ / MinGW-w64 header conflict: include MinGW intrin.h first
-// to provide unsigned _xgetbv before any other headers pull in GCC's version
-#ifdef _WIN32
+// Fix GCC 13+ / MinGW-w64 header conflict
+#ifdef __MINGW32__
+// Block GCC's conflicting signed _xgetbv declaration by skipping xsaveintrin.h
+#define __XSAVEINTRIN_H
+// Suppress __cpuidex redeclaration warning
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wredundant-decls"
 #pragma GCC diagnostic ignored "-Wattributes"
+// Force MinGW-w64's intrinsics early (unsigned _xgetbv version)
 #include <intrin.h>
 #pragma GCC diagnostic pop
 #endif
 
-//-----------------------------------------------------------------------------
-//
 // $Id: m_misc.cpp 616 2010-03-23 05:15:47Z smite-meister $
 //
 // Copyright (C) 1993-1996 by id Software, Inc.

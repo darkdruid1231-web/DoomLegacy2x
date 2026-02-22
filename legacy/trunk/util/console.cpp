@@ -1,18 +1,15 @@
-// Emacs style mode select   -*- C++ -*-
-//-----------------------------------------------------------------------------
-//
-// $Id: console.cpp 616 2010-03-23 05:15:47Z smite-meister $
-//
-// Copyright (C) 1998-2007 by DooM Legacy Team.
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
-// of the License, or (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// Fix GCC 13+ / MinGW-w64 header conflict
+#ifdef __MINGW32__
+// Block GCC's conflicting signed _xgetbv declaration by skipping xsaveintrin.h
+#define __XSAVEINTRIN_H
+// Suppress __cpuidex redeclaration warning
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wattributes"
+// Force MinGW-w64's intrinsics early (unsigned _xgetbv version)
+#include <intrin.h>
+#pragma GCC diagnostic pop
+#endif
+
 // GNU General Public License for more details.
 //
 //-----------------------------------------------------------------------------
