@@ -169,3 +169,46 @@ jobs:
           legacy/trunk/build-win/test_vector.exe
           legacy/trunk/build-win/test_console.exe
         retention-days: 30
+
+  # Native Windows build using MSYS2 (full features including networking)
+  windows-native-build:
+    runs-on: windows-latest
+    
+    defaults:
+      run:
+        shell: msys2 {0}
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Setup MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: mingw64
+        install: >-
+          mingw-w64-x86_64-gcc
+          mingw-w64-x86_64-cmake
+          mingw-w64-x86_64-SDL2
+          mingw-w64-x86_64-libpng
+          mingw-w64-x86_64-libjpeg-turbo
+          mingw-w64-x86_64-libgl
+          mingw-w64-x86_64-enet
+          flex
+          lemon
+    
+    - name: Configure and Build
+      run: |
+        cd legacy/trunk
+        rm -rf build-win-native
+        mkdir -p build-win-native
+        cd build-win-native
+        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
+        cmake --build . --parallel
+    
+    - name: Upload Windows native artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: doomlegacy-windows-native
+        path: legacy/trunk/build-win-native/doomlegacy.exe
+        retention-days: 30
