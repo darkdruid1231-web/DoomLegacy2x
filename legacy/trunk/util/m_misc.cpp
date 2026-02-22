@@ -41,6 +41,13 @@
 
 #include "parser.h"
 
+// Fix GCC 13+ / MinGW-w64 header conflict: prevent GCC from declaring its own _xgetbv
+// Let MinGW-w64's intrin-impl.h provide the unsigned version
+#ifdef __MINGW32__
+# define __XSAVEINTRIN_H
+# define _XGETBV_DEFINED
+#endif
+
 #include "hardware/oglrenderer.hpp"
 
 

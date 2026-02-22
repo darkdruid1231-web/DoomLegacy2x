@@ -5,20 +5,6 @@
 
 /// \file
 /// \brief Console for Doom LEGACY
-#ifdef __MINGW32__
-// Fix GCC 13+ / MinGW-w64 header conflict: prevent GCC from declaring its own _xgetbv
-// Let MinGW-w64's intrin-impl.h provide the unsigned version
-# define __XSAVEINTRIN_H
-# define _XGETBV_DEFINED
-#endif
-#ifdef _WIN32
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wredundant-decls"
-#pragma GCC diagnostic ignored "-Wattributes"
-#include <intrin.h>
-#pragma GCC diagnostic pop
-#endif
-
 
 #include <stdarg.h>
 

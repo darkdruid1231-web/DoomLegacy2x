@@ -2,6 +2,12 @@
 
 #include "m_swap.h"
 #include "m_menu.h" // for message boxes
+// Fix GCC 13+ / MinGW-w64 header conflict: prevent GCC from declaring its own _xgetbv
+// Let MinGW-w64's intrin-impl.h provide the unsigned version
+#ifdef __MINGW32__
+# define __XSAVEINTRIN_H
+# define _XGETBV_DEFINED
+#endif
 #include "r_data.h"
 #include "z_zone.h"
 #include <zlib.h>
