@@ -4,9 +4,13 @@
 set(CMAKE_SYSTEM_NAME Windows)
 set(CMAKE_SYSTEM_PROCESSOR x86_64)
 
-# Cross-compiler paths
-set(CMAKE_C_COMPILER x86_64-w64-mingw32-gcc)
-set(CMAKE_CXX_COMPILER x86_64-w64-mingw32-g++)
+# Cross-compiler paths.
+# Use the posix-threading variant: the win32 variant has a crippled C++ stdlib
+# (no <ctime> clock_t, no std::thread, etc.) which causes Catch2 / test builds
+# to fail.  The posix variant is installed alongside win32 by the mingw-w64
+# package and is fully C++11/14 compliant.
+set(CMAKE_C_COMPILER x86_64-w64-mingw32-gcc-posix)
+set(CMAKE_CXX_COMPILER x86_64-w64-mingw32-g++-posix)
 set(CMAKE_RC_COMPILER x86_64-w64-mingw32-windres)
 
 # Where to find the target environment
