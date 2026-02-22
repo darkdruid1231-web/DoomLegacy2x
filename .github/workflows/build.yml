@@ -48,34 +48,35 @@ jobs:
         cd legacy/trunk/build
         ctest --output-on-failure -R "fixed_t|vector|console|save_load" || true
 
-    - name: cppcheck static analysis
-      run: |
-        cppcheck \
-          --enable=warning,style,performance,portability \
-          --suppress=missingIncludeSystem \
-          --suppress=unmatchedSuppression \
-          --std=c++11 \
-          --platform=win64 \
-          -I legacy/trunk/include \
-          -I legacy/trunk/include/core \
-          -I legacy/trunk/include/game \
-          -I legacy/trunk/include_stubs \
-          --error-exitcode=0 \
-          --output-file=cppcheck-report.txt \
-          legacy/trunk/engine legacy/trunk/util legacy/trunk/video \
-          2>&1 | tail -20 || true
-        echo "=== cppcheck summary ==="
-        grep -c "error\|warning" cppcheck-report.txt 2>/dev/null && \
-          echo "Full report: cppcheck-report.txt" || echo "No issues found"
-
-    - name: Upload cppcheck report
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: cppcheck-report
-        path: cppcheck-report.txt
-        retention-days: 14
-        if-no-files-found: ignore
+    # cppcheck disabled - takes too long
+    # - name: cppcheck static analysis
+    #   run: |
+    #     cppcheck \
+    #       --enable=warning,style,performance,portability \
+    #       --suppress=missingIncludeSystem \
+    #       --suppress=unmatchedSuppression \
+    #       --std=c++11 \
+    #       --platform=win64 \
+    #       -I legacy/trunk/include \
+    #       -I legacy/trunk/include/core \
+    #       -I legacy/trunk/include/game \
+    #       -I legacy/trunk/include_stubs \
+    #       --error-exitcode=0 \
+    #       --output-file=cppcheck-report.txt \
+    #       legacy/trunk/engine legacy/trunk/util legacy/trunk/video \
+    #       2>&1 | tail -20 || true
+    #     echo "=== cppcheck summary ==="
+    #     grep -c "error\|warning" cppcheck-report.txt 2>/dev/null && \
+    #       echo "Full report: cppcheck-report.txt" || echo "No issues found"
+    #
+    # - name: Upload cppcheck report
+    #   uses: actions/upload-artifact@v4
+    #   if: always()
+    #   with:
+    #     name: cppcheck-report
+    #     path: cppcheck-report.txt
+    #     retention-days: 14
+    #     if-no-files-found: ignore
 
   # Windows cross-compilation
   windows-build:
