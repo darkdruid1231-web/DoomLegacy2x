@@ -9,13 +9,8 @@
 # define _XSAVEINTRIN_H_INCLUDED 1
 # define _XGETBV_DEFINED 1
 # define __CPUID_H 1
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wattributes"
 #endif
 #include "r_data.h"
-#ifdef __MINGW32__
-# pragma GCC diagnostic pop
-#endif
 #include "z_zone.h"
 #include <zlib.h>
 

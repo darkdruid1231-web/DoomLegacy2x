@@ -28,8 +28,6 @@
 # define _XSAVEINTRIN_H_INCLUDED 1
 # define _XGETBV_DEFINED 1
 # define __CPUID_H 1
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wattributes"
 #endif
 
 // Why oh why can't there be just one standard DLL system inteface?!?
@@ -44,10 +42,6 @@
 
 #include "doomdef.h"
 #include "m_dll.h"
-
-#ifdef __MINGW32__
-# pragma GCC diagnostic pop
-#endif
 
 // Dynamically loads a DLL file 
 dll_handle_t OpenDLL(const char *dllname)

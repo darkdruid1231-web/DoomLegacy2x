@@ -30,9 +30,15 @@
 # define _XSAVEINTRIN_H_INCLUDED 1
 # define _XGETBV_DEFINED 1
 # define __CPUID_H 1
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wattributes"
 #endif
 
 #include <GL/gl.h>
+
+#ifdef __MINGW32__
+# pragma GCC diagnostic pop
+#endif
 // OpenGL 1.2+ / ARB extension constants absent from the Windows 1.1 header.
 // Define them here so all video files that include r_data.h pick them up.
 #ifndef GL_BGR
