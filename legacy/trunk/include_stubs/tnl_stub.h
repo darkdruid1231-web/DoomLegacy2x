@@ -79,7 +79,7 @@ public:
     void writeBool(bool val) { write(&val, 1); }
     
     // Flag write (writes 1 bit, 1 for true, 0 for false)
-    void writeFlag(bool val) { writeBool(val); }
+    bool writeFlag(bool val) { writeBool(val); return true; }
     void writeString(const char* str) {
         size_t len = str ? strlen(str) + 1 : 0;
         writeUInt32((uint32_t)len, 16);
@@ -326,6 +326,8 @@ public:
     void addGhost(NetObject*)    {}
     void removeGhost(NetObject*) {}
     void updateGhost(NetObject*) {}
+    NetObject* getGhost(int ghostIndex) const { return nullptr; }  // get ghost by index
+    int getGhostIndex(const NetObject* /*obj*/) const { return -1; }  // get index of ghost
     virtual void onGhostAdded(NetObject*)   {}
     virtual void onGhostRemoved(NetObject*) {}
     virtual void onGhostUpdate(NetObject*)  {}
@@ -352,7 +354,7 @@ public:
 
     // Termination callbacks (LConnection overrides these)
     virtual void onConnectTerminated(TerminationReason, const char*) {}
-    virtual void onConnectionTerminated(TerminationReason, const char*) {}
+    
 };
 
 } // namespace TNL
