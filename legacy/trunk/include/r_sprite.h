@@ -97,7 +97,7 @@ protected:
 public:
   spritepres_t() {}; ///< simple constructor for unserialization
   spritepres_t(const ActorInfo *inf, int col = 0); ///< normal constructor
-  spritepres_t(class TNL::BitStream *s);
+  spritepres_t(lnet::BitStream &s);
   virtual ~spritepres_t();
 
   virtual void SetFrame(const state_t *st); // Only used by DActors with sprites
@@ -110,10 +110,10 @@ public:
   virtual int  Marshal(LArchive &a);
 
   /// Netcode
-  virtual void   Pack(class TNL::BitStream *s);
-  virtual void Unpack(class TNL::BitStream *s) {}
-  virtual void   PackAnim(class TNL::BitStream *s);
-  virtual void UnpackAnim(class TNL::BitStream *s);
+  virtual void   Pack(lnet::BitStream &s);
+  virtual void Unpack(lnet::BitStream &s) {}
+  virtual void   PackAnim(lnet::BitStream &s);
+  virtual void UnpackAnim(lnet::BitStream &s);
 };
 
 
