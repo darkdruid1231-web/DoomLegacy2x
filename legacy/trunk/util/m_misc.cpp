@@ -1,12 +1,4 @@
 // $Id: m_misc.cpp 616 2010-03-23 05:15:47Z smite-meister $
-#ifdef __MINGW32__
-#undef _xgetbv
-static inline unsigned long long _xgetbv(unsigned int index) {
-    unsigned long long eax, edx;
-    __asm__ __volatile__ ("xgetbv" : "=a" (eax), "=d" (edx) : "c" (index));
-    return (edx << 32) | eax;
-}
-#endif
 
 //
 // Copyright (C) 1993-1996 by id Software, Inc.
