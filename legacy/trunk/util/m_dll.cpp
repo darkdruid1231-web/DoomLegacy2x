@@ -26,6 +26,8 @@
 #ifdef __MINGW32__
 # define __XSAVEINTRIN_H
 # define _XGETBV_DEFINED
+# pragma GCC diagnostic ignored "-Wattributes"
+# pragma GCC diagnostic ignored "-Wconflicting-declarations"
 #endif
 
 // Why oh why can't there be just one standard DLL system inteface?!?
