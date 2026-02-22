@@ -207,8 +207,8 @@ jobs:
         rm -rf build-win-native
         mkdir -p build-win-native
         cd build-win-native
-        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
-        cmake --build . --parallel
+        cmake .. -DCMAKE_BUILD_TYPE=Release
+        cmake --build . --parallel 2>&1
 
     - name: Upload Windows native artifact
       uses: actions/upload-artifact@v4
