@@ -4,6 +4,10 @@ project(doomlegacy C CXX)
 # Global compile options
 # -w: suppress all warnings (including GCC 15 / MinGW intrinsics redefinition)
 # -fpermissive: allow implicit conversions, etc.
+# Fix GCC 13+ / MinGW-w64 intrinsics conflict: define these BEFORE any includes
+# to prevent GCC's xsaveintrin.h from declaring conflicting signed versions
+add_compile_definitions(__XSAVEINTRIN_H _XGETBV_DEFINED)
+
 add_compile_options(-w -fpermissive)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
