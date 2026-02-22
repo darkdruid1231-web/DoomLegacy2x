@@ -329,6 +329,9 @@ public:
     bool isGhostAvailable(NetObject* /*obj*/ = nullptr) const { return false; }
     void postNetEvent(NetEvent* /*e*/) {}
 
+    // objectInScope - called to register objects in client's scope
+    void objectInScope(NetObject* /*obj*/) {}
+
     // Connection lifecycle virtuals (declared in n_connection.h via override)
     virtual void onConnectionEstablished() {}
     virtual void onStartGhosting()         {}
