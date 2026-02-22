@@ -5742,6 +5742,13 @@ enum mobjtype_t
   MT_DOOM = 0, MT_PLAYER = MT_DOOM,
   MT_POSSESSED,
   MT_SHOTGUY,
+  MT_VILE,      ///< Arch-Vile (Doom 2)
+  MT_FIRE,      ///< Arch-Vile fire attack (Doom 2)
+  MT_UNDEAD,    ///< Revenant (Doom 2)
+  MT_TRACER,    ///< Revenant homing missile (Doom 2)
+  MT_SMOKE,     ///< Revenant tracer smoke (Doom 2)
+  MT_FATSO,     ///< Mancubus (Doom 2)
+  MT_FATSHOT,   ///< Mancubus fireball (Doom 2)
   MT_CHAINGUY,
   MT_TROOP,
   MT_SERGEANT,

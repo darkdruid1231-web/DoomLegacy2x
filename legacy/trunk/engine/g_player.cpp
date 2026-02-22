@@ -490,10 +490,10 @@ void PlayerInfo::Serialize(DoomLegacy::ISerializer& s)
   s.write(static_cast<int32_t>(time));
 
   // View data
-  // Note: fixed_t needs special handling - convert to/from float
-  s.writeFloat(static_cast<float>(viewz));
-  s.writeFloat(static_cast<float>(viewheight));
-  s.writeFloat(static_cast<float>(deltaviewheight));
+  // Note: fixed_t has no implicit float conversion; use .Float()
+  s.writeFloat(viewz.Float());
+  s.writeFloat(viewheight.Float());
+  s.writeFloat(deltaviewheight.Float());
 
   // HUD/feedback data
   s.write(static_cast<int32_t>(palette));
@@ -542,6 +542,11 @@ void PlayerInfo::Unserialize(DoomLegacy::ISerializer& s)
   options.Read(s);
 }
 
+
+// In stub builds, these RPC methods are already defined as inline no-ops via
+// TNL_DECLARE_RPC in the class body.  The real implementations below are only
+// compiled when the actual TNL library is present.
+#ifndef TNL_STUB_BUILD
 
 /// server notifies the client that this player has entered a new map
 PLAYERINFO_RPC_S2C(s2cEnterMap, (U8 mapnum), (mapnum))
@@ -593,6 +598,8 @@ PLAYERINFO_RPC_C2S(c2sIntermissionDone, (), ())
   CONS_Printf("client player %d has finished intermission\n", number);
   playerstate = PST_NEEDMAP; 
 }
+
+#endif // TNL_STUB_BUILD
 
 
 

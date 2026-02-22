@@ -4,6 +4,11 @@
 #ifndef TNL_STUB_H
 #define TNL_STUB_H
 
+/// Defined whenever the TNL stub headers are in use (i.e. non-Linux builds
+/// and any build that lacks the real OpenTNL library).  Engine code can
+/// guard TNL-specific implementation bodies with #ifndef TNL_STUB_BUILD.
+#define TNL_STUB_BUILD 1
+
 #include <cstdint>
 #include <cstring>
 #include <string>
@@ -199,6 +204,20 @@ enum TerminationReason {
 };
 
 // ============================================================
+// RPC direction / guarantee constants  (inside TNL namespace)
+// ============================================================
+enum RPCDirection {
+    RPCToGhost       = 0,  ///< server → client (ghost-side)
+    RPCToGhostParent = 1,  ///< client → server (ghost-parent side)
+};
+
+enum RPCGuarantee {
+    RPCGuaranteedOrdered = 0,
+    RPCGuaranteed        = 1,
+    RPCUnguaranteed      = 2,
+};
+
+// ============================================================
 // RPC pointer types used in RPC signatures
 // ============================================================
 typedef const char*             StringPtr;
@@ -278,6 +297,10 @@ public:
     // Dirty-mask tracking (no-op — no real ghosting infrastructure in stub)
     void setMaskBits(uint32_t /*mask*/)   {}
     void clearMaskBits(uint32_t /*mask*/) {}
+
+    // isInitialUpdate: in real TNL, returns true when packUpdate is called for
+    // the first time on a newly-ghosted object.  Stub always returns false.
+    bool isInitialUpdate() const { return false; }
 
     NetInterface* getNetInterface()        { return mNetInterface; }
     void  setNetInterface(NetInterface* i) { mNetInterface = i; }
@@ -363,8 +386,10 @@ public:
 // RPC / NetEvent macros  (outside namespace — they are text substitutions)
 // ============================================================
 
-// TNL_DECLARE_RPC: expand to an inline virtual no-op method so the method
-// actually exists on the class (needed for s2cEnterMap, c2sIntermissionDone, etc.)
+// TNL_DECLARE_RPC: expand to an inline virtual no-op method.  This covers all
+// RPCs that have no out-of-class implementation (e.g. those in n_connection.h).
+// The 3 PlayerInfo RPCs that *do* have bodies in g_player.cpp are wrapped in
+// #ifndef TNL_STUB_BUILD guards there, so the inline stub is used instead.
 #define TNL_DECLARE_RPC(name, params) virtual void name params {}
 
 // TNL_IMPLEMENT_RPC: out-of-class implementation body — stub as no-op.
@@ -382,7 +407,10 @@ public:
 // (e.g. TNL_IMPLEMENT_NETOBJECT(PlayerInfo), TNL_IMPLEMENT_CLASS(GameType))
 // Real TNL uses these to register classes with the netobject manager; stub as no-ops.
 #define TNL_IMPLEMENT_NETOBJECT(cls)
-#define TNL_IMPLEMENT_NETOBJECT_RPC(cls, methodName, args, argNames, group, guarantee, direction, version)
+// TNL_IMPLEMENT_NETOBJECT_RPC: no-op in stub builds.  The RPCs are already
+// defined inline via TNL_DECLARE_RPC; the .cpp bodies are guarded by
+// #ifndef TNL_STUB_BUILD so this macro is never followed by a stray { }.
+#define TNL_IMPLEMENT_NETOBJECT_RPC(cls, name, args, argNames, group, guarantee, direction, version)
 #define TNL_IMPLEMENT_CLASS(cls)
 
 #endif // TNL_STUB_H
