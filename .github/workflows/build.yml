@@ -199,7 +199,7 @@ jobs:
           flex
           lemon
 
-    - name: Configure and Build (test targets)
+    - name: Configure and Build (full exe - DEBUG)
       shell: msys2 {0}
       run: |
         export PATH="/c/msys64/mingw64/bin:$PATH"
@@ -208,10 +208,8 @@ jobs:
         mkdir -p build-win-native
         cd build-win-native
         cmake .. -DCMAKE_BUILD_TYPE=Release
-        # Build test targets only — the full game requires additional code fixes
-        # (missing mobjtype_t entries for Doom 2 monsters such as MT_UNDEAD/MT_VILE/
-        # MT_FATSO, g_mapinfo pointer-to-size_t casts, etc.) tracked separately.
-        cmake --build . --target test_fixed_t test_fixed_catch2 test_vector test_console test_actor test_save_load_unit --parallel
+        # TEMP: try full exe build to find remaining errors
+        cmake --build . --parallel 2>&1 | head -200
 
     - name: Upload Windows native test artifacts
       uses: actions/upload-artifact@v4
