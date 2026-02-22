@@ -4,7 +4,11 @@
 // Fix GCC 13+ / MinGW-w64 header conflict: include MinGW intrin.h first
 // to provide unsigned _xgetbv before any other headers pull in GCC's version
 #ifdef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wredundant-decls"
+#pragma GCC diagnostic ignored "-Wattributes"
 #include <intrin.h>
+#pragma GCC diagnostic pop
 #endif
 
 //-----------------------------------------------------------------------------
