@@ -382,6 +382,7 @@ public:
 // (e.g. TNL_IMPLEMENT_NETOBJECT(PlayerInfo), TNL_IMPLEMENT_CLASS(GameType))
 // Real TNL uses these to register classes with the netobject manager; stub as no-ops.
 #define TNL_IMPLEMENT_NETOBJECT(cls)
+#define TNL_IMPLEMENT_NETOBJECT_RPC(cls, methodName, args, argNames, group, guarantee, direction, version)
 #define TNL_IMPLEMENT_CLASS(cls)
 
 #endif // TNL_STUB_H
