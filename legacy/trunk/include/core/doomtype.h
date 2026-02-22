@@ -27,9 +27,9 @@
 // Standard library differences
 #ifdef __WIN32__
 // Fix GCC 13+ / MinGW-w64 header conflict with intrinsics
-// Include umbrella header that safely pulls in cpuid.h, xsaveintrin.h, etc.
+// Include MinGW-w64's intrin.h which handles declarations properly
 # ifdef __GNUC__
-#  include <x86gprintrin.h>
+#  include <intrin.h>
 # endif
 
 # include <windows.h>
