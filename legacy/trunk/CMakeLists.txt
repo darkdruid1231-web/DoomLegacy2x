@@ -259,6 +259,9 @@ endforeach()
 add_library(util STATIC ${UTIL_SRCS})
 target_include_directories(util PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
+# Suppress GCC 15 / MinGW intrinsics redefinition warnings (toolchain bug)
+target_compile_options(util PRIVATE -fpermissive)
+
 # Apply platform-specific definitions to util (required for TNL headers)
 target_compile_definitions(util PRIVATE
     FN_CDECL=
