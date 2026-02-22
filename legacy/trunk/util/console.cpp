@@ -1,14 +1,9 @@
 // GNU General Public License for more details.
 #ifdef __MINGW32__
-// GCC 13+ declares _xgetbv as signed long long in xsaveintrin.h;
-// MinGW-w64 wants unsigned __int64. Block GCC version.
+// GCC 13 declares signed _xgetbv; MinGW-w64 wants unsigned.
+// Block GCC's header via its guard + force MinGW version.
 #define __XSAVEINTRIN_H
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wattributes"
-#pragma GCC diagnostic ignored "-Wredundant-decls"
-// Force MinGW-w64 intrinsics (unsigned version)
 #include <intrin.h>
-#pragma GCC diagnostic pop
 #endif
 
 //
