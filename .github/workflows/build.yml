@@ -126,7 +126,10 @@ jobs:
           x86_64-w64-mingw32-gcc -c -O2 -Iinclude ${f}.c -o lib/${f}.o
         done
         x86_64-w64-mingw32-ar rcs lib/libenet.a lib/*.o
-        sudo cp include/enet/*.h /usr/x86_64-w64-mingw32/include/
+        # Install into include/enet/ subdir so enet/time.h does NOT shadow the
+        # real Windows time.h in the root include dir (which breaks <ctime>).
+        sudo mkdir -p /usr/x86_64-w64-mingw32/include/enet
+        sudo cp include/enet/*.h /usr/x86_64-w64-mingw32/include/enet/
         sudo cp lib/libenet.a /usr/x86_64-w64-mingw32/lib/
 
     - name: Configure CMake for MinGW
