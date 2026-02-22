@@ -23,11 +23,13 @@
 #ifndef oglrenderer_hpp_
 #define oglrenderer_hpp_
 
-// Fix GCC 13+ / MinGW-w64 header conflict: prevent GCC from declaring its own _xgetbv
-// Let MinGW-w64's intrin-impl.h provide the unsigned version
+// Fix GCC 13+ / MinGW-w64 header conflicts
 #ifdef __MINGW32__
+// Prevent GCC from declaring conflicting _xgetbv and __cpuidex
+// Let MinGW-w64's intrin-impl.h provide the compatible versions
 # define _XSAVEINTRIN_H_INCLUDED 1
 # define _XGETBV_DEFINED 1
+# define __CPUID_H 1
 #endif
 
 // SDL2 headers - use SDL2/SDL.h on MSYS2/MinGW or SDL/SDL.h fallback
