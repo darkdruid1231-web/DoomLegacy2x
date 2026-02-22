@@ -229,6 +229,23 @@ private:
 };
 
 // ============================================================
+// NetFlags helper (minimal BitSet-like type for mNetFlags)
+// ============================================================
+struct NetFlags {
+    uint32_t bits;
+    NetFlags() : bits(0) {}
+    void set(uint32_t mask)        { bits |=  mask; }
+    void clear(uint32_t mask)      { bits &= ~mask; }
+    bool test(uint32_t mask) const { return (bits & mask) != 0; }
+    bool any() const               { return bits != 0; }
+};
+
+// Flag constants used with mNetFlags (e.g. mNetFlags.set(Ghostable))
+static const uint32_t Ghostable  = (1u << 0);
+static const uint32_t ScopeLocal = (1u << 1);
+static const uint32_t IsGhost    = (1u << 2);
+
+// ============================================================
 // NetObject stub
 // ============================================================
 class NetObject {
@@ -241,10 +258,20 @@ public:
     virtual void onGhostReceive(BitStream*){}
     virtual void packUpdate(BitStream*)    {}
     virtual bool unpackUpdate(BitStream*)  { return true; }
+
+    // Dirty-mask tracking (no-op — no real ghosting infrastructure in stub)
+    void setMaskBits(uint32_t /*mask*/)   {}
+    void clearMaskBits(uint32_t /*mask*/) {}
+
     NetInterface* getNetInterface()        { return mNetInterface; }
     void  setNetInterface(NetInterface* i) { mNetInterface = i; }
     int   getGhostIndex()  const           { return mGhostIndex; }
     void  setGhostIndex(int idx)           { mGhostIndex = idx; }
+
+protected:
+    // Engine code accesses mNetFlags directly (e.g. mNetFlags.set(Ghostable))
+    NetFlags mNetFlags;
+
 private:
     NetInterface* mNetInterface;
     int           mGhostIndex;
@@ -288,7 +315,8 @@ public:
     virtual void onGhostUpdate(NetObject*)  {}
 
     // Methods called by engine code
-    bool isGhostAvailable() const { return false; }
+    // isGhostAvailable(obj) — is obj already being ghosted to this connection?
+    bool isGhostAvailable(NetObject* /*obj*/ = nullptr) const { return false; }
     void postNetEvent(NetEvent* /*e*/) {}
 
     // Connection lifecycle virtuals (declared in n_connection.h via override)
