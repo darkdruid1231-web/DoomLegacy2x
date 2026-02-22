@@ -120,14 +120,13 @@ jobs:
         tar -xzf enet-src.tar.gz
         cd enet-1.3.17
         # Build ENet for MinGW manually (avoid CMake's Linux-specific flag issues)
-        # Compile with MinGW directly, no CMake needed
+        # Compile each ENet source file individually, then archive
         mkdir -p lib
-        # Compile ENet source files for Windows
-        x86_64-w64-mingw32-gcc -c -O2 -Wall \
-          callbacks.c compress.c host.c list.c packet.c peer.c protocol.c win32.c \
-          -Iinclude -o lib/enet.o
+        for src in callbacks compress host list packet peer protocol win32; do
+          x86_64-w64-mingw32-gcc -c -O2 -Wall ${src}.c -Iinclude -o lib/${src}.o
+        done
         # Archive into static library
-        x86_64-w64-mingw32-ar rcs lib/libenet.a lib/enet.o
+        x86_64-w64-mingw32-ar rcs lib/libenet.a lib/*.o
         # Install headers and library
         sudo cp include/enet/*.h /usr/x86_64-w64-mingw32/include/
         sudo cp lib/libenet.a /usr/x86_64-w64-mingw32/lib/
