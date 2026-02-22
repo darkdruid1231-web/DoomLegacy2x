@@ -102,14 +102,15 @@ void GameType::ReadServerInfo(DoomLegacy::ISerializer &s)
   s.read(&n, sizeof(S32)*8); // number of files
 
   bool dl;
-  char name[128];
+  std::string tmpname; // ISerializer.readString takes std::string&
   S32 size;
   byte md5[16];
 
   for (int i=0; i<n; i++)
     {
       s.read(&dl, sizeof(bool)*8);  // downloadable?
-      s.readString(name); // ISerializer.readString takes std::string&
+      s.readString(tmpname); // ISerializer.readString takes std::string&
+      // copy to char array if needed
       s.read(&size, sizeof(S32)*8);
       s.read(md5, 16);
     }
