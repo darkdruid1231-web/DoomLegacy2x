@@ -176,6 +176,12 @@ jobs:
         unset C_INCLUDE_PATH
         unset CPLUS_INCLUDE_PATH
         unset INCLUDE
+        unset CPATH
+        # Debug: Show what paths are active
+        echo "C_INCLUDE_PATH after unset: '$C_INCLUDE_PATH'"
+        echo "CPLUS_INCLUDE_PATH after unset: '$CPLUS_INCLUDE_PATH'"
+        echo "CPATH after unset: '$CPATH'"
+        echo "INCLUDE after unset: '$INCLUDE'"
 
         # Cross-compile with MinGW.
         # USE_SDL2=OFF: avoids pkg-config cross-sysroot complexities; core test
