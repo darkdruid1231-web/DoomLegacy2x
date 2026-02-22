@@ -24,8 +24,30 @@
 #define oglrenderer_hpp_
 
 #ifdef USE_SDL2
+// SDL1 -> SDL2 compatibility shims for legacy renderer code
+#include<SDL2/SDL.h>
+
+// SDL1 constants mapped to SDL2 equivalents
+#ifndef SDL_SWSURFACE
+#  define SDL_SWSURFACE 0
+#endif
+#ifndef SDL_OPENGL
+#  define SDL_OPENGL SDL_WINDOW_OPENGL
+#endif
+#ifndef SDL_FULLSCREEN
+#  define SDL_FULLSCREEN SDL_WINDOW_FULLSCREEN
+#endif
+#ifndef SDL_GL_DEPTH_SIZE
+#  define SDL_GL_DEPTH_SIZE SDL_GL_DEPTH_SIZE
+#endif
+#ifndef SDL_GL_SwapBuffers
+#  define SDL_GL_SwapBuffers SDL_GL_SwapWindow
+#endif
+
+#else
 #include<SDL/SDL.h>
 #endif
+
 #include<GL/gl.h>
 
 // On Windows, <GL/gl.h> only covers OpenGL 1.1.  Declare the 1.4 point
