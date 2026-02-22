@@ -23,7 +23,7 @@
 #include <string.h>
 #include <math.h>
 
-#include <GL/gl.h>
+#include <GL/gl.h>  // GL_BGR/GL_BGRA compat defines come via r_data.h below
 
 #include "doomtype.h"
 #include "lnet.h"  // lnet::BitStream for Pack/Unpack stubs
