@@ -172,7 +172,7 @@ jobs:
         rm -rf build-win
         mkdir -p build-win
         cd build-win
-        
+
         # Unset conflicting include paths to prevent Linux header leakage
         unset C_INCLUDE_PATH
         unset CPLUS_INCLUDE_PATH
@@ -260,33 +260,33 @@ jobs:
         mkdir -p /tmp/sdl2
         cd /tmp/sdl2
 
-        # SDL2 - download development libraries for MinGW
-        wget -q https://github.com/libsdl-org/SDL/releases/download/release-2.32.10/SDL2-devel-2.32.10-mingw.tar.gz
-        tar -xzf SDL2-devel-2.32.10-mingw.tar.gz
+        # SDL1 - download development libraries for MinGW
+        wget -q https://www.libsdl.org/release/SDL-devel-1.2.15-mingw32.tar.gz
+        tar -xzf SDL-devel-1.2.15-mingw32.tar.gz
 
         # Create Windows sysroot
         sudo mkdir -p /usr/x86_64-w64-mingw32
-        sudo cp -r /tmp/sdl2/SDL2-2.32.10/x86_64-w64-mingw32/* /usr/x86_64-w64-mingw32/
+        sudo cp -r /tmp/sdl2/SDL-1.2.15/* /usr/x86_64-w64-mingw32/
 
-        # Copy SDL2.dll to expected location
+        # Copy SDL.dll to expected location
         sudo mkdir -p /usr/x86_64-w64-mingw32/bin
-        sudo cp /tmp/sdl2/SDL2-2.32.10/x86_64-w64-mingw32/bin/SDL2.dll /usr/x86_64-w64-mingw32/bin/
+        sudo cp /tmp/sdl2/SDL-1.2.15/bin/SDL.dll /usr/x86_64-w64-mingw32/bin/
 
-    - name: Create SDL2 config for MinGW
+    - name: Create SDL config for MinGW
       run: |
-        # Create a fake pkg-config for SDL2 targeting Windows
+        # Create a fake pkg-config for SDL targeting Windows
         sudo mkdir -p /usr/x86_64-w64-mingw32/lib/pkgconfig
-        cat << 'EOF' | sudo tee /usr/x86_64-w64-mingw32/lib/pkgconfig/sdl2.pc
+        cat << 'EOF' | sudo tee /usr/x86_64-w64-mingw32/lib/pkgconfig/sdl.pc
         prefix=/usr/x86_64-w64-mingw32
         exec_prefix=${prefix}
         libdir=${exec_prefix}/lib
         includedir=${prefix}/include
 
-        Name: SDL2
+        Name: SDL
         Description: Simple DirectMedia Layer
-        Version: 2.30.10
-        Libs: -L${libdir} -lSDL2
-        Cflags: -I${includedir}/SDL2
+        Version: 1.2.15
+        Libs: -L${libdir} -lSDL
+        Cflags: -I${includedir}/SDL
         EOF
 
     - name: Build ENet for MinGW
@@ -333,7 +333,7 @@ jobs:
     - name: Build Windows test executables (Clang cross-compile)
       run: |
         cd legacy/trunk/build-win-clang
-        # Build test targets only — the full game requires additional code fixes
+        # Build test targets only - the full game requires additional code fixes
         # (missing mobjtype_t entries, g_mapinfo cast issues) that are tracked
         # separately.  Tests validate the core logic compiles for Windows ABI.
         cmake --build . --target test_fixed_t test_fixed_catch2 test_vector test_console test_actor test_save_load_unit --parallel
@@ -368,7 +368,7 @@ jobs:
           mingw-w64-x86_64-gcc
           mingw-w64-x86_64-cmake
           mingw-w64-x86_64-make
-          mingw-w64-x86_64-SDL2
+          mingw-w64-x86_64-SDL
           mingw-w64-x86_64-libpng
           mingw-w64-x86_64-libjpeg-turbo
           mingw-w64-x86_64-enet
