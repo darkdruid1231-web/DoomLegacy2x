@@ -46,14 +46,10 @@
 #  include <SDL2/SDL.h>
 #else
 #  include <SDL/SDL.h>
+#endif
 
 #ifdef __MINGW32__
 # pragma GCC diagnostic pop
-#endif
-#elif __has_include(<SDL/SDL.h>)
-#  include <SDL/SDL.h>
-#else
-#  error "SDL2 headers not found"
 #endif
 
 // SDL1 -> SDL2 compatibility shims for legacy renderer code
