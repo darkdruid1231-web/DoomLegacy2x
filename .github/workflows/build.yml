@@ -241,6 +241,13 @@ jobs:
             unzip \
             lemon
 
+    - name: Verify Clang installation
+      run: |
+        clang --version
+        echo "int main() { return 0; }" > test.c
+        clang test.c -o test_app
+        ./test_app
+
     - name: Download SDL2 for Windows
       run: |
         mkdir -p /tmp/sdl2
