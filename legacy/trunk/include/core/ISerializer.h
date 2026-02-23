@@ -101,6 +101,7 @@ public:
     void write(uint16_t val) override { write(&val, 16); }
     void write(int16_t val) override { write(&val, 16); }
     void write(uint32_t val) override { write(&val, 32); }
+    void write(uint32_t val, size_t bits) { write(&val, bits); }
     void write(int32_t val) override { write(&val, 32); }
     void writeFloat(float val) override { write(&val, 32); }
     void writeString(const char* str) override {
