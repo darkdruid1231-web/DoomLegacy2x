@@ -38,7 +38,7 @@ typedef double   F64;
 // ============================================================
 #define TNLAssert(expr, msg)
 #define TNLAssertMacro(expr, msg)
-#define TNL_IMPLEMENT_NETCONNECTION(a,b,c) a * server_con a * server_con
+#define TNL_IMPLEMENT_NETCONNECTION(a,b,c) a * server_con
 
 inline void assertHandler(const char*, const char*, int, const char*) {}
 
