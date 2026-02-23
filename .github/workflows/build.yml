@@ -272,18 +272,6 @@ jobs:
         Cflags: -I${includedir}/SDL2
         EOF
 
-    - name: Build and install zlib for MinGW
-      run: |
-        cd /tmp
-        wget -q https://github.com/madler/zlib/archive/refs/tags/v1.2.11.tar.gz -O zlib-src.tar.gz
-        tar -xzf zlib-src.tar.gz
-        cd zlib-1.2.11
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/DoomLegacy/DoomLegacy/legacy/trunk/cmake/clang-mingw-w64-x86_64.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/x86_64-w64-mingw32
-        make -j4
-        sudo make install
-
     - name: Build ENet for MinGW
       run: |
         cd /tmp
@@ -294,7 +282,7 @@ jobs:
         # Compile each source file individually
         mkdir -p lib
         for f in callbacks compress host list packet peer protocol win32; do
-          clang -target x86_64-w64-mingw32 -c -O2 -Iinclude -I/usr/x86_64-w64-mingw32/include ${f}.c -o lib/${f}.o
+          clang -target x86_64-w64-mingw32 --sysroot=/usr/x86_64-w64-mingw32 -c -O2 -Iinclude ${f}.c -o lib/${f}.o
         done
         llvm-ar rcs lib/libenet.a lib/*.o
         # Install into include/enet/ subdir so enet/time.h does NOT shadow the
