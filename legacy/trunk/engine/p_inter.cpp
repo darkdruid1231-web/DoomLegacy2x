@@ -711,7 +711,7 @@ bool DActor::Damage(Actor *inflictor, Actor *source, int damage, int dtype)
                 pres->SetAnim(presentation_t::Pain);
             }
             else
-            {   // "electrocute" the target
+            { // "electrocute" the target
                 /* TODO fullbright
                 frame |= FF_FULLBRIGHT;
                 if (flags & MF_MONSTER && P_Random() < 128)
