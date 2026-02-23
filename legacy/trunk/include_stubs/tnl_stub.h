@@ -291,12 +291,6 @@ private:
     uint32_t      mConnectId;
 };
 
-class LConnection : public NetConnection {
-public:
-    LConnection() {}
-    virtual ~LConnection() {}
-};
-
 // ============================================================
 // NetFlags helper (minimal BitSet-like type for mNetFlags)
 // ============================================================
