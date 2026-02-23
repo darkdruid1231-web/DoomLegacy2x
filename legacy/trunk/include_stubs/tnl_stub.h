@@ -72,7 +72,7 @@ class StringPtr
     }
 
   private:
-    std::string str;
+    ::std::string str;
 };
 typedef uint8_t U8;
 typedef uint16_t U16;
@@ -284,12 +284,12 @@ class BitStream
     {
         return readBool();
     }
-    void readString(std::string &str)
+    void readString(::std::string &str)
     {
         uint32_t len = readUInt32();
         if (len > 0 && len < 65536)
         {
-            std::vector<char> buf(len);
+            ::std::vector<char> buf(len);
             read(buf.data(), len * 8);
             str = buf.data();
         }
@@ -367,7 +367,7 @@ class BitStream
     }
 
   private:
-    std::vector<uint8_t> buffer;
+    ::std::vector<uint8_t> buffer;
     size_t currentBit;
     bool ownBuffer;
 };
@@ -442,15 +442,15 @@ class Address
     {
         return ipStr == other.ipStr && port == other.port;
     }
-    std::string toString() const
+    ::std::string toString() const
     {
-        return ipStr + ":" + std::to_string(port);
+        return ipStr + ":" + ::std::to_string(port);
     }
     U32 hash() const
     {
         return 0;
     }
-    std::string ipStr;
+    ::std::string ipStr;
     uint16_t port;
 };
 
