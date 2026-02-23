@@ -423,6 +423,7 @@ inline void setGhostFrom(bool) {}
 inline void setGhostTo(bool) {}
 inline const char* getNetAddressString() { return "127.0.0.1"; }
 inline void setScopeObject(void*) {}
+inline void activateGhosting() {}
 
 // ============================================================
 // RPC / NetEvent macros  (outside namespace — they are text substitutions)
