@@ -420,6 +420,7 @@ public:
 // Global utility functions
 inline TNL::Address getNetAddress() { return TNL::Address(); }
 inline void setGhostFrom(bool) {}
+inline void setGhostTo(bool) {}
 
 // ============================================================
 // RPC / NetEvent macros  (outside namespace — they are text substitutions)
