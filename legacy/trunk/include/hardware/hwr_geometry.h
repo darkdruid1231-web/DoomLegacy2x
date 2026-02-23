@@ -30,7 +30,7 @@
 */
 class Geometry
 {
-public:
+  public:
     enum GeometryAttributes
     {
         VERTEX_ARRAY = 0,
@@ -48,8 +48,7 @@ public:
         NUM_GEOMETRY_ATTRIBUTES
     };
 
-private:
-
+  private:
     GLfloat *vertex_array;
     GLfloat *tex_coord_arrays[State::MAX_TEXTURE_UNITS];
     GLfloat *normal_array;
@@ -65,30 +64,38 @@ private:
     static GLuint *last_color_array;
 
     // kind of garbage collector (TODO: should be an hash_map instead of a map)
-    static std::map<GLfloat *, int> float_refcount;   // keep a reference count for all GLfloat pointers
-    static std::map<GLuint *, int> uint_refcount;     // keep a reference count for all GLuint pointers
-    static std::map<GLushort *, int> ushort_refcount; // keep a reference count for all GLishort pointers
+    static std::map<GLfloat *, int>
+        float_refcount;                           // keep a reference count for all GLfloat pointers
+    static std::map<GLuint *, int> uint_refcount; // keep a reference count for all GLuint pointers
+    static std::map<GLushort *, int>
+        ushort_refcount; // keep a reference count for all GLishort pointers
 
     void EnableArrays();
 
-public:
-
+  public:
     /// Create a Geometry.
     Geometry();
     /// Destroy a Geometry.
     ~Geometry();
     /// Set the length of each primitive of the Geometry.
     void SetPrimitiveLength(GLuint *length);
-    /// Set the primitive type (GL_TRIANGLES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN) of each Geometry's primitives.
+    /// Set the primitive type (GL_TRIANGLES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN) of each Geometry's
+    /// primitives.
     void SetPrimitiveType(GLuint *type);
     /// Set the number of primitive in the Geometry.
     void SetNumPrimitives(int num);
-    /// Change one of the attributes (VERTEX_ARRAY, COLOR_ARRAY, NORMAL_ARRAY, TEXCOORD_ARRAY, TEXCOORD_ARRAYi) of the Geometry.
+    /// Change one of the attributes (VERTEX_ARRAY, COLOR_ARRAY, NORMAL_ARRAY, TEXCOORD_ARRAY,
+    /// TEXCOORD_ARRAYi) of the Geometry.
     void SetAttributes(GeometryAttributes attr, void *array);
     /// Set the indices array. If null, we will assume indices are 0, 1, 2, ...
     void SetIndices(GLushort *indices);
     /// Create a basic textured rectangle
-    void CreateTexturedRectangle(bool overwrite = false, float x1 = 0.0f, float y1 = 0.0f, float x2 = 1.0f, float y2 = 1.0f, float z = 0.0f);
+    void CreateTexturedRectangle(bool overwrite = false,
+                                 float x1 = 0.0f,
+                                 float y1 = 0.0f,
+                                 float x2 = 1.0f,
+                                 float y2 = 1.0f,
+                                 float z = 0.0f);
     /// Change a vertex in the arrays
     inline void SetTexturedVertex(int which, float x, float y, float z, float s, float t);
     /// Draw the Geometry
@@ -110,7 +117,8 @@ public:
     inline static void UnrefDelete(GLfloat *buffer);
     /// Free the memory allocated for unsigned int buffer if it's not used anymore (refcount == 0)
     inline static void UnrefDelete(GLuint *buffer);
-    /// Free the memory allocated for the unsigned short buffer if it's not used anymore (refcount == 0)
+    /// Free the memory allocated for the unsigned short buffer if it's not used anymore (refcount
+    /// == 0)
     inline static void UnrefDelete(GLushort *buffer);
     /// Free the memory allocated for all non used buffers (refcount == 0), see TODO above
     static void FreeAllBuffers();
@@ -146,7 +154,7 @@ inline void Geometry::UnrefDelete(GLfloat *buffer)
 {
     if (buffer && (--float_refcount[buffer] == 0))
     {
-        delete [] buffer;
+        delete[] buffer;
     }
 }
 
@@ -154,7 +162,7 @@ inline void Geometry::UnrefDelete(GLuint *buffer)
 {
     if (buffer && (--uint_refcount[buffer] == 0))
     {
-        delete [] buffer;
+        delete[] buffer;
     }
 }
 
@@ -162,7 +170,7 @@ inline void Geometry::UnrefDelete(GLushort *buffer)
 {
     if (buffer && (--ushort_refcount[buffer] == 0))
     {
-        delete [] buffer;
+        delete[] buffer;
     }
 }
 

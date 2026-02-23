@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: r_things.h 533 2009-06-11 08:31:10Z smite-meister $
@@ -29,40 +29,39 @@
 
 // Constant arrays used for psprite clipping
 //  and initializing clipping.
-extern short            negonearray[MAXVIDWIDTH];
-extern short            screenheightarray[MAXVIDWIDTH];
+extern short negonearray[MAXVIDWIDTH];
+extern short screenheightarray[MAXVIDWIDTH];
 
 // vars for R_DrawMaskedColumn
-extern short*           mfloorclip;
-extern short*           mceilingclip;
-extern fixed_t          spryscale;
-extern fixed_t          sprtopscreen;
-extern fixed_t          sprbotscreen;
-extern fixed_t          windowtop;
-extern fixed_t          windowbottom;
+extern short *mfloorclip;
+extern short *mceilingclip;
+extern fixed_t spryscale;
+extern fixed_t sprtopscreen;
+extern fixed_t sprbotscreen;
+extern fixed_t windowtop;
+extern fixed_t windowbottom;
 
-extern fixed_t          pspritescale;
-extern fixed_t          pspriteiscale;
-extern fixed_t          pspriteyscale;  //added:02-02-98:for aspect ratio
+extern fixed_t pspritescale;
+extern fixed_t pspriteiscale;
+extern fixed_t pspriteyscale; // added:02-02-98:for aspect ratio
 
 extern const int PSpriteSY[];
 
 typedef struct post_t column_t;
-void R_DrawMaskedColumn(column_t* column);
+void R_DrawMaskedColumn(column_t *column);
 
 void R_SortVisSprites();
 
-//SoM: 6/5/2000: Light sprites correctly!
-void R_AddSprites(struct sector_t* sec, int lightlevel);
+// SoM: 6/5/2000: Light sprites correctly!
+void R_AddSprites(struct sector_t *sec, int lightlevel);
 void R_AddPSprites();
-//void R_DrawSprite(vissprite_t* spr);
+// void R_DrawSprite(vissprite_t* spr);
 void R_InitSprites();
 void R_ClearSprites();
-void R_DrawSprites();  //draw all vissprites
-//void R_DrawMasked();
+void R_DrawSprites(); // draw all vissprites
+// void R_DrawMasked();
 
 void R_ClipVisSprite(struct vissprite_t *vis, int xl, int xh);
-
 
 void R_InitDrawNodes();
 

@@ -25,55 +25,51 @@
 /// \file
 /// \brief Implementation of MapCluster class
 
-#include "g_game.h"
 #include "g_level.h"
-#include "g_mapinfo.h"
-#include "g_map.h"
 #include "dstrings.h"
+#include "g_game.h"
+#include "g_map.h"
+#include "g_mapinfo.h"
 #include "sounds.h"
 
 #include "z_zone.h"
 
-
-
 // default cluster constructor
 MapCluster::MapCluster()
 {
-  number = 0;
-  keepstuff = hub = false;
-  episode = 0;
+    number = 0;
+    keepstuff = hub = false;
+    episode = 0;
 
-  time = partime = 0;
+    time = partime = 0;
 };
 
 // cluster constructor
 MapCluster::MapCluster(int n)
 {
-  number = n;
-  keepstuff = hub = false;
-  episode = 0;
+    number = n;
+    keepstuff = hub = false;
+    episode = 0;
 
-  time = partime = 0;
+    time = partime = 0;
 }
-
 
 // ticks the entire cluster forward in time
 void MapCluster::Ticker()
 {
-  int i, n = maps.size();
-  for (i=0; i<n; i++)
-    maps[i]->Ticker();
+    int i, n = maps.size();
+    for (i = 0; i < n; i++)
+        maps[i]->Ticker();
 }
-
 
 // called before moving on to a new cluster
 void MapCluster::Finish(int nextmap, int ep)
 {
-  CONS_Printf("Cluster %d finished!\n", number);
-  int n = maps.size();
-  for (int i=0; i<n; i++)
-    maps[i]->Close(nextmap, ep, true);
+    CONS_Printf("Cluster %d finished!\n", number);
+    int n = maps.size();
+    for (int i = 0; i < n; i++)
+        maps[i]->Close(nextmap, ep, true);
 
-  // Z_FreeTags(PU_LEVEL, PU_PURGELEVEL-1); // destroys pawns if they are not Detached
-  // P_Initsecnode();  // re-initialize sector node list (the old nodes were just freed)
+    // Z_FreeTags(PU_LEVEL, PU_PURGELEVEL-1); // destroys pawns if they are not Detached
+    // P_Initsecnode();  // re-initialize sector node list (the old nodes were just freed)
 }

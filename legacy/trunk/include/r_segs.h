@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: r_segs.h 452 2007-05-17 17:11:02Z smite-meister $
@@ -24,63 +24,59 @@
 #ifndef r_segs_h
 #define r_segs_h 1
 
-
 #ifndef MAXFFLOORS
-# define MAXFFLOORS 40
+#define MAXFFLOORS 40
 #endif
 
 /// Silhouette, needed for clipping Segs (mainly) and sprites representing things.
 enum silhouette_e
 {
-  SIL_NONE   = 0,
-  SIL_BOTTOM = 1,
-  SIL_TOP    = 2,
-  SIL_BOTH   = 3
+    SIL_NONE = 0,
+    SIL_BOTTOM = 1,
+    SIL_TOP = 2,
+    SIL_BOTH = 3
 };
-
 
 /// \brief Represents a seg_t to be drawn, allocated on the fly.
 /// \ingroup g_sw
 struct drawseg_t
 {
-  seg_t*              curline;
-  int                 x1;
-  int                 x2;
+    seg_t *curline;
+    int x1;
+    int x2;
 
-  fixed_t             scale1;
-  fixed_t             scale2;
-  fixed_t             scalestep;
+    fixed_t scale1;
+    fixed_t scale2;
+    fixed_t scalestep;
 
-  // 0=none, 1=bottom, 2=top, 3=both
-  int                 silhouette;
+    // 0=none, 1=bottom, 2=top, 3=both
+    int silhouette;
 
-  /// do not clip sprites above this
-  fixed_t             bsilheight;
+    /// do not clip sprites above this
+    fixed_t bsilheight;
 
-  /// do not clip sprites below this
-  fixed_t             tsilheight;
+    /// do not clip sprites below this
+    fixed_t tsilheight;
 
-  // Pointers to lists for sprite clipping,
-  //  all three adjusted so [x1] is first value.
-  short*              sprtopclip;
-  short*              sprbottomclip;
-  short*              maskedtexturecol;
+    // Pointers to lists for sprite clipping,
+    //  all three adjusted so [x1] is first value.
+    short *sprtopclip;
+    short *sprbottomclip;
+    short *maskedtexturecol;
 
-  struct visplane_t*  ffloorplanes[MAXFFLOORS];
-  int                 numffloorplanes;
-  ffloor_t*    thicksides[MAXFFLOORS];
-  short*              thicksidecol;
-  int                 numthicksides;
-  fixed_t             frontscale[MAXVIDWIDTH];
+    struct visplane_t *ffloorplanes[MAXFFLOORS];
+    int numffloorplanes;
+    ffloor_t *thicksides[MAXFFLOORS];
+    short *thicksidecol;
+    int numthicksides;
+    fixed_t frontscale[MAXVIDWIDTH];
 };
-
 
 extern drawseg_t *ds_p;
 extern drawseg_t *drawsegs;
-extern unsigned   maxdrawsegs;
+extern unsigned maxdrawsegs;
 extern drawseg_t *firstseg;
 extern drawseg_t *firstnewseg;
-
 
 extern int *walllights;
 

@@ -25,12 +25,11 @@
 #define r_sky_h 1
 
 // The sky map is 256*128*4 maps.
-#define ANGLETOSKYSHIFT         22
+#define ANGLETOSKYSHIFT 22
 
-extern int            skytexturemid;
+extern int skytexturemid;
 
 // call after skytexture is set to adapt for old/new skies
 void R_SetupSkyDraw(class Material *skytex);
-
 
 #endif

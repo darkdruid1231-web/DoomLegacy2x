@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: doomdef.h 466 2007-05-25 18:55:27Z smite-meister $
@@ -25,41 +25,36 @@
 #define doomdef_h 1
 
 /// version control
-extern const int  LEGACY_VERSION;
-extern const int  LEGACY_REVISION;
+extern const int LEGACY_VERSION;
+extern const int LEGACY_REVISION;
 extern const char LEGACY_VERSIONSTRING[];
 extern char LEGACY_VERSION_BANNER[];
 
+// #define RANGECHECK              // Uncheck this to compile debugging code
+#define PARANOIA // do some test that never happens but maybe
 
-//#define RANGECHECK              // Uncheck this to compile debugging code
-#define PARANOIA                // do some test that never happens but maybe
-
-#define MAXPLAYERNAME           21
-#define MAXSKINCOLORS           11
+#define MAXPLAYERNAME 21
+#define MAXSKINCOLORS 11
 
 /// Frame rate, original number of game tics / second.
 #define TICRATE 35
 
-
 /// Max. numbers of local players (human and bot) on a client.
 enum
 {
-  NUM_LOCALHUMANS = 4,
-  NUM_LOCALBOTS = 10,
-  NUM_LOCALPLAYERS = NUM_LOCALHUMANS + NUM_LOCALBOTS
+    NUM_LOCALHUMANS = 4,
+    NUM_LOCALBOTS = 10,
+    NUM_LOCALPLAYERS = NUM_LOCALHUMANS + NUM_LOCALBOTS
 };
-
-
 
 /// development mode (-devparm)
 extern bool devparm;
 
-
 /// commonly used routines - moved here for include convenience
-void  I_Error(const char *error, ...);
-void  CONS_Printf(const char *fmt, ...);
+void I_Error(const char *error, ...);
+void CONS_Printf(const char *fmt, ...);
 char *va(const char *format, ...);
 char *Z_StrDup(const char *in);
-int   I_GetKey();
+int I_GetKey();
 
 #endif

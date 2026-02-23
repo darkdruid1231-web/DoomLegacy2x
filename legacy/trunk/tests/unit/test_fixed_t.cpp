@@ -19,12 +19,12 @@
 /// \file
 /// \brief Unit tests for fixed_t arithmetic operations.
 
-#include <iostream>
+#include "m_fixed.h"
 #include <cassert>
 #include <cmath>
-#include <string>
+#include <iostream>
 #include <limits>
-#include "m_fixed.h"
+#include <string>
 
 using namespace std;
 
@@ -32,38 +32,52 @@ static int tests_run = 0;
 static int tests_passed = 0;
 static string last_failure;
 
-#define TEST(name) do { \
-    tests_run++; \
-    last_failure = ""; \
-    cout << "  " << name << " ... "; \
-} while(0)
+#define TEST(name)                                                                                 \
+    do                                                                                             \
+    {                                                                                              \
+        tests_run++;                                                                               \
+        last_failure = "";                                                                         \
+        cout << "  " << name << " ... ";                                                           \
+    } while (0)
 
-#define PASS() do { \
-    tests_passed++; \
-    cout << "PASS" << endl; \
-} while(0)
+#define PASS()                                                                                     \
+    do                                                                                             \
+    {                                                                                              \
+        tests_passed++;                                                                            \
+        cout << "PASS" << endl;                                                                    \
+    } while (0)
 
-#define FAIL(msg) do { \
-    last_failure = msg; \
-    cout << "FAIL: " << msg << endl; \
-    return; \
-} while(0)
+#define FAIL(msg)                                                                                  \
+    do                                                                                             \
+    {                                                                                              \
+        last_failure = msg;                                                                        \
+        cout << "FAIL: " << msg << endl;                                                           \
+        return;                                                                                    \
+    } while (0)
 
-#define CHECK(cond, msg) do { \
-    if (!(cond)) FAIL(msg); \
-} while(0)
+#define CHECK(cond, msg)                                                                           \
+    do                                                                                             \
+    {                                                                                              \
+        if (!(cond))                                                                               \
+            FAIL(msg);                                                                             \
+    } while (0)
 
-#define CHECK_CLOSE(actual, expected, tol) do { \
-    if (std::abs((actual) - (expected)) > (tol)) { \
-        FAIL("Value " + to_string(actual) + " not within " + to_string(tol) + " of " + to_string(expected)); \
-    } \
-} while(0)
+#define CHECK_CLOSE(actual, expected, tol)                                                         \
+    do                                                                                             \
+    {                                                                                              \
+        if (std::abs((actual) - (expected)) > (tol))                                               \
+        {                                                                                          \
+            FAIL("Value " + to_string(actual) + " not within " + to_string(tol) + " of " +         \
+                 to_string(expected));                                                             \
+        }                                                                                          \
+    } while (0)
 
 //============================================================================
 // Constructor Tests
 //============================================================================
 
-void test_default_constructor() {
+void test_default_constructor()
+{
     TEST("default_constructor");
     fixed_t f;
     f = fixed_t(0);
@@ -71,14 +85,16 @@ void test_default_constructor() {
     PASS();
 }
 
-void test_int_constructor() {
+void test_int_constructor()
+{
     TEST("int_constructor");
     fixed_t f(10);
     CHECK(f.value() == (10 << fixed_t::FBITS), "int constructor failed");
     PASS();
 }
 
-void test_float_constructor() {
+void test_float_constructor()
+{
     TEST("float_constructor");
     fixed_t f(2.5f);
     float expected = 2.5f * float(fixed_t::UNIT);
@@ -86,7 +102,8 @@ void test_float_constructor() {
     PASS();
 }
 
-void test_double_constructor() {
+void test_double_constructor()
+{
     TEST("double_constructor");
     fixed_t f(3.14159);
     double expected = 3.14159 * double(fixed_t::UNIT);
@@ -94,7 +111,8 @@ void test_double_constructor() {
     PASS();
 }
 
-void test_copy_constructor() {
+void test_copy_constructor()
+{
     TEST("copy_constructor");
     fixed_t a(42);
     fixed_t b(a);
@@ -106,7 +124,8 @@ void test_copy_constructor() {
 // Arithmetic Tests
 //============================================================================
 
-void test_addition() {
+void test_addition()
+{
     TEST("addition");
     fixed_t a(10), b(20);
     fixed_t c = a + b;
@@ -114,7 +133,8 @@ void test_addition() {
     PASS();
 }
 
-void test_subtraction() {
+void test_subtraction()
+{
     TEST("subtraction");
     fixed_t a(20), b(5);
     fixed_t c = a - b;
@@ -122,7 +142,8 @@ void test_subtraction() {
     PASS();
 }
 
-void test_multiplication_fixed_fixed() {
+void test_multiplication_fixed_fixed()
+{
     TEST("multiplication_fixed_fixed");
     fixed_t a(4), b(2);
     fixed_t c = a * b;
@@ -130,7 +151,8 @@ void test_multiplication_fixed_fixed() {
     PASS();
 }
 
-void test_multiplication_int_fixed() {
+void test_multiplication_int_fixed()
+{
     TEST("multiplication_int_fixed");
     fixed_t a(4);
     fixed_t c = 3 * a;
@@ -138,7 +160,8 @@ void test_multiplication_int_fixed() {
     PASS();
 }
 
-void test_multiplication_fixed_int() {
+void test_multiplication_fixed_int()
+{
     TEST("multiplication_fixed_int");
     fixed_t a(4);
     fixed_t c = a * 3;
@@ -146,7 +169,8 @@ void test_multiplication_fixed_int() {
     PASS();
 }
 
-void test_division_fixed_fixed() {
+void test_division_fixed_fixed()
+{
     TEST("division_fixed_fixed");
     fixed_t a(20), b(4);
     fixed_t c = a / b;
@@ -154,7 +178,8 @@ void test_division_fixed_fixed() {
     PASS();
 }
 
-void test_division_fixed_int() {
+void test_division_fixed_int()
+{
     TEST("division_fixed_int");
     fixed_t a(20);
     fixed_t c = a / 4;
@@ -162,7 +187,8 @@ void test_division_fixed_int() {
     PASS();
 }
 
-void test_unary_minus() {
+void test_unary_minus()
+{
     TEST("unary_minus");
     fixed_t a(10);
     fixed_t b = -a;
@@ -174,7 +200,8 @@ void test_unary_minus() {
 // Assignment Operator Tests
 //============================================================================
 
-void test_assignment() {
+void test_assignment()
+{
     TEST("assignment");
     fixed_t a(10), b;
     b = a;
@@ -182,7 +209,8 @@ void test_assignment() {
     PASS();
 }
 
-void test_add_assignment() {
+void test_add_assignment()
+{
     TEST("add_assignment");
     fixed_t a(10);
     a += fixed_t(5);
@@ -190,7 +218,8 @@ void test_add_assignment() {
     PASS();
 }
 
-void test_sub_assignment() {
+void test_sub_assignment()
+{
     TEST("sub_assignment");
     fixed_t a(10);
     a -= fixed_t(3);
@@ -198,7 +227,8 @@ void test_sub_assignment() {
     PASS();
 }
 
-void test_mul_assignment_fixed() {
+void test_mul_assignment_fixed()
+{
     TEST("mul_assignment_fixed");
     fixed_t a(10);
     a *= fixed_t(2);
@@ -206,7 +236,8 @@ void test_mul_assignment_fixed() {
     PASS();
 }
 
-void test_mul_assignment_int() {
+void test_mul_assignment_int()
+{
     TEST("mul_assignment_int");
     fixed_t a(10);
     a *= 2;
@@ -214,7 +245,8 @@ void test_mul_assignment_int() {
     PASS();
 }
 
-void test_div_assignment_fixed() {
+void test_div_assignment_fixed()
+{
     TEST("div_assignment_fixed");
     fixed_t a(20);
     a /= fixed_t(4);
@@ -222,7 +254,8 @@ void test_div_assignment_fixed() {
     PASS();
 }
 
-void test_div_assignment_int() {
+void test_div_assignment_int()
+{
     TEST("div_assignment_int");
     fixed_t a(20);
     a /= 4;
@@ -234,7 +267,8 @@ void test_div_assignment_int() {
 // Comparison Operator Tests
 //============================================================================
 
-void test_equality() {
+void test_equality()
+{
     TEST("equality");
     fixed_t a(10), b(10), c(20);
     CHECK(a == b, "equal values should be equal");
@@ -242,7 +276,8 @@ void test_equality() {
     PASS();
 }
 
-void test_inequality() {
+void test_inequality()
+{
     TEST("inequality");
     fixed_t a(10), b(20);
     CHECK(a != b, "different values should not be equal");
@@ -250,7 +285,8 @@ void test_inequality() {
     PASS();
 }
 
-void test_less_than() {
+void test_less_than()
+{
     TEST("less_than");
     fixed_t a(10), b(20);
     CHECK(a < b, "10 should be < 20");
@@ -258,7 +294,8 @@ void test_less_than() {
     PASS();
 }
 
-void test_greater_than() {
+void test_greater_than()
+{
     TEST("greater_than");
     fixed_t a(20), b(10);
     CHECK(a > b, "20 should be > 10");
@@ -266,7 +303,8 @@ void test_greater_than() {
     PASS();
 }
 
-void test_less_equal() {
+void test_less_equal()
+{
     TEST("less_equal");
     fixed_t a(10), b(10), c(20);
     CHECK(a <= b, "10 <= 10 should be true");
@@ -275,7 +313,8 @@ void test_less_equal() {
     PASS();
 }
 
-void test_greater_equal() {
+void test_greater_equal()
+{
     TEST("greater_equal");
     fixed_t a(20), b(20), c(10);
     CHECK(a >= b, "20 >= 20 should be true");
@@ -288,7 +327,8 @@ void test_greater_equal() {
 // Bit Shift Tests
 //============================================================================
 
-void test_left_shift() {
+void test_left_shift()
+{
     TEST("left_shift");
     fixed_t a(1);
     fixed_t b = a << 1;
@@ -296,7 +336,8 @@ void test_left_shift() {
     PASS();
 }
 
-void test_right_shift() {
+void test_right_shift()
+{
     TEST("right_shift");
     fixed_t a(2);
     fixed_t b = a >> 1;
@@ -304,7 +345,8 @@ void test_right_shift() {
     PASS();
 }
 
-void test_left_shift_assignment() {
+void test_left_shift_assignment()
+{
     TEST("left_shift_assignment");
     fixed_t a(1);
     a <<= 2;
@@ -312,7 +354,8 @@ void test_left_shift_assignment() {
     PASS();
 }
 
-void test_right_shift_assignment() {
+void test_right_shift_assignment()
+{
     TEST("right_shift_assignment");
     fixed_t a(4);
     a >>= 2;
@@ -324,7 +367,8 @@ void test_right_shift_assignment() {
 // Edge Case Tests
 //============================================================================
 
-void test_limits() {
+void test_limits()
+{
     TEST("limits");
     CHECK(fixed_t::FMAX == 32767, "FMAX should be 32767");
     CHECK(fixed_t::FMIN == -32768, "FMIN should be -32768");
@@ -333,7 +377,8 @@ void test_limits() {
     PASS();
 }
 
-void test_abs() {
+void test_abs()
+{
     TEST("abs");
     fixed_t a(10), b(-10);
     CHECK(abs(a).value() == (10 << fixed_t::FBITS), "abs(10) failed");
@@ -341,7 +386,8 @@ void test_abs() {
     PASS();
 }
 
-void test_frac() {
+void test_frac()
+{
     TEST("frac");
     fixed_t a(3.5f);
     fixed_t f = a.frac();
@@ -349,7 +395,8 @@ void test_frac() {
     PASS();
 }
 
-void test_float_conversion() {
+void test_float_conversion()
+{
     TEST("float_conversion");
     fixed_t a(2.5f);
     float f = a.Float();
@@ -357,21 +404,24 @@ void test_float_conversion() {
     PASS();
 }
 
-void test_trunc() {
+void test_trunc()
+{
     TEST("trunc");
     fixed_t a(3.9f);
     CHECK(a.trunc() == 3, "trunc(3.9) should be 3");
     PASS();
 }
 
-void test_floor() {
+void test_floor()
+{
     TEST("floor");
     fixed_t a(3.9f);
     CHECK(a.floor() == 3, "floor(3.9) should be 3");
     PASS();
 }
 
-void test_ceil() {
+void test_ceil()
+{
     TEST("ceil");
     fixed_t a(3.1f);
     CHECK(a.ceil() == 4, "ceil(3.1) should be 4");
@@ -382,7 +432,8 @@ void test_ceil() {
 // Modulus Tests
 //============================================================================
 
-void test_modulus() {
+void test_modulus()
+{
     TEST("modulus");
     fixed_t a(7);
     fixed_t b(3);
@@ -395,7 +446,8 @@ void test_modulus() {
 // Logical Tests
 //============================================================================
 
-void test_logical_not() {
+void test_logical_not()
+{
     TEST("logical_not");
     fixed_t a(0);
     fixed_t b(10);
@@ -408,21 +460,24 @@ void test_logical_not() {
 // Precision Tests
 //============================================================================
 
-void test_precision_half() {
+void test_precision_half()
+{
     TEST("precision_half");
     fixed_t a(0.5f);
     CHECK(std::abs(a.value() - (fixed_t::UNIT / 2)) <= 1, "0.5 precision failed");
     PASS();
 }
 
-void test_precision_quarter() {
+void test_precision_quarter()
+{
     TEST("precision_quarter");
     fixed_t a(0.25f);
     CHECK(std::abs(a.value() - (fixed_t::UNIT / 4)) <= 1, "0.25 precision failed");
     PASS();
 }
 
-void test_precision_small() {
+void test_precision_small()
+{
     TEST("precision_small");
     fixed_t a(0.001f);
     CHECK(a.value() > 0, "small positive value should be > 0");
@@ -434,7 +489,8 @@ void test_precision_small() {
 // Negative Value Tests
 //============================================================================
 
-void test_negative_addition() {
+void test_negative_addition()
+{
     TEST("negative_addition");
     fixed_t a(-5), b(3);
     fixed_t c = a + b;
@@ -442,7 +498,8 @@ void test_negative_addition() {
     PASS();
 }
 
-void test_negative_multiplication() {
+void test_negative_multiplication()
+{
     TEST("negative_multiplication");
     fixed_t a(-4), b(2);
     fixed_t c = a * b;
@@ -450,7 +507,8 @@ void test_negative_multiplication() {
     PASS();
 }
 
-void test_negative_division() {
+void test_negative_division()
+{
     TEST("negative_division");
     fixed_t a(-20), b(4);
     fixed_t c = a / b;
@@ -462,7 +520,8 @@ void test_negative_division() {
 // Main
 //============================================================================
 
-int main() {
+int main()
+{
     cout << "========================================" << endl;
     cout << "fixed_t Unit Tests" << endl;
     cout << "========================================" << endl;

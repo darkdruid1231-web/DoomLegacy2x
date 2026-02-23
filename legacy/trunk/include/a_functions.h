@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: a_functions.h 511 2007-12-21 00:20:42Z smite-meister $
@@ -25,11 +25,11 @@
 
 // Basic use: prototyping
 #ifndef WEAPON
-# define WEAPON(x) void A_ ## x (PlayerPawn *, pspdef_t *);
+#define WEAPON(x) void A_##x(PlayerPawn *, pspdef_t *);
 #endif
 
 #ifndef DACTOR
-# define DACTOR(x) void A_ ## x (DActor *);
+#define DACTOR(x) void A_##x(DActor *);
 #endif
 
 //=============================================
@@ -122,7 +122,6 @@ DACTOR(SpawnFly)
 DACTOR(SpawnSound)
 DACTOR(BFGSpray)
 
-
 //=============================================
 //  Heretic actions
 //=============================================
@@ -207,7 +206,7 @@ DACTOR(BeastAttack)
 DACTOR(SpawnTeleGlitter)
 DACTOR(SpawnTeleGlitter2)
 DACTOR(Feathers)
-  //DACTOR(ContMobjSound)
+// DACTOR(ContMobjSound)
 DACTOR(ChicAttack)
 DACTOR(ChicPain)
 DACTOR(CheckSkullDone)
@@ -217,7 +216,7 @@ DACTOR(HeadFireGrow)
 DACTOR(SkullRodPL2Seek)
 DACTOR(BoltSpark)
 DACTOR(FloatPuff)
-  //DACTOR(ESound)
+// DACTOR(ESound)
 DACTOR(FlameSnd)
 DACTOR(FlameEnd)
 DACTOR(PhoenixPuff)
@@ -240,7 +239,6 @@ DACTOR(HideThing)
 DACTOR(UnHideThing)
 DACTOR(RestoreArtifact)
 DACTOR(InitKeyGizmo)
-
 
 //=============================================
 //  Hexen actions
@@ -379,7 +377,7 @@ DACTOR(XMinotaurAtk3)
 DACTOR(XMinotaurCharge)
 DACTOR(SmokePuffExit)
 DACTOR(MinotaurFade0)
-//DACTOR(MntrFloorFire)
+// DACTOR(MntrFloorFire)
 DACTOR(SerpentChase)
 DACTOR(SerpentHumpDecide)
 DACTOR(SerpentUnHide)
@@ -465,8 +463,6 @@ DACTOR(KBolt)
 DACTOR(BatSpawnInit)
 DACTOR(BatSpawn)
 DACTOR(BatMove)
-
-
 
 #undef WEAPON
 #undef DACTOR

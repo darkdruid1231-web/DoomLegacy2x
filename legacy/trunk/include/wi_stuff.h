@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: wi_stuff.h 352 2006-07-21 00:27:31Z smite-meister $
@@ -25,8 +25,8 @@
 #ifndef wi_stuff_h
 #define wi_stuff_h 1
 
-#include <vector>
 #include "doomdef.h"
+#include <vector>
 
 using namespace std;
 
@@ -40,108 +40,108 @@ using namespace std;
 
 class Intermission
 {
-private:
-  /// States for the intermission
-  enum WIstate_e
-  {
-    Inactive,
-    StatCount,
-    ShowNextLoc,
-    Wait
-  };
+  private:
+    /// States for the intermission
+    enum WIstate_e
+    {
+        Inactive,
+        StatCount,
+        ShowNextLoc,
+        Wait
+    };
 
-  /// specifies current state
-  WIstate_e state;
+    /// specifies current state
+    WIstate_e state;
 
-  // player wants to accelerate or skip a stage
-  bool acceleratestage;
+    // player wants to accelerate or skip a stage
+    bool acceleratestage;
 
-  /// What animation, if any, do we show? Applicable in Doom1 and Heretic, otherwise zero.
-  int  episode;
-  bool show_yah;
+    /// What animation, if any, do we show? Applicable in Doom1 and Heretic, otherwise zero.
+    int episode;
+    bool show_yah;
 
-  const char *interpic;
-  const char *intermusic;
+    const char *interpic;
+    const char *intermusic;
 
-  const char *lastlevelname;
-  const char *nextlevelname;
+    const char *lastlevelname;
+    const char *nextlevelname;
 
-  // level numbers for old Doom style graphic levelnames and YAH's
-  int next, last; 
+    // level numbers for old Doom style graphic levelnames and YAH's
+    int next, last;
 
-  // used for general timing and bg animation timing
-  int count, bcount;
+    // used for general timing and bg animation timing
+    int count, bcount;
 
-  // blinking pointer
-  bool pointeron;
+    // blinking pointer
+    bool pointeron;
 
-  // DM stats
-  int nplayers;
-  struct fragsort_t *dm_score[4];
+    // DM stats
+    int nplayers;
+    struct fragsort_t *dm_score[4];
 
-  // Coop stats
-  int  count_stage;
-  bool dofrags;
-  struct statcounter_t
-  {
-    int kills;
-    int items;
-    int secrets;
-    int frags;
-  };
+    // Coop stats
+    int count_stage;
+    bool dofrags;
+    struct statcounter_t
+    {
+        int kills;
+        int items;
+        int secrets;
+        int frags;
+    };
 
-  // counters for each player
-  vector<statcounter_t> cnt;
-  // players that participate in the intermission
-  vector<class PlayerInfo *> plrs;
+    // counters for each player
+    vector<statcounter_t> cnt;
+    // players that participate in the intermission
+    vector<class PlayerInfo *> plrs;
 
-  // level totals
-  statcounter_t total;
+    // level totals
+    statcounter_t total;
 
-  int  cnt_time, cnt_par;
-  int  time, partime;
+    int cnt_time, cnt_par;
+    int time, partime;
 
-  int s_count; /// counting sound id
+    int s_count; /// counting sound id
 
+    void LoadData();
+    void UnloadData();
 
-  void LoadData();
-  void UnloadData();
+    /// draw background
+    void SlamBackground();
 
-  /// draw background
-  void SlamBackground();
+    /// background animations (Doom 1 only)
+    void UpdateAnimatedBack();
 
-  /// background animations (Doom 1 only)
-  void UpdateAnimatedBack();
+    void InitCoopStats();
+    void UpdateCoopStats();
+    void DrawCoopStats();
 
-  void InitCoopStats();
-  void UpdateCoopStats();
-  void DrawCoopStats();
+    void InitDMStats();
+    void UpdateDMStats();
+    void DrawDMStats();
 
-  void InitDMStats();
-  void UpdateDMStats();
-  void DrawDMStats();
+    void DrawYAH();
 
-  void DrawYAH();
+    void InitWait();
 
-  void InitWait();
+  public:
+    Intermission();
 
-public:
-  Intermission();
+    /// starts the intermission
+    void
+    Start(const class MapInfo *f, const MapInfo *n, int maptic, int kills, int items, int secrets);
 
-  /// starts the intermission
-  void Start(const class MapInfo *f, const MapInfo *n, int maptic, int kills, int items, int secrets);
+    /// the intermission is ended when the server says so
+    void End();
 
-  /// the intermission is ended when the server says so
-  void End();
+    /// accelerate stage?
+    bool Responder(struct event_t *ev);
 
-  /// accelerate stage?
-  bool Responder(struct event_t *ev);
+    /// Updates stuff each tick
+    void Ticker();
 
-  /// Updates stuff each tick
-  void Ticker();
-
-  /// well.
-  void Drawer();
+    /// well.
+    void Drawer();
 };
 
 extern Intermission wi;

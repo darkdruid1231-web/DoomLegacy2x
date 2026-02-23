@@ -31,8 +31,8 @@
 const fixed_t LOWERSPEED = 6;
 const fixed_t RAISESPEED = 6;
 
-#define WEAPONBOTTOM            128
-#define WEAPONTOP               32
+#define WEAPONBOTTOM 128
+#define WEAPONTOP 32
 
 //
 // Overlay psprites are scaled shapes
@@ -41,21 +41,20 @@ const fixed_t RAISESPEED = 6;
 //
 typedef enum
 {
-  ps_weapon,
-  ps_flash,
-  NUMPSPRITES
+    ps_weapon,
+    ps_flash,
+    NUMPSPRITES
 
 } psprnum_t;
 
 struct pspdef_t
 {
-  struct weaponstate_t *state;  // a NULL state means not active
-  int       tics;
-  fixed_t   sx, sy;
+    struct weaponstate_t *state; // a NULL state means not active
+    int tics;
+    fixed_t sx, sy;
 };
 
-
-extern struct line_t  *target_line;
+extern struct line_t *target_line;
 extern enum mobjtype_t PuffType;
 
 #endif

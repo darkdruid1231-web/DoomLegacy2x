@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: d_event.h 504 2007-12-16 17:58:26Z smite-meister $
@@ -28,44 +28,42 @@
 /// \brief Input event types.
 enum evtype_t
 {
-  ev_keydown,
-  ev_keyup,
-  ev_mouse,
-  ev_mouse2
+    ev_keydown,
+    ev_keyup,
+    ev_mouse,
+    ev_mouse2
 };
 
 /// \brief Event structure.
 struct event_t
 {
-  evtype_t    type;
-  int         data1;  ///< keys / mouse/joystick buttons
-  int         data2;  ///< mouse x move
-  int         data3;  ///< mouse y move
+    evtype_t type;
+    int data1; ///< keys / mouse/joystick buttons
+    int data2; ///< mouse x move
+    int data3; ///< mouse y move
 };
 
 //
 // GLOBAL VARIABLES
 //
-#define MAXEVENTS               64
+#define MAXEVENTS 64
 
-extern  event_t         events[MAXEVENTS];
-extern  int             eventhead;
-extern  int             eventtail;
-
+extern event_t events[MAXEVENTS];
+extern int eventhead;
+extern int eventtail;
 
 // current modifier key status
 extern bool shiftdown;
 extern bool altdown;
 
-
 // finale
-bool F_Responder(event_t* ev);
+bool F_Responder(event_t *ev);
 
 // cheat
-bool cht_Responder(event_t* ev);
+bool cht_Responder(event_t *ev);
 
 /// Called by IO functions when input is detected.
-void D_PostEvent(const event_t* ev);
+void D_PostEvent(const event_t *ev);
 void D_ProcessEvents();
 
 #endif

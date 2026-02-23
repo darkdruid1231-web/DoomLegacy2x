@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: r_plane.h 449 2007-05-05 20:45:25Z smite-meister $
@@ -24,8 +24,8 @@
 #ifndef r_plane_h
 #define r_plane_h 1
 
-#include "screen.h"     //needs MAXVIDWIDTH/MAXVIDHEIGHT
 #include "r_segs.h"
+#include "screen.h" //needs MAXVIDWIDTH/MAXVIDHEIGHT
 
 //
 // Now what is a visplane, anyway?
@@ -34,102 +34,98 @@
 //
 struct visplane_t
 {
-  visplane_t*    next;//SoM: 3/17/2000
+    visplane_t *next; // SoM: 3/17/2000
 
-  fixed_t               height;
-  fixed_t               viewz;
-  angle_t               viewangle;
-  Material*             pic;
-  int                   lightlevel;
-  int                   minx;
-  int                   maxx;
+    fixed_t height;
+    fixed_t viewz;
+    angle_t viewangle;
+    Material *pic;
+    int lightlevel;
+    int minx;
+    int maxx;
 
-  //SoM: 4/3/2000: Colormaps per sector!
-  class fadetable_t    *extra_colormap;
+    // SoM: 4/3/2000: Colormaps per sector!
+    class fadetable_t *extra_colormap;
 
-  // leave pads for [minx-1]/[maxx+1]
+    // leave pads for [minx-1]/[maxx+1]
 
-  //faB: words sucks .. should get rid of that.. but eats memory
-  //added:08-02-98: THIS IS UNSIGNED! VERY IMPORTANT!!
-  unsigned short         pad1;
-  unsigned short         top[MAXVIDWIDTH];
-  unsigned short         pad2;
-  unsigned short         pad3;
-  unsigned short         bottom[MAXVIDWIDTH];
-  unsigned short         pad4;
+    // faB: words sucks .. should get rid of that.. but eats memory
+    // added:08-02-98: THIS IS UNSIGNED! VERY IMPORTANT!!
+    unsigned short pad1;
+    unsigned short top[MAXVIDWIDTH];
+    unsigned short pad2;
+    unsigned short pad3;
+    unsigned short bottom[MAXVIDWIDTH];
+    unsigned short pad4;
 
-  int                    high, low; // SoM: R_PlaneBounds should set these.
+    int high, low; // SoM: R_PlaneBounds should set these.
 
-  fixed_t xoffs, yoffs;  // SoM: 3/6/2000: Srolling flats.
+    fixed_t xoffs, yoffs; // SoM: 3/6/2000: Srolling flats.
 
-  // SoM: frontscale should be stored in the first seg of the subsector
-  // where the planes themselves are stored. I'm doing this now because
-  // the old way caused trouble with the drawseg array was re-sized.
-  int    scaleseg;
+    // SoM: frontscale should be stored in the first seg of the subsector
+    // where the planes themselves are stored. I'm doing this now because
+    // the old way caused trouble with the drawseg array was re-sized.
+    int scaleseg;
 
-  ffloor_t* ffloor;
-  bool sky; // sky plane?
+    ffloor_t *ffloor;
+    bool sky; // sky plane?
 };
 
-
-extern visplane_t*    floorplane;
-extern visplane_t*    ceilingplane;
+extern visplane_t *floorplane;
+extern visplane_t *ceilingplane;
 
 #ifdef OLDWATER
-extern visplane_t*    waterplane;
+extern visplane_t *waterplane;
 #endif
 
-
 // Visplane related.
-extern  short*          lastopening;
+extern short *lastopening;
 
-typedef void (*planefunction_t) (int top, int bottom);
+typedef void (*planefunction_t)(int top, int bottom);
 
-extern planefunction_t  floorfunc;
-extern planefunction_t  ceilingfunc_t;
+extern planefunction_t floorfunc;
+extern planefunction_t ceilingfunc_t;
 
-extern short            floorclip[MAXVIDWIDTH];
-extern short            ceilingclip[MAXVIDWIDTH];
-extern short            waterclip[MAXVIDWIDTH];   //added:18-02-98:WATER!
-extern fixed_t          frontscale[MAXVIDWIDTH];
-extern fixed_t          yslopetab[MAXVIDHEIGHT*4];
+extern short floorclip[MAXVIDWIDTH];
+extern short ceilingclip[MAXVIDWIDTH];
+extern short waterclip[MAXVIDWIDTH]; // added:18-02-98:WATER!
+extern fixed_t frontscale[MAXVIDWIDTH];
+extern fixed_t yslopetab[MAXVIDHEIGHT * 4];
 
-extern fixed_t*         yslope;
-extern fixed_t          distscale[MAXVIDWIDTH];
+extern fixed_t *yslope;
+extern fixed_t distscale[MAXVIDWIDTH];
 
 void R_InitPlanes();
 void R_MapPlane(int y, int x1, int x2);
 void R_MakeSpans(int x, int t1, int b1, int t2, int b2);
 
-
 // SoM: Draws a single visplane. If !handlesource, it won't allocate or
 // remove ds_source.
-//void R_DrawSinglePlane(visplane_t* pl, bool handlesource);
+// void R_DrawSinglePlane(visplane_t* pl, bool handlesource);
 
-visplane_t* R_CheckPlane( visplane_t*   pl, int           start, int           stop );
+visplane_t *R_CheckPlane(visplane_t *pl, int start, int stop);
 
-void R_ExpandPlane(visplane_t*  pl, int start, int stop);
+void R_ExpandPlane(visplane_t *pl, int start, int stop);
 
-void R_PlaneBounds(visplane_t* plane);
-
+void R_PlaneBounds(visplane_t *plane);
 
 struct planemgr_t
 {
-  visplane_t*  plane;
-  fixed_t      height;
-  bool      mark;
-  fixed_t      f_pos;  // `F' for `Front sector'.
-  fixed_t      b_pos;  // `B' for `Back sector'
-  fixed_t      f_frac;
-  fixed_t      f_step;
-  fixed_t      b_frac;
-  fixed_t      b_step;
-  short        f_clip[MAXVIDWIDTH];
-  short        c_clip[MAXVIDWIDTH];
+    visplane_t *plane;
+    fixed_t height;
+    bool mark;
+    fixed_t f_pos; // `F' for `Front sector'.
+    fixed_t b_pos; // `B' for `Back sector'
+    fixed_t f_frac;
+    fixed_t f_step;
+    fixed_t b_frac;
+    fixed_t b_step;
+    short f_clip[MAXVIDWIDTH];
+    short c_clip[MAXVIDWIDTH];
 
-  ffloor_t  *ffloor;
+    ffloor_t *ffloor;
 };
 
-extern planemgr_t    ffloor[MAXFFLOORS];
-extern int           numffloors;
+extern planemgr_t ffloor[MAXFFLOORS];
+extern int numffloors;
 #endif

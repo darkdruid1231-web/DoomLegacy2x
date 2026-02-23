@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: f_finale.h 306 2006-02-11 16:26:27Z jussip $
@@ -20,9 +20,8 @@
 //
 // DESCRIPTION:
 //
-//    
+//
 //-----------------------------------------------------------------------------
-
 
 #ifndef f_finale_h
 #define f_finale_h 1
@@ -34,7 +33,7 @@ class clusterdef_t;
 //
 
 // Called by main loop.
-//boolean F_Responder (event_t* ev);
+// boolean F_Responder (event_t* ev);
 
 // Called by main loop.
 void F_Ticker();
@@ -43,6 +42,5 @@ void F_Ticker();
 void F_Drawer();
 
 void F_StartFinale(const class MapCluster *c, bool enter, bool endgame);
-
 
 #endif

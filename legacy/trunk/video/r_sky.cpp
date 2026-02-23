@@ -29,12 +29,11 @@
   that a particular sector ceiling is in fact the sky.
 */
 
-#include "doomdef.h"
 #include "r_sky.h"
+#include "doomdef.h"
 #include "r_data.h"
 
-int          skytexturemid;
-
+int skytexturemid;
 
 //  Setup sky draw for old or new skies (new skies = freelook 256x240)
 //
@@ -42,26 +41,25 @@ int          skytexturemid;
 //
 void R_SetupSkyDraw(Material *skytex)
 {
-  // parse the patches composing sky texture for the tallest one
-  // patches are usually RSKY1,RSKY2... and unique
+    // parse the patches composing sky texture for the tallest one
+    // patches are usually RSKY1,RSKY2... and unique
 
-  // note: the TEXTURES lump doesn't have the taller size of Legacy
-  //       skies, but the patches it use will give the right size
+    // note: the TEXTURES lump doesn't have the taller size of Legacy
+    //       skies, but the patches it use will give the right size
 
-  if (skytex->tex[0].t->height > 128)
+    if (skytex->tex[0].t->height > 128)
     {
-      // horizon line on 256x240 freelook textures of Legacy or heretic
-      skytexturemid = 200;
-      // normal aspect ratio corrected scale
+        // horizon line on 256x240 freelook textures of Legacy or heretic
+        skytexturemid = 200;
+        // normal aspect ratio corrected scale
     }
-  else
+    else
     {
-      // the horizon line in a 256x128 sky texture
-      skytexturemid = 100;
-      // double the texture vertically, bleeergh!!
-      skytex->tex[0].yscale /= 2;
+        // the horizon line in a 256x128 sky texture
+        skytexturemid = 100;
+        // double the texture vertically, bleeergh!!
+        skytex->tex[0].yscale /= 2;
     }
 
-
-  // skytexturemid = (100*skytex->height) / 128;
+    // skytexturemid = (100*skytex->height) / 128;
 }

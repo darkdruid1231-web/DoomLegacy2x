@@ -23,53 +23,50 @@
 #ifndef ntexture_h
 #define ntexture_h
 
-#include <string>
 #include "r_data.h"
+#include <string>
 
 // Forward declarations
 // All Bison parser stuff is inside this namespace
 namespace yy
 {
-  class location;
-  class ntexture_parser;
-}
-
-
+class location;
+class ntexture_parser;
+} // namespace yy
 
 /// \brief Conducts the scanning and parsing
 class ntexture_driver
 {
-protected:
-  std::string lumpname;
-  char *buffer;
-  int   length;
+  protected:
+    std::string lumpname;
+    char *buffer;
+    int length;
 
-  bool trace_scanning;
-  bool trace_parsing;
+    bool trace_scanning;
+    bool trace_parsing;
 
-public:
-  // temp variables for building textures
-  std::string texname;
-  Texture *t;
-  LumpTexture dummy;
-  bool texeloffsets;
-  bool is_sprite;
+  public:
+    // temp variables for building textures
+    std::string texname;
+    Texture *t;
+    LumpTexture dummy;
+    bool texeloffsets;
+    bool is_sprite;
 
-public:
-  ntexture_driver(int lump);
-  virtual ~ntexture_driver();
-  
-  // Handling the scanner.
-  void scan_begin();
-  void scan_end();
+  public:
+    ntexture_driver(int lump);
+    virtual ~ntexture_driver();
 
-  // Handling the parser.
-  int  parse();
+    // Handling the scanner.
+    void scan_begin();
+    void scan_end();
 
-  // Error handling.
-  void error(const yy::location& l, const std::string& m);
-  void error(const std::string& m);
+    // Handling the parser.
+    int parse();
+
+    // Error handling.
+    void error(const yy::location &l, const std::string &m);
+    void error(const std::string &m);
 };
-
 
 #endif

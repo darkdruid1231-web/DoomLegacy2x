@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: m_swap.h 425 2007-01-28 14:57:38Z smite-meister $
@@ -29,26 +29,25 @@
 // WAD files are always little-endian.
 // Other files, such as MIDI files, are always big-endian.
 
-#define SWAP_INT16(x) ((Sint16)( \
-(((Uint16)(x) & (Uint16)0x00ffU) << 8) | \
-(((Uint16)(x) & (Uint16)0xff00U) >> 8) ))
+#define SWAP_INT16(x)                                                                              \
+    ((Sint16)((((Uint16)(x) & (Uint16)0x00ffU) << 8) | (((Uint16)(x) & (Uint16)0xff00U) >> 8)))
 
-#define SWAP_INT32(x) ((Sint32)( \
-(((Uint32)(x) & (Uint32)0x000000ffUL) << 24) | \
-(((Uint32)(x) & (Uint32)0x0000ff00UL) <<  8) | \
-(((Uint32)(x) & (Uint32)0x00ff0000UL) >>  8) | \
-(((Uint32)(x) & (Uint32)0xff000000UL) >> 24) ))
+#define SWAP_INT32(x)                                                                              \
+    ((Sint32)((((Uint32)(x) & (Uint32)0x000000ffUL) << 24) |                                       \
+              (((Uint32)(x) & (Uint32)0x0000ff00UL) << 8) |                                        \
+              (((Uint32)(x) & (Uint32)0x00ff0000UL) >> 8) |                                        \
+              (((Uint32)(x) & (Uint32)0xff000000UL) >> 24)))
 
 #ifdef __BIG_ENDIAN__
-# define SHORT(x) SWAP_INT16(x)
-# define LONG(x)  SWAP_INT32(x)
-# define SHORT_BE(x) (x)
-# define LONG_BE(x)  (x)
+#define SHORT(x) SWAP_INT16(x)
+#define LONG(x) SWAP_INT32(x)
+#define SHORT_BE(x) (x)
+#define LONG_BE(x) (x)
 #else // little-endian
-# define SHORT(x) (x)
-# define LONG(x)  (x)
-# define SHORT_BE(x) SWAP_INT16(x)
-# define LONG_BE(x)  SWAP_INT32(x)
+#define SHORT(x) (x)
+#define LONG(x) (x)
+#define SHORT_BE(x) SWAP_INT16(x)
+#define LONG_BE(x) SWAP_INT32(x)
 #endif
 
 #endif

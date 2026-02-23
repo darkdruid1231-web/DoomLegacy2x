@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: sounds.cpp 515 2007-12-22 14:51:46Z jussip $
@@ -29,164 +29,159 @@
 #include "g_game.h"
 #include "g_mapinfo.h"
 
-#include "parser.h"
 #include "functors.h"
-#include "sounds.h"
+#include "parser.h"
 #include "s_sound.h"
-
+#include "sounds.h"
 
 // Doom/Heretic music names corresponding to musicenum_t
 // NOTE: padded with \0 to stringlen=8, to allow dehacked patching
 
-const char* MusicNames[NUMMUSIC] =
-{
-    NULL,
-    // Doom
-    "D_E1M1\0\0",
-    "D_E1M2\0\0",
-    "D_E1M3\0\0",
-    "D_E1M4\0\0",
-    "D_E1M5\0\0",
-    "D_E1M6\0\0",
-    "D_E1M7\0\0",
-    "D_E1M8\0\0",
-    "D_E1M9\0\0",
+const char *MusicNames[NUMMUSIC] = {NULL,
+                                    // Doom
+                                    "D_E1M1\0\0",
+                                    "D_E1M2\0\0",
+                                    "D_E1M3\0\0",
+                                    "D_E1M4\0\0",
+                                    "D_E1M5\0\0",
+                                    "D_E1M6\0\0",
+                                    "D_E1M7\0\0",
+                                    "D_E1M8\0\0",
+                                    "D_E1M9\0\0",
 
-    "D_E2M1\0\0",
-    "D_E2M2\0\0",
-    "D_E2M3\0\0",
-    "D_E2M4\0\0",
-    "D_E2M5\0\0",
-    "D_E2M6\0\0",
-    "D_E2M7\0\0",
-    "D_E2M8\0\0",
-    "D_E2M9\0\0",
+                                    "D_E2M1\0\0",
+                                    "D_E2M2\0\0",
+                                    "D_E2M3\0\0",
+                                    "D_E2M4\0\0",
+                                    "D_E2M5\0\0",
+                                    "D_E2M6\0\0",
+                                    "D_E2M7\0\0",
+                                    "D_E2M8\0\0",
+                                    "D_E2M9\0\0",
 
-    "D_E3M1\0\0",
-    "D_E3M2\0\0",
-    "D_E3M3\0\0",
-    "D_E3M4\0\0",
-    "D_E3M5\0\0",
-    "D_E3M6\0\0",
-    "D_E3M7\0\0",
-    "D_E3M8\0\0",
-    "D_E3M9\0\0",
-    // Ultimate Doom Ep. 4 re-used music
-    "D_E3M4\0\0",
-    "D_E3M2\0\0",
-    "D_E3M3\0\0",
-    "D_E1M5\0\0",
-    "D_E2M7\0\0",
-    "D_E2M4\0\0",
-    "D_E2M6\0\0",
-    "D_E2M5\0\0",
-    "D_E1M9\0\0",
+                                    "D_E3M1\0\0",
+                                    "D_E3M2\0\0",
+                                    "D_E3M3\0\0",
+                                    "D_E3M4\0\0",
+                                    "D_E3M5\0\0",
+                                    "D_E3M6\0\0",
+                                    "D_E3M7\0\0",
+                                    "D_E3M8\0\0",
+                                    "D_E3M9\0\0",
+                                    // Ultimate Doom Ep. 4 re-used music
+                                    "D_E3M4\0\0",
+                                    "D_E3M2\0\0",
+                                    "D_E3M3\0\0",
+                                    "D_E1M5\0\0",
+                                    "D_E2M7\0\0",
+                                    "D_E2M4\0\0",
+                                    "D_E2M6\0\0",
+                                    "D_E2M5\0\0",
+                                    "D_E1M9\0\0",
 
-    "D_INTER\0" ,
-    "D_INTRO\0" ,
-    "D_BUNNY\0" ,
-    "D_VICTOR"  ,
-    "D_INTROA"  ,
-    // Doom II
-    "D_RUNNIN"  ,
-    "D_STALKS"  ,
-    "D_COUNTD"  ,
-    "D_BETWEE"  ,
-    "D_DOOM\0\0",
-    "D_THE_DA"  ,
-    "D_SHAWN\0" ,
-    "D_DDTBLU"  ,
-    "D_IN_CIT"  ,
-    "D_DEAD\0\0",
-    "D_STLKS2"  ,
-    "D_THEDA2"  ,
-    "D_DOOM2\0" ,
-    "D_DDTBL2"  ,
-    "D_RUNNI2"  ,
-    "D_DEAD2\0" ,
-    "D_STLKS3"  ,
-    "D_ROMERO"  ,
-    "D_SHAWN2"  ,
-    "D_MESSAG"  ,
-    "D_COUNT2"  ,
-    "D_DDTBL3"  ,
-    "D_AMPIE\0" ,
-    "D_THEDA3"  ,
-    "D_ADRIAN"  ,
-    "D_MESSG2"  ,
-    "D_ROMER2"  ,
-    "D_TENSE\0" ,
-    "D_SHAWN3"  ,
-    "D_OPENIN"  ,
-    "D_EVIL\0\0",
-    "D_ULTIMA"  ,
-    "D_READ_M"  ,
-    "D_DM2TTL"  ,
-    "D_DM2INT"  ,
-    // Heretic
-    "MUS_E1M1", // 1-1
-    "MUS_E1M2",
-    "MUS_E1M3",
-    "MUS_E1M4",
-    "MUS_E1M5",
-    "MUS_E1M6",
-    "MUS_E1M7",
-    "MUS_E1M8",
-    "MUS_E1M9",
+                                    "D_INTER\0",
+                                    "D_INTRO\0",
+                                    "D_BUNNY\0",
+                                    "D_VICTOR",
+                                    "D_INTROA",
+                                    // Doom II
+                                    "D_RUNNIN",
+                                    "D_STALKS",
+                                    "D_COUNTD",
+                                    "D_BETWEE",
+                                    "D_DOOM\0\0",
+                                    "D_THE_DA",
+                                    "D_SHAWN\0",
+                                    "D_DDTBLU",
+                                    "D_IN_CIT",
+                                    "D_DEAD\0\0",
+                                    "D_STLKS2",
+                                    "D_THEDA2",
+                                    "D_DOOM2\0",
+                                    "D_DDTBL2",
+                                    "D_RUNNI2",
+                                    "D_DEAD2\0",
+                                    "D_STLKS3",
+                                    "D_ROMERO",
+                                    "D_SHAWN2",
+                                    "D_MESSAG",
+                                    "D_COUNT2",
+                                    "D_DDTBL3",
+                                    "D_AMPIE\0",
+                                    "D_THEDA3",
+                                    "D_ADRIAN",
+                                    "D_MESSG2",
+                                    "D_ROMER2",
+                                    "D_TENSE\0",
+                                    "D_SHAWN3",
+                                    "D_OPENIN",
+                                    "D_EVIL\0\0",
+                                    "D_ULTIMA",
+                                    "D_READ_M",
+                                    "D_DM2TTL",
+                                    "D_DM2INT",
+                                    // Heretic
+                                    "MUS_E1M1", // 1-1
+                                    "MUS_E1M2",
+                                    "MUS_E1M3",
+                                    "MUS_E1M4",
+                                    "MUS_E1M5",
+                                    "MUS_E1M6",
+                                    "MUS_E1M7",
+                                    "MUS_E1M8",
+                                    "MUS_E1M9",
 
-    "MUS_E2M1", // 2-1
-    "MUS_E2M2",
-    "MUS_E2M3",
-    "MUS_E2M4",
-    "MUS_E1M4",
-    "MUS_E2M6",
-    "MUS_E2M7",
-    "MUS_E2M8",
-    "MUS_E2M9",
+                                    "MUS_E2M1", // 2-1
+                                    "MUS_E2M2",
+                                    "MUS_E2M3",
+                                    "MUS_E2M4",
+                                    "MUS_E1M4",
+                                    "MUS_E2M6",
+                                    "MUS_E2M7",
+                                    "MUS_E2M8",
+                                    "MUS_E2M9",
 
-    "MUS_E1M1", // 3-1
-    "MUS_E3M2",
-    "MUS_E3M3",
-    "MUS_E1M6",
-    "MUS_E1M3",
-    "MUS_E1M2",
-    "MUS_E1M5",
-    "MUS_E1M9",
-    "MUS_E2M6",
+                                    "MUS_E1M1", // 3-1
+                                    "MUS_E3M2",
+                                    "MUS_E3M3",
+                                    "MUS_E1M6",
+                                    "MUS_E1M3",
+                                    "MUS_E1M2",
+                                    "MUS_E1M5",
+                                    "MUS_E1M9",
+                                    "MUS_E2M6",
 
-    "MUS_E1M6", // 4-1
-    "MUS_E1M2",
-    "MUS_E1M3",
-    "MUS_E1M4",
-    "MUS_E1M5",
-    "MUS_E1M1",
-    "MUS_E1M7",
-    "MUS_E1M8",
-    "MUS_E1M9",
+                                    "MUS_E1M6", // 4-1
+                                    "MUS_E1M2",
+                                    "MUS_E1M3",
+                                    "MUS_E1M4",
+                                    "MUS_E1M5",
+                                    "MUS_E1M1",
+                                    "MUS_E1M7",
+                                    "MUS_E1M8",
+                                    "MUS_E1M9",
 
-    "MUS_E2M1", // 5-1
-    "MUS_E2M2",
-    "MUS_E2M3",
-    "MUS_E2M4",
-    "MUS_E1M4",
-    "MUS_E2M6",
-    "MUS_E2M7",
-    "MUS_E2M8",
-    "MUS_E2M9",
+                                    "MUS_E2M1", // 5-1
+                                    "MUS_E2M2",
+                                    "MUS_E2M3",
+                                    "MUS_E2M4",
+                                    "MUS_E1M4",
+                                    "MUS_E2M6",
+                                    "MUS_E2M7",
+                                    "MUS_E2M8",
+                                    "MUS_E2M9",
 
-    "MUS_E3M2", // 6-1
-    "MUS_E3M3", // 6-2
-    "MUS_E1M6", // 6-3
+                                    "MUS_E3M2", // 6-1
+                                    "MUS_E3M3", // 6-2
+                                    "MUS_E1M6", // 6-3
 
-    "MUS_TITL",
-    "MUS_INTR",
-    "MUS_CPTD"
-};
-
+                                    "MUS_TITL",
+                                    "MUS_INTR",
+                                    "MUS_CPTD"};
 
 /*
-// Information about all the sfx. Kept here to see if the priority info is needed (see resources/SNDINFO.lmp)
-sfxinfo_t S_sfx[NUMSFX] =
+// Information about all the sfx. Kept here to see if the priority info is needed (see
+resources/SNDINFO.lmp) sfxinfo_t S_sfx[NUMSFX] =
 {
   // S_sfx[0] needs to be a dummy for odd reasons.
 //              multiplicity
@@ -286,10 +281,9 @@ sfxinfo_t S_sfx[NUMSFX] =
   { NULL, "DSPUNCH\0"  , 0,  64}, //SKSPUNCH},
   { NULL, "DSHOOF\0\0" , 0,  70},
   { NULL, "DSMETAL\0"  , 0,  70},
-  { NULL, "DSPISTOL"  , 0,  64}, // FIXME wrong pitch for chaingun... "dschgun\0", &S_sfx[sfx_pistol], 150, 0},
-  { NULL, "DSTINK\0\0" , 0,  60},
-  { NULL, "DSBDOPN\0"  , 0, 100},
-  { NULL, "DSBDCLS\0"  , 0, 100},
+  { NULL, "DSPISTOL"  , 0,  64}, // FIXME wrong pitch for chaingun... "dschgun\0",
+&S_sfx[sfx_pistol], 150, 0}, { NULL, "DSTINK\0\0" , 0,  60}, { NULL, "DSBDOPN\0"  , 0, 100}, { NULL,
+"DSBDCLS\0"  , 0, 100},
 
   { NULL, "DSITMBK\0"  , 0, 100},
   { NULL, "DSFLAME\0"  , 0,  32},
@@ -755,91 +749,84 @@ sfxinfo_t S_sfx[NUMSFX] =
 };
 */
 
-
 //=========================================================
 //  Sound utilities
 //=========================================================
 
-static vector<sfxinfo_t*> SoundStore;  // keeps track of allocated sfx for deleting
+static vector<sfxinfo_t *> SoundStore; // keeps track of allocated sfx for deleting
 
-static int  soundnumber = 1;
+static int soundnumber = 1;
 static byte def_multi = 0;
 static byte def_priority = 64;
-static int  def_pitch = 128;
+static int def_pitch = 128;
 
 // Sound mappings
-map<const char*, sfxinfo_t*, less_cstring> SoundInfo; // tag => sound
-map<int, sfxinfo_t*> SoundID;  // ID-number => sound
+map<const char *, sfxinfo_t *, less_cstring> SoundInfo; // tag => sound
+map<int, sfxinfo_t *> SoundID;                          // ID-number => sound
 
-typedef map<const char*, sfxinfo_t*, less_cstring>::iterator sound_iter_t;
-typedef map<int, sfxinfo_t*>::iterator soundID_iter_t;
-
+typedef map<const char *, sfxinfo_t *, less_cstring>::iterator sound_iter_t;
+typedef map<int, sfxinfo_t *>::iterator soundID_iter_t;
 
 sfxinfo_t::sfxinfo_t(const char *t, int n)
 {
-  strncpy(tag, t, S_TAGLEN);
-  number = n;
-  lumpname[0] = lumpname[8] = '\0';
+    strncpy(tag, t, S_TAGLEN);
+    number = n;
+    lumpname[0] = lumpname[8] = '\0';
 
-  multiplicity = def_multi;
-  priority = def_priority;
-  pitch = def_pitch;
+    multiplicity = def_multi;
+    priority = def_priority;
+    pitch = def_pitch;
 }
-
 
 // deletes all SNDINFO/SNDSEQ data
 void S_ClearSounds()
 {
-  // There is no reason to stop currently playing sounds,
-  // because they should be independent of the definitions.
+    // There is no reason to stop currently playing sounds,
+    // because they should be independent of the definitions.
 
-  extern map<int, struct sndseq_t*> SoundSeqs;
-  map<int, sndseq_t*>::iterator t;
-  for (t = SoundSeqs.begin(); t != SoundSeqs.end(); t++)
-    delete t->second;
-  SoundSeqs.clear();
+    extern map<int, struct sndseq_t *> SoundSeqs;
+    map<int, sndseq_t *>::iterator t;
+    for (t = SoundSeqs.begin(); t != SoundSeqs.end(); t++)
+        delete t->second;
+    SoundSeqs.clear();
 
-  int n = SoundStore.size();
-  for (int i=0; i<n; i++)
-    delete SoundStore[i];
+    int n = SoundStore.size();
+    for (int i = 0; i < n; i++)
+        delete SoundStore[i];
 
-  SoundStore.clear();
-  SoundInfo.clear();
-  SoundID.clear();
+    SoundStore.clear();
+    SoundInfo.clear();
+    SoundID.clear();
 
-  soundnumber = 1;
-  def_multi = 0;
-  def_priority = 64;
-  def_pitch = 128;
+    soundnumber = 1;
+    def_multi = 0;
+    def_priority = 64;
+    def_pitch = 128;
 }
-
 
 int S_GetSoundID(const char *tag)
 {
-  sound_iter_t i = SoundInfo.find(tag);
-  if (i == SoundInfo.end())
+    sound_iter_t i = SoundInfo.find(tag);
+    if (i == SoundInfo.end())
     {
-      CONS_Printf("S_GetSoundID: Tag '%s' not found.\n", tag);
-      return -1;
+        CONS_Printf("S_GetSoundID: Tag '%s' not found.\n", tag);
+        return -1;
     }
 
-  return i->second->number;
+    return i->second->number;
 }
-
 
 const char *S_GetSoundTag(int sfx_id)
 {
-  soundID_iter_t i = SoundID.find(sfx_id);
-  if (i == SoundID.end())
+    soundID_iter_t i = SoundID.find(sfx_id);
+    if (i == SoundID.end())
     {
-      CONS_Printf("S_GetSoundTag: ID %d not found!\n", sfx_id);
-      return NULL;
+        CONS_Printf("S_GetSoundTag: ID %d not found!\n", sfx_id);
+        return NULL;
     }
 
-  return i->second->tag;
+    return i->second->tag;
 }
-
-
 
 //======================================
 //  SNDINFO parser
@@ -847,178 +834,169 @@ const char *S_GetSoundTag(int sfx_id)
 
 enum SNDINFO_cmd_t
 {
-  SI_Map,
-  SI_IFDoom,
-  SI_IFHeretic,
-  SI_IFHexen,
-  SI_Multi,
-  SI_Priority,
-  SI_Pitch,
-  SI_NUM
+    SI_Map,
+    SI_IFDoom,
+    SI_IFHeretic,
+    SI_IFHexen,
+    SI_Multi,
+    SI_Priority,
+    SI_Pitch,
+    SI_NUM
 };
 
-static const char *SNDINFO_cmds[SI_NUM + 1] =
-{
-  "$map",
-  "$ifdoom",
-  "$ifheretic",
-  "$ifhexen",
-  "$multiplicity",
-  "$priority",
-  "$pitch",
-  NULL
-};
+static const char *SNDINFO_cmds[SI_NUM + 1] = {
+    "$map", "$ifdoom", "$ifheretic", "$ifhexen", "$multiplicity", "$priority", "$pitch", NULL};
 
 // parses the SNDINFO lump
 int S_Read_SNDINFO(int lump)
 {
-  Parser p;
-  int i, n;
-  char c;
+    Parser p;
+    int i, n;
+    char c;
 
-  if (!p.Open(lump))
-    return -1;
+    if (!p.Open(lump))
+        return -1;
 
-  CONS_Printf("Reading SNDINFO...\n");
+    CONS_Printf("Reading SNDINFO...\n");
 
-  p.RemoveComments(';');
-  while (p.NewLine())
+    p.RemoveComments(';');
+    while (p.NewLine())
     {
-      char tag[50], lname[9];
-      
-      if (!p.GetString(tag, S_TAGLEN))
-	{
-	  CONS_Printf("Crap in the SNDINFO lump!\n");
-	  continue;
-	}
+        char tag[50], lname[9];
 
-      if (tag[0] == '$')
-	{
-	  // it's a command.
-	  switch (P_MatchString(tag, SNDINFO_cmds))
-	    {
-	    case SI_Map:
-	      n = p.GetInt();
-	      i = p.GetString(lname, 8);
-	      if (i >= 1  && n >= 1 && n <= 99)
-		{
-		  // store the map music
-		  strupr(lname);
-		  MapInfo *t = game.FindMapInfo(n);
-		  if (t)
-		    t->musiclump = lname;
-		}
-	      break;
-	    case SI_IFDoom:
-	      if (game.mode == gm_heretic || game.mode == gm_hexen)
-		p.GoToNext("$endif");
-	      break;
-	    case SI_IFHeretic:
-	      if (game.mode != gm_heretic)
-		p.GoToNext("$endif");
-	      break;
-	    case SI_IFHexen:
-	      if (game.mode != gm_hexen)
-		p.GoToNext("$endif");
-	      break;
-	    case SI_Multi:
-	      def_multi = p.GetInt();
-	      break;
-	    case SI_Priority:
-	      def_priority = p.GetInt();
-	      break;
-	    case SI_Pitch:
-	      def_pitch = 128 + p.GetInt();
-	      break;
+        if (!p.GetString(tag, S_TAGLEN))
+        {
+            CONS_Printf("Crap in the SNDINFO lump!\n");
+            continue;
+        }
 
-	    default:
-	      // $ARCHIVEPATH ignored
-	      break;
-	    }
-	}
-      else
-	{
-	  // must be a tagname mapping
-	  // if tag is found, update, if not, create
-	  sfxinfo_t *info;
-	  sound_iter_t t = SoundInfo.find(tag);
-	  if (t == SoundInfo.end())
-	    {
-	      info = new sfxinfo_t(tag, soundnumber++);
-	      SoundStore.push_back(info); // to make deleting easy (the maps are many-to-one!)
-	      SoundInfo[info->tag] = info; // NOTE that we need a static copy of the tag c-string for the map to work!
-	      SoundID[info->number] = info;
-	    }
-	  else
-	    info = t->second;
+        if (tag[0] == '$')
+        {
+            // it's a command.
+            switch (P_MatchString(tag, SNDINFO_cmds))
+            {
+                case SI_Map:
+                    n = p.GetInt();
+                    i = p.GetString(lname, 8);
+                    if (i >= 1 && n >= 1 && n <= 99)
+                    {
+                        // store the map music
+                        strupr(lname);
+                        MapInfo *t = game.FindMapInfo(n);
+                        if (t)
+                            t->musiclump = lname;
+                    }
+                    break;
+                case SI_IFDoom:
+                    if (game.mode == gm_heretic || game.mode == gm_hexen)
+                        p.GoToNext("$endif");
+                    break;
+                case SI_IFHeretic:
+                    if (game.mode != gm_heretic)
+                        p.GoToNext("$endif");
+                    break;
+                case SI_IFHexen:
+                    if (game.mode != gm_hexen)
+                        p.GoToNext("$endif");
+                    break;
+                case SI_Multi:
+                    def_multi = p.GetInt();
+                    break;
+                case SI_Priority:
+                    def_priority = p.GetInt();
+                    break;
+                case SI_Pitch:
+                    def_pitch = 128 + p.GetInt();
+                    break;
 
-	  //CONS_Printf("  sound '%s'", tag);
+                default:
+                    // $ARCHIVEPATH ignored
+                    break;
+            }
+        }
+        else
+        {
+            // must be a tagname mapping
+            // if tag is found, update, if not, create
+            sfxinfo_t *info;
+            sound_iter_t t = SoundInfo.find(tag);
+            if (t == SoundInfo.end())
+            {
+                info = new sfxinfo_t(tag, soundnumber++);
+                SoundStore.push_back(info);  // to make deleting easy (the maps are many-to-one!)
+                SoundInfo[info->tag] = info; // NOTE that we need a static copy of the tag c-string
+                                             // for the map to work!
+                SoundID[info->number] = info;
+            }
+            else
+                info = t->second;
 
-	  if (!(n = p.GetString(tag, 30)))
-	    {
-	      CONS_Printf("SNDINFO: bad lumpname\n");
-	      continue;
-	    }
+            // CONS_Printf("  sound '%s'", tag);
 
-	  // TODO random sounds
-	  if (n == 1 && tag[0] == '=')
-	    {
-	      // alias (hence no sound lumpname may be a plain "=")
-	      p.GetString(tag, S_TAGLEN);
-	      //CONS_Printf(" alias '%s', #%d\n", tag, info->number);
+            if (!(n = p.GetString(tag, 30)))
+            {
+                CONS_Printf("SNDINFO: bad lumpname\n");
+                continue;
+            }
 
-	      sfxinfo_t *al;
-	      t = SoundInfo.find(tag); // is the alias already there?
-	      if (t == SoundInfo.end())
-		{
-		  al = new sfxinfo_t(tag, -1); // 'al' only exists to provide static storage for the tag of the alias
-		  SoundStore.push_back(al); // to make deleting easy
-		}
-	      else
-		{
-		  CONS_Printf("Warning: Alias sound '%s' already defined!\n", tag);
-		  // it loses its tag mapping, but the number mapping remains.
-		  al = t->second;
-		}
+            // TODO random sounds
+            if (n == 1 && tag[0] == '=')
+            {
+                // alias (hence no sound lumpname may be a plain "=")
+                p.GetString(tag, S_TAGLEN);
+                // CONS_Printf(" alias '%s', #%d\n", tag, info->number);
 
-	      SoundInfo[al->tag] = info; // info contains all the real data
-	      continue;
-	    }
-	  else
-	    {
-	      // lumpname
-	      if (n > 8)
-		CONS_Printf("Warning: Long lumpname '%s'\n", tag);
-	      //CONS_Printf(" => '%s', #%d\n", tag, info->number);
-	      //strupr(tag);
-	      strncpy(info->lumpname, tag, 8);
-	    }
+                sfxinfo_t *al;
+                t = SoundInfo.find(tag); // is the alias already there?
+                if (t == SoundInfo.end())
+                {
+                    al = new sfxinfo_t(
+                        tag,
+                        -1); // 'al' only exists to provide static storage for the tag of the alias
+                    SoundStore.push_back(al); // to make deleting easy
+                }
+                else
+                {
+                    CONS_Printf("Warning: Alias sound '%s' already defined!\n", tag);
+                    // it loses its tag mapping, but the number mapping remains.
+                    al = t->second;
+                }
 
-	  // read attributes
-	  while (p.GetChar(&c))
-	    switch (c)
-	      {
-	      case 'm':
-		info->multiplicity = p.GetInt();
-		break;
-	      case 'r':
-		info->priority = p.GetInt();
-		break;
-	      case 'p':
-		info->pitch = 128 + p.GetInt();
-		break;
-	      default:
-		CONS_Printf("Unknown sound attribute '%c'\n", c);
-	      }
-	}
+                SoundInfo[al->tag] = info; // info contains all the real data
+                continue;
+            }
+            else
+            {
+                // lumpname
+                if (n > 8)
+                    CONS_Printf("Warning: Long lumpname '%s'\n", tag);
+                // CONS_Printf(" => '%s', #%d\n", tag, info->number);
+                // strupr(tag);
+                strncpy(info->lumpname, tag, 8);
+            }
+
+            // read attributes
+            while (p.GetChar(&c))
+                switch (c)
+                {
+                    case 'm':
+                        info->multiplicity = p.GetInt();
+                        break;
+                    case 'r':
+                        info->priority = p.GetInt();
+                        break;
+                    case 'p':
+                        info->pitch = 128 + p.GetInt();
+                        break;
+                    default:
+                        CONS_Printf("Unknown sound attribute '%c'\n", c);
+                }
+        }
     }
 
-  CONS_Printf(" %d sounds found.\n", soundnumber - 1);
-  return (soundnumber - 1);
+    CONS_Printf(" %d sounds found.\n", soundnumber - 1);
+    return (soundnumber - 1);
 }
-
-
-
 
 //=========================================================
 // wrappers
@@ -1027,135 +1005,132 @@ int S_Read_SNDINFO(int lump)
 // Starts some music with the music id found in sounds.h.
 bool S_StartMusic(int m_id, bool loop)
 {
-  if (m_id > mus_None && m_id < NUMMUSIC)
-    return S.StartMusic(MusicNames[m_id], loop);
-  else
-    I_Error("Bad music id: %d\n", m_id);
+    if (m_id > mus_None && m_id < NUMMUSIC)
+        return S.StartMusic(MusicNames[m_id], loop);
+    else
+        I_Error("Bad music id: %d\n", m_id);
 
-  return false;
+    return false;
 }
-
 
 int S_StartAmbSound(PlayerInfo *p, int sfx_id, float volume)
 {
-  // TEMPorary
-  return S_StartLocalAmbSound(sfx_id, volume);
+    // TEMPorary
+    return S_StartLocalAmbSound(sfx_id, volume);
 }
 
 int S_StartLocalAmbSound(int sfx_id, float volume)
 {
-  if (!sfx_id)
-    return -1; // no sound
+    if (!sfx_id)
+        return -1; // no sound
 
-  // check for bogus sound #
-  if (sfx_id < 0 || sfx_id >= NUMSFX)
+    // check for bogus sound #
+    if (sfx_id < 0 || sfx_id >= NUMSFX)
     {
-      CONS_Printf("Bad sfx number: %d\n", sfx_id);
-      return -1;
+        CONS_Printf("Bad sfx number: %d\n", sfx_id);
+        return -1;
     }
 
 #ifdef HW3SOUND
-  if (hws_mode != HWS_DEFAULT_MODE)
+    if (hws_mode != HWS_DEFAULT_MODE)
     {
-      volume += 0.1;
-      if (volume > 1)
-	volume = 1;
-      HW3S_StartSoundTypeAtVolume(NULL, sfx_id, CT_AMBIENT, volume);
-      return -1;
+        volume += 0.1;
+        if (volume > 1)
+            volume = 1;
+        HW3S_StartSoundTypeAtVolume(NULL, sfx_id, CT_AMBIENT, volume);
+        return -1;
     }
 #endif
 
-  if (volume < 0.0)
-    return -1;
+    if (volume < 0.0)
+        return -1;
 
-  soundID_iter_t i = SoundID.find(sfx_id);
-  if (i == SoundID.end())
+    soundID_iter_t i = SoundID.find(sfx_id);
+    if (i == SoundID.end())
     {
-      CONS_Printf("Sound ID %d not found!\n", sfx_id);
-      return -1;
+        CONS_Printf("Sound ID %d not found!\n", sfx_id);
+        return -1;
     }
 
-  return S.StartAmbSound(i->second, volume);
+    return S.StartAmbSound(i->second, volume);
 }
-
 
 int S_StartSound(mappoint_t *m, int sfx_id, float vol)
 {
-  if (!sfx_id)
-    return -1; // no sound
+    if (!sfx_id)
+        return -1; // no sound
 
-  // check for bogus sound #
-  if (sfx_id < 0 || sfx_id >= NUMSFX)
+    // check for bogus sound #
+    if (sfx_id < 0 || sfx_id >= NUMSFX)
     {
-      CONS_Printf("Bad sfx number: %d\n", sfx_id);
-      return -1;
+        CONS_Printf("Bad sfx number: %d\n", sfx_id);
+        return -1;
     }
 
-  soundsource_t s;
-  s.isactor = false;
-  s.mpt = m;
+    soundsource_t s;
+    s.isactor = false;
+    s.mpt = m;
 
 #ifdef HW3SOUND
-  if (hws_mode != HWS_DEFAULT_MODE)
-    HW3S_StartSound(NULL, sfx_id);
-  else;
+    if (hws_mode != HWS_DEFAULT_MODE)
+        HW3S_StartSound(NULL, sfx_id);
+    else
+        ;
 #endif
 
-  soundID_iter_t i = SoundID.find(sfx_id);
-  if (i == SoundID.end())
+    soundID_iter_t i = SoundID.find(sfx_id);
+    if (i == SoundID.end())
     {
-      CONS_Printf("Sound ID %d not found!\n", sfx_id);
-      return -1;
+        CONS_Printf("Sound ID %d not found!\n", sfx_id);
+        return -1;
     }
 
-  return S.Start3DSound(i->second, &s, vol);
+    return S.Start3DSound(i->second, &s, vol);
 }
-
 
 int S_StartSound(Actor *a, int sfx_id, float vol)
 {
-  if (!sfx_id)
-    return -1; // no sound
+    if (!sfx_id)
+        return -1; // no sound
 
-  // check for bogus sound #
-  if (sfx_id < 0 || sfx_id >= NUMSFX)
+    // check for bogus sound #
+    if (sfx_id < 0 || sfx_id >= NUMSFX)
     {
-      CONS_Printf("Bad sfx number: %d\n", sfx_id);
-      return -1;
+        CONS_Printf("Bad sfx number: %d\n", sfx_id);
+        return -1;
     }
 
-  soundsource_t s;
-  s.isactor = true;
-  s.act = a;
+    soundsource_t s;
+    s.isactor = true;
+    s.act = a;
 
-  /* FIXME skins are temporarily removed until a better system is made
-    if (sfx->skinsound!=-1 && origin && origin->skin)
-    {
-    // it redirect player sound to the sound in the skin table
-    sfx_id = ((skin_t *)origin->skin)->soundsid[sfx->skinsound];
-    sfx    = &S_sfx[sfx_id];
-    }
-  */
+    /* FIXME skins are temporarily removed until a better system is made
+      if (sfx->skinsound!=-1 && origin && origin->skin)
+      {
+      // it redirect player sound to the sound in the skin table
+      sfx_id = ((skin_t *)origin->skin)->soundsid[sfx->skinsound];
+      sfx    = &S_sfx[sfx_id];
+      }
+    */
 
 #ifdef HW3SOUND
-  if (hws_mode != HWS_DEFAULT_MODE)
-    HW3S_StartSound(a, sfx_id);
-  else;
+    if (hws_mode != HWS_DEFAULT_MODE)
+        HW3S_StartSound(a, sfx_id);
+    else
+        ;
 #endif
 
-  soundID_iter_t i = SoundID.find(sfx_id);
-  if (i == SoundID.end())
+    soundID_iter_t i = SoundID.find(sfx_id);
+    if (i == SoundID.end())
     {
-      CONS_Printf("Sound ID %d not found!\n", sfx_id);
-      return -1;
+        CONS_Printf("Sound ID %d not found!\n", sfx_id);
+        return -1;
     }
 
-  return S.Start3DSound(i->second, &s, vol);
+    return S.Start3DSound(i->second, &s, vol);
 }
-
-
 
 bool S_PlayingSound(Actor *origin, int sfx_id)
 {
-  return S.PlayingSound(origin);
+    return S.PlayingSound(origin);
 }

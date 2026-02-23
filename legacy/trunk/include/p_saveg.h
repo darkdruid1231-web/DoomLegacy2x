@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: p_saveg.h 306 2006-02-11 16:26:27Z jussip $
@@ -20,7 +20,6 @@
 //      Savegame I/O, archiving, persistence.
 //
 //-----------------------------------------------------------------------------
-
 
 #ifndef __P_SAVEG__
 #define __P_SAVEG__

@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: g_pawn.h 483 2007-07-21 19:31:43Z smite-meister $
@@ -26,35 +26,32 @@
 
 #include <vector>
 
+#include "d_items.h"
 #include "g_actor.h" // Actor class
 #include "g_decorate.h"
-#include "d_items.h"
 #include "p_pspr.h" // 1st person weapon sprites
 
 using namespace std;
 
-
 /// Player internal flags, for cheats and debug. Must fit into an int.
 enum cheat_t
 {
-  CF_NOCLIP      = 1,  // No clipping, walk through barriers.
-  CF_GODMODE     = 2,  // No damage, no health loss.
-  CF_NOMOMENTUM  = 4,  // Not really a cheat, just a debug aid.
-  CF_FLYAROUND   = 8,  // Fly using jump key
+    CF_NOCLIP = 1,     // No clipping, walk through barriers.
+    CF_GODMODE = 2,    // No damage, no health loss.
+    CF_NOMOMENTUM = 4, // Not really a cheat, just a debug aid.
+    CF_FLYAROUND = 8,  // Fly using jump key
 };
 
 /// Player class, from Hexen.
 enum pclass_t
 {
-  PCLASS_NONE = 0,
-  PCLASS_FIGHTER,
-  PCLASS_CLERIC,
-  PCLASS_MAGE,
-  PCLASS_PIG,
-  NUMCLASSES
+    PCLASS_NONE = 0,
+    PCLASS_FIGHTER,
+    PCLASS_CLERIC,
+    PCLASS_MAGE,
+    PCLASS_PIG,
+    NUMCLASSES
 };
-
-
 
 /// \brief Pawn type definition. Each instant defines a DECORATE class.
 /// \ingroup g_thing
@@ -63,24 +60,21 @@ enum pclass_t
  */
 class PawnAI : public ActorInfo
 {
-public:
-  
-  byte         pclass;  ///< player class, a Hexen kludge
-  weapontype_t bweapon; ///< beginning weapon (besides fist/staff)
-  int          bammo;   ///< ammo for bweapon
+  public:
+    byte pclass;          ///< player class, a Hexen kludge
+    weapontype_t bweapon; ///< beginning weapon (besides fist/staff)
+    int bammo;            ///< ammo for bweapon
 
-  int     gruntsound; ///< hitting ground at high speed
-  int  puzzfailsound; ///< failing to solve a puzzle
-  int burndeathsound; ///< fire death
+    int gruntsound;     ///< hitting ground at high speed
+    int puzzfailsound;  ///< failing to solve a puzzle
+    int burndeathsound; ///< fire death
 
-public:
-  PawnAI(const ActorInfo& base, pclass_t cls, weapontype_t bw);
+  public:
+    PawnAI(const ActorInfo &base, pclass_t cls, weapontype_t bw);
 };
 
 /// All known pawn types.
-extern vector<PawnAI*> pawn_aid;
-
-
+extern vector<PawnAI *> pawn_aid;
 
 /// \brief An Actor that has active AI or human control.
 /*!
@@ -89,171 +83,175 @@ extern vector<PawnAI*> pawn_aid;
  */
 class Pawn : public Actor
 {
-  TNL_DECLARE_CLASS(Pawn);
-  DECLARE_CLASS(Pawn)
-public:
-  const class PawnAI *info; ///< Pawn type.
+    TNL_DECLARE_CLASS(Pawn);
+    DECLARE_CLASS(Pawn)
+  public:
+    const class PawnAI *info; ///< Pawn type.
 
-  class skin_t *skin; // TEMP
+    class skin_t *skin; // TEMP
 
-  byte  pclass;    ///< Current player class, a Hexen kludge. Affects many things.
-  int   maxhealth; ///< Maximum health value.
-  float speed;     ///< Walking speed (units/tic), runspeed = 2*speed.
-  float toughness; ///< Natural armor, depends on pclass.
+    byte pclass;     ///< Current player class, a Hexen kludge. Affects many things.
+    int maxhealth;   ///< Maximum health value.
+    float speed;     ///< Walking speed (units/tic), runspeed = 2*speed.
+    float toughness; ///< Natural armor, depends on pclass.
 
-  int attackphase; ///< Counter for the more complex weapons.
-  Actor *attacker; ///< Who last damaged the Pawn? (NULL for floors/ceilings).
+    int attackphase; ///< Counter for the more complex weapons.
+    Actor *attacker; ///< Who last damaged the Pawn? (NULL for floors/ceilings).
 
-public:
-  Pawn(fixed_t x, fixed_t y, fixed_t z, int type);
+  public:
+    Pawn(fixed_t x, fixed_t y, fixed_t z, int type);
 
-  virtual void Detach();
-  virtual void CheckPointers();
+    virtual void Detach();
+    virtual void CheckPointers();
 
-  bool GiveBody(int num);
-  void AdjustPlayerAngle(Actor *t);
+    bool GiveBody(int num);
+    void AdjustPlayerAngle(Actor *t);
 };
-
 
 /// \brief A Pawn that represents a player avatar.
 /// \ingroup g_central
 /*!
-  It takes orders from its player, which is represented by a PlayerInfo instance, 
+  It takes orders from its player, which is represented by a PlayerInfo instance,
   or from a BotAI instance.
 */
 class PlayerPawn : public Pawn
 {
-  TNL_DECLARE_CLASS(PlayerPawn);
-  DECLARE_CLASS(PlayerPawn);
-public:
-  /// Controlling player
-  class PlayerInfo *player; 
+    TNL_DECLARE_CLASS(PlayerPawn);
+    DECLARE_CLASS(PlayerPawn);
 
-  /// \name Controls.
-  /// True if the corresponding button was down last tic.
-  //@{
-  bool attackdown;
-  bool usedown;
-  bool jumpdown;   ///< don't jump like a monkey!
-  //@}
+  public:
+    /// Controlling player
+    class PlayerInfo *player;
 
-  int refire;     ///< Refired shots are less accurate. to Pawn?
-  int morphTics;  ///< Player is in a morphed state if >0
-  int fly_zspeed; ///< For smoothing the z motion while flying
+    /// \name Controls.
+    /// True if the corresponding button was down last tic.
+    //@{
+    bool attackdown;
+    bool usedown;
+    bool jumpdown; ///< don't jump like a monkey!
+    //@}
 
-  /// First person sprites (weapon and muzzle flash)
-  pspdef_t psprites[NUMPSPRITES];
+    int refire;     ///< Refired shots are less accurate. to Pawn?
+    int morphTics;  ///< Player is in a morphed state if >0
+    int fly_zspeed; ///< For smoothing the z motion while flying
 
-  /// Inventory
-  vector<inventory_t> inventory;
+    /// First person sprites (weapon and muzzle flash)
+    pspdef_t psprites[NUMPSPRITES];
 
-  int  keycards; ///< Bit field, see the definition of keycard_t
+    /// Inventory
+    vector<inventory_t> inventory;
 
-  /// \name Guns & Ammo, armor
-  //@{
-  weapontype_t readyweapon;   ///< Current weapon
-  weapontype_t pendingweapon; ///< Weapon we are changing to or wp_nochange
-  bool         weaponowned[NUMWEAPONS]; ///< owned weapons
+    int keycards; ///< Bit field, see the definition of keycard_t
 
-  const weaponinfo_t *weaponinfo; ///< Changed when using level2 weapons (Heretic)
+    /// \name Guns & Ammo, armor
+    //@{
+    weapontype_t readyweapon;     ///< Current weapon
+    weapontype_t pendingweapon;   ///< Weapon we are changing to or wp_nochange
+    bool weaponowned[NUMWEAPONS]; ///< owned weapons
 
-  int ammo[NUMAMMO];
-  int maxammo[NUMAMMO];
+    const weaponinfo_t *weaponinfo; ///< Changed when using level2 weapons (Heretic)
 
-  float armorfactor[NUMARMOR];
-  int   armorpoints[NUMARMOR];
-  //@}
+    int ammo[NUMAMMO];
+    int maxammo[NUMAMMO];
 
-  /// Tic counters for power ups.
-  int powers[NUMPOWERS];
+    float armorfactor[NUMARMOR];
+    int armorpoints[NUMARMOR];
+    //@}
 
-  int poisoncount; ///< poisoning
+    /// Tic counters for power ups.
+    int powers[NUMPOWERS];
 
-  /// Bit flags, for cheats and debug.
-  int cheats;
+    int poisoncount; ///< poisoning
 
-  /// Current sector special (lava/slime/water...)
-  int specialsector;
+    /// Bit flags, for cheats and debug.
+    int cheats;
 
-  /// Gun flashes light up nearby areas.
-  int extralight;
+    /// Current sector special (lava/slime/water...)
+    int specialsector;
 
-  /// Colormap to replace the lightlevel-based colormap in rendering.
-  /// Used for invulnerability, IR goggles etc.
-  int fixedcolormap;
+    /// Gun flashes light up nearby areas.
+    int extralight;
 
-public:
-  // in g_pawn.cpp
-  PlayerPawn(fixed_t x, fixed_t y, fixed_t z, int type);
-  ~PlayerPawn();
+    /// Colormap to replace the lightlevel-based colormap in rendering.
+    /// Used for invulnerability, IR goggles etc.
+    int fixedcolormap;
 
-  /// If this actor is used as a pov, at which height are the eyes?
-  virtual fixed_t GetViewZ() const;
+  public:
+    // in g_pawn.cpp
+    PlayerPawn(fixed_t x, fixed_t y, fixed_t z, int type);
+    ~PlayerPawn();
 
-  virtual void Think();
-  void DeathThink();
-  void MorphThink();
+    /// If this actor is used as a pov, at which height are the eyes?
+    virtual fixed_t GetViewZ() const;
 
-  void Move();
-  virtual void ZMovement();
-  virtual void XYFriction(fixed_t oldx, fixed_t oldy);
-  virtual bool Teleport(const vec_t<fixed_t> &p, angle_t nangle, bool silent = false);
-  virtual void LandOnThing(Actor *a);
-  virtual void LandOnFloor(bool floor);
+    virtual void Think();
+    void DeathThink();
+    void MorphThink();
 
-  void Reset();
-  weapontype_t FindWeapon(int g);
+    void Move();
+    virtual void ZMovement();
+    virtual void XYFriction(fixed_t oldx, fixed_t oldy);
+    virtual bool Teleport(const vec_t<fixed_t> &p, angle_t nangle, bool silent = false);
+    virtual void LandOnThing(Actor *a);
+    virtual void LandOnFloor(bool floor);
 
-  inline DActor *SpawnPlayerMissile(mobjtype_t type) { return SPMAngle(type, yaw); }
-  DActor *SPMAngle(mobjtype_t type, angle_t ang);
+    void Reset();
+    weapontype_t FindWeapon(int g);
 
-  bool CanUnlockGenDoor(struct line_t *line);
-  void ProcessSpecialSector(struct sector_t *sector);
-  void PlayerInSpecialSector();
+    inline DActor *SpawnPlayerMissile(mobjtype_t type)
+    {
+        return SPMAngle(type, yaw);
+    }
+    DActor *SPMAngle(mobjtype_t type, angle_t ang);
 
-  bool GivePower(int power);
-  bool GiveAmmo(ammotype_t at, int count);
-  bool GiveWeapon(weapontype_t wt, int ammocontent, bool dropped = false);
-  bool GiveArmor(armortype_t type, float factor, int points);
-  bool GiveKey(keycard_t k);
-  bool GiveArtifact(artitype_t arti, DActor *from);
+    bool CanUnlockGenDoor(struct line_t *line);
+    void ProcessSpecialSector(struct sector_t *sector);
+    void PlayerInSpecialSector();
 
-  // in p_user.cpp
-  virtual bool Morph(mobjtype_t form);
-  bool UndoMorph();
+    bool GivePower(int power);
+    bool GiveAmmo(ammotype_t at, int count);
+    bool GiveWeapon(weapontype_t wt, int ammocontent, bool dropped = false);
+    bool GiveArmor(armortype_t type, float factor, int points);
+    bool GiveKey(keycard_t k);
+    bool GiveArtifact(artitype_t arti, DActor *from);
 
-  void UseArtifact(artitype_t arti);
+    // in p_user.cpp
+    virtual bool Morph(mobjtype_t form);
+    bool UndoMorph();
 
-  // in p_map.cpp
-  void UseLines();
-  bool UsePuzzleItem(int type);
+    void UseArtifact(artitype_t arti);
 
-  // in p_inter.cpp
-  void TouchSpecialThing(DActor *special);
-  virtual bool Touch(Actor *a);
-  virtual void Die(Actor *inflictor, Actor *source, int dtype);
-  virtual void Killed(PlayerPawn *victim, Actor *inflictor);
-  virtual bool Damage(Actor *inflictor, Actor *source, int damage, int dtype = dt_normal);
-  virtual bool FallingDamage(float v);
-  void Poison(Actor *culprit, int poison);
+    // in p_map.cpp
+    void UseLines();
+    bool UsePuzzleItem(int type);
 
-  // in p_pspr.cpp
-  void MovePsprites();
-  void UseFavoriteWeapon();
-  void SetupPsprites();
-  void SetPsprite(int position, weaponstate_t *st, bool call = true);
-  inline void SetPsprite(int position, weaponstatenum_t stnum, bool call = true) { SetPsprite(position, &weaponstates[stnum], call); }
+    // in p_inter.cpp
+    void TouchSpecialThing(DActor *special);
+    virtual bool Touch(Actor *a);
+    virtual void Die(Actor *inflictor, Actor *source, int dtype);
+    virtual void Killed(PlayerPawn *victim, Actor *inflictor);
+    virtual bool Damage(Actor *inflictor, Actor *source, int damage, int dtype = dt_normal);
+    virtual bool FallingDamage(float v);
+    void Poison(Actor *culprit, int poison);
 
-  void DropWeapon();
-  void FireWeapon();
-  bool CheckAmmo();
-  void BringUpWeapon();
+    // in p_pspr.cpp
+    void MovePsprites();
+    void UseFavoriteWeapon();
+    void SetupPsprites();
+    void SetPsprite(int position, weaponstate_t *st, bool call = true);
+    inline void SetPsprite(int position, weaponstatenum_t stnum, bool call = true)
+    {
+        SetPsprite(position, &weaponstates[stnum], call);
+    }
 
-  // in p_hpspr.cpp
-  void ActivateMorphWeapon();
-  void PostMorphWeapon(weapontype_t weapon);
+    void DropWeapon();
+    void FireWeapon();
+    bool CheckAmmo();
+    void BringUpWeapon();
+
+    // in p_hpspr.cpp
+    void ActivateMorphWeapon();
+    void PostMorphWeapon(weapontype_t weapon);
 };
-
-
 
 #endif

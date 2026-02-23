@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: m_bbox.h 474 2007-06-12 01:41:05Z smite-meister $
@@ -26,42 +26,44 @@
 
 #include "m_fixed.h"
 
-
 /// Bounding box coordinate order.
 enum bbox_e
 {
-  BOXTOP,
-  BOXBOTTOM,
-  BOXLEFT,
-  BOXRIGHT
+    BOXTOP,
+    BOXBOTTOM,
+    BOXLEFT,
+    BOXRIGHT
 };
-
 
 /// \brief A rectangular axis-aligned bounding box
 ///
 /// NOTE! Must remain a Plain Old Datatype (no vtable!)
 struct bbox_t
 {
-  fixed_t box[4];
+    fixed_t box[4];
 
-  void Clear();
-  void Add(fixed_t x, fixed_t y);
-  void Set(fixed_t x, fixed_t y, fixed_t r);
-  void Move(fixed_t x, fixed_t y);
+    void Clear();
+    void Add(fixed_t x, fixed_t y);
+    void Set(fixed_t x, fixed_t y, fixed_t r);
+    void Move(fixed_t x, fixed_t y);
 
-  inline bbox_t operator=(const bbox_t &other)
-  {
-    for (int i=0; i<4; i++)
-      box[i] = other.box[i];
-    return *this;
-  };
-  inline fixed_t operator[](bbox_e side) const { return box[side]; };
+    inline bbox_t operator=(const bbox_t &other)
+    {
+        for (int i = 0; i < 4; i++)
+            box[i] = other.box[i];
+        return *this;
+    };
+    inline fixed_t operator[](bbox_e side) const
+    {
+        return box[side];
+    };
 
-  bool PointInBox(fixed_t x, fixed_t y) const;
-  bool CircleTouchBox(fixed_t x, fixed_t y, fixed_t radius) const;
-  bool BoxTouchBox(const bbox_t &other) const;
-  bool LineCrossesEdge(const fixed_t x1, const fixed_t y1, const fixed_t x2, const fixed_t y2) const; 
-  int  BoxOnLineSide(const struct line_t *ld) const;
+    bool PointInBox(fixed_t x, fixed_t y) const;
+    bool CircleTouchBox(fixed_t x, fixed_t y, fixed_t radius) const;
+    bool BoxTouchBox(const bbox_t &other) const;
+    bool
+    LineCrossesEdge(const fixed_t x1, const fixed_t y1, const fixed_t x2, const fixed_t y2) const;
+    int BoxOnLineSide(const struct line_t *ld) const;
 };
 
 #endif

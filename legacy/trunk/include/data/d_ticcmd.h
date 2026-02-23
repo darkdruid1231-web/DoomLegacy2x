@@ -25,8 +25,8 @@
 #ifndef d_ticcmd_h
 #define d_ticcmd_h 1
 
-#include "m_fixed.h" // fixed_t
 #include "doomtype.h"
+#include "m_fixed.h" // fixed_t
 
 /// \brief Player input.
 ///
@@ -35,37 +35,35 @@
 
 struct ticcmd_t
 {
-  /// Button-type actions
-  enum buttoncode_t
-  {
-    BT_ATTACK   = 1, ///< Press "Fire".
-    BT_USE      = 2, ///< Use button, to open doors, activate switches.
-    BT_JUMP     = 4, ///< Jump or fly/swim up.
-    BT_FLYDOWN  = 8, ///< Fly/swim down.
+    /// Button-type actions
+    enum buttoncode_t
+    {
+        BT_ATTACK = 1,  ///< Press "Fire".
+        BT_USE = 2,     ///< Use button, to open doors, activate switches.
+        BT_JUMP = 4,    ///< Jump or fly/swim up.
+        BT_FLYDOWN = 8, ///< Fly/swim down.
 
-    // The weapon mask and shift, for convenience.
-    WEAPONMASK  = 0xFFF0,
-    WEAPONSHIFT = 4,
-  };
+        // The weapon mask and shift, for convenience.
+        WEAPONMASK = 0xFFF0,
+        WEAPONSHIFT = 4,
+    };
 
-  short buttons; ///< buttons and weapon changes
-  char  item;    ///< if nonzero, using an inventory item
-  char  forward; ///< "push" forward-backward
-  char  side;    ///< "push" right-left
+    short buttons; ///< buttons and weapon changes
+    char item;     ///< if nonzero, using an inventory item
+    char forward;  ///< "push" forward-backward
+    char side;     ///< "push" right-left
 
-  // rotation: << 16 for angle_t
-  short yaw;   ///< left-right   
-  short pitch; ///< up-down
+    // rotation: << 16 for angle_t
+    short yaw;   ///< left-right
+    short pitch; ///< up-down
 
+    ticcmd_t() : buttons(0), item(0), forward(0), side(0), yaw(0), pitch(0){};
 
+    /// sets the ticcmd into a neutral state
+    void Clear();
 
-  ticcmd_t() : buttons(0), item(0), forward(0), side(0), yaw(0), pitch(0) {};
-
-  /// sets the ticcmd into a neutral state
-  void Clear();
-
-  /// Fills the ticcmd_t with local input data.
-  void Build(class LocalPlayerInfo *info, int elapsedtics);
+    /// Fills the ticcmd_t with local input data.
+    void Build(class LocalPlayerInfo *info, int elapsedtics);
 };
 
 #endif

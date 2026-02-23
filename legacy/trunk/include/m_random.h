@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: m_random.h 531 2008-11-02 09:03:56Z smite-meister $
@@ -21,7 +21,6 @@
 /// \file
 /// \brief Pseudorandom numbers.
 
-
 #ifndef m_random_h
 #define m_random_h 1
 
@@ -30,9 +29,15 @@
 
 /// Uniformly distributed pseudo-random numbers in the range [0,1).
 float RandomUniform();
-inline float Random() { return RandomUniform(); }
+inline float Random()
+{
+    return RandomUniform();
+}
 /// Uniformly distributed pseudo-random numbers in the range [min,max).
-inline float Random(float min, float max) { return RandomUniform()*(max-min) + min; }
+inline float Random(float min, float max)
+{
+    return RandomUniform() * (max - min) + min;
+}
 
 /// Pseudo-random numbers following a pyramid distribution in the range (-1,1).
 float RandomS();
@@ -40,14 +45,12 @@ float RandomS();
 /// N(0,1) normally distributed pseudo-random numbers.
 float RandomGauss();
 
-
 /// Returns a number from 0 to 255, from a lookup table.
 byte M_Random();
 
 /// As M_Random, but used only by the play simulation.
 byte P_Random();
 int P_SignedRandom();
-
 
 // Fix randoms for demos.
 void M_ClearRandom();

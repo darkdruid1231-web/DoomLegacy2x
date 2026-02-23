@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: p_tick.cpp 433 2007-02-07 19:06:40Z smite-meister $
@@ -21,147 +21,142 @@
 /// \file
 /// \brief Part of Map class implementation. Thinkers, Map::Ticker().
 
-#include "g_mapinfo.h"
-#include "g_map.h"
 #include "g_game.h"
-#include "g_player.h"
+#include "g_map.h"
+#include "g_mapinfo.h"
 #include "g_pawn.h"
+#include "g_player.h"
 #include "z_zone.h"
 
 #include "r_defs.h"
 
-
 // Resets the Thinker list
 void Map::InitThinkers()
 {
-  thinkercap.prev = thinkercap.next = &thinkercap;
+    thinkercap.prev = thinkercap.next = &thinkercap;
 }
-
 
 // Adds a new Thinker at the end of the list.
 void Map::AddThinker(Thinker *t)
 {
-  if (!t)
-    return;
-  t->mp = this;
-  thinkercap.prev->next = t;
-  t->next = &thinkercap;
-  t->prev = thinkercap.prev;
-  thinkercap.prev = t;
+    if (!t)
+        return;
+    t->mp = this;
+    thinkercap.prev->next = t;
+    t->next = &thinkercap;
+    t->prev = thinkercap.prev;
+    thinkercap.prev = t;
 }
-
 
 // Removes a Thinker from the Map without deleting it
 void Map::DetachThinker(Thinker *t)
 {
-  t->mp = NULL;
-  t->next->prev = t->prev;
-  t->prev->next = t->next;
-  t->prev = t->next = NULL;
+    t->mp = NULL;
+    t->next->prev = t->prev;
+    t->prev->next = t->next;
+    t->prev = t->next = NULL;
 
-  force_pointercheck = true;
+    force_pointercheck = true;
 }
-
 
 // Moves a Thinker to the removal list
 void Map::RemoveThinker(Thinker *t)
 {
-  t->next->prev = t->prev;
-  t->prev->next = t->next;
+    t->next->prev = t->prev;
+    t->prev->next = t->next;
 
-  // Most Thinkers could be deleted right away (it is assumed that there will be
-  // no dangling pointers, or that they have already been taken care of.)
-  // This does not work for Actors. Hence...
-  DeletionList.push_back(t);
-  // TODO perhaps this is needed just for Actors, and other Thinkers can be deleted right away?
+    // Most Thinkers could be deleted right away (it is assumed that there will be
+    // no dangling pointers, or that they have already been taken care of.)
+    // This does not work for Actors. Hence...
+    DeletionList.push_back(t);
+    // TODO perhaps this is needed just for Actors, and other Thinkers can be deleted right away?
 }
-
 
 void Map::RunThinkers()
 {
-  Thinker *t, *next; 
+    Thinker *t, *next;
 
-  for (t = thinkercap.next; t != &thinkercap; t = next)
+    for (t = thinkercap.next; t != &thinkercap; t = next)
     {
-      next = t->next; // if t is removed while it thinks, its next pointer will no longer be valid.
-      //if (t->mp == NULL) I_Error("Thinker::mp == NULL! Cannot be!\n");
-      t->Think();
+        next =
+            t->next; // if t is removed while it thinks, its next pointer will no longer be valid.
+        // if (t->mp == NULL) I_Error("Thinker::mp == NULL! Cannot be!\n");
+        t->Think();
     }
 }
 
-
 void Map::PointerCleanup()
 {
-  int n = DeletionList.size();
-  if (n == 0 && !force_pointercheck)
-    return;
+    int n = DeletionList.size();
+    if (n == 0 && !force_pointercheck)
+        return;
 
-  for (Thinker *t = thinkercap.next; t != &thinkercap; t = t->next)
-    t->CheckPointers();
+    for (Thinker *t = thinkercap.next; t != &thinkercap; t = t->next)
+        t->CheckPointers();
 
-  // FIXME unfortunate HACK (the entire sound alert system is unrealistic!)
-  for (int i=0 ; i<numsectors ; i++)
-    if (sectors[i].soundtarget && (sectors[i].soundtarget->eflags & MFE_REMOVE))
-      sectors[i].soundtarget = NULL;
+    // FIXME unfortunate HACK (the entire sound alert system is unrealistic!)
+    for (int i = 0; i < numsectors; i++)
+        if (sectors[i].soundtarget && (sectors[i].soundtarget->eflags & MFE_REMOVE))
+            sectors[i].soundtarget = NULL;
 
-  force_pointercheck = false;
+    force_pointercheck = false;
 
-  for (int i=0; i<n; i++)
-    delete DeletionList[i];
+    for (int i = 0; i < n; i++)
+        delete DeletionList[i];
 
-  DeletionList.clear();
+    DeletionList.clear();
 }
-
 
 // Ticks the map forward in time
 void Map::Ticker()
 {
-  //CONS_Printf("Tic begins..");
-  int i = 0;
+    // CONS_Printf("Tic begins..");
+    int i = 0;
 
-  if (game.server)
+    if (game.server)
     {
-      RunThinkers();
+        RunThinkers();
 
-      // after a player is respawned, its input should be built before it is used in RunThinkers.
-      if (!respawnqueue.empty())
-	i = RespawnPlayers();
+        // after a player is respawned, its input should be built before it is used in RunThinkers.
+        if (!respawnqueue.empty())
+            i = RespawnPlayers();
 
-      //CONS_Printf("think..");
-      //RunThinkers();
+        // CONS_Printf("think..");
+        // RunThinkers();
 
-      //CONS_Printf("specials..");
-      UpdateSpecials();
+        // CONS_Printf("specials..");
+        UpdateSpecials();
 
-      //CONS_Printf("respawnspecials..");
-      RespawnSpecials();
+        // CONS_Printf("respawnspecials..");
+        RespawnSpecials();
 
-      //CONS_Printf("sound sequences..");
-      UpdateSoundSequences();
+        // CONS_Printf("sound sequences..");
+        UpdateSoundSequences();
 
-      //CONS_Printf("FS..");
-      FS_DelayedScripts();
+        // CONS_Printf("FS..");
+        FS_DelayedScripts();
 
-      HandlePlayers();
+        HandlePlayers();
     }
-  else
+    else
     {
-      // client tick 
-      if (players.size() == 0)
-	{
-	  info->state = MapInfo::MAP_FINISHED;
-	  //info->state = MapInfo::MAP_INSTASIS; // TODO alternative
-	  return;
-	}
+        // client tick
+        if (players.size() == 0)
+        {
+            info->state = MapInfo::MAP_FINISHED;
+            // info->state = MapInfo::MAP_INSTASIS; // TODO alternative
+            return;
+        }
 
-      for (Thinker *t = thinkercap.next; t != &thinkercap; t = t->next)
-	t->ClientThink();
+        for (Thinker *t = thinkercap.next; t != &thinkercap; t = t->next)
+            t->ClientThink();
     }
 
-  PointerCleanup(); // this must be done AFTER players have left the Map, BEFORE they enter another
+    PointerCleanup(); // this must be done AFTER players have left the Map, BEFORE they enter
+                      // another
 
-  // for par times etc.
-  maptic++;
+    // for par times etc.
+    maptic++;
 
-  //CONS_Printf("tick done\n");
+    // CONS_Printf("tick done\n");
 }

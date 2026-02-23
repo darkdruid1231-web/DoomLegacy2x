@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: i_system.h 516 2007-12-22 15:57:58Z jussip $
@@ -45,7 +45,7 @@ void I_Quit();
 void I_OutputMsg(const char *error, ...);
 
 /// creates a new directory
-int  I_mkdir(const char *dirname, int unixright);
+int I_mkdir(const char *dirname, int unixright);
 
 /// returns the free space on disk in bytes
 void I_GetDiskFreeSpace(Sint64 *freespace);
@@ -63,7 +63,7 @@ void I_StartFrame();
 // called before processing each tic in a frame.
 // Quick syncronous operations are performed here.
 // Can call D_PostEvent.
-void I_OsPolling ();
+void I_OsPolling();
 
 // Asynchronous interrupt functions should maintain private queues
 // that are read by the synchronous functions
@@ -74,8 +74,6 @@ char *I_GetUserName();
 
 /// returns the path to the default wadfile location (usually the current working directory)
 const char *I_GetWadPath();
-
-
 
 //===========================================
 //               User input
@@ -100,8 +98,6 @@ void I_UngrabMouse();
 // This ticcmd will then be modified by the gameloop
 // for normal input.
 struct ticcmd_t *I_BaseTiccmd();
-
-
 
 //=================================================================
 // Some old stuff I like to keep here for the nostalgia value:)

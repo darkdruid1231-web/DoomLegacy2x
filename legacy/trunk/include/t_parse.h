@@ -10,12 +10,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -31,40 +31,36 @@
 #include "m_fixed.h"
 #include "t_vari.h"
 
-
 #define T_MAXTOKENS 128
 #define TOKENLENGTH 128
-
 
 /// \brief FS {} sections
 struct fs_section_t
 {
-  char *start;    // offset of starting brace {
-  char *end;      // offset of ending brace   }
-  int type;       // section type: for() loop, while() loop etc
-  
-  union
-  {
-    struct
-    {
-      char *loopstart;  // positioned before the while()
-    } data_loop;
-  } data; // data for section
-  
-  fs_section_t *next;        // for hashing
-};
+    char *start; // offset of starting brace {
+    char *end;   // offset of ending brace   }
+    int type;    // section type: for() loop, while() loop etc
 
+    union
+    {
+        struct
+        {
+            char *loopstart; // positioned before the while()
+        } data_loop;
+    } data; // data for section
+
+    fs_section_t *next; // for hashing
+};
 
 /// \brief FS {} section types
 enum fs_section_e
 {
-  st_empty,       // none: empty {} braces
-  st_if,          // if() statement
-  st_elseif,      // elseif() statement
-  st_else,        // else() statement
-  st_loop,        // loop
+    st_empty,  // none: empty {} braces
+    st_if,     // if() statement
+    st_elseif, // elseif() statement
+    st_else,   // else() statement
+    st_loop,   // loop
 };
-
 
 #define VARIABLESLOTS 16
 #define SECTIONSLOTS 17
@@ -73,79 +69,77 @@ enum fs_section_e
 /// \brief FS script definition
 struct script_t
 {
-  char *data;     ///< script data 
-  int scriptnum;  ///< this script's number
-  int len;
-  
-  /// {} sections
-  fs_section_t *sections[SECTIONSLOTS];
-  
-  /// variables, goto labels
-  struct svariable_t *variables[VARIABLESLOTS];
-  
-  // ptr to the parent script
-  // the parent script is the script above this level
-  // eg. individual linetrigger scripts are children
-  // of the levelscript, which is a child of the
-  // global_script
-  script_t *parent;
+    char *data;    ///< script data
+    int scriptnum; ///< this script's number
+    int len;
 
-  // child scripts.
-  // levelscript holds ptrs to all of the level's scripts
-  // here.
-  script_t *children[MAXSCRIPTS];
-  
-  class Actor      *trigger;  // object which triggered this script
+    /// {} sections
+    fs_section_t *sections[SECTIONSLOTS];
 
-  //SoM: Used for if/elseif/else statements
-  bool  lastiftrue;
+    /// variables, goto labels
+    struct svariable_t *variables[VARIABLESLOTS];
 
-protected:
+    // ptr to the parent script
+    // the parent script is the script above this level
+    // eg. individual linetrigger scripts are children
+    // of the levelscript, which is a child of the
+    // global_script
+    script_t *parent;
 
-  void clear_variables();
+    // child scripts.
+    // levelscript holds ptrs to all of the level's scripts
+    // here.
+    script_t *children[MAXSCRIPTS];
 
-  inline int section_hash(char *b) { return int((b - data) % SECTIONSLOTS); }
-  fs_section_t *new_section(char *brace);
-  svariable_t *new_label(char *labelptr);
+    class Actor *trigger; // object which triggered this script
 
-  void parse();
+    // SoM: Used for if/elseif/else statements
+    bool lastiftrue;
 
-public: 
-  void clear(); // nukes sections, variables, children (does not free them!)
+  protected:
+    void clear_variables();
 
-  void preprocess();
-  void dry_run();
-  void run();
-  void save(char *r, int wt, int wdata);
-  void continue_script(char *continue_point);
+    inline int section_hash(char *b)
+    {
+        return int((b - data) % SECTIONSLOTS);
+    }
+    fs_section_t *new_section(char *brace);
+    svariable_t *new_label(char *labelptr);
 
-  // variables are hashed for speed. this is the hashkey.
-  inline static int variable_hash(const char *n)
-  {
-    return ((n[0] + n[1] + (n[1] ? n[2] + (n[2] ? n[3] : 0) : 0)) % VARIABLESLOTS);
-  }
+    void parse();
 
-  fs_section_t *find_section_start(char *brace);
-  fs_section_t *find_section_end(char *brace);
-  char *process_find_char(char *data, char find);
-  svariable_t *new_variable(const char *name, int vtype);
-  svariable_t *variableforname(const char *name);
+  public:
+    void clear(); // nukes sections, variables, children (does not free them!)
 
-  /// Saving and loading
-  int  Serialize(class LArchive &a);
-  int  Unserialize(LArchive &a);
+    void preprocess();
+    void dry_run();
+    void run();
+    void save(char *r, int wt, int wdata);
+    void continue_script(char *continue_point);
+
+    // variables are hashed for speed. this is the hashkey.
+    inline static int variable_hash(const char *n)
+    {
+        return ((n[0] + n[1] + (n[1] ? n[2] + (n[2] ? n[3] : 0) : 0)) % VARIABLESLOTS);
+    }
+
+    fs_section_t *find_section_start(char *brace);
+    fs_section_t *find_section_end(char *brace);
+    char *process_find_char(char *data, char find);
+    svariable_t *new_variable(const char *name, int vtype);
+    svariable_t *variableforname(const char *name);
+
+    /// Saving and loading
+    int Serialize(class LArchive &a);
+    int Unserialize(LArchive &a);
 };
-
-
-
-
 
 /// \brief FS operator definition
 struct operator_t
 {
-  const char *str;
-  svalue_t (*handler)(int, int, int); // left, mid, right
-  int direction;
+    const char *str;
+    svalue_t (*handler)(int, int, int); // left, mid, right
+    int direction;
 };
 
 extern operator_t operators[];
@@ -153,8 +147,8 @@ extern int num_operators;
 
 enum operator_dir_e
 {
-  opdir_forward,
-  opdir_backward
+    opdir_forward,
+    opdir_backward
 };
 
 void parse_data(char *data, char *end);
@@ -172,26 +166,24 @@ char *get_tokens(char *r);
 
 enum tokentype_t
 {
-  TO_name,   // a name, eg 'count1' or 'frag'
-  TO_number,
-  TO_oper,
-  TO_string,
-  TO_unset,
-  TO_function          // function name
+    TO_name, // a name, eg 'count1' or 'frag'
+    TO_number,
+    TO_oper,
+    TO_string,
+    TO_unset,
+    TO_function // function name
 };
-
 
 struct token_t
 {
-  char *v;
-  tokentype_t type;
+    char *v;
+    tokentype_t type;
 };
 
-
-enum    // brace types: where current_section is a { or }
+enum // brace types: where current_section is a { or }
 {
-  bracket_open,
-  bracket_close
+    bracket_open,
+    bracket_close
 };
 
 extern svalue_t nullvar;
@@ -217,7 +209,7 @@ extern int bracetype;
 // script and contains only built-in
 // FraggleScript variables/functions
 
-extern script_t global_script; 
+extern script_t global_script;
 extern script_t hub_script;
 
 #endif

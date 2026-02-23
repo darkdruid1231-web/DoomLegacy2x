@@ -21,13 +21,13 @@
 /// \file
 /// \brief Client-side bots
 
-#include "doomdef.h"
 #include "command.h"
+#include "doomdef.h"
 
 #include "g_game.h"
-#include "g_player.h"
 #include "g_map.h"
 #include "g_mapinfo.h"
+#include "g_player.h"
 
 #include "acbot.h"
 #include "b_path.h"
@@ -35,54 +35,24 @@
 #include "m_random.h"
 
 // to be read from an XML config-file...
-static const char *botnames[] =
-{
-  "Frag-God",
-  "Thresh",
-  "Reptile",
-  "Archer",
-  "Freak",
-  "TF-Master",
-  "Carmack",
-  "Romero",
-  "Quaker",
-  "FragMaster",
-  "Punisher",
-  "Xoleras",
-  "Hurdlerbot",
-  "Meisterbot",
-  "Borisbot",
-  "Tailsbot",
-  "TonyD-bot",
-  "Azathoth",
-  "yo momma",
-  "crusher",
-  "aimbot",
-  "crash",
-  "akira",
-  "meiko",
-  "undead",
-  "death",
-  "unit",
-  "fodder",
-  "2-vile",
-  "nitemare",
-  "nos482",
-  "billy"
-};
+static const char *botnames[] = {
+    "Frag-God", "Thresh",   "Reptile",    "Archer",   "Freak",    "TF-Master",  "Carmack",
+    "Romero",   "Quaker",   "FragMaster", "Punisher", "Xoleras",  "Hurdlerbot", "Meisterbot",
+    "Borisbot", "Tailsbot", "TonyD-bot",  "Azathoth", "yo momma", "crusher",    "aimbot",
+    "crash",    "akira",    "meiko",      "undead",   "death",    "unit",       "fodder",
+    "2-vile",   "nitemare", "nos482",     "billy"};
 
-const int NUMBOTNAMES = sizeof(botnames)/sizeof(char *);
+const int NUMBOTNAMES = sizeof(botnames) / sizeof(char *);
 
 unsigned num_bots = 0; // TEMP
 
 BotAI::BotAI()
 {
-  subject = NULL;
-  pawn = NULL;
-  mp = NULL;
-  cmd = NULL;
+    subject = NULL;
+    pawn = NULL;
+    mp = NULL;
+    cmd = NULL;
 };
-
 
 /*
   TODO bot dlls
@@ -93,30 +63,29 @@ BotAI::BotAI()
     The dll can get the parameters x,y,z... directly from the command buffer.
  */
 
-
-
 // add bots to game
 void Command_AddBot_f()
 {
-  // Client-side bots are supposed to be in principle indistinguishable from human players to the server.
-  // TODO syntax: "addbot [bottype] [name] [team] [parameters]..."
+    // Client-side bots are supposed to be in principle indistinguishable from human players to the
+    // server.
+    // TODO syntax: "addbot [bottype] [name] [team] [parameters]..."
 
-  int i;
-  int n = COM.Argc();
-  
-  // parse common parameters
-  if (n < 2)
-    ; // default: ACBot
+    int i;
+    int n = COM.Argc();
 
-  const char *name;
-  if (n < 3)
-    name = botnames[P_Random() % NUMBOTNAMES];
-  else
-    name = COM.Argv(2);
+    // parse common parameters
+    if (n < 2)
+        ; // default: ACBot
 
-  int team = 0;
-  if (n >= 4)
-    team = atoi(COM.Argv(3));
+    const char *name;
+    if (n < 3)
+        name = botnames[P_Random() % NUMBOTNAMES];
+    else
+        name = COM.Argv(2);
+
+    int team = 0;
+    if (n >= 4)
+        team = atoi(COM.Argv(3));
 
 #if 0
 

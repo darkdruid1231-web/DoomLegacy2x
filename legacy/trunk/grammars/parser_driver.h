@@ -22,40 +22,36 @@
 
 #ifndef driver_h
 #define driver_h 1
-#include <assert.h>
 #include "doomdef.h"
-#include "r_data.h"
 #include "hardware/oglshaders.h"
-
+#include "r_data.h"
+#include <assert.h>
 
 #ifndef YYSTYPE
 union yy_t
 {
-  float ftype;
-  int   itype;
-  const char *stype; // copy of the parsed string, must be destroyed later on
+    float ftype;
+    int itype;
+    const char *stype; // copy of the parsed string, must be destroyed later on
 };
-# define YYSTYPE yy_t // sizeof(yy_t) == small, no point in using a pointer
-# define YYSTYPE_IS_TRIVIAL 1
+#define YYSTYPE yy_t // sizeof(yy_t) == small, no point in using a pointer
+#define YYSTYPE_IS_TRIVIAL 1
 #endif
-
 
 /// temp variables for building Textures
 struct ntexture_driver
 {
-  class ShaderProg *p;
-  bool vertex_src;
+    class ShaderProg *p;
+    bool vertex_src;
 
-  class Material *m;
-  bool is_sprite;
-  bool texeloffsets;
-  int  tex_unit;
-  struct Material::TextureRef *tr;
+    class Material *m;
+    bool is_sprite;
+    bool texeloffsets;
+    int tex_unit;
+    struct Material::TextureRef *tr;
 };
-
 
 /// temp variables for building ActorInfos
 typedef void decorate_driver;
-
 
 #endif

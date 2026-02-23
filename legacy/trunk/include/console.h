@@ -31,21 +31,21 @@
 
 // Console color palette (matching legacy_one C version)
 // Standard 16-color VGA palette indices
-#define COLOR_BLACK         0
-#define COLOR_BLUE          1
-#define COLOR_GREEN         2
-#define COLOR_CYAN          3
-#define COLOR_RED           4
-#define COLOR_MAGENTA       5
-#define COLOR_BROWN         6
-#define COLOR_WHITE         7
-#define COLOR_GRAY          8
-#define COLOR_LIGHTBLUE     9
-#define COLOR_LIGHTGREEN    10
-#define COLOR_LIGHTCYAN     11
-#define COLOR_LIGHTRED      12
-#define COLOR_LIGHTMAGENTA  13
-#define COLOR_YELLOW        14
+#define COLOR_BLACK 0
+#define COLOR_BLUE 1
+#define COLOR_GREEN 2
+#define COLOR_CYAN 3
+#define COLOR_RED 4
+#define COLOR_MAGENTA 5
+#define COLOR_BROWN 6
+#define COLOR_WHITE 7
+#define COLOR_GRAY 8
+#define COLOR_LIGHTBLUE 9
+#define COLOR_LIGHTGREEN 10
+#define COLOR_LIGHTCYAN 11
+#define COLOR_LIGHTRED 12
+#define COLOR_LIGHTMAGENTA 13
+#define COLOR_YELLOW 14
 #define COLOR_BRIGHTTHWHITE 15
 
 using namespace std;
@@ -59,117 +59,107 @@ using namespace std;
 
 class Console
 {
-public:
-  bool refresh; ///< explicitly refresh screen after each CONS_Printf (game is not yet in display loop)
-  bool recalc;  ///< set true when screen size has changed. on next tick, console will conform
+  public:
+    bool refresh; ///< explicitly refresh screen after each CONS_Printf (game is not yet in display
+                  ///< loop)
+    bool recalc;  ///< set true when screen size has changed. on next tick, console will conform
 
-  char *bindtable[NUMINPUTS]; ///< console key bindings
+    char *bindtable[NUMINPUTS]; ///< console key bindings
 
-protected:
-  bool graphic; ///< console can be drawn
-  bool active;  ///< console is active (accepting input)
+  protected:
+    bool graphic; ///< console can be drawn
+    bool active;  ///< console is active (accepting input)
 
-  int con_tick; ///< console ticker for anim of blinking prompt cursor
+    int con_tick; ///< console ticker for anim of blinking prompt cursor
 
+    // console input
+#define CON_MAXINPUT 256
+#define CON_HISTORY 32
+    deque<string> input_history; ///< input history (current line is always input_history.front())
+    int input_browse;            ///< input history line number being browsed/edited
 
-  // console input
-#define  CON_MAXINPUT 256
-#define  CON_HISTORY 32
-  deque<string> input_history; ///< input history (current line is always input_history.front())
-  int           input_browse;  ///< input history line number being browsed/edited
+    // console output
+#define CON_MAXLINECHARS 120                          // nobody wants to read lines longer than this
+#define CON_LINES 100                                 // reasonable output history
+    char con_buffer[CON_LINES][CON_MAXLINECHARS + 1]; ///< wrapping output buffer (ASCII or UTF-8)
+    char *con_line;                                   ///< pointer to current output line
 
+    int con_cx;       ///< cursor position in current line (column number)
+    int con_cy;       ///< cursor line number in con_buffer, wraps around using modulo
+    int con_scrollup; ///< how many rows of text to scroll up (pgup/pgdn)
 
-  // console output
-#define CON_MAXLINECHARS 120 // nobody wants to read lines longer than this
-#define CON_LINES 100 // reasonable output history
-  char  con_buffer[CON_LINES][CON_MAXLINECHARS+1]; ///< wrapping output buffer (ASCII or UTF-8)
-  char *con_line;   ///< pointer to current output line
+    // hud lines, used when console is closed
+#define CON_HUDLINES 5
+    int con_lineowner[CON_HUDLINES]; ///< In splitscreen, which player gets this line of text
+    int con_hudtime[CON_HUDLINES];   ///< remaining time of display for hud msg lines
 
-  int con_cx;       ///< cursor position in current line (column number)
-  int con_cy;       ///< cursor line number in con_buffer, wraps around using modulo
-  int con_scrollup; ///< how many rows of text to scroll up (pgup/pgdn)
+    // graphics
+    class Material *con_backpic;         ///< console background picture, loaded static
+    Material *con_lborder, *con_rborder; ///< console borders in translucent mode
 
+    int con_destheight; ///< destination height in pixels
+    int con_height;     ///< current console height in pixels
 
-  // hud lines, used when console is closed
-#define  CON_HUDLINES 5
-  int con_lineowner[CON_HUDLINES]; ///< In splitscreen, which player gets this line of text
-  int con_hudtime[CON_HUDLINES];   ///< remaining time of display for hud msg lines
+    float con_width;      ///< printing area width in pixels
+    float con_lineheight; ///< height of a line in pixels
 
-  // graphics
-  class Material *con_backpic; ///< console background picture, loaded static
-  Material *con_lborder, *con_rborder; ///< console borders in translucent mode
+  protected:
+    /// called after vidmode has changed
+    void RecalcSize();
 
-  int con_destheight; ///< destination height in pixels
-  int con_height;     ///< current console height in pixels
+    void DrawConsole();
+    void DrawHudlines();
 
-  float con_width; ///< printing area width in pixels
-  float con_lineheight; ///< height of a line in pixels
+    void Print(char *msg);
+    void Linefeed(int player);
 
+  public:
+    Console();
+    ~Console();
 
-protected:
-  /// called after vidmode has changed
-  void RecalcSize();
+    /// client init
+    void Init();
 
-  void DrawConsole();
-  void DrawHudlines();
+    /// change console state (on/off)
+    void Toggle(bool forceoff = false);
 
-  void Print(char *msg);
-  void Linefeed(int player);
+    /// clear the output buffer
+    void Clear();
 
-public:
-  Console();
-  ~Console();
+    /// clears HUD messages
+    void ClearHUD();
 
-  /// client init
-  void Init();
+    /// event responder
+    bool Responder(struct event_t *ev);
 
-  /// change console state (on/off)
-  void Toggle(bool forceoff = false);
+    /// animation, message timers
+    void Ticker();
 
-  /// clear the output buffer
-  void Clear();
+    /// draws the console
+    void Drawer();
 
-  /// clears HUD messages
-  void ClearHUD();
-
-  /// event responder
-  bool Responder(struct event_t *ev);
-
-  /// animation, message timers
-  void Ticker();
-
-  /// draws the console
-  void Drawer();
-
-  /// wrapper
-  friend void CONS_Printf(const char *fmt, ...);
+    /// wrapper
+    friend void CONS_Printf(const char *fmt, ...);
 };
-
 
 void CONS_Error(char *msg); // print out error msg, wait for keypress
 
-
 extern Console con;
-
 
 extern int con_keymap;
 
 // character input
-extern char *shiftxform; // SHIFT-keycode to ASCII mapping
+extern char *shiftxform;               // SHIFT-keycode to ASCII mapping
 char KeyTranslation(unsigned char ch); // keycode to ASCII mapping
 
-
 // top clip value for view render: do not draw part of view hidden by console
-extern int  con_clipviewtop;
-extern int  con_clearlines;  // lines of top of screen to refresh
-extern bool con_hudupdate;   // hud messages have changed, need refresh
-
-
+extern int con_clipviewtop;
+extern int con_clearlines; // lines of top of screen to refresh
+extern bool con_hudupdate; // hud messages have changed, need refresh
 
 // globally used colormaps
 extern byte *whitemap;
 extern byte *greenmap;
 extern byte *graymap;
-
 
 #endif

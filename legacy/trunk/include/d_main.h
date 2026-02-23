@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: d_main.h 1529 2020-05-14 09:44:10Z wesleyjohnson $
@@ -36,34 +36,33 @@
 #define D_MAIN_H
 
 #include "d_event.h"
-  // doomtype
+// doomtype
 #include "w_wad.h"
-  // for MAX_WADFILES
+// for MAX_WADFILES
 #include "command.h"
-  // consvar_t
-
+// consvar_t
 
 // make sure not to write back the config until it's been correctly loaded
-extern tic_t      rendergametic;
+extern tic_t rendergametic;
 
 // to make savegamename and directories
-extern char * legacyhome;
-extern int  legacyhome_len;
-#define MAX_NUM_DOOMWADDIR  28
+extern char *legacyhome;
+extern int legacyhome_len;
+#define MAX_NUM_DOOMWADDIR 28
 extern char *doomwaddir[MAX_NUM_DOOMWADDIR];
 
-extern char * startupwadfiles[MAX_WADFILES+1];
+extern char *startupwadfiles[MAX_WADFILES + 1];
 
 // Setup variable doomwaddir for owner usage.
-void  owner_wad_search_order( void );
+void owner_wad_search_order(void);
 
 extern consvar_t cv_home, cv_doomwaddir, cv_iwad;
 extern consvar_t cv_screenshot_type, cv_screenshot_dir;
 
-extern byte  init_sequence;  // = 0 on first init
+extern byte init_sequence; // = 0 on first init
 
 // the infinite loop of D_DoomLoop() called from win_main for windows version
-void D_DoomLoop (void);
+void D_DoomLoop(void);
 
 //
 // D_DoomMain()
@@ -71,38 +70,43 @@ void D_DoomLoop (void);
 // calls all startup code, parses command line options.
 // If not overrided by user input, calls D_AdvanceDemo.
 //
-void D_DoomMain (void);
+void D_DoomMain(void);
 
 // Called by IO functions when input is detected.
-void D_PostEvent (const event_t* ev);
-void D_PostEvent_end (void);    // delimiter for locking memory
+void D_PostEvent(const event_t *ev);
+void D_PostEvent_end(void); // delimiter for locking memory
 
-void D_Process_Events (void);
-void D_DoAdvanceDemo (void);
+void D_Process_Events(void);
+void D_DoAdvanceDemo(void);
 
 //
 // BASE LEVEL
 //
-void D_PageTicker (void);
+void D_PageTicker(void);
 // pagename is lumpname of a 320x200 patch to fill the screen
-void D_PageDrawer (const char* pagename);
-void D_AdvanceDemo (void);
-void D_DisableDemo (void);
+void D_PageDrawer(const char *pagename);
+void D_AdvanceDemo(void);
+void D_DisableDemo(void);
 
 // Demo markers for reading/writing demo file.
 // Written as bytes between player democmds.
 enum
 {
-  DEMOMARKER_PLAYER = 0,
-  DEMOMARKER_TOTAL = 1,
-  DEMOMARKER_END = 255
+    DEMOMARKER_PLAYER = 0,
+    DEMOMARKER_TOTAL = 1,
+    DEMOMARKER_END = 255
 };
 
 // demo seq controls
-enum { DEMO_seq_advance = 1, DEMO_seq_playdemo = 2, DEMO_seq_disabled = 8 };  // bits
+enum
+{
+    DEMO_seq_advance = 1,
+    DEMO_seq_playdemo = 2,
+    DEMO_seq_disabled = 8
+}; // bits
 extern byte demo_ctrl;
 
-void D_StartTitle (void);
+void D_StartTitle(void);
 void D_End_commandline(void);
 
 #endif //__D_MAIN__

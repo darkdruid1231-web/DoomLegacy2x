@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: i_main.cpp 514 2007-12-21 16:07:36Z smite-meister $
@@ -21,19 +21,19 @@
 /// \brief Main program, simply calls D_DoomMain and the main game loop D_DoomLoop.
 
 // in m_argv.h
-extern  int     myargc;
-extern  char**  myargv;
+extern int myargc;
+extern char **myargv;
 
 void D_DoomLoop();
 bool D_DoomMain();
 
 int main(int argc, char **argv)
-{ 
-  myargc = argc; 
-  myargv = argv; 
- 
-  if (D_DoomMain())
-    D_DoomLoop();
+{
+    myargc = argc;
+    myargv = argv;
 
-  return 0;
-} 
+    if (D_DoomMain())
+        D_DoomLoop();
+
+    return 0;
+}

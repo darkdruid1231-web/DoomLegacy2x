@@ -26,20 +26,18 @@
 
 #include "r_defs.h"
 
-extern seg_t*           curline;
-extern side_t*          sidedef;
-extern line_t*          linedef;
-extern sector_t*        frontsector;
-extern sector_t*        backsector;
-
+extern seg_t *curline;
+extern side_t *sidedef;
+extern line_t *linedef;
+extern sector_t *frontsector;
+extern sector_t *backsector;
 
 typedef void (*drawfunc_t)(int start, int stop);
-
 
 void R_ClearClipSegs();
 void R_SetupClipSegs();
 void R_ClearDrawSegs();
 
-int  R_GetPlaneLight(sector_t* sector, fixed_t  planeheight, bool underside);
+int R_GetPlaneLight(sector_t *sector, fixed_t planeheight, bool underside);
 
 #endif
