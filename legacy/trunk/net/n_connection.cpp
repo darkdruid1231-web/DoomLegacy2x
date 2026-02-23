@@ -362,7 +362,7 @@ Shooting and artifact use should be guaranteed...
 LCONNECTION_RPC(rpcTest, (U8 num), (num), RPCGuaranteedOrdered, RPCDirClientToServer, 0)
 {
   CONS_Printf("client sent this: %d\n", num);
-};
+}
 
 
 // the chat message "router"
@@ -429,7 +429,7 @@ LCONNECTION_RPC(rpcChat, (S8 from, S8 to, StringPtr msg), (from, to, msg),
 
       static_cast<LNetInterface *>(getInterface())->SendChat(from, to, msg);
     }
-};
+}
 
 
 
