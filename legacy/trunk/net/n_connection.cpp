@@ -60,7 +60,7 @@ bool isGhosting()
 list<class LocalPlayerInfo *> LConnection::joining_players;
 
 
-TNL_IMPLEMENT_NETCONNECTION(LConnection, NetClassGroupGame, true);
+TNL_IMPLEMENT_NETCONNECTION(LConnection, NetClassGroupGame, true)
 
 
 LConnection::LConnection()
