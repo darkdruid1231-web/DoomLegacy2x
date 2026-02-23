@@ -39,9 +39,19 @@ jobs:
         rm -rf build
         mkdir -p build
         cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_MODERN_NETWORKING=ON
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_MODERN_NETWORKING=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
         # Build test executables
         cmake --build . --target test_fixed_t test_fixed_catch2 test_vector test_console test_actor test_save_load_unit --parallel
+
+    - name: Check code formatting
+      run: |
+        cd legacy/trunk
+        find . -name "*.cpp" -o -name "*.h" | head -10 | xargs clang-format --dry-run --Werror || (echo "Code formatting issues found. Run clang-format -i <file> to fix."; exit 1)
+
+    - name: Run clang-tidy
+      run: |
+        cd legacy/trunk
+        clang-tidy --quiet net/n_connection.cpp engine/g_state.cpp -- -std=c++11 -I. -Iinclude -Iinclude_stubs || (echo "Clang-tidy found issues."; exit 1)
 
     - name: Run Tests
       run: |
