@@ -39,6 +39,7 @@ typedef double   F64;
 #define TNLAssert(expr, msg)
 #define TNLAssertMacro(expr, msg)
 #define TNL_IMPLEMENT_NETCONNECTION(a,b,c)
+#define LCONNECTION_RPC(name, params, args, delivery, dir, flags) void name params
 
 inline void assertHandler(const char*, const char*, int, const char*) {}
 
