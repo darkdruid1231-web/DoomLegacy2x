@@ -183,6 +183,7 @@ public:
     std::string toString() const {
         return ipStr + ":" + std::to_string(port);
     }
+    U32 hash() const { return 0; }
     std::string ipStr;
     uint16_t port;
 };
@@ -204,6 +205,7 @@ typedef BitStream PacketStream;
 // Utility functions
 // ============================================================
 inline U32 computeClientIdentityToken(const Address&, const Nonce&) { return 0; }
+inline Address getNetAddress() { return Address(); }
 
 void checkIncomingPackets() {}
 void processConnections() {}
