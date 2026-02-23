@@ -250,7 +250,7 @@ enum RPCGuarantee {
 // RPC pointer types used in RPC signatures
 // ============================================================
 typedef const char*             StringPtr;
-typedef std::vector<uint8_t>*   ByteBufferPtr;
+typedef BitStream*   ByteBufferPtr;
 
 // ============================================================
 // NetEvent stub (target of postNetEvent / TNL_RPC_CONSTRUCT_NETEVENT)
