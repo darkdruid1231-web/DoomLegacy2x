@@ -78,8 +78,9 @@ jobs:
     #     retention-days: 14
     #     if-no-files-found: ignore
 
-  # Windows cross-compilation (commented out due to GCC 13 + MinGW issues)
-  # windows-build:
+  # Windows cross-compilation (disabled due to GCC 13 + MinGW issues)
+  windows-gcc-build:
+    if: false
     runs-on: ubuntu-latest
 
     steps:
