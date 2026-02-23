@@ -279,6 +279,7 @@ public:
     virtual void onPacketReceived(uint8_t, BitStream*) {}
     virtual void onConnect() {}
     virtual void onDisconnect() {}
+    virtual bool isInitiator() const { return false; }
 
     int          getState()      const { return mState; }
     int          getConnectionState() const { return mState; }
