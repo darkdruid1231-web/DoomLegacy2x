@@ -423,6 +423,7 @@ inline TNL::Address getNetAddress() { return TNL::Address(); }
 inline void setGhostFrom(bool) {}
 inline void setGhostTo(bool) {}
 inline const char* getNetAddressString() { return "127.0.0.1"; }
+inline void resetGhosting() {}
 inline void setScopeObject(void*) {}
 inline void activateGhosting() {}
 inline bool isConnectionToServer() { return false; }
