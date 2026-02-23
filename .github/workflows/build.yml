@@ -235,7 +235,7 @@ jobs:
             clang \
             lld \
             mingw-w64 \
-            libstdc++-dev \
+            libstdc++-12-dev \
             cmake \
             wget \
             unzip \
