@@ -454,7 +454,7 @@ inline bool isConnectionToServer() { return false; }
 // RPCs that have no out-of-class implementation (e.g. those in n_connection.h).
 // The 3 PlayerInfo RPCs that *do* have bodies in g_player.cpp are wrapped in
 // #ifndef TNL_STUB_BUILD guards there, so the inline stub is used instead.
-#define TNL_DECLARE_RPC(name, params) virtual void name params {}
+#define TNL_DECLARE_RPC(name, params) virtual void name params ;
 
 // TNL_IMPLEMENT_RPC: out-of-class implementation body — stub as no-op.
 // Variadic because the real macro takes 8 arguments.
