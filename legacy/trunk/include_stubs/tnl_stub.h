@@ -267,7 +267,7 @@ public:
     virtual ~NetConnection() {}
 
     enum PacketType { PT_ServerPing = 0 };
-    enum { ReasonSelfDisconnect = ::TNL::ReasonSelfDisconnect };
+    static const TerminationReason ReasonSelfDisconnect = TerminationReason::ReasonSelfDisconnect;
 
     virtual void connect(void*, const Address&) {}
     virtual void disconnect(NetConnection*, TerminationReason, const char*) {}
