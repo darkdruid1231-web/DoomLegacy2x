@@ -144,7 +144,7 @@ jobs:
         tar -xzf zlib-src.tar.gz
         cd zlib-1.2.11
         # Use --static to avoid building shared library which requires -lc (not available for MinGW)
-        CC=x86_64-w64-mingw32-clang ./configure --prefix=/usr/local/llvm-mingw --static
+        CC=x86_64-w64-mingw32-clang CFLAGS="-Wno-error" ./configure --prefix=/usr/local/llvm-mingw --static
         make -j4
         sudo cp zlib.h zconf.h /usr/local/llvm-mingw/include/
         sudo cp libz.a /usr/local/llvm-mingw/lib/
@@ -159,7 +159,7 @@ jobs:
         # Compile each source file individually
         mkdir -p lib
         for f in callbacks compress host list packet peer protocol win32; do
-          x86_64-w64-mingw32-clang -c -O2 -Iinclude ${f}.c -o lib/${f}.o
+          x86_64-w64-mingw32-clang -c -O2 -Wno-error -Iinclude ${f}.c -o lib/${f}.o
         done
         x86_64-w64-mingw32-ar rcs lib/libenet.a lib/*.o
         # Install into include/enet/ subdir so enet/time.h does NOT shadow the
