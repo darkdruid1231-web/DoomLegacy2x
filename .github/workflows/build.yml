@@ -78,8 +78,9 @@ jobs:
     #     retention-days: 14
     #     if-no-files-found: ignore
 
-  # Windows cross-compilation with GCC + MinGW
+  # Windows cross-compilation with GCC + MinGW (disabled)
   windows-gcc-build:
+    if: false
     runs-on: ubuntu-latest
 
     steps:
@@ -219,20 +220,25 @@ jobs:
         retention-days: 30
         if-no-files-found: warn
 
-  # Windows cross-compilation with Clang + MinGW (disabled due to cross-compilation issues)
+  # Windows cross-compilation with Clang + MinGW
   windows-clang-build:
-    if: false
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Install Clang and MinGW tools
+    - name: Set up Clang
+      uses: egor-tensin/setup-clang@v2
+      with:
+        version: latest
+        platform: x64
+
+    - name: Install additional tools
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-            clang \
+            build-essential \
             lld \
             mingw-w64 \
             libstdc++-12-dev \
