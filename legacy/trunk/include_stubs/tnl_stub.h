@@ -270,7 +270,7 @@ public:
     enum TerminationReason { ReasonSelfDisconnect = 0 };
 
     virtual void connect(void*, const Address&) {}
-    virtual void disconnect(NetConnection*, TerminationReason, const char*) {}
+    virtual void disconnect(NetConnection*, NetConnection::TerminationReason, const char*) {}
     virtual void update() {}
     virtual void sendPacket(BitStream*, uint8_t) {}
     virtual void onPacketReceived(uint8_t, BitStream*) {}
