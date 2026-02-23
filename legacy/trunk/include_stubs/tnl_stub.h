@@ -267,10 +267,10 @@ public:
     virtual ~NetConnection() {}
 
     enum PacketType { PT_ServerPing = 0 };
-    enum TerminationReason { ReasonSelfDisconnect = 0 };
+    enum { ReasonSelfDisconnect = ::TNL::ReasonSelfDisconnect };
 
     virtual void connect(void*, const Address&) {}
-    virtual void disconnect(NetConnection*, NetConnection::TerminationReason, const char*) {}
+    virtual void disconnect(NetConnection*, TerminationReason, const char*) {}
     virtual void update() {}
     virtual void sendPacket(BitStream*, uint8_t) {}
     virtual void onPacketReceived(uint8_t, BitStream*) {}
