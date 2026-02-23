@@ -27,31 +27,6 @@ typedef signed int S32;
 typedef unsigned long long U64;
 typedef signed long long S64;
 
-// Move some types to global for compatibility
-using TNL::hash_cstring;
-using TNL::equal_cstring;
-using TNL::StringPtr;
-using TNL::NUMWEAPONS;
-using TNL::NUMAMMO;
-using TNL::NUMARMOR;
-using TNL::NUMPOWERS;
-using TNL::inventory_t;
-using TNL::weapontype_t;
-using TNL::ammotype_t;
-using TNL::armortype_t;
-using TNL::keycard_t;
-using TNL::artitype_t;
-using TNL::weaponinfo_t;
-using TNL::wpnlev1info;
-using TNL::maxammo1;
-using TNL::wp_bfg;
-using TNL::weaponstatenum_t;
-using TNL::mobjinfo;
-using TNL::MT_TELEPORTMAN;
-using TNL::MF_NOSECTOR;
-using TNL::I_Error;
-using TNL::CONS_Printf;
-using TNL::Z_StrDup;
 
 #define TNL_DECLARE_CLASS(name)
 #define TNL_DECLARE_NETCONNECTION(name) TNL_DECLARE_CLASS(name)
@@ -424,6 +399,7 @@ class NetInterface;
 class NetObject;
 class NetConnection;
 class NetEvent; // forward-declared so GhostConnection can use it
+class NetObject; // forward-declared for GhostConnection
 class Address;
 
 // ============================================================
@@ -803,6 +779,32 @@ inline bool isConnectionToServer()
 {
     return false;
 }
+
+// Move some types to global for compatibility
+using TNL::hash_cstring;
+using TNL::equal_cstring;
+using TNL::StringPtr;
+using TNL::NUMWEAPONS;
+using TNL::NUMAMMO;
+using TNL::NUMARMOR;
+using TNL::NUMPOWERS;
+using TNL::inventory_t;
+using TNL::weapontype_t;
+using TNL::ammotype_t;
+using TNL::armortype_t;
+using TNL::keycard_t;
+using TNL::artitype_t;
+using TNL::weaponinfo_t;
+using TNL::wpnlev1info;
+using TNL::maxammo1;
+using TNL::wp_bfg;
+using TNL::weaponstatenum_t;
+using TNL::mobjinfo;
+using TNL::MT_TELEPORTMAN;
+using TNL::MF_NOSECTOR;
+using TNL::I_Error;
+using TNL::CONS_Printf;
+using TNL::Z_StrDup;
 
 // ============================================================
 // RPC / NetEvent macros  (outside namespace — they are text substitutions)
