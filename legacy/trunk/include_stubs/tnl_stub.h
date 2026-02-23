@@ -211,6 +211,7 @@ void processConnections() {}
 // Packet / connection constants
 // ============================================================
 const U32 FirstValidInfoPacketId  = 100;
+const U32 NetClassGroupGame       = 0xFFFFFFFFu;
 const U32 NetClassGroupGameMask   = 0xFFFFFFFFu;
 
 // ============================================================
