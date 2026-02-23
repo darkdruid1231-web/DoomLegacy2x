@@ -204,7 +204,11 @@ typedef BitStream PacketStream;
 // ============================================================
 inline U32 computeClientIdentityToken(const Address&, const Nonce&) { return 0; }
 
-typedef NetConnection LConnection;
+class LConnection : public NetConnection {
+public:
+    LConnection() {}
+    virtual ~LConnection() {}
+};
 
 void checkIncomingPackets() {}
 void processConnections() {}
