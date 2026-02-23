@@ -749,14 +749,14 @@ class NetInterface
 };
 
 // ============================================================
-// GhostConnection stub
+// Duplicate GhostConnection removed
 // ============================================================
-class GhostConnection : public NetConnection
-{
-  public:
-    GhostConnection()
-    {
-    }
+// class GhostConnection : public NetConnection
+// {
+  // public:
+    // GhostConnection()
+    // {
+    // }
     virtual ~GhostConnection()
     {
     }
