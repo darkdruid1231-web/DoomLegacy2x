@@ -421,6 +421,7 @@ public:
 inline TNL::Address getNetAddress() { return TNL::Address(); }
 inline void setGhostFrom(bool) {}
 inline void setGhostTo(bool) {}
+inline const char* getNetAddressString() { return "127.0.0.1"; }
 
 // ============================================================
 // RPC / NetEvent macros  (outside namespace — they are text substitutions)
