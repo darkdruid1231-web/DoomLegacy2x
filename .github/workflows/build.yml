@@ -107,11 +107,11 @@ jobs:
       run: |
         mkdir -p /tmp/sdl2
         cd /tmp/sdl2
-        
+
         # SDL2 - download development libraries for MinGW (includes headers)
         wget -q https://github.com/libsdl-org/SDL/releases/download/release-2.32.10/SDL2-devel-2.32.10-mingw.tar.gz
         tar -xzf SDL2-devel-2.32.10-mingw.tar.gz
-        
+
         # Create Windows sysroot
         sudo mkdir -p /usr/local/llvm-mingw
         sudo cp -r /tmp/sdl2/SDL2-2.32.10/x86_64-w64-mingw32/* /usr/local/llvm-mingw/
@@ -139,6 +139,7 @@ jobs:
 
     - name: Build and install zlib for LLVM MinGW
       run: |
+        export PATH="/usr/local/llvm-mingw/bin:$PATH"
         cd /tmp
         wget -q https://github.com/madler/zlib/archive/refs/tags/v1.2.11.tar.gz -O zlib-src.tar.gz
         tar -xzf zlib-src.tar.gz
@@ -151,6 +152,7 @@ jobs:
 
     - name: Build ENet for LLVM MinGW
       run: |
+        export PATH="/usr/local/llvm-mingw/bin:$PATH"
         cd /tmp
         # Download ENet source
         wget -q https://github.com/lsalzman/enet/archive/refs/tags/v1.3.17.tar.gz -O enet.tar.gz
@@ -172,6 +174,7 @@ jobs:
       env:
         PKG_CONFIG_PATH: /usr/local/llvm-mingw/lib/pkgconfig
       run: |
+        export PATH="/usr/local/llvm-mingw/bin:$PATH"
         cd legacy/trunk
         rm -rf build-win
         mkdir -p build-win
@@ -193,7 +196,7 @@ jobs:
     - name: Build Windows test executables (cross-compile)
       run: |
         cd legacy/trunk/build-win
-        # Build test targets only — the full game requires additional code fixes
+        # Build test targets only - the full game requires additional code fixes
         # (missing mobjtype_t entries, g_mapinfo cast issues) that are tracked
         # separately.  Tests validate the core logic compiles for Windows ABI.
         cmake --build . --target test_fixed_t test_fixed_catch2 test_vector test_console test_actor test_save_load_unit --parallel
