@@ -368,8 +368,7 @@ jobs:
           mingw-w64-x86_64-gcc
           mingw-w64-x86_64-cmake
           mingw-w64-x86_64-make
-          mingw-w64-x86_64-SDL2
-          mingw-w64-x86_64-sdl12-compat
+          mingw-w64-x86_64-SDL
           mingw-w64-x86_64-libpng
           mingw-w64-x86_64-libjpeg-turbo
           mingw-w64-x86_64-enet
@@ -384,7 +383,7 @@ jobs:
         rm -rf build-win-native
         mkdir -p build-win-native
         cd build-win-native
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-w -Wno-error" -DUSE_SDL2=ON
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-w -Wno-error" -DUSE_SDL2=OFF
         # TEMP: try full exe build to find remaining errors
         cmake --build . --parallel 2>&1 | head -500
 
