@@ -280,7 +280,7 @@ jobs:
         cd zlib-1.2.11
         mkdir build
         cd build
-        cmake .. -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/DoomLegacy/DoomLegacy/legacy/trunk/cmake/clang-mingw-w64-x86_64.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/x86_64-w64-mingw32
+        cmake .. -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/DoomLegacy/DoomLegacy/legacy/trunk/cmake/clang-mingw-w64-x86_64.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/x86_64-w64-mingw32 -DCMAKE_C_FLAGS="-target x86_64-w64-mingw32" -DCMAKE_CXX_FLAGS="-target x86_64-w64-mingw32"
         make -j4
         sudo make install
 
