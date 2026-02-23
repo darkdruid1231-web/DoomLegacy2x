@@ -353,7 +353,7 @@ public:
     NetInterface(const Address&) : mAllowConnections(false), mSocket(nullptr) {}
     virtual ~NetInterface() {}
     virtual bool connect(const char*, uint16_t) { return false; }
-    virtual void disconnect() {}
+    virtual void disconnect(NetConnection*, TerminationReason, const char*) {}
     virtual void update() {}
     virtual void send(NetConnection*, BitStream*, uint8_t) {}
     virtual void processPacket(NetConnection*, uint8_t, BitStream*) {}
