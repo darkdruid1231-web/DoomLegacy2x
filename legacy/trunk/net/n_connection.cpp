@@ -407,7 +407,7 @@ void LConnection::rpcChat(S8 from, S8 to, StringPtr msg)
             return;
         }
 
-        static_cast<LNetInterface *>(getInterface())->SendChat(from, to, msg);
+        static_cast<LNetInterface *>(getInterface())->SendChat(from, to, msg.getString());
     }
 }
 
