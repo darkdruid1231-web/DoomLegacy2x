@@ -205,7 +205,6 @@ typedef BitStream PacketStream;
 // Utility functions
 // ============================================================
 inline U32 computeClientIdentityToken(const Address&, const Nonce&) { return 0; }
-inline Address getNetAddress() { return Address(); }
 
 void checkIncomingPackets() {}
 void processConnections() {}
@@ -417,6 +416,9 @@ public:
 };
 
 } // namespace TNL
+
+// Global utility functions
+inline TNL::Address getNetAddress() { return TNL::Address(); }
 
 // ============================================================
 // RPC / NetEvent macros  (outside namespace — they are text substitutions)
