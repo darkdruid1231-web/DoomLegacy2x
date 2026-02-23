@@ -143,11 +143,11 @@ jobs:
         wget -q https://github.com/madler/zlib/archive/refs/tags/v1.2.11.tar.gz -O zlib-src.tar.gz
         tar -xzf zlib-src.tar.gz
         cd zlib-1.2.11
-        # Use --static to avoid building shared library which requires -lc (not available for MinGW)
-        CC=x86_64-w64-mingw32-clang CFLAGS="-Wno-error" ./configure --disable-werror --prefix=/usr/local/llvm-mingw --static
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/DoomLegacy/DoomLegacy/legacy/trunk/cmake/mingw-w64-x86_64.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local/llvm-mingw
         make -j4
-        sudo cp zlib.h zconf.h /usr/local/llvm-mingw/include/
-        sudo cp libz.a /usr/local/llvm-mingw/lib/
+        sudo make install
 
     - name: Build ENet for LLVM MinGW
       run: |
