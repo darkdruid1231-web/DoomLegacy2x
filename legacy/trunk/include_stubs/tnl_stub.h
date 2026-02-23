@@ -204,6 +204,11 @@ typedef BitStream PacketStream;
 // ============================================================
 inline U32 computeClientIdentityToken(const Address&, const Nonce&) { return 0; }
 
+typedef NetConnection LConnection;
+
+void checkIncomingPackets() {}
+void processConnections() {}
+
 // ============================================================
 // Packet / connection constants
 // ============================================================
@@ -264,9 +269,10 @@ public:
     virtual ~NetConnection() {}
 
     enum PacketType { PT_ServerPing = 0 };
+    enum TerminationReason { ReasonSelfDisconnect = 0 };
 
-    virtual void connect(const char*, uint16_t) {}
-    virtual void disconnect() {}
+    virtual void connect(void*, const Address&) {}
+    virtual void disconnect(NetConnection*, TerminationReason, const char*) {}
     virtual void update() {}
     virtual void sendPacket(BitStream*, uint8_t) {}
     virtual void onPacketReceived(uint8_t, BitStream*) {}
@@ -274,6 +280,7 @@ public:
     virtual void onDisconnect() {}
 
     int          getState()      const { return mState; }
+    int          getConnectionState() const { return mState; }
     void         setState(int s)       { mState = s; }
     NetInterface* getInterface()       { return mInterface; }
     void         setInterface(NetInterface* i) { mInterface = i; }
