@@ -166,6 +166,8 @@ public:
     void   setBytePosition(size_t p)  { currentBit = p * 8; }
     size_t getBytePosition() const    { return currentBit >> 3; }
     void   clear()  { buffer.clear(); currentBit = 0; }
+    const uint8_t* getBuffer() const { return buffer.data(); }
+    size_t getBufferSize() const { return buffer.size(); }
     void   reset()  { currentBit = 0; }
     bool   isAtEnd() const { return (currentBit >> 3) >= buffer.size(); }
     void   sendto(void* socket, const Address& addr) {}
