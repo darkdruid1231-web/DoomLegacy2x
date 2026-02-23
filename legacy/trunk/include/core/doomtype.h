@@ -26,11 +26,12 @@
 
 // Standard library differences
 #ifdef __WIN32__
-// Fix GCC 13+ / MinGW-w64 header conflict: prevent GCC from declaring its own _xgetbv
-// Let MinGW-w64's intrin-impl.h provide the unsigned version (what SDL expects)
+// Fix GCC 13+ / MinGW-w64 header conflicts: prevent GCC from declaring its own _xgetbv and __cpuidex
+// Let MinGW-w64's intrin-impl.h provide the compatible versions
 # ifdef __MINGW32__
 #  define __XSAVEINTRIN_H
 #  define _XGETBV_DEFINED
+#  define __CPUID_H
 # endif
 
 // Don't include windows.h early - causes intrinsics conflict with GCC 13+
