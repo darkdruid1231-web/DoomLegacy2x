@@ -20,6 +20,8 @@
 /// \file
 /// \brief MapCluster class.
 
+#include <vector>
+
 #ifndef g_level_h
 #define g_level_h 1
 
