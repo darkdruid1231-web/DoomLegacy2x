@@ -69,11 +69,13 @@ if(USE_SDL2)
     endif()
     include_directories(${SDL2_INCLUDE_DIRS} ${SDL2MIXER_INCLUDE_DIRS})
 else()
-    message(STATUS "SDL2 disabled")
-    # Create dummy SDL2 definitions for code that checks for SDL
-    add_compile_definitions(SDL_DISABLE_ASSERTIONS)
-    # Set empty libraries when SDL2 is disabled
-    set(SDL2_LIBRARIES "")
+    message(STATUS "SDL2 disabled, using SDL1")
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(SDL REQUIRED sdl)
+    include_directories(${SDL_INCLUDE_DIRS})
+    add_compile_definitions(SDL)
+    # Set SDL2 variables to SDL for compatibility
+    set(SDL2_LIBRARIES ${SDL_LIBRARIES})
     set(SDL2MIXER_LIBRARIES "")
 endif()
 # SDL definition added via target_compile_definitions below
