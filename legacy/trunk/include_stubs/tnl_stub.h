@@ -147,6 +147,7 @@ public:
     void   clear()  { buffer.clear(); currentBit = 0; }
     void   reset()  { currentBit = 0; }
     bool   isAtEnd() const { return (currentBit >> 3) >= buffer.size(); }
+    void   sendto(void* socket, const Address& addr);
     uint8_t*       getBuffer()       { return buffer.data(); }
     const uint8_t* getBuffer() const { return buffer.data(); }
 
@@ -156,6 +157,9 @@ private:
     bool   ownBuffer;
 };
 
+// BitStream method implementations
+inline void BitStream::sendto(void* socket, const Address& addr) {}
+
 // ============================================================
 // Forward declarations
 // ============================================================
@@ -163,6 +167,8 @@ class NetInterface;
 class NetObject;
 class NetConnection;
 class NetEvent;        // forward-declared so GhostConnection can use it
+class Address;
+class Address;
 
 // ============================================================
 // Address / Nonce stubs
