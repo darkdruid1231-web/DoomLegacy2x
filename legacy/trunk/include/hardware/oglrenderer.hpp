@@ -42,8 +42,8 @@
 
 // SDL2 headers - use SDL2/SDL.h on MSYS2/MinGW or SDL/SDL.h fallback
 // SDL1 code (USE_SDL2 not defined) falls back to same headers for compatibility
-#if __has_include(<SDL2/SDL.h>)
-#  include <SDL2/SDL.h>
+#if __has_include(<SDL/SDL.h>)
+#  include <SDL/SDL.h>
 
 #ifdef __MINGW32__
 # pragma GCC diagnostic pop
