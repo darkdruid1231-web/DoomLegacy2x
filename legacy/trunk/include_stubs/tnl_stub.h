@@ -26,8 +26,17 @@ typedef unsigned int    U32;
 typedef signed int      S32;
 typedef unsigned long long U64;
 typedef signed long long S64;
-typedef std::string* StringPtr;
+
 namespace TNL {
+
+// Stub for StringPtr
+class StringPtr {
+public:
+    StringPtr(const char* s = "") : str(s) {}
+    const char* getString() const { return str.c_str(); }
+private:
+    std::string str;
+};
 typedef uint8_t  U8;
 typedef uint16_t U16;
 typedef uint32_t U32;
@@ -259,7 +268,6 @@ enum RPCGuarantee {
 // ============================================================
 // RPC pointer types used in RPC signatures
 // ============================================================
-typedef const char*             StringPtr;
 typedef BitStream*   ByteBufferPtr;
 
 // ============================================================
