@@ -88,9 +88,9 @@ jobs:
 
     - name: Download LLVM MinGW toolchain
       run: |
-        wget -q https://github.com/mstorsjo/llvm-mingw/releases/download/20241219/llvm-mingw-20241219-ucrt-x86_64.zip -O llvm-mingw.zip
+        wget -q https://github.com/mstorsjo/llvm-mingw/releases/download/20231128/llvm-mingw-20231128-ucrt-x86_64.zip -O llvm-mingw.zip
         unzip -q llvm-mingw.zip
-        sudo mv llvm-mingw-20241219-ucrt-x86_64 /usr/local/llvm-mingw
+        sudo mv llvm-mingw-20231128-ucrt-x86_64 /usr/local/llvm-mingw
         export PATH="/usr/local/llvm-mingw/bin:$PATH"
         echo "PATH=/usr/local/llvm-mingw/bin:$PATH" >> $GITHUB_ENV
 
