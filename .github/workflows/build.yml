@@ -78,8 +78,8 @@ jobs:
     #     retention-days: 14
     #     if-no-files-found: ignore
 
-  # Windows cross-compilation
-  windows-build:
+  # Windows cross-compilation (commented out due to GCC 13 + MinGW issues)
+  # windows-build:
     runs-on: ubuntu-latest
 
     steps:
@@ -215,6 +215,134 @@ jobs:
           legacy/trunk/build-win/test_console.exe
           legacy/trunk/build-win/test_actor.exe
           legacy/trunk/build-win/test_save_load_unit.exe
+        retention-days: 30
+        if-no-files-found: warn
+
+  # Windows cross-compilation with Clang + MinGW
+  windows-clang-build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Clang and MinGW tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+            clang \
+            lld \
+            cmake \
+            wget \
+            unzip \
+            lemon
+
+    - name: Download SDL2 for Windows
+      run: |
+        mkdir -p /tmp/sdl2
+        cd /tmp/sdl2
+
+        # SDL2 - download development libraries for MinGW
+        wget -q https://github.com/libsdl-org/SDL/releases/download/release-2.32.10/SDL2-devel-2.32.10-mingw.tar.gz
+        tar -xzf SDL2-devel-2.32.10-mingw.tar.gz
+
+        # Create Windows sysroot
+        sudo mkdir -p /usr/x86_64-w64-mingw32
+        sudo cp -r /tmp/sdl2/SDL2-2.32.10/x86_64-w64-mingw32/* /usr/x86_64-w64-mingw32/
+
+        # Copy SDL2.dll to expected location
+        sudo mkdir -p /usr/x86_64-w64-mingw32/bin
+        sudo cp /tmp/sdl2/SDL2-2.32.10/x86_64-w64-mingw32/bin/SDL2.dll /usr/x86_64-w64-mingw32/bin/
+
+    - name: Create SDL2 config for MinGW
+      run: |
+        # Create a fake pkg-config for SDL2 targeting Windows
+        sudo mkdir -p /usr/x86_64-w64-mingw32/lib/pkgconfig
+        cat << 'EOF' | sudo tee /usr/x86_64-w64-mingw32/lib/pkgconfig/sdl2.pc
+        prefix=/usr/x86_64-w64-mingw32
+        exec_prefix=${prefix}
+        libdir=${exec_prefix}/lib
+        includedir=${prefix}/include
+
+        Name: SDL2
+        Description: Simple DirectMedia Layer
+        Version: 2.30.10
+        Libs: -L${libdir} -lSDL2
+        Cflags: -I${includedir}/SDL2
+        EOF
+
+    - name: Build and install zlib for MinGW
+      run: |
+        cd /tmp
+        wget -q https://github.com/madler/zlib/archive/refs/tags/v1.2.11.tar.gz -O zlib-src.tar.gz
+        tar -xzf zlib-src.tar.gz
+        cd zlib-1.2.11
+        # Use --static to avoid building shared library which requires -lc (not available for MinGW)
+        CC=x86_64-w64-mingw32-gcc-posix ./configure --prefix=/usr/x86_64-w64-mingw32 --static
+        make -j4
+        sudo cp zlib.h zconf.h /usr/x86_64-w64-mingw32/include/
+        sudo cp libz.a /usr/x86_64-w64-mingw32/lib/
+
+    - name: Build ENet for MinGW
+      run: |
+        cd /tmp
+        # Download ENet source
+        wget -q https://github.com/lsalzman/enet/archive/refs/tags/v1.3.17.tar.gz -O enet.tar.gz
+        tar -xzf enet.tar.gz
+        cd enet-1.3.17
+        # Compile each source file individually
+        mkdir -p lib
+        for f in callbacks compress host list packet peer protocol win32; do
+          x86_64-w64-mingw32-gcc-posix -c -O2 -Iinclude ${f}.c -o lib/${f}.o
+        done
+        x86_64-w64-mingw32-ar rcs lib/libenet.a lib/*.o
+        # Install into include/enet/ subdir so enet/time.h does NOT shadow the
+        # real Windows time.h in the root include dir (which breaks <ctime>).
+        sudo mkdir -p /usr/x86_64-w64-mingw32/include/enet
+        sudo cp include/enet/*.h /usr/x86_64-w64-mingw32/include/enet/
+        sudo cp lib/libenet.a /usr/x86_64-w64-mingw32/lib/
+
+    - name: Configure CMake for Clang MinGW
+      env:
+        PKG_CONFIG_PATH: /usr/x86_64-w64-mingw32/lib/pkgconfig
+      run: |
+        cd legacy/trunk
+        rm -rf build-win-clang
+        mkdir -p build-win-clang
+        cd build-win-clang
+
+        # Cross-compile with Clang targeting MinGW.
+        # USE_SDL2=OFF: avoids pkg-config cross-sysroot complexities; core test
+        # targets (fixed_t, vector, etc.) don't need SDL directly.
+        cmake .. \
+          -DCMAKE_TOOLCHAIN_FILE=../cmake/clang-mingw-w64-x86_64.cmake \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DUSE_SDL2=OFF \
+          -DUSE_IMAGE_SUPPORT=OFF \
+          -DUSE_NETWORKING=ON \
+          -DSDL2MIXER=OFF \
+          -DENET_INCLUDE_DIR=/usr/x86_64-w64-mingw32/include \
+          -DENET_LIBRARY=/usr/x86_64-w64-mingw32/lib/libenet.a
+
+    - name: Build Windows test executables (Clang cross-compile)
+      run: |
+        cd legacy/trunk/build-win-clang
+        # Build test targets only — the full game requires additional code fixes
+        # (missing mobjtype_t entries, g_mapinfo cast issues) that are tracked
+        # separately.  Tests validate the core logic compiles for Windows ABI.
+        cmake --build . --target test_fixed_t test_fixed_catch2 test_vector test_console test_actor test_save_load_unit --parallel
+
+    - name: Upload Windows Clang cross-compile test artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: doomlegacy-windows-clang-cross-tests
+        path: |
+          legacy/trunk/build-win-clang/test_fixed_t.exe
+          legacy/trunk/build-win-clang/test_fixed_catch2.exe
+          legacy/trunk/build-win-clang/test_vector.exe
+          legacy/trunk/build-win-clang/test_console.exe
+          legacy/trunk/build-win-clang/test_actor.exe
+          legacy/trunk/build-win-clang/test_save_load_unit.exe
         retention-days: 30
         if-no-files-found: warn
 
