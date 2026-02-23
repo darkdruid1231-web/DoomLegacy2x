@@ -55,6 +55,7 @@ public:
 // ============================================================
 // BitStream stub
 // ============================================================
+class Address;
 class BitStream {
 public:
     BitStream() : currentBit(0), ownBuffer(true) {}
@@ -167,7 +168,6 @@ class NetObject;
 class NetConnection;
 class NetEvent;        // forward-declared so GhostConnection can use it
 class Address;
-class Address;
 
 // ============================================================
 // Address / Nonce stubs
@@ -185,9 +185,6 @@ public:
     std::string ipStr;
     uint16_t port;
 };
-
-// Add sendto to BitStream now that Address is defined
-inline void BitStream::sendto(void* socket, const Address& addr) {}
 
 class Nonce {
 public:
