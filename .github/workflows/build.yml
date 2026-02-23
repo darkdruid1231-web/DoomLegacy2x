@@ -78,9 +78,8 @@ jobs:
     #     retention-days: 14
     #     if-no-files-found: ignore
 
-  # Windows cross-compilation with GCC + MinGW (disabled)
+  # Windows cross-compilation with GCC + MinGW
   windows-gcc-build:
-    if: false
     runs-on: ubuntu-latest
 
     steps:
@@ -220,8 +219,9 @@ jobs:
         retention-days: 30
         if-no-files-found: warn
 
-  # Windows cross-compilation with Clang + MinGW
+  # Windows cross-compilation with Clang + MinGW (disabled due to cross-compilation issues)
   windows-clang-build:
+    if: false
     runs-on: ubuntu-latest
 
     steps:
