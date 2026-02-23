@@ -26,6 +26,8 @@ typedef unsigned int U32;
 typedef signed int S32;
 typedef unsigned long long U64;
 typedef signed long long S64;
+#define TNL_DECLARE_CLASS(name)
+#define TNL_DECLARE_NETCONNECTION(name) TNL_DECLARE_CLASS(name)
 
 namespace TNL
 {
@@ -341,6 +343,32 @@ class BitStream
     std::vector<uint8_t> buffer;
     size_t currentBit;
     bool ownBuffer;
+};
+
+// ============================================================
+// NetEvent stub
+// ============================================================
+class NetEvent {
+public:
+    NetEvent() {}
+    virtual ~NetEvent() {}
+};
+
+// ============================================================
+// GhostConnection stub
+// ============================================================
+class GhostConnection : public NetConnection {
+public:
+    GhostConnection() {}
+    virtual ~GhostConnection() {}
+    virtual void writeConnectRequest(BitStream* stream) {}
+    virtual bool readConnectRequest(BitStream* stream, const char*& errorString) { return true; }
+    virtual void writeConnectAccept(BitStream* stream) {}
+    virtual bool readConnectAccept(BitStream* stream, const char*& errorString) { return true; }
+    virtual void onConnectionEstablished() {}
+    virtual void onConnectTerminated(TerminationReason r, const char* error) {}
+    virtual bool isGhostAvailable(NetObject* obj) { return true; }
+    virtual void postNetEvent(NetEvent* event) {}
 };
 
 // BitStream method implementations
