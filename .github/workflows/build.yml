@@ -383,7 +383,7 @@ jobs:
         rm -rf build-win-native
         mkdir -p build-win-native
         cd build-win-native
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-w -Wno-error" -DUSE_SDL2=OFF
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-w -Wno-error" -DUSE_SDL2=ON
         # TEMP: try full exe build to find remaining errors
         cmake --build . --parallel 2>&1 | head -500
 
