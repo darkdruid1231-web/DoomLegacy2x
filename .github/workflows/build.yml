@@ -285,7 +285,7 @@ jobs:
         for f in callbacks compress host list packet peer protocol win32; do
           clang -target x86_64-w64-mingw32 --sysroot=/usr/x86_64-w64-mingw32 -c -O2 -Iinclude -I/usr/x86_64-w64-mingw32/include ${f}.c -o lib/${f}.o
         done
-        llvm-ar rcs lib/libenet.a lib/*.o
+        x86_64-w64-mingw32-ar rcs lib/libenet.a lib/*.o
         # Install into include/enet/ subdir so enet/time.h does NOT shadow the
         # real Windows time.h in the root include dir (which breaks <ctime>).
         sudo mkdir -p /usr/x86_64-w64-mingw32/include/enet
