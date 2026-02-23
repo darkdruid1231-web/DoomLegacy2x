@@ -78,8 +78,9 @@ jobs:
     #     retention-days: 14
     #     if-no-files-found: ignore
 
-  # Windows cross-compilation with GCC + MinGW
+  # Windows cross-compilation with GCC + MinGW (disabled)
   windows-gcc-build:
+    if: false
     runs-on: ubuntu-latest
 
     steps:
@@ -352,11 +353,7 @@ jobs:
         if-no-files-found: warn
 
   # Native Windows build using MSYS2
-  # DISABLED: GCC 15.2.0 in MSYS2 has a known bug with MinGW Windows SDK headers
-  # (intrinsics redefinition error). Use windows-build (cross-compile) instead.
-  # To re-enable, install GCC 13 in MSYS2: pacman -S mingw-w64-x86_64-gcc=13
   windows-native-build:
-    if: false  # Temporarily disabled due to GCC 15 toolchain bug
     runs-on: windows-latest
 
     steps:
