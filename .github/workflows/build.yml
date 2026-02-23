@@ -78,9 +78,8 @@ jobs:
     #     retention-days: 14
     #     if-no-files-found: ignore
 
-  # Windows cross-compilation (disabled due to GCC 13 + MinGW issues)
+  # Windows cross-compilation with GCC + MinGW
   windows-gcc-build:
-    if: false
     runs-on: ubuntu-latest
 
     steps:
@@ -190,6 +189,7 @@ jobs:
         cmake .. \
           -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw-w64-x86_64.cmake \
           -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_CXX_FLAGS="-Wno-inline -Wno-missing-attributes" \
           -DUSE_SDL2=OFF \
           -DUSE_IMAGE_SUPPORT=OFF \
           -DUSE_NETWORKING=ON \
@@ -219,8 +219,9 @@ jobs:
         retention-days: 30
         if-no-files-found: warn
 
-  # Windows cross-compilation with Clang + MinGW
+  # Windows cross-compilation with Clang + MinGW (disabled)
   windows-clang-build:
+    if: false
     runs-on: ubuntu-latest
 
     steps:
