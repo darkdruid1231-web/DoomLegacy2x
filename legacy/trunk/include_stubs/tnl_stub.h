@@ -346,6 +346,23 @@ class BitStream
 };
 
 // ============================================================
+// TerminationReason enum (used in NetConnection callbacks)
+// ============================================================
+enum TerminationReason
+{
+    ReasonTimedOut = 0,
+    ReasonIdle,
+    ReasonSelfDisconnect,
+    ReasonRemoteDisconnect,
+    ReasonDuplicateId,
+    ReasonConnectsCancelled,
+    ReasonConnectionError,
+    ReasonMaxConnections,
+    ReasonDisconnectPacket,
+    ReasonMaxReasonCount
+};
+
+// ============================================================
 // NetEvent stub
 // ============================================================
 class NetEvent {
@@ -463,23 +480,6 @@ const U32 NetClassGroupGame = 0xFFFFFFFFu;
 const U32 NetClassGroupGameMask = 0xFFFFFFFFu;
 
 // ============================================================
-// TerminationReason enum (used in NetConnection callbacks)
-// ============================================================
-enum TerminationReason
-{
-    ReasonTimedOut = 0,
-    ReasonIdle,
-    ReasonSelfDisconnect,
-    ReasonRemoteDisconnect,
-    ReasonDuplicateId,
-    ReasonConnectsCancelled,
-    ReasonConnectionError,
-    ReasonMaxConnections,
-    ReasonDisconnectPacket,
-    ReasonMaxReasonCount
-};
-
-// ============================================================
 // RPC direction / guarantee constants  (inside TNL namespace)
 // ============================================================
 enum RPCDirection
@@ -499,20 +499,6 @@ enum RPCGuarantee
 // RPC pointer types used in RPC signatures
 // ============================================================
 typedef BitStream *ByteBufferPtr;
-
-// ============================================================
-// NetEvent stub (target of postNetEvent / TNL_RPC_CONSTRUCT_NETEVENT)
-// ============================================================
-class NetEvent
-{
-  public:
-    NetEvent()
-    {
-    }
-    virtual ~NetEvent()
-    {
-    }
-};
 
 // ============================================================
 // NetConnection stub
