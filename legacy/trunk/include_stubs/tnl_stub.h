@@ -26,6 +26,7 @@ typedef unsigned int    U32;
 typedef signed int      S32;
 typedef unsigned long long U64;
 typedef signed long long S64;
+typedef std::string* StringPtr;
 namespace TNL {
 typedef uint8_t  U8;
 typedef uint16_t U16;

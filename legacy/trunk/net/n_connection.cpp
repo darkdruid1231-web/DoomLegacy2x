@@ -359,7 +359,7 @@ Shooting and artifact use should be guaranteed...
 
 
 
-LCONNECTION_RPC(rpcTest, (U8 num), (num), RPCGuaranteedOrdered, RPCDirClientToServer, 0)
+void LConnection::rpcTest(U8 num)
 {
   CONS_Printf("client sent this: %d\n", num);
 }
@@ -406,8 +406,7 @@ void LNetInterface::SendChat(int from, int to, const char *msg)
 }
 
 // to: 0 means everyone, positive numbers are players, negative numbers are teams
-LCONNECTION_RPC(rpcChat, (S8 from, S8 to, StringPtr msg), (from, to, msg),
-		RPCGuaranteedOrdered, RPCDirAny, 0)
+void LConnection::rpcChat(S8 from, S8 to, StringPtr msg)
 {
   PlayerInfo *p = game.FindPlayer(from);
 
@@ -481,8 +480,7 @@ void LNetInterface::Pause(int pnum, bool on)
     }
 }
 
-LCONNECTION_RPC(rpcPause, (U8 pnum, bool on), (pnum, on),
-		RPCGuaranteedOrdered, RPCDirAny, 0)
+void LConnection::rpcPause(U8 pnum, bool on)
 {
   if (isConnectionToServer())
     {
@@ -499,8 +497,7 @@ LCONNECTION_RPC(rpcPause, (U8 pnum, bool on), (pnum, on),
 
 
 
-LCONNECTION_RPC(rpcMessage_s2c, (S8 pnum, StringPtr msg, S8 priority, S8 type), (pnum, msg, priority, type),
-		RPCGuaranteedOrdered, RPCDirServerToClient, 0)
+void LConnection::rpcMessage_s2c(S8 pnum, StringPtr msg, S8 priority, S8 type)
 {
   for (int i=0; i<NUM_LOCALPLAYERS; i++)
     if (LocalPlayers[i].info && LocalPlayers[i].info->number == pnum)
@@ -522,8 +519,7 @@ void LNetInterface::SendNetVar(U16 netid, const char *str)
     client_con[i]->rpcSendNetVar_s2c(netid, str);
 }
 
-LCONNECTION_RPC(rpcSendNetVar_s2c, (U16 netid, StringPtr s), (netid, s),
-		RPCGuaranteed, RPCDirServerToClient, 0)
+void LConnection::rpcSendNetVar_s2c(U16 netid, StringPtr s)
 {
   consvar_t::GotNetVar(netid, s);
 }
@@ -551,8 +547,7 @@ void LNetInterface::Kick(PlayerInfo *p)
   CONS_Printf("\2%s kicked from the game.\n", p->name.c_str());
 }
 
-LCONNECTION_RPC(rpcKick_s2c, (U8 pnum, StringPtr str), (pnum, str),
-		RPCGuaranteedOrdered, RPCDirServerToClient, 0)
+void LConnection::rpcKick_s2c(U8 pnum, StringPtr str)
 {
   // TODO
   const char *s = str;
@@ -581,8 +576,7 @@ void LNetInterface::SendPlayerOptions(int pnum, LocalPlayerInfo &p)
   server_con->rpcSendOptions_c2s(pnum, &s);
 }
 
-LCONNECTION_RPC(rpcSendOptions_c2s, (U8 pnum, ByteBufferPtr buf), (pnum, buf),
-		RPCGuaranteedOrdered, RPCDirClientToServer, 0)
+void LConnection::rpcSendOptions_c2s(U8 pnum, ByteBufferPtr buf)
 {
   PlayerInfo *p = game.FindPlayer(pnum);
 
@@ -611,8 +605,7 @@ void LNetInterface::RequestSuicide(int pnum)
     server_con->rpcSuicide_c2s(pnum);
 }
 
-LCONNECTION_RPC(rpcSuicide_c2s, (U8 pnum), (pnum),
-		RPCGuaranteedOrdered, RPCDirClientToServer, 0)
+void LConnection::rpcSuicide_c2s(U8 pnum)
 {
   void Kill_pawn(Actor *v, Actor *k);
 
@@ -623,8 +616,7 @@ LCONNECTION_RPC(rpcSuicide_c2s, (U8 pnum), (pnum),
 
 
 
-LCONNECTION_RPC(rpcRequestPOVchange_c2s, (S32 pnum), (pnum),
-		  RPCGuaranteedOrdered, RPCDirClientToServer, 0)
+void LConnection::rpcRequestPOVchange_c2s(S32 pnum)
 {
   // spy mode
   if (game.state == GameInfo::GS_LEVEL && !cv_hiddenplayers.value)
