@@ -147,7 +147,6 @@ public:
     void   clear()  { buffer.clear(); currentBit = 0; }
     void   reset()  { currentBit = 0; }
     bool   isAtEnd() const { return (currentBit >> 3) >= buffer.size(); }
-    void   sendto(void* socket, const Address& addr) {}
     uint8_t*       getBuffer()       { return buffer.data(); }
     const uint8_t* getBuffer() const { return buffer.data(); }
 
@@ -156,13 +155,6 @@ private:
     size_t currentBit;
     bool   ownBuffer;
 };
-
-typedef BitStream PacketStream;
-
-// ============================================================
-// Utility functions
-// ============================================================
-inline U32 computeClientIdentityToken(const Address&, const Nonce&) { return 0; }
 
 // ============================================================
 // Forward declarations
@@ -189,6 +181,9 @@ public:
     uint16_t port;
 };
 
+// Add sendto to BitStream now that Address is defined
+inline void BitStream::sendto(void* socket, const Address& addr) {}
+
 class Nonce {
 public:
     Nonce() {}
@@ -199,6 +194,13 @@ public:
     bool operator==(const Nonce& other) const { return true; }
     bool operator!=(const Nonce& other) const { return false; }
 };
+
+typedef BitStream PacketStream;
+
+// ============================================================
+// Utility functions
+// ============================================================
+inline U32 computeClientIdentityToken(const Address&, const Nonce&) { return 0; }
 
 // ============================================================
 // Packet / connection constants
