@@ -32,6 +32,7 @@
 #  define __XSAVEINTRIN_H
 #  define _XGETBV_DEFINED
 #  define __CPUID_H
+#  define _CPUID_H_INCLUDED
 # endif
 
 // Don't include windows.h early - causes intrinsics conflict with GCC 13+
