@@ -147,6 +147,7 @@ public:
     void   clear()  { buffer.clear(); currentBit = 0; }
     void   reset()  { currentBit = 0; }
     bool   isAtEnd() const { return (currentBit >> 3) >= buffer.size(); }
+    void   sendto(void* socket, const Address& addr) {}
     uint8_t*       getBuffer()       { return buffer.data(); }
     const uint8_t* getBuffer() const { return buffer.data(); }
 
@@ -155,6 +156,13 @@ private:
     size_t currentBit;
     bool   ownBuffer;
 };
+
+typedef BitStream PacketStream;
+
+// ============================================================
+// Utility functions
+// ============================================================
+inline U32 computeClientIdentityToken(const Address&, const Nonce&) { return 0; }
 
 // ============================================================
 // Forward declarations
@@ -171,6 +179,12 @@ class Address {
 public:
     Address() : port(0) {}
     Address(const char* ip, uint16_t p) : ipStr(ip ? ip : ""), port(p) {}
+    bool operator==(const Address& other) const {
+        return ipStr == other.ipStr && port == other.port;
+    }
+    std::string toString() const {
+        return ipStr + ":" + std::to_string(port);
+    }
     std::string ipStr;
     uint16_t port;
 };
@@ -179,6 +193,11 @@ class Nonce {
 public:
     Nonce() {}
     Nonce(const uint8_t*, size_t) {}
+    void getRandom() {}
+    void read(BitStream* stream) {}
+    void write(BitStream* stream) const {}
+    bool operator==(const Nonce& other) const { return true; }
+    bool operator!=(const Nonce& other) const { return false; }
 };
 
 // ============================================================
@@ -321,7 +340,8 @@ private:
 // ============================================================
 class NetInterface {
 public:
-    NetInterface() {}
+    NetInterface() : mAllowConnections(false), mSocket(nullptr) {}
+    NetInterface(const Address&) : mAllowConnections(false), mSocket(nullptr) {}
     virtual ~NetInterface() {}
     virtual bool connect(const char*, uint16_t) { return false; }
     virtual void disconnect() {}
@@ -332,9 +352,12 @@ public:
     virtual void onDisconnect(NetConnection*) {}
     virtual void onConnectionRejected(NetConnection*, const char*) {}
     void setMaxConnections(int) {}
+    void setAllowsConnections(bool allow) { mAllowConnections = allow; }
     int  getMaxConnections()     const { return 0; }
     int  getConnectionCount()    const { return 0; }
     NetConnection* getConnection(int)  { return nullptr; }
+    bool mAllowConnections;
+    void* mSocket;
 };
 
 // ============================================================
