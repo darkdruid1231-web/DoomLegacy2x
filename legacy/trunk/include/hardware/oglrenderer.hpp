@@ -57,6 +57,7 @@
 #ifndef SDL_SWSURFACE
 #  define SDL_SWSURFACE 0
 #endif
+#ifdef USE_SDL2
 #ifndef SDL_OPENGL
 #  define SDL_OPENGL SDL_WINDOW_OPENGL
 #endif
@@ -68,6 +69,7 @@
 #endif
 #ifndef SDL_GL_SwapBuffers
 #  define SDL_GL_SwapBuffers SDL_GL_SwapWindow
+#endif
 #endif
 
 #include<GL/gl.h>
