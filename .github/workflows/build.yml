@@ -86,13 +86,18 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Install MinGW cross-compiler and tools
+    - name: Download LLVM MinGW toolchain
+      run: |
+        wget -q https://github.com/mstorsjo/llvm-mingw/releases/download/20241219/llvm-mingw-20241219-ucrt-x86_64.zip -O llvm-mingw.zip
+        unzip -q llvm-mingw.zip
+        sudo mv llvm-mingw-20241219-ucrt-x86_64 /usr/local/llvm-mingw
+        export PATH="/usr/local/llvm-mingw/bin:$PATH"
+        echo "PATH=/usr/local/llvm-mingw/bin:$PATH" >> $GITHUB_ENV
+
+    - name: Install additional tools
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-            mingw-w64 \
-            g++-mingw-w64-x86-64 \
-            gcc-mingw-w64-x86-64 \
             cmake \
             wget \
             unzip \
@@ -108,23 +113,23 @@ jobs:
         tar -xzf SDL2-devel-2.32.10-mingw.tar.gz
         
         # Create Windows sysroot
-        sudo mkdir -p /usr/x86_64-w64-mingw32
-        sudo cp -r /tmp/sdl2/SDL2-2.32.10/x86_64-w64-mingw32/* /usr/x86_64-w64-mingw32/
-        
-        # Copy SDL2.dll to expected location
-        sudo mkdir -p /usr/x86_64-w64-mingw32/bin
-        sudo cp /tmp/sdl2/SDL2-2.32.10/x86_64-w64-mingw32/bin/SDL2.dll /usr/x86_64-w64-mingw32/bin/
+        sudo mkdir -p /usr/local/llvm-mingw
+        sudo cp -r /tmp/sdl2/SDL2-2.32.10/x86_64-w64-mingw32/* /usr/local/llvm-mingw/
 
-    - name: Create SDL2 config for MinGW
+        # Copy SDL2.dll to expected location
+        sudo mkdir -p /usr/local/llvm-mingw/bin
+        sudo cp /tmp/sdl2/SDL2-2.32.10/x86_64-w64-mingw32/bin/SDL2.dll /usr/local/llvm-mingw/bin/
+
+    - name: Create SDL2 config for LLVM MinGW
       run: |
         # Create a fake pkg-config for SDL2 targeting Windows
-        sudo mkdir -p /usr/x86_64-w64-mingw32/lib/pkgconfig
-        cat << 'EOF' | sudo tee /usr/x86_64-w64-mingw32/lib/pkgconfig/sdl2.pc
-        prefix=/usr/x86_64-w64-mingw32
+        sudo mkdir -p /usr/local/llvm-mingw/lib/pkgconfig
+        cat << 'EOF' | sudo tee /usr/local/llvm-mingw/lib/pkgconfig/sdl2.pc
+        prefix=/usr/local/llvm-mingw
         exec_prefix=${prefix}
         libdir=${exec_prefix}/lib
         includedir=${prefix}/include
-        
+
         Name: SDL2
         Description: Simple DirectMedia Layer
         Version: 2.30.10
@@ -132,19 +137,19 @@ jobs:
         Cflags: -I${includedir}/SDL2
         EOF
 
-    - name: Build and install zlib for MinGW
+    - name: Build and install zlib for LLVM MinGW
       run: |
         cd /tmp
         wget -q https://github.com/madler/zlib/archive/refs/tags/v1.2.11.tar.gz -O zlib-src.tar.gz
         tar -xzf zlib-src.tar.gz
         cd zlib-1.2.11
         # Use --static to avoid building shared library which requires -lc (not available for MinGW)
-        CC=x86_64-w64-mingw32-gcc ./configure --prefix=/usr/x86_64-w64-mingw32 --static
+        CC=x86_64-w64-mingw32-clang ./configure --prefix=/usr/local/llvm-mingw --static
         make -j4
-        sudo cp zlib.h zconf.h /usr/x86_64-w64-mingw32/include/
-        sudo cp libz.a /usr/x86_64-w64-mingw32/lib/
+        sudo cp zlib.h zconf.h /usr/local/llvm-mingw/include/
+        sudo cp libz.a /usr/local/llvm-mingw/lib/
 
-    - name: Build ENet for MinGW
+    - name: Build ENet for LLVM MinGW
       run: |
         cd /tmp
         # Download ENet source
@@ -154,48 +159,36 @@ jobs:
         # Compile each source file individually
         mkdir -p lib
         for f in callbacks compress host list packet peer protocol win32; do
-          x86_64-w64-mingw32-gcc -c -O2 -Iinclude ${f}.c -o lib/${f}.o
+          x86_64-w64-mingw32-clang -c -O2 -Iinclude ${f}.c -o lib/${f}.o
         done
         x86_64-w64-mingw32-ar rcs lib/libenet.a lib/*.o
         # Install into include/enet/ subdir so enet/time.h does NOT shadow the
         # real Windows time.h in the root include dir (which breaks <ctime>).
-        sudo mkdir -p /usr/x86_64-w64-mingw32/include/enet
-        sudo cp include/enet/*.h /usr/x86_64-w64-mingw32/include/enet/
-        sudo cp lib/libenet.a /usr/x86_64-w64-mingw32/lib/
+        sudo mkdir -p /usr/local/llvm-mingw/include/enet
+        sudo cp include/enet/*.h /usr/local/llvm-mingw/include/enet/
+        sudo cp lib/libenet.a /usr/local/llvm-mingw/lib/
 
-    - name: Configure CMake for MinGW
+    - name: Configure CMake for LLVM MinGW
       env:
-        PKG_CONFIG_PATH: /usr/x86_64-w64-mingw32/lib/pkgconfig
+        PKG_CONFIG_PATH: /usr/local/llvm-mingw/lib/pkgconfig
       run: |
         cd legacy/trunk
         rm -rf build-win
         mkdir -p build-win
         cd build-win
-        
-        # Unset conflicting include paths to prevent Linux header leakage
-        unset C_INCLUDE_PATH
-        unset CPLUS_INCLUDE_PATH
-        unset INCLUDE
-        unset CPATH
-        # Debug: Show what paths are active
-        echo "C_INCLUDE_PATH after unset: '$C_INCLUDE_PATH'"
-        echo "CPLUS_INCLUDE_PATH after unset: '$CPLUS_INCLUDE_PATH'"
-        echo "CPATH after unset: '$CPATH'"
-        echo "INCLUDE after unset: '$INCLUDE'"
 
-        # Cross-compile with MinGW.
+        # Cross-compile with LLVM MinGW (clang-based).
         # USE_SDL2=OFF: avoids pkg-config cross-sysroot complexities; core test
         # targets (fixed_t, vector, etc.) don't need SDL directly.
         cmake .. \
           -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw-w64-x86_64.cmake \
           -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_CXX_FLAGS="-Wno-inline" \
           -DUSE_SDL2=OFF \
           -DUSE_IMAGE_SUPPORT=OFF \
           -DUSE_NETWORKING=ON \
           -DSDL2MIXER=OFF \
-          -DENET_INCLUDE_DIR=/usr/x86_64-w64-mingw32/include \
-          -DENET_LIBRARY=/usr/x86_64-w64-mingw32/lib/libenet.a
+          -DENET_INCLUDE_DIR=/usr/local/llvm-mingw/include \
+          -DENET_LIBRARY=/usr/local/llvm-mingw/lib/libenet.a
 
     - name: Build Windows test executables (cross-compile)
       run: |
