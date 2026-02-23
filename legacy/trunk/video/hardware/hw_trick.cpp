@@ -52,24 +52,21 @@
 #include "command.h"
 #include "g_game.h"
 
-#include "r_render.h"
 #include "r_data.h"
+#include "r_render.h"
 
 #include "i_system.h"
 
-
 #ifndef M_PI
-# define M_PI 3.14159265358979323846 // matches value in gcc v2 math.h
+#define M_PI 3.14159265358979323846 // matches value in gcc v2 math.h
 #endif
 
-
 /// For creating a chain with the lines around a sector
-struct  linechain_t
+struct linechain_t
 {
-  line_t        *line;
-  linechain_t   *next;
+    line_t *line;
+    linechain_t *next;
 };
-
 
 //
 // add a line to a sectors list of lines
@@ -78,23 +75,23 @@ static void addLineToChain(sector_t *sector, line_t *line)
 {
     linechain_t *thisElem, *nextElem;
 
-    if(NULL == sector)
+    if (NULL == sector)
         return;
 
     thisElem = NULL;
     nextElem = sector->sectorLines;
 
-    while(NULL != nextElem) // walk through chain
+    while (NULL != nextElem) // walk through chain
     {
         thisElem = nextElem;
         nextElem = thisElem->next;
     }
 
     // add a new element into the chain
-    if(thisElem)
+    if (thisElem)
     {
         thisElem->next = (linechain_t *)malloc(sizeof(linechain_t));
-        if(thisElem->next)
+        if (thisElem->next)
         {
             thisElem->next->line = line;
             thisElem->next->next = NULL;
@@ -107,7 +104,7 @@ static void addLineToChain(sector_t *sector, line_t *line)
     else // first element in chain
     {
         sector->sectorLines = (linechain_t *)malloc(sizeof(linechain_t));
-        if(sector->sectorLines)
+        if (sector->sectorLines)
         {
             sector->sectorLines->line = line;
             sector->sectorLines->next = NULL;
@@ -128,12 +125,12 @@ void Rend::releaseLineChains()
     sector_t *sector;
     int i;
 
-    for(i=0; i<numsectors; i++)
+    for (i = 0; i < numsectors; i++)
     {
         sector = &sectors[i];
         nextElem = sector->sectorLines;
 
-        while(NULL != nextElem)
+        while (NULL != nextElem)
         {
             thisElem = nextElem;
             nextElem = thisElem->next;
@@ -151,7 +148,7 @@ static bool isPSectorValid(sector_t *sector)
 {
     linechain_t *thisElem, *nextElem;
 
-    if(!sector->pseudoSector) // check only pseudosectors, others don´t care
+    if (!sector->pseudoSector) // check only pseudosectors, others don´t care
     {
 #ifdef PARANOIA
         CONS_Printf("Alert! non-pseudosector fed to isPSectorClosed()\n");
@@ -161,11 +158,11 @@ static bool isPSectorValid(sector_t *sector)
 
     nextElem = sector->sectorLines;
 
-    while(NULL != nextElem)
+    while (NULL != nextElem)
     {
         thisElem = nextElem;
         nextElem = thisElem->next;
-        if(thisElem->line->frontsector != thisElem->line->backsector)
+        if (thisElem->line->frontsector != thisElem->line->backsector)
             return false;
     }
     return true;
@@ -176,16 +173,16 @@ static bool isPSectorValid(sector_t *sector)
 //
 static double phiDiff(double phiMin, double phiMax)
 {
-  double result;
+    double result;
 
-  result = phiMax-phiMin;
+    result = phiMax - phiMin;
 
-  if (result < 0.0)
+    if (result < 0.0)
     {
-      result += 2.0*M_PI;
+        result += 2.0 * M_PI;
     }
 
-  return result;
+    return result;
 }
 
 //
@@ -193,7 +190,7 @@ static double phiDiff(double phiMin, double phiMax)
 //
 static void sortPhi(double phi1, double phi2, double *phiMin, double *phiMax)
 {
-    if(phiDiff(phi1, phi2) < M_PI)
+    if (phiDiff(phi1, phi2) < M_PI)
     {
         *phiMin = phi1;
         *phiMax = phi2;
@@ -211,13 +208,13 @@ static void sortPhi(double phi1, double phi2, double *phiMin, double *phiMax)
 //
 static bool biggerThanPi(double phi1, double phi2)
 {
-    if(phiDiff(phi1, phi2) > M_PI)
+    if (phiDiff(phi1, phi2) > M_PI)
         return true;
 
     return false;
 }
 
-#define DELTAPHI (M_PI/100.0) // some small phi << \pi
+#define DELTAPHI (M_PI / 100.0) // some small phi << \pi
 
 //
 // calculate bounds for minimum angle
@@ -232,7 +229,7 @@ void phiBounds(double phi1, double phi2, double *phiMin, double *phiMax)
     phi2 = phi2Tmp;
 
     // check start condition
-    if(*phiMin > M_PI || *phiMax > M_PI)
+    if (*phiMin > M_PI || *phiMax > M_PI)
     {
         *phiMin = phi1;
         *phiMax = phi2;
@@ -252,20 +249,21 @@ void phiBounds(double phi1, double phi2, double *phiMin, double *phiMax)
     psi3 = phiDiff(*phiMax, phi1);
     psi4 = phiDiff(*phiMax, phi2);
     psi5 = phiDiff(*phiMin, *phiMax);
-    psi6 = 2.0*M_PI - psi5; // phiDiff(*phiMax, *phiMin);
-    psi7 = 2.0*M_PI - psi2; // phiDiff(phi2, *phiMin);
+    psi6 = 2.0 * M_PI - psi5; // phiDiff(*phiMax, *phiMin);
+    psi7 = 2.0 * M_PI - psi2; // phiDiff(phi2, *phiMin);
 
     // case 1 & 5!
-    if((psi1 <= psi5) && (psi2 <= psi5))
+    if ((psi1 <= psi5) && (psi2 <= psi5))
     {
-        if(psi1 <= psi2) // case 1
+        if (psi1 <= psi2) // case 1
         {
             return;
         }
         else // case 5
         {
             // create some artificial interval here not to get into numerical trouble
-            // in fact we know now the sector is completely enclosed -> base for computational optimization
+            // in fact we know now the sector is completely enclosed -> base for computational
+            // optimization
             *phiMax = 0.0;
             *phiMin = DELTAPHI;
             return;
@@ -273,14 +271,14 @@ void phiBounds(double phi1, double phi2, double *phiMin, double *phiMax)
     }
 
     // case 2
-    if((psi1 >= psi5) && (psi2 <= psi5))
+    if ((psi1 >= psi5) && (psi2 <= psi5))
     {
         *phiMin = phi1;
         return;
     }
 
     // case 3
-    if((psi3 >= psi6) && (psi4 <= psi6))
+    if ((psi3 >= psi6) && (psi4 <= psi6))
     {
         *phiMax = phi2;
         return;
@@ -288,12 +286,12 @@ void phiBounds(double phi1, double phi2, double *phiMin, double *phiMax)
 
     // case 4 & 6
 #ifdef PARANOIA
-    if((psi3 <= psi6) && (psi4 <= psi6)) // FIXME: isn't this case implicitly true anyway??
+    if ((psi3 <= psi6) && (psi4 <= psi6)) // FIXME: isn't this case implicitly true anyway??
 #endif
     {
-        if(psi3 <= psi4) //case 4
+        if (psi3 <= psi4) // case 4
         {
-            if(psi3 >= psi7)
+            if (psi3 >= psi7)
             {
                 *phiMin = phi1;
                 return;
@@ -331,9 +329,9 @@ bool isVertexInside(vertex_t *vertex, sector_t *sector)
     double phi1, phi2;
 
     chain = sector->sectorLines;
-    phiMin = phiMax = 10.0*M_PI; // some value > \pi
+    phiMin = phiMax = 10.0 * M_PI; // some value > \pi
 
-    while(chain)
+    while (chain)
     {
         // start and end vertex
         xa = chain->line->v1->x.Float() - vertex->x.Float();
@@ -354,7 +352,6 @@ bool isVertexInside(vertex_t *vertex, sector_t *sector)
     return biggerThanPi(phiMin, phiMax);
 }
 
-
 #define MAXSTACK 256 // Not more than 256 polys in each other?
 //
 // generate a list of sectors which enclose the given sector
@@ -369,38 +366,38 @@ void Rend::generateStacklist(sector_t *thisSector)
 
     stackCnt = 0;
 
-    for(i=0; i<numsectors; i++)
+    for (i = 0; i < numsectors; i++)
     {
         checkSector = &sectors[i];
 
-        if(checkSector == thisSector) // don´t check self
+        if (checkSector == thisSector) // don´t check self
             continue;
 
         // buggy sector?
-        if(NULL == thisSector->sectorLines)
+        if (NULL == thisSector->sectorLines)
             continue;
 
         // check if an arbitrary vertex of thisSector lies inside the checkSector
-        if(isVertexInside(thisSector->sectorLines->line->v1, checkSector))
+        if (isVertexInside(thisSector->sectorLines->line->v1, checkSector))
         {
             // if so, the thisSector lies inside the checkSector
             locStacklist[stackCnt] = checkSector;
             stackCnt++;
 
-            if(MAXSTACK-1 == stackCnt) // beware of the SIGSEGV! and consider terminating NULL!
+            if (MAXSTACK - 1 == stackCnt) // beware of the SIGSEGV! and consider terminating NULL!
                 break;
         }
     }
 
-    thisSector->stackList = (sector_t **)malloc(sizeof(sector_t*) * (stackCnt+1));
-    if(NULL == thisSector->stackList)
+    thisSector->stackList = (sector_t **)malloc(sizeof(sector_t *) * (stackCnt + 1));
+    if (NULL == thisSector->stackList)
     {
         I_Error("Out of memory error in generateStacklist()");
     }
 
     locStacklist[stackCnt] = NULL; // terminating NULL
 
-    memcpy(thisSector->stackList, locStacklist, sizeof(sector_t*) * (stackCnt+1));
+    memcpy(thisSector->stackList, locStacklist, sizeof(sector_t *) * (stackCnt + 1));
 }
 
 //
@@ -416,23 +413,23 @@ static void sortStacklist(sector_t *sector)
     list = sector->stackList;
     finished = false;
 
-    if(NULL == *list)
+    if (NULL == *list)
         return; // nothing to sort
 
-    while(!finished)
+    while (!finished)
     {
-        i=0;
+        i = 0;
         finished = true;
 
-        while(NULL != *(list+i+1))
+        while (NULL != *(list + i + 1))
         {
-            sec1 = *(list+i);
-            sec2 = *(list+i+1);
+            sec1 = *(list + i);
+            sec2 = *(list + i + 1);
 
-            if(sec1->lineoutLength > sec2->lineoutLength)
+            if (sec1->lineoutLength > sec2->lineoutLength)
             {
-                *(list+i) = sec2;
-                *(list+i+1) = sec1;
+                *(list + i) = sec2;
+                *(list + i + 1) = sec1;
                 finished = false;
             }
             i++;
@@ -450,11 +447,10 @@ static double lineLength(line_t *line)
     dx = line->v1->x.Float() - line->v2->x.Float();
     dy = line->v1->y.Float() - line->v2->y.Float();
 
-    length = sqrt(dx*dx + dy*dy);
+    length = sqrt(dx * dx + dy * dy);
 
     return length;
 }
-
 
 //
 // length of the sector lineout
@@ -467,7 +463,7 @@ static double calcLineoutLength(sector_t *sector)
     length = 0.0;
     chain = sector->sectorLines;
 
-    while(NULL != chain) // sum up lengths of all lines
+    while (NULL != chain) // sum up lengths of all lines
     {
         length += lineLength(chain->line);
         chain = chain->next;
@@ -486,9 +482,9 @@ static void calcLineouts(sector_t *sector)
     secCount = 0;
     encSector = *(sector->stackList);
 
-    while(NULL != encSector)
+    while (NULL != encSector)
     {
-        if(encSector->lineoutLength < 0.0) // if length has not yet been calculated
+        if (encSector->lineoutLength < 0.0) // if length has not yet been calculated
         {
             encSector->lineoutLength = calcLineoutLength(encSector);
         }
@@ -505,9 +501,9 @@ void Rend::freeStacklists()
 {
     int i;
 
-    for(i=0; i<numsectors; i++)
+    for (i = 0; i < numsectors; i++)
     {
-        if(sectors[i].stackList)
+        if (sectors[i].stackList)
         {
             free(sectors[i].stackList);
             sectors[i].stackList = NULL;
@@ -529,20 +525,20 @@ bool Rend::areToptexturesMissing(sector_t *thisSector)
     nextElem = thisSector->sectorLines;
     nomiss = 0;
 
-    while(NULL != nextElem) // walk through chain
+    while (NULL != nextElem) // walk through chain
     {
         thisElem = nextElem;
         nextElem = thisElem->next;
 
         frontSector = thisElem->line->frontsector;
-        backSector  = thisElem->line->backsector;
+        backSector = thisElem->line->backsector;
 
-        if(frontSector == backSector) // skip damn renderer tricks here
+        if (frontSector == backSector) // skip damn renderer tricks here
         {
             continue;
         }
 
-        if(frontSector == NULL || backSector == NULL)
+        if (frontSector == NULL || backSector == NULL)
         {
             continue;
         }
@@ -550,18 +546,18 @@ bool Rend::areToptexturesMissing(sector_t *thisSector)
         sdr = thisElem->line->sideptr[0];
         sdl = thisElem->line->sideptr[1];
 
-        if(backSector->ceilingheight < frontSector->ceilingheight)
+        if (backSector->ceilingheight < frontSector->ceilingheight)
         {
-            if(sdr->toptexture != 0)
+            if (sdr->toptexture != 0)
             {
                 nomiss++;
                 break; // we can stop here if decision criterium is ==0
             }
         }
 
-        else if(backSector->ceilingheight > frontSector->ceilingheight)
+        else if (backSector->ceilingheight > frontSector->ceilingheight)
         {
-            if(sdl->toptexture != 0)
+            if (sdl->toptexture != 0)
             {
                 nomiss++;
                 break; // we can stop here if decision criterium is ==0
@@ -586,38 +582,38 @@ bool Rend::areBottomtexturesMissing(sector_t *thisSector)
     nextElem = thisSector->sectorLines;
     nomiss = 0;
 
-    while(NULL != nextElem) // walk through chain
+    while (NULL != nextElem) // walk through chain
     {
         thisElem = nextElem;
         nextElem = thisElem->next;
 
         frontSector = thisElem->line->frontsector;
-        backSector  = thisElem->line->backsector;
+        backSector = thisElem->line->backsector;
 
-        if(frontSector == backSector) // skip damn renderer tricks here
+        if (frontSector == backSector) // skip damn renderer tricks here
         {
-           continue;
+            continue;
         }
 
-        if(frontSector == NULL || backSector == NULL)
+        if (frontSector == NULL || backSector == NULL)
         {
             continue;
         }
         sdr = thisElem->line->sideptr[0];
         sdl = thisElem->line->sideptr[1];
 
-        if(backSector->floorheight > frontSector->floorheight)
+        if (backSector->floorheight > frontSector->floorheight)
         {
-            if(sdr->bottomtexture != 0)
+            if (sdr->bottomtexture != 0)
             {
                 nomiss++;
                 break; // we can stop here if decision criterium is ==0
             }
         }
 
-        else if(backSector->floorheight < frontSector->floorheight)
+        else if (backSector->floorheight < frontSector->floorheight)
         {
-            if(sdl->bottomtexture != 0)
+            if (sdl->bottomtexture != 0)
             {
                 nomiss++;
                 break; // we can stop here if decision criterium is ==0
@@ -638,41 +634,40 @@ static bool isCeilingFloating(sector_t *thisSector)
     bool floating = true;
     linechain_t *thisElem, *nextElem;
 
-    if(NULL == thisSector)
+    if (NULL == thisSector)
         return false;
 
     refSector = NULL;
-    thisElem  = NULL;
-    nextElem  = thisSector->sectorLines;
+    thisElem = NULL;
+    nextElem = thisSector->sectorLines;
 
-    while(NULL != nextElem) // walk through chain
+    while (NULL != nextElem) // walk through chain
     {
         thisElem = nextElem;
         nextElem = thisElem->next;
 
         frontSector = thisElem->line->frontsector;
-        backSector  = thisElem->line->backsector;
+        backSector = thisElem->line->backsector;
 
-        if(frontSector == thisSector)
+        if (frontSector == thisSector)
             adjSector = backSector;
         else
             adjSector = frontSector;
 
-        if(NULL == adjSector) // assume floating sectors have surrounding sectors
+        if (NULL == adjSector) // assume floating sectors have surrounding sectors
         {
             floating = false;
             break;
         }
 
-        if(NULL == refSector)
+        if (NULL == refSector)
         {
             refSector = adjSector;
             continue;
         }
 
         // if adjacent sector has same height or more than one adjacent sector exists -> stop
-        if(thisSector->ceilingheight == adjSector->ceilingheight ||
-           refSector != adjSector)
+        if (thisSector->ceilingheight == adjSector->ceilingheight || refSector != adjSector)
         {
             floating = false;
             break;
@@ -680,9 +675,9 @@ static bool isCeilingFloating(sector_t *thisSector)
     }
 
     // now check for walltextures
-    if(floating)
+    if (floating)
     {
-        if(!R.areToptexturesMissing(thisSector))
+        if (!R.areToptexturesMissing(thisSector))
         {
             floating = false;
         }
@@ -700,41 +695,40 @@ static bool isFloorFloating(sector_t *thisSector)
     bool floating = true;
     linechain_t *thisElem, *nextElem;
 
-    if(NULL == thisSector)
+    if (NULL == thisSector)
         return false;
 
     refSector = NULL;
-    thisElem  = NULL;
-    nextElem  = thisSector->sectorLines;
+    thisElem = NULL;
+    nextElem = thisSector->sectorLines;
 
-    while(NULL != nextElem) // walk through chain
+    while (NULL != nextElem) // walk through chain
     {
         thisElem = nextElem;
         nextElem = thisElem->next;
 
         frontSector = thisElem->line->frontsector;
-        backSector  = thisElem->line->backsector;
+        backSector = thisElem->line->backsector;
 
-        if(frontSector == thisSector)
+        if (frontSector == thisSector)
             adjSector = backSector;
         else
             adjSector = frontSector;
 
-        if(NULL == adjSector) // assume floating sectors have surrounding sectors
+        if (NULL == adjSector) // assume floating sectors have surrounding sectors
         {
             floating = false;
             break;
         }
 
-        if(NULL == refSector)
+        if (NULL == refSector)
         {
             refSector = adjSector;
             continue;
         }
 
         // if adjacent sector has same height or more than one adjacent sector exists -> stop
-        if(thisSector->floorheight == adjSector->floorheight ||
-           refSector != adjSector)
+        if (thisSector->floorheight == adjSector->floorheight || refSector != adjSector)
         {
             floating = false;
             break;
@@ -742,9 +736,9 @@ static bool isFloorFloating(sector_t *thisSector)
     }
 
     // now check for walltextures
-    if(floating)
+    if (floating)
     {
-        if(!R.areBottomtexturesMissing(thisSector))
+        if (!R.areBottomtexturesMissing(thisSector))
         {
             floating = false;
         }
@@ -759,16 +753,15 @@ static fixed_t estimateCeilHeight(sector_t *thisSector)
 {
     sector_t *adjSector;
 
-    if(NULL == thisSector ||
-       NULL == thisSector->sectorLines ||
-       NULL == thisSector->sectorLines->line)
+    if (NULL == thisSector || NULL == thisSector->sectorLines ||
+        NULL == thisSector->sectorLines->line)
         return 0;
 
     adjSector = thisSector->sectorLines->line->frontsector;
-    if(adjSector == thisSector)
+    if (adjSector == thisSector)
         adjSector = thisSector->sectorLines->line->backsector;
 
-    if(NULL == adjSector)
+    if (NULL == adjSector)
         return 0;
 
     return adjSector->ceilingheight;
@@ -781,23 +774,21 @@ static fixed_t estimateFloorHeight(sector_t *thisSector)
 {
     sector_t *adjSector;
 
-    if(NULL == thisSector ||
-       NULL == thisSector->sectorLines ||
-       NULL == thisSector->sectorLines->line)
+    if (NULL == thisSector || NULL == thisSector->sectorLines ||
+        NULL == thisSector->sectorLines->line)
         return 0;
 
     adjSector = thisSector->sectorLines->line->frontsector;
-    if(adjSector == thisSector)
+    if (adjSector == thisSector)
         adjSector = thisSector->sectorLines->line->backsector;
 
-    if(NULL == adjSector)
+    if (NULL == adjSector)
         return 0;
 
     return adjSector->floorheight;
 }
 
 #define CORRECT_FLOAT_EXPERIMENTAL
-
 
 // --------------------------------------------------------------------------
 // Some levels have missing sidedefs, which produces HOM, so let´s try to compensate for that
@@ -808,26 +799,26 @@ void Rend::HWR_CorrectSWTricks()
 {
 #ifndef NO_OPENGL
 
-  extern consvar_t cv_grcorrecttricks;
+    extern consvar_t cv_grcorrecttricks;
 
-  int i, k;
-  line_t *ld;
-  side_t *sdl = NULL, *sdr;
-  sector_t *secl, *secr;
-  sector_t **sectorList;
-  sector_t *outSector;
+    int i, k;
+    line_t *ld;
+    side_t *sdl = NULL, *sdr;
+    sector_t *secl, *secr;
+    sector_t **sectorList;
+    sector_t *outSector;
 
-  if ((0 == cv_grcorrecttricks.value) || game.mode >= gm_heretic)
-    return;
+    if ((0 == cv_grcorrecttricks.value) || game.mode >= gm_heretic)
+        return;
 
     // determine lines for sectors
-    for(i=0; i<numlines; i++)
+    for (i = 0; i < numlines; i++)
     {
         ld = &lines[i];
         secr = ld->frontsector;
         secl = ld->backsector;
 
-        if(secr == secl)
+        if (secr == secl)
         {
             secr->pseudoSector = true; // special renderer trick?
             addLineToChain(secr, ld);
@@ -840,23 +831,23 @@ void Rend::HWR_CorrectSWTricks()
     }
 
     // preprocessing
-    for(i=0; i<numsectors; i++)
+    for (i = 0; i < numsectors; i++)
     {
         sector_t *checkSector;
 
         checkSector = &sectors[i];
 
         // identify real pseudosectors first
-        if(checkSector->pseudoSector)
+        if (checkSector->pseudoSector)
         {
-            if(!isPSectorValid(checkSector)) // drop invalid pseudo sectors
+            if (!isPSectorValid(checkSector)) // drop invalid pseudo sectors
             {
                 checkSector->pseudoSector = false;
             }
         }
 
         // determine enclosing sectors for pseudosectors ... used later
-        if(checkSector->pseudoSector)
+        if (checkSector->pseudoSector)
         {
             generateStacklist(checkSector);
             calcLineouts(checkSector);
@@ -866,16 +857,16 @@ void Rend::HWR_CorrectSWTricks()
 
     // set virtual floor heights for pseudo sectors
     // required for deep water effect e.g.
-    for(i=0; i<numsectors; i++)
+    for (i = 0; i < numsectors; i++)
     {
-        if(sectors[i].pseudoSector)
+        if (sectors[i].pseudoSector)
         {
             sectorList = sectors[i].stackList;
             k = 0;
-            while(*(sectorList+k))
+            while (*(sectorList + k))
             {
-                outSector = *(sectorList+k);
-                if(!outSector->pseudoSector)
+                outSector = *(sectorList + k);
+                if (!outSector->pseudoSector)
                 {
                     sectors[i].virtualFloorheight = outSector->floorheight;
                     sectors[i].virtualCeilingheight = outSector->ceilingheight;
@@ -883,7 +874,7 @@ void Rend::HWR_CorrectSWTricks()
                 }
                 k++;
             }
-            if(*(sectorList+k) == NULL) // sorry, did not work :(
+            if (*(sectorList + k) == NULL) // sorry, did not work :(
             {
                 sectors[i].virtualFloorheight = sectors[i].floorheight;
                 sectors[i].virtualCeilingheight = sectors[i].ceilingheight;
@@ -892,14 +883,14 @@ void Rend::HWR_CorrectSWTricks()
     }
 #ifdef CORRECT_FLOAT_EXPERIMENTAL
     // correct ceiling/floor heights of totally floating sectors
-    for(i=0; i<numsectors; i++)
+    for (i = 0; i < numsectors; i++)
     {
         sector_t *floatSector;
 
         floatSector = &sectors[i];
 
         // correct height of floating sectors
-        if(isCeilingFloating(floatSector))
+        if (isCeilingFloating(floatSector))
         {
             fixed_t corrheight;
 
@@ -907,7 +898,7 @@ void Rend::HWR_CorrectSWTricks()
             floatSector->virtualCeilingheight = corrheight;
             floatSector->virtualCeiling = true;
         }
-        if(isFloorFloating(floatSector))
+        if (isFloorFloating(floatSector))
         {
             fixed_t corrheight;
 
@@ -919,41 +910,41 @@ void Rend::HWR_CorrectSWTricks()
 #endif
 
     // now for the missing textures
-    for(i=0; i<numlines; i++)
+    for (i = 0; i < numlines; i++)
     {
         ld = &lines[i];
         sdr = ld->sideptr[0];
-	sdl = ld->sideptr[1];
+        sdl = ld->sideptr[1];
 
         secr = ld->frontsector;
         secl = ld->backsector;
 
-        if(secr == secl) // special renderer trick
-            continue; // we can´t correct missing textures here
+        if (secr == secl) // special renderer trick
+            continue;     // we can´t correct missing textures here
 
-        if(NULL != secl) // only if there is a backsector
+        if (NULL != secl) // only if there is a backsector
         {
-            if(secr->pseudoSector || secl->pseudoSector)
+            if (secr->pseudoSector || secl->pseudoSector)
                 continue;
-            if(!secr->virtualFloor && !secl->virtualFloor)
+            if (!secr->virtualFloor && !secl->virtualFloor)
             {
-                if(secl->floorheight > secr->floorheight)
+                if (secl->floorheight > secr->floorheight)
                 {
                     // now check if r-sidedef is correct
-                    if(sdr->bottomtexture == 0)
+                    if (sdr->bottomtexture == 0)
                     {
-                        if(sdr->midtexture == 0)
+                        if (sdr->midtexture == 0)
                             sdr->bottomtexture = materials.Get("STONE2", TEX_wall);
                         else
                             sdr->bottomtexture = sdr->midtexture;
                     }
                 }
-                else if(secl->floorheight < secr->floorheight)
+                else if (secl->floorheight < secr->floorheight)
                 {
                     // now check if l-sidedef is correct
-                    if(sdl->bottomtexture == 0)
+                    if (sdl->bottomtexture == 0)
                     {
-                        if(sdl->midtexture == 0)
+                        if (sdl->midtexture == 0)
                             sdl->bottomtexture = materials.Get("STONE2", TEX_wall);
                         else
                             sdl->bottomtexture = sdl->midtexture;
@@ -961,29 +952,28 @@ void Rend::HWR_CorrectSWTricks()
                 }
             }
 
-            if(!secr->virtualCeiling && !secl->virtualCeiling)
+            if (!secr->virtualCeiling && !secl->virtualCeiling)
             {
-                if(secl->ceilingheight < secr->ceilingheight)
+                if (secl->ceilingheight < secr->ceilingheight)
                 {
                     // now check if r-sidedef is correct
-                    if(sdr->toptexture == 0)
+                    if (sdr->toptexture == 0)
                     {
-                        if(sdr->midtexture == 0)
+                        if (sdr->midtexture == 0)
                             sdr->toptexture = materials.Get("STONE2", TEX_wall);
                         else
                             sdr->toptexture = sdr->midtexture;
                     }
                 }
-                else if(secl->ceilingheight > secr->ceilingheight)
+                else if (secl->ceilingheight > secr->ceilingheight)
                 {
                     // now check if l-sidedef is correct
-                    if(sdl->toptexture == 0)
+                    if (sdl->toptexture == 0)
                     {
-                    if(sdl->midtexture == 0)
-                        sdl->toptexture = materials.Get("STONE2", TEX_wall);
-                    else
-                        sdl->toptexture = sdl->midtexture;
-
+                        if (sdl->midtexture == 0)
+                            sdl->toptexture = materials.Get("STONE2", TEX_wall);
+                        else
+                            sdl->toptexture = sdl->midtexture;
                     }
                 }
             }

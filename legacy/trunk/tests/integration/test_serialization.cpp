@@ -19,31 +19,35 @@
 /// \file
 /// \brief Basic data serialization tests.
 
+#include "m_fixed.h"
 #include <cassert>
 #include <cstring>
 #include <iostream>
-#include "m_fixed.h"
 
 using namespace std;
 
 static int tests_run = 0;
 static int tests_passed = 0;
 
-#define TEST(name) do { \
-    tests_run++; \
-    cout << "  " << name << " ... "; \
-} while(0)
+#define TEST(name)                                                                                 \
+    do                                                                                             \
+    {                                                                                              \
+        tests_run++;                                                                               \
+        cout << "  " << name << " ... ";                                                           \
+    } while (0)
 
-#define PASS() do { \
-    tests_passed++; \
-    cout << "PASS" << endl; \
-} while(0)
+#define PASS()                                                                                     \
+    do                                                                                             \
+    {                                                                                              \
+        tests_passed++;                                                                            \
+        cout << "PASS" << endl;                                                                    \
+    } while (0)
 
 // Test basic integer serialization (simplified, no LArchive)
 void test_int_serialization()
 {
     TEST("int_serialization");
-    
+
     // Simple test: verify basic data types serialize correctly
     int original = 42;
     char buffer[4];
@@ -51,14 +55,14 @@ void test_int_serialization()
     int restored;
     memcpy(&restored, buffer, 4);
     assert(original == restored);
-    
+
     PASS();
 }
 
 void test_fixed_serialization()
 {
     TEST("fixed_serialization");
-    
+
     fixed_t f(10);
     char buffer[4];
     // Manual serialization
@@ -68,14 +72,14 @@ void test_fixed_serialization()
     Sint32 restored;
     memcpy(&restored, buffer, 4);
     assert(v == restored);
-    
+
     PASS();
 }
 
 void test_fixed_negative_serialization()
 {
     TEST("fixed_negative_serialization");
-    
+
     fixed_t f(-10);
     char buffer[4];
     // Manual serialization
@@ -85,14 +89,14 @@ void test_fixed_negative_serialization()
     Sint32 restored;
     memcpy(&restored, buffer, 4);
     assert(v == restored);
-    
+
     PASS();
 }
 
 void test_fixed_fractional_serialization()
 {
     TEST("fixed_fractional_serialization");
-    
+
     fixed_t f(10.5f);
     char buffer[4];
     // Manual serialization
@@ -102,21 +106,21 @@ void test_fixed_fractional_serialization()
     Sint32 restored;
     memcpy(&restored, buffer, 4);
     assert(v == restored);
-    
+
     PASS();
 }
 
 int main()
 {
     cout << "Running serialization tests..." << endl;
-    
+
     test_int_serialization();
     test_fixed_serialization();
     test_fixed_negative_serialization();
     test_fixed_fractional_serialization();
-    
+
     cout << endl;
     cout << "Results: " << tests_passed << "/" << tests_run << " tests passed" << endl;
-    
+
     return (tests_passed == tests_run) ? 0 : 1;
 }

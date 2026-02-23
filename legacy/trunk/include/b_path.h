@@ -23,125 +23,133 @@
 #ifndef b_node_h
 #define b_node_h 1
 
-#include <vector>
-#include <list>
-#include "vect.h"
 #include "m_fixed.h"
+#include "vect.h"
+#include <list>
+#include <vector>
 
-//#define SHOWBOTPATH //show the path the bot is taking in game?
-
+// #define SHOWBOTPATH //show the path the bot is taking in game?
 
 enum botdirtype_t
 {
- BDI_EAST,
- BDI_NORTHEAST,
- BDI_NORTH,
- BDI_NORTHWEST,
- BDI_WEST,
- BDI_SOUTHWEST,
- BDI_SOUTH,
- BDI_SOUTHEAST,
- BDI_TELEPORT,
- NUMBOTDIRS
+    BDI_EAST,
+    BDI_NORTHEAST,
+    BDI_NORTH,
+    BDI_NORTHWEST,
+    BDI_WEST,
+    BDI_SOUTHWEST,
+    BDI_SOUTH,
+    BDI_SOUTHEAST,
+    BDI_TELEPORT,
+    NUMBOTDIRS
 };
-
 
 /// \brief Pathnode for bots
 class SearchNode_t
 {
-  friend class BotNodes;
-protected:
-  // used only during pathfinding
-  bool visited;
-  fixed_t cost;      ///< cumulative cost based on path length and difficulty
-  fixed_t heuristic; ///< "distance to destination" 
-  fixed_t f;         ///< cost + heuristic
-  SearchNode_t *pprevious; ///< previous node in the path
+    friend class BotNodes;
 
-  SearchNode_t *dir[NUMBOTDIRS]; ///< neighbor nodes
-  fixed_t   costDir[NUMBOTDIRS]; ///< the cost of going from this node to a neighboring one
+  protected:
+    // used only during pathfinding
+    bool visited;
+    fixed_t cost;            ///< cumulative cost based on path length and difficulty
+    fixed_t heuristic;       ///< "distance to destination"
+    fixed_t f;               ///< cost + heuristic
+    SearchNode_t *pprevious; ///< previous node in the path
 
-public:
-  /// grid coordinates of the node
-  int gx, gy;
+    SearchNode_t *dir[NUMBOTDIRS]; ///< neighbor nodes
+    fixed_t costDir[NUMBOTDIRS];   ///< the cost of going from this node to a neighboring one
 
-  /// map coordinates of the node
-  fixed_t mx, my; 
+  public:
+    /// grid coordinates of the node
+    int gx, gy;
+
+    /// map coordinates of the node
+    fixed_t mx, my;
 
 #ifdef SHOWBOTPATH
-  class Actor *marker; ///< visible path marker for debugging
+    class Actor *marker; ///< visible path marker for debugging
 #endif
 
-public:
-  SearchNode_t(int gx, int gy, fixed_t mx, fixed_t my);
-  ~SearchNode_t();
+  public:
+    SearchNode_t(int gx, int gy, fixed_t mx, fixed_t my);
+    ~SearchNode_t();
 
-  void PushSuccessors(class priorityQ_t *q, int destgx, int destgy);
+    void PushSuccessors(class priorityQ_t *q, int destgx, int destgy);
 
-  void *operator new(size_t size);
-  void  operator delete(void *mem);
+    void *operator new(size_t size);
+    void operator delete(void *mem);
 };
-
-
 
 /// \brief BotNode structure for Maps
 class BotNodes
 {
-  class Map *mp;
+    class Map *mp;
 
-  // node grid
-  fixed_t xOrigin, yOrigin;
-  int xSize, ySize;
-  int numbotnodes;
+    // node grid
+    fixed_t xOrigin, yOrigin;
+    int xSize, ySize;
+    int numbotnodes;
 
-  SearchNode_t ***botNodeArray;
+    SearchNode_t ***botNodeArray;
 
-public:
-  enum
-  {
-    GRIDBITS = 5,
-    GRIDSIZE = (1 << GRIDBITS) // 32 units
-  };
+  public:
+    enum
+    {
+        GRIDBITS = 5,
+        GRIDSIZE = (1 << GRIDBITS) // 32 units
+    };
 
-  BotNodes(Map *m);
+    BotNodes(Map *m);
 
-  void BuildNodes(SearchNode_t *node);
+    void BuildNodes(SearchNode_t *node);
 
-  bool DirectlyReachable(class Actor *a, fixed_t x, fixed_t y, fixed_t destx, fixed_t desty);
+    bool DirectlyReachable(class Actor *a, fixed_t x, fixed_t y, fixed_t destx, fixed_t desty);
 
-  SearchNode_t *FindClosestNode(fixed_t x, fixed_t y);
-  SearchNode_t *GetClosestReachableNode(fixed_t x, fixed_t y);
-  SearchNode_t *GetNodeAt(const vec_t<fixed_t>& r);
+    SearchNode_t *FindClosestNode(fixed_t x, fixed_t y);
+    SearchNode_t *GetClosestReachableNode(fixed_t x, fixed_t y);
+    SearchNode_t *GetNodeAt(const vec_t<fixed_t> &r);
 
-  bool FindPath(std::list<SearchNode_t *> &path, SearchNode_t *start, SearchNode_t *dest);
+    bool FindPath(std::list<SearchNode_t *> &path, SearchNode_t *start, SearchNode_t *dest);
 
-  // nodes lie at the middle of their grid cell
-  // map coordinates into grid coordinates
-  inline int x2PosX(fixed_t x) { return (x - xOrigin).floor() >> GRIDBITS; };
-  inline int y2PosY(fixed_t y) { return (y - yOrigin).floor() >> GRIDBITS; };
+    // nodes lie at the middle of their grid cell
+    // map coordinates into grid coordinates
+    inline int x2PosX(fixed_t x)
+    {
+        return (x - xOrigin).floor() >> GRIDBITS;
+    };
+    inline int y2PosY(fixed_t y)
+    {
+        return (y - yOrigin).floor() >> GRIDBITS;
+    };
 
-  // grid coordinates into map coordinates
-  inline fixed_t posX2x(int nx) { return fixed_t((nx << GRIDBITS) + GRIDSIZE/2) + xOrigin; };
-  inline fixed_t posY2y(int ny) { return fixed_t((ny << GRIDBITS) + GRIDSIZE/2) + yOrigin; };
+    // grid coordinates into map coordinates
+    inline fixed_t posX2x(int nx)
+    {
+        return fixed_t((nx << GRIDBITS) + GRIDSIZE / 2) + xOrigin;
+    };
+    inline fixed_t posY2y(int ny)
+    {
+        return fixed_t((ny << GRIDBITS) + GRIDSIZE / 2) + yOrigin;
+    };
 };
 
-
-
-/// \brief Heap-based priority queue for SearchNodes. 
+/// \brief Heap-based priority queue for SearchNodes.
 class priorityQ_t
 {
-private:
-  std::vector<SearchNode_t*> pq; // a priority queue
+  private:
+    std::vector<SearchNode_t *> pq; // a priority queue
 
-public:
-  void Push(SearchNode_t *node);
-  SearchNode_t *Pop();
-  SearchNode_t *FindNode(SearchNode_t *node);
-  SearchNode_t *RemoveNode(SearchNode_t *node);
+  public:
+    void Push(SearchNode_t *node);
+    SearchNode_t *Pop();
+    SearchNode_t *FindNode(SearchNode_t *node);
+    SearchNode_t *RemoveNode(SearchNode_t *node);
 
-  inline bool Empty() { return pq.empty(); };
+    inline bool Empty()
+    {
+        return pq.empty();
+    };
 };
 
-
 #endif
-

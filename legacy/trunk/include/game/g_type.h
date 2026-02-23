@@ -20,24 +20,22 @@
 /// \file
 /// \brief Game types
 
-#include <string>
-#include "tnl/tnlNetObject.h"
 #include "core/ISerializer.h"
+#include "tnl/tnlNetObject.h"
+#include <string>
 
 using namespace std;
 using namespace TNL;
 
-
 struct engine_export_t
 {
-  class GameInfo *game;  
+    class GameInfo *game;
 };
-
 
 /// \brief Describes a game type or ruleset, i.e. coop, dm, ctf, domination...
 ///
 /// Each modification DLL subclasses this class and redefines virtual methods, if necessary.
-/// If the 
+/// If the
 ///
 /// For security reasons, a mod DLL must never be automatically transferred, let alone executed.
 /// It would be easy to write a malware DLL.
@@ -45,37 +43,37 @@ struct engine_export_t
 
 class GameType : public NetObject
 {
-  typedef NetObject Parent;
+    typedef NetObject Parent;
 
-  TNL_DECLARE_CLASS(GameType);
-public:
-  string     gt_name; ///< name unique to this GameType
-  U32     gt_version;
+    TNL_DECLARE_CLASS(GameType);
 
-  /// dll-to-engine interface
-  engine_export_t e;
+  public:
+    string gt_name; ///< name unique to this GameType
+    U32 gt_version;
 
-public:
-  GameType();
+    /// dll-to-engine interface
+    engine_export_t e;
 
-  // These polymorphic methods are the engine-to-dll interface
+  public:
+    GameType();
 
-  //----- before game -----
+    // These polymorphic methods are the engine-to-dll interface
 
-  /// called when server accepts client connection
-  virtual void WriteServerInfo(BitStream &s);
-  virtual void ReadServerInfo(BitStream &s);
+    //----- before game -----
 
-  /// ISerializer overloads for TNL-free serialization
-  virtual void WriteServerInfo(DoomLegacy::ISerializer &s);
-  virtual void ReadServerInfo(DoomLegacy::ISerializer &s);
+    /// called when server accepts client connection
+    virtual void WriteServerInfo(BitStream &s);
+    virtual void ReadServerInfo(BitStream &s);
 
-  //----- in game -----
+    /// ISerializer overloads for TNL-free serialization
+    virtual void WriteServerInfo(DoomLegacy::ISerializer &s);
+    virtual void ReadServerInfo(DoomLegacy::ISerializer &s);
 
-  /// Called when a player frags another. Usually a scoring rule.
-  virtual void Frag(class PlayerInfo *killer, PlayerInfo *victim);
+    //----- in game -----
 
-  /// GameType is the scope object for _all_ the client connections
-  virtual void performScopeQuery(GhostConnection *c);
+    /// Called when a player frags another. Usually a scoring rule.
+    virtual void Frag(class PlayerInfo *killer, PlayerInfo *victim);
 
+    /// GameType is the scope object for _all_ the client connections
+    virtual void performScopeQuery(GhostConnection *c);
 };

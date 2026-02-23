@@ -22,68 +22,67 @@
 
 #include "SDL.h"
 
-#include "screen.h"
-#include "v_video.h"
-#include "hardware/hwr_render.h"
 #include "command.h"
 #include "cvars.h"
+#include "hardware/hwr_render.h"
+#include "screen.h"
+#include "v_video.h"
 
-
-static SDL_Surface *vidSurface = NULL; //use the one from i_video_sdl.c instead?
+static SDL_Surface *vidSurface = NULL; // use the one from i_video_sdl.c instead?
 
 bool OglSdlSurface()
 {
-  Uint32 surfaceFlags;
+    Uint32 surfaceFlags;
 
-  if (NULL != vidSurface)
+    if (NULL != vidSurface)
     {
-      SDL_FreeSurface(vidSurface);
-      vidSurface = NULL;
+        SDL_FreeSurface(vidSurface);
+        vidSurface = NULL;
 #ifdef VOODOOSAFESWITCHING
-      SDL_QuitSubSystem(SDL_INIT_VIDEO);
-      SDL_InitSubSystem(SDL_INIT_VIDEO);
+        SDL_QuitSubSystem(SDL_INIT_VIDEO);
+        SDL_InitSubSystem(SDL_INIT_VIDEO);
 #endif
     }
 
-  if (cv_fullscreen.value)
-    surfaceFlags = SDL_OPENGL|SDL_FULLSCREEN;
-  else
-    surfaceFlags = SDL_OPENGL;
+    if (cv_fullscreen.value)
+        surfaceFlags = SDL_OPENGL | SDL_FULLSCREEN;
+    else
+        surfaceFlags = SDL_OPENGL;
 
-  // We want at least 1 bit (???) for R, G, and B, and at least 16 bits for depth buffer.
-  SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 1);
-  SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 1);
-  SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 1);
-  SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+    // We want at least 1 bit (???) for R, G, and B, and at least 16 bits for depth buffer.
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 1);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 1);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
 
-  int cbpp = SDL_VideoModeOK(vid.width, vid.height, vid.BitsPerPixel, surfaceFlags);
-  if (cbpp < 16)
-    return false;
-  if ((vidSurface = SDL_SetVideoMode(vid.width, vid.height, cbpp, surfaceFlags)) == NULL)
-    return false;
+    int cbpp = SDL_VideoModeOK(vid.width, vid.height, vid.BitsPerPixel, surfaceFlags);
+    if (cbpp < 16)
+        return false;
+    if ((vidSurface = SDL_SetVideoMode(vid.width, vid.height, cbpp, surfaceFlags)) == NULL)
+        return false;
 
-  CONS_Printf("HWRend::Startup(): %dx%d %d bits\n", vid.width, vid.height, cbpp);
+    CONS_Printf("HWRend::Startup(): %dx%d %d bits\n", vid.width, vid.height, cbpp);
 
-  return true;
+    return true;
 }
 
 void OglSdlFinishUpdate(bool vidwait)
 {
-  SDL_GL_SwapBuffers();
+    SDL_GL_SwapBuffers();
 }
 
 void OglSdlShutdown()
 {
-  if (NULL != vidSurface)
+    if (NULL != vidSurface)
     {
-      SDL_FreeSurface(vidSurface);
-      vidSurface = NULL;
+        SDL_FreeSurface(vidSurface);
+        vidSurface = NULL;
     }
 }
 
 void OglSdlSetGamma(float r, float g, float b)
 {
-  SDL_SetGamma(r, g, b);
+    SDL_SetGamma(r, g, b);
 }
 
 /*

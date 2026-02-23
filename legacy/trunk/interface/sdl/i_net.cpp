@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: i_net.cpp 308 2006-02-11 16:54:43Z jussip $
@@ -20,19 +20,18 @@
 //
 // DESCRIPTION:
 //      network interface
-//      
+//
 //-----------------------------------------------------------------------------
-
 
 #include <errno.h>
 
 #include "doomdef.h"
 
-#include "i_system.h"
 #include "d_event.h"
+#include "i_system.h"
 #include "m_argv.h"
 
-//#include "doomstat.h"
+// #include "doomstat.h"
 
 #include "i_net.h"
 
@@ -62,12 +61,12 @@ void Internal_FreeNodenum(int nodenum)
 // I_InitNetwork
 // Only required for DOS, so this is more a dummy
 //
-bool I_InitNetwork (void)
+bool I_InitNetwork(void)
 {
-  if( M_CheckParm ("-net") )
+    if (M_CheckParm("-net"))
     {
-      I_Error("-net not supported, use -server and -connect\n"
-	      "see docs for more\n");
+        I_Error("-net not supported, use -server and -connect\n"
+                "see docs for more\n");
     }
-  return false;
+    return false;
 }

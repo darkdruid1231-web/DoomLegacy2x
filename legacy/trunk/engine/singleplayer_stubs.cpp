@@ -3,62 +3,62 @@
 
 #ifdef SINGLEPLAYER
 
-#include "doomtype.h"
+#include "am_map.h"
+#include "command.h"
+#include "console.h"
+#include "cvars.h"
 #include "doomdef.h"
+#include "doomtype.h"
 #include "g_game.h"
 #include "g_player.h"
-#include "command.h"
-#include "screen.h"
-#include "console.h"
 #include "hud.h"
+#include "m_menu.h"
 #include "r_main.h"
+#include "s_sound.h"
+#include "screen.h"
+#include "sounds.h"
 #include "v_video.h"
 #include "w_wad.h"
-#include "s_sound.h"
-#include "sounds.h"
-#include "m_menu.h"
-#include "am_map.h"
-#include "cvars.h"
 
 // CVAR stubs - provide definitions
-consvar_t cv_fragsweaponfalling = { "cv_fragsweaponfalling", "", 0 };
-consvar_t cv_allowpause = { "cv_allowpause", "", 1 };
-consvar_t cv_hiddenplayers = { "cv_hiddenplayers", "", 0 };
-consvar_t cv_maxplayers = { "cv_maxplayers", "", 8 };
-consvar_t cv_allownewplayers = { "cv_allownewplayers", "", 1 };
-consvar_t cv_masterserver = { "cv_masterserver", "", 0 };
-consvar_t cv_servername = { "cv_servername", "My Doom Server", 0 };
-consvar_t cv_publicserver = { "cv_publicserver", "", 0 };
+consvar_t cv_fragsweaponfalling = {"cv_fragsweaponfalling", "", 0};
+consvar_t cv_allowpause = {"cv_allowpause", "", 1};
+consvar_t cv_hiddenplayers = {"cv_hiddenplayers", "", 0};
+consvar_t cv_maxplayers = {"cv_maxplayers", "", 8};
+consvar_t cv_allownewplayers = {"cv_allownewplayers", "", 1};
+consvar_t cv_masterserver = {"cv_masterserver", "", 0};
+consvar_t cv_servername = {"cv_servername", "My Doom Server", 0};
+consvar_t cv_publicserver = {"cv_publicserver", "", 0};
 // Note: cv_menu_serversearch is defined in menu.cpp
 
 // Additional CVARs that might be needed
-consvar_t cv_allowrocketjump = { "cv_allowrocketjump", "", 1 };
-consvar_t cv_itemrespawn = { "cv_itemrespawn", "", 0 };
+consvar_t cv_allowrocketjump = {"cv_allowrocketjump", "", 1};
+consvar_t cv_itemrespawn = {"cv_itemrespawn", "", 0};
 
 // Game mode CVARs (from net/sv_main.cpp and others)
-consvar_t cv_deathmatch = { "deathmatch", "0", 0 };
-consvar_t cv_fraglimit = { "fraglimit", "0", 0 };
-consvar_t cv_teamplay = { "teamplay", "0", 0 };
-consvar_t cv_timelimit = { "timelimit", "0", 0 };
-consvar_t cv_nomonsters = { "nomonsters", "0", 0 };
-consvar_t cv_fastmonsters = { "fastmonsters", "0", 0 };
-consvar_t cv_respawnmonsters = { "respawnmonsters", "0", 0 };
-consvar_t cv_allowmlook = { "allowmlook", "1", 0 };
-consvar_t cv_exitmode = { "exitmode", "0", 0 };
-consvar_t cv_itemrespawntime = { "itemrespawntime", "0", 0 };
-consvar_t cv_bodyqueue_size = { "bodyqueue_size", "8", 0 };
-consvar_t cv_intermission = { "intermission", "0", 0 };
-consvar_t cv_voodoodolls = { "voodoodolls", "1", 0 };
-consvar_t cv_respawnmonsterstime = { "respawnmonsterstime", "0", 0 };
-consvar_t cv_gravity = { "gravity", "1.0", 0 };
-consvar_t cv_fallingdamage = { "fallingdamage", "1", 0 };
-consvar_t cv_allowautoaim = { "allowautoaim", "1", 0 };
-consvar_t cv_jumpspeed = { "jumpspeed", "0", 0 };
-consvar_t cv_bodyqueue_monsters = { "bodyqueue_monsters", "3", 0 };
-consvar_t cv_solidcorpse = { "solidcorpse", "1", 0 };
-consvar_t cv_teamdamage = { "teamdamage", "0", 0 };
-consvar_t cv_infighting = { "infighting", "1", 0 };
-consvar_t cv_splitscreen = { "splitscreen", "0", 0 };
+consvar_t cv_deathmatch = {"deathmatch", "0", 0};
+consvar_t cv_fraglimit = {"fraglimit", "0", 0};
+consvar_t cv_teamplay = {"teamplay", "0", 0};
+consvar_t cv_timelimit = {"timelimit", "0", 0};
+consvar_t cv_nomonsters = {"nomonsters", "0", 0};
+consvar_t cv_fastmonsters = {"fastmonsters", "0", 0};
+consvar_t cv_respawnmonsters = {"respawnmonsters", "0", 0};
+consvar_t cv_allowmlook = {"allowmlook", "1", 0};
+consvar_t cv_exitmode = {"exitmode", "0", 0};
+consvar_t cv_itemrespawntime = {"itemrespawntime", "0", 0};
+consvar_t cv_bodyqueue_size = {"bodyqueue_size", "8", 0};
+consvar_t cv_intermission = {"intermission", "0", 0};
+consvar_t cv_voodoodolls = {"voodoodolls", "1", 0};
+consvar_t cv_respawnmonsterstime = {"respawnmonsterstime", "0", 0};
+consvar_t cv_gravity = {"gravity", "1.0", 0};
+consvar_t cv_fallingdamage = {"fallingdamage", "1", 0};
+consvar_t cv_allowautoaim = {"allowautoaim", "1", 0};
+consvar_t cv_jumpspeed = {"jumpspeed", "0", 0};
+consvar_t cv_bodyqueue_monsters = {"bodyqueue_monsters", "3", 0};
+consvar_t cv_solidcorpse = {"solidcorpse", "1", 0};
+consvar_t cv_teamdamage = {"teamdamage", "0", 0};
+consvar_t cv_infighting = {"infighting", "1", 0};
+consvar_t cv_splitscreen = {"splitscreen", "0", 0};
 
 // Stub implementations for networking functions
 void SV_Init()
@@ -184,31 +184,34 @@ void CL_Init()
 // These functions are from OpenGL extensions (GL_ARB_multitexture, GL_ARB_point_parameters)
 
 #ifdef _WIN32
-#include <windows.h>
 #include <GL/gl.h>
+#include <windows.h>
 
 // Define these as C functions that do nothing
-extern "C" {
+extern "C"
+{
 
-// GL_ARB_multitexture
-void WINAPI glActiveTexture(GLenum texture) {
-    (void)texture;
-    // Stub - does nothing
-}
+    // GL_ARB_multitexture
+    void WINAPI glActiveTexture(GLenum texture)
+    {
+        (void)texture;
+        // Stub - does nothing
+    }
 
-// GL_ARB_point_parameters
-void WINAPI glPointParameterf(GLenum pname, GLfloat param) {
-    (void)pname;
-    (void)param;
-    // Stub - does nothing
-}
+    // GL_ARB_point_parameters
+    void WINAPI glPointParameterf(GLenum pname, GLfloat param)
+    {
+        (void)pname;
+        (void)param;
+        // Stub - does nothing
+    }
 
-void WINAPI glPointParameterfv(GLenum pname, const GLfloat* params) {
-    (void)pname;
-    (void)params;
-    // Stub - does nothing
-}
-
+    void WINAPI glPointParameterfv(GLenum pname, const GLfloat *params)
+    {
+        (void)pname;
+        (void)params;
+        // Stub - does nothing
+    }
 }
 
 #endif // _WIN32

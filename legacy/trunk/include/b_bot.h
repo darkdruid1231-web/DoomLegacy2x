@@ -23,23 +23,23 @@
 #ifndef b_bot_h
 #define b_bot_h 1
 
-
 /// \brief ABC for PlayerInfo AI (a client-side bot)
 class BotAI
 {
-protected:
-  class  PlayerInfo *subject; ///< the player the AI is controlling
-  class  PlayerPawn *pawn;    ///< shorthand for subject->pawn
-  class  Map        *mp;      ///< shorthand for subject->mp
-  struct ticcmd_t   *cmd;     ///< shorthand for *subject->cmd
+  protected:
+    class PlayerInfo *subject; ///< the player the AI is controlling
+    class PlayerPawn *pawn;    ///< shorthand for subject->pawn
+    class Map *mp;             ///< shorthand for subject->mp
+    struct ticcmd_t *cmd;      ///< shorthand for *subject->cmd
 
-public:
-  BotAI();
-  virtual ~BotAI() {}
+  public:
+    BotAI();
+    virtual ~BotAI()
+    {
+    }
 
-  virtual void BuildInput(PlayerInfo *p, int elapsed_tics) = 0;
+    virtual void BuildInput(PlayerInfo *p, int elapsed_tics) = 0;
 };
-
 
 extern unsigned num_bots;
 

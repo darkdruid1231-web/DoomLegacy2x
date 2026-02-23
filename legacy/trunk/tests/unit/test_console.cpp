@@ -19,10 +19,10 @@
 /// \file
 /// \brief Unit tests for Command buffer and console header definitions.
 
-#include <iostream>
-#include <cstring>
-#include <string>
 #include "command.h"
+#include <cstring>
+#include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -30,30 +30,38 @@ static int tests_run = 0;
 static int tests_passed = 0;
 static string last_failure;
 
-#define TEST(name) do { \
-    tests_run++; \
-    last_failure = ""; \
-    cout << "  " << name << " ... "; \
-} while(0)
+#define TEST(name)                                                                                 \
+    do                                                                                             \
+    {                                                                                              \
+        tests_run++;                                                                               \
+        last_failure = "";                                                                         \
+        cout << "  " << name << " ... ";                                                           \
+    } while (0)
 
-#define PASS() do { \
-    tests_passed++; \
-    cout << "PASS" << endl; \
-} while(0)
+#define PASS()                                                                                     \
+    do                                                                                             \
+    {                                                                                              \
+        tests_passed++;                                                                            \
+        cout << "PASS" << endl;                                                                    \
+    } while (0)
 
-#define FAIL(msg) do { \
-    last_failure = msg; \
-    cout << "FAIL: " << msg << endl; \
-} while(0)
+#define FAIL(msg)                                                                                  \
+    do                                                                                             \
+    {                                                                                              \
+        last_failure = msg;                                                                        \
+        cout << "FAIL: " << msg << endl;                                                           \
+    } while (0)
 
-#define ASSERT_EQ(expected, actual, msg) do { \
-    if ((expected) != (actual)) { \
-        FAIL(msg); \
-        cout << "    Expected: " << (expected) << ", Got: " << (actual) << endl; \
-        return; \
-    } \
-} while(0)
-
+#define ASSERT_EQ(expected, actual, msg)                                                           \
+    do                                                                                             \
+    {                                                                                              \
+        if ((expected) != (actual))                                                                \
+        {                                                                                          \
+            FAIL(msg);                                                                             \
+            cout << "    Expected: " << (expected) << ", Got: " << (actual) << endl;               \
+            return;                                                                                \
+        }                                                                                          \
+    } while (0)
 
 // Test command buffer class existence
 void test_command_buffer_class_exists()
@@ -64,17 +72,15 @@ void test_command_buffer_class_exists()
     PASS();
 }
 
-
 void test_command_buffer_fields()
 {
     TEST("command_buffer_t has required fields");
-    
+
     // Verify basic structure fields exist by checking offset/size
     // We can't actually access them without a constructor, so just check class exists
     ASSERT_EQ(1, sizeof(command_buffer_t) > 0, "command_buffer_t is a valid type");
     PASS();
 }
-
 
 void test_console_variable_flags()
 {
@@ -103,21 +109,19 @@ void test_console_variable_flags()
     PASS();
 }
 
-
 void test_cvar_possible_value_structure()
 {
     TEST("CV_PossibleValue_t structure exists");
-    
+
     CV_PossibleValue_t pv;
-    
+
     // Just verify the structure can be instantiated
     pv.value = 0;
     pv.strvalue = NULL;
-    
+
     ASSERT_EQ(1, sizeof(pv) > 0, "CV_PossibleValue_t is valid");
     PASS();
 }
-
 
 void test_cvar_onoff_exists()
 {
@@ -126,14 +130,12 @@ void test_cvar_onoff_exists()
     PASS();
 }
 
-
 void test_cvar_yesno_exists()
 {
     TEST("CV_YesNo array exists");
     ASSERT_EQ(1, CV_YesNo != NULL, "CV_YesNo array exists");
     PASS();
 }
-
 
 void test_cvar_unsigned_exists()
 {
@@ -142,14 +144,12 @@ void test_cvar_unsigned_exists()
     PASS();
 }
 
-
 void test_max_args_constant()
 {
     TEST("MAX_ARGS constant defined");
     ASSERT_EQ(80, MAX_ARGS, "MAX_ARGS = 80");
     PASS();
 }
-
 
 void test_com_object_exists()
 {
@@ -158,14 +158,12 @@ void test_com_object_exists()
     PASS();
 }
 
-
 void test_consvar_t_exists()
 {
     TEST("consvar_t structure exists");
     ASSERT_EQ(1, sizeof(consvar_t) > 0, "consvar_t structure is defined");
     PASS();
 }
-
 
 void test_consvar_flags()
 {
@@ -190,11 +188,10 @@ void test_consvar_flags()
     PASS();
 }
 
-
 int main()
 {
     cout << "=== Command Buffer Tests ===" << endl;
-    
+
     test_command_buffer_class_exists();
     test_command_buffer_fields();
     test_console_variable_flags();
@@ -206,9 +203,9 @@ int main()
     test_com_object_exists();
     test_consvar_t_exists();
     test_consvar_flags();
-    
+
     cout << endl;
     cout << "Results: " << tests_passed << "/" << tests_run << " tests passed" << endl;
-    
+
     return (tests_passed == tests_run) ? 0 : 1;
 }

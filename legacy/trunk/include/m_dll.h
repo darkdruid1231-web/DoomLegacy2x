@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: m_dll.h 306 2006-02-11 16:26:27Z jussip $
@@ -25,16 +25,15 @@
 #define m_dll_h 1
 
 #ifdef __WIN32__
-# include <windows.h>
+#include <windows.h>
 typedef HINSTANCE dll_handle_t;
 #else
-typedef void* dll_handle_t;
+typedef void *dll_handle_t;
 #endif
 
 // macros for exporting data and functions in a DLL
 #define DATAEXPORT __declspec(dllexport)
 #define EXPORT extern "C" __declspec(dllexport)
-
 
 /// \brief Handles all Doom Legacy DLL plugins
 ///
@@ -44,37 +43,34 @@ typedef void* dll_handle_t;
 
 class LegacyDLL
 {
-private:
-  dll_handle_t handle;
+  private:
+    dll_handle_t handle;
 
-public:
-  struct dll_info_t
-  {
-    int  api_version; ///< the interface version of the dll
-    int  version;     ///< dll version number
-    char name[64];    ///< official dll name
-  };
+  public:
+    struct dll_info_t
+    {
+        int api_version; ///< the interface version of the dll
+        int version;     ///< dll version number
+        char name[64];   ///< official dll name
+    };
 
-  char name[64];
-  int  api_version;
-  int  version;
+    char name[64];
+    int api_version;
+    int version;
 
+    LegacyDLL();
+    ~LegacyDLL();
 
-  LegacyDLL();
-  ~LegacyDLL();
+    /// loads the DLL, imports and checks dll_info
+    bool Open(const char *filename);
 
-  /// loads the DLL, imports and checks dll_info
-  bool  Open(const char *filename);
-
-  /// looks for an exported symbol in the DLL
-  void *FindSymbol(const char *symbol);
+    /// looks for an exported symbol in the DLL
+    void *FindSymbol(const char *symbol);
 };
-
-
 
 // common DLL interface
 dll_handle_t OpenDLL(const char *dllname);
-void  CloseDLL(dll_handle_t handle);
+void CloseDLL(dll_handle_t handle);
 void *GetSymbol(dll_handle_t handle, const char *symbol);
 
 #endif

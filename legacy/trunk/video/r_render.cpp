@@ -2,35 +2,34 @@
 // temporary? Renderer class implementation
 // Ville Bergholm
 
-#include "doomdef.h"
 #include "r_render.h"
-#include "r_draw.h"
-#include "r_data.h"
+#include "doomdef.h"
 #include "g_map.h"
-
+#include "r_data.h"
+#include "r_draw.h"
 
 void Rend::SetMap(Map *mp)
 {
-  m = mp;
+    m = mp;
 
-  numvertexes = m->numvertexes;
-  vertexes = m->vertexes;
+    numvertexes = m->numvertexes;
+    vertexes = m->vertexes;
 
-  segs = m->segs;
+    segs = m->segs;
 
-  numsectors = m->numsectors;
-  sectors = m->sectors;
+    numsectors = m->numsectors;
+    sectors = m->sectors;
 
-  numsubsectors = m->numsubsectors;
-  subsectors = m->subsectors;
+    numsubsectors = m->numsubsectors;
+    subsectors = m->subsectors;
 
-  numnodes = m->numnodes;
-  nodes = m->nodes;
+    numnodes = m->numnodes;
+    nodes = m->nodes;
 
-  numlines = m->numlines;
-  lines = m->lines;
+    numlines = m->numlines;
+    lines = m->lines;
 
-  sides = m->sides;
+    sides = m->sides;
 
-  base_colormap = m->fadetable->colormap;
+    base_colormap = m->fadetable->colormap;
 }

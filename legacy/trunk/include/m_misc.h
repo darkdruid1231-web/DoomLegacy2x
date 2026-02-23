@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: m_misc.h 516 2007-12-22 15:57:58Z jussip $
@@ -30,11 +30,11 @@
 
 //===========================================================================
 
-bool  FIL_WriteFile(const char *name, void *source, int length);
-int   FIL_ReadFile(const char *name, byte **buffer);
-void  FIL_DefaultExtension(char *path, const char *extension);
-void  FIL_ExtractFileBase(char *path, char *dest);
-bool  FIL_CheckExtension(const char *in);
+bool FIL_WriteFile(const char *name, void *source, int length);
+int FIL_ReadFile(const char *name, byte **buffer);
+void FIL_DefaultExtension(char *path, const char *extension);
+void FIL_ExtractFileBase(char *path, char *dest);
+bool FIL_CheckExtension(const char *in);
 const char *FIL_StripPath(const char *s);
 
 //===========================================================================
@@ -52,13 +52,13 @@ void Command_LoadConfig_f();
 void Command_ChangeConfig_f();
 
 void M_FirstLoadConfig();
-//Fab:26-04-98: save game config : cvars, aliases..
+// Fab:26-04-98: save game config : cvars, aliases..
 void M_SaveConfig(char *filename);
 
 //===========================================================================
 
 // s1=s2+s3+s1 (1024 lenghtmax)
-void strcatbf(char *s1,char *s2,char *s3);
+void strcatbf(char *s1, char *s2, char *s3);
 
 string string_to_upper(const char *c);
 #endif

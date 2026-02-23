@@ -23,17 +23,17 @@
 //
 //-----------------------------------------------------------------------------
 
-#include <iostream>
-#include <cstring>
 #include <cstdlib>
+#include <cstring>
+#include <iostream>
 
-#include "m_fixed.h"
-#include "doomtype.h"
-#include "d_ticcmd.h"
 #include "d_main.h"
-#include "info.h"
+#include "d_ticcmd.h"
+#include "doomtype.h"
 #include "g_actor.h"
 #include "g_mapinfo.h"
+#include "info.h"
+#include "m_fixed.h"
 #include "savegame.h"
 
 using namespace std;
@@ -42,40 +42,52 @@ static int tests_run = 0;
 static int tests_passed = 0;
 static int tests_failed = 0;
 
-#define TEST(name) do { \
-    tests_run++; \
-    cout << "  " << name << " ... "; \
-} while(0)
+#define TEST(name)                                                                                 \
+    do                                                                                             \
+    {                                                                                              \
+        tests_run++;                                                                               \
+        cout << "  " << name << " ... ";                                                           \
+    } while (0)
 
-#define PASS() do { \
-    tests_passed++; \
-    cout << "PASS" << endl; \
-} while(0)
+#define PASS()                                                                                     \
+    do                                                                                             \
+    {                                                                                              \
+        tests_passed++;                                                                            \
+        cout << "PASS" << endl;                                                                    \
+    } while (0)
 
-#define FAIL(msg) do { \
-    tests_failed++; \
-    cout << "FAIL: " << msg << endl; \
-    return; \
-} while(0)
+#define FAIL(msg)                                                                                  \
+    do                                                                                             \
+    {                                                                                              \
+        tests_failed++;                                                                            \
+        cout << "FAIL: " << msg << endl;                                                           \
+        return;                                                                                    \
+    } while (0)
 
-#define CHECK(cond, msg) do { \
-    if (!(cond)) { \
-        FAIL(msg); \
-        return; \
-    } \
-} while(0)
+#define CHECK(cond, msg)                                                                           \
+    do                                                                                             \
+    {                                                                                              \
+        if (!(cond))                                                                               \
+        {                                                                                          \
+            FAIL(msg);                                                                             \
+            return;                                                                                \
+        }                                                                                          \
+    } while (0)
 
-#define CHECK_EQ(actual, expected, msg) do { \
-    tests_run++; \
-    if ((actual) != (expected)) { \
-        cout << "FAIL: " << msg << endl; \
-        cout << "    Expected: " << (expected) << " (0x" << hex << (expected) << ")" << endl; \
-        cout << "    Got:      " << (actual) << " (0x" << (actual) << ")" << dec << endl; \
-        tests_failed++; \
-        return; \
-    } \
-    cout << "PASS" << endl; \
-} while(0)
+#define CHECK_EQ(actual, expected, msg)                                                            \
+    do                                                                                             \
+    {                                                                                              \
+        tests_run++;                                                                               \
+        if ((actual) != (expected))                                                                \
+        {                                                                                          \
+            cout << "FAIL: " << msg << endl;                                                       \
+            cout << "    Expected: " << (expected) << " (0x" << hex << (expected) << ")" << endl;  \
+            cout << "    Got:      " << (actual) << " (0x" << (actual) << ")" << dec << endl;      \
+            tests_failed++;                                                                        \
+            return;                                                                                \
+        }                                                                                          \
+        cout << "PASS" << endl;                                                                    \
+    } while (0)
 
 //============================================================================
 // EXPECTED VALUES FROM legacy_one/trunk/src/
@@ -108,7 +120,8 @@ static int tests_failed = 0;
 // FIXED-POINT MATH TESTS (Reference: legacy_one/src/m_fixed.c)
 //============================================================================
 
-void test_fixed_add() {
+void test_fixed_add()
+{
     TEST("fixed_add basic");
     fixed_t a(10), b(20);
     fixed_t c = a + b;
@@ -116,7 +129,8 @@ void test_fixed_add() {
     PASS();
 }
 
-void test_fixed_subtract() {
+void test_fixed_subtract()
+{
     TEST("fixed_subtract basic");
     fixed_t a(30), b(10);
     fixed_t c = a - b;
@@ -124,19 +138,21 @@ void test_fixed_subtract() {
     PASS();
 }
 
-void test_fixed_multiply() {
+void test_fixed_multiply()
+{
     TEST("fixed_multiply");
     fixed_t a(4), b(2);
     fixed_t c = a * b;
     CHECK(c.floor() == 8, "4 * 2 = 8");
-    
+
     fixed_t d(100), e(50);
     fixed_t f = d * e;
     CHECK(f.floor() == 5000, "100 * 50 = 5000");
     PASS();
 }
 
-void test_fixed_divide() {
+void test_fixed_divide()
+{
     TEST("fixed_divide");
     fixed_t a(100), b(4);
     fixed_t c = a / b;
@@ -144,38 +160,41 @@ void test_fixed_divide() {
     PASS();
 }
 
-void test_fixed_operators() {
+void test_fixed_operators()
+{
     TEST("fixed_operators");
     fixed_t a(10), b(20);
-    
+
     CHECK((a + b).floor() == 30, "+ operator");
     CHECK((b - a).floor() == 10, "- operator");
     CHECK((a * b).floor() == 200, "* operator");
     CHECK((b / a).floor() == 2, "/ operator");
-    
+
     CHECK(a < b, "< operator");
     CHECK(b > a, "> operator");
     CHECK(a == a, "== operator");
     PASS();
 }
 
-void test_fixed_fracbits() {
+void test_fixed_fracbits()
+{
     TEST("fixed_fracbits precision");
     fixed_t quarter(0.25f);
     CHECK(quarter.floor() == 0, "0.25 floor is 0");
-    
+
     fixed_t half(0.5f);
     CHECK(half.floor() == 0, "0.5 floor is 0");
-    
+
     fixed_t one(1.0f);
     CHECK(one.floor() == 1, "1.0 floor is 1");
-    
+
     fixed_t two(2.0f);
     CHECK(two.floor() == 2, "2.0 floor is 2");
     PASS();
 }
 
-void test_fixed_min_max() {
+void test_fixed_min_max()
+{
     TEST("fixed_min_max constants");
     CHECK(fixed_t::FMIN < 0, "FMIN is negative");
     CHECK(fixed_t::FMAX > 0, "FMAX is positive");
@@ -188,17 +207,18 @@ void test_fixed_min_max() {
 // TICCMD TESTS (Reference: legacy_one/src/d_ticcmd.h)
 //============================================================================
 
-void test_ticcmd_structure() {
+void test_ticcmd_structure()
+{
     TEST("ticcmd_structure");
     ticcmd_t cmd;
     memset(&cmd, 0, sizeof(cmd));
-    
+
     cmd.forward = 100;
     cmd.side = -50;
     cmd.yaw = 18000;
     cmd.pitch = 0;
     cmd.buttons = ticcmd_t::BT_ATTACK;
-    
+
     CHECK(cmd.forward == 100, "forward field exists");
     CHECK(cmd.side == -50, "side field exists");
     CHECK(cmd.yaw == 18000, "yaw field exists");
@@ -206,7 +226,8 @@ void test_ticcmd_structure() {
     PASS();
 }
 
-void test_ticcmd_buttons_parity() {
+void test_ticcmd_buttons_parity()
+{
     // These MUST match legacy_one values exactly
     TEST("BT_ATTACK=1");
     CHECK_EQ(ticcmd_t::BT_ATTACK, 1, "BT_ATTACK must equal 1");
@@ -222,10 +243,11 @@ void test_ticcmd_buttons_parity() {
 // ACTOR/MONSTER TESTS (Reference: legacy_one/src/info.c, p_enemy.c)
 //============================================================================
 
-void test_mobj_types_parity() {
+void test_mobj_types_parity()
+{
     // Expected values from legacy_one/src/info.h
     // If these fail, MT_* constants don't match C version
-    
+
     cout << endl;
     cout << "  [MT_* mobjtype_t constants - expected values from legacy_one]" << endl;
     cout << "  MT_PLAYER should = 0" << endl;
@@ -243,7 +265,8 @@ void test_mobj_types_parity() {
     PASS();
 }
 
-void test_mobj_flags_parity() {
+void test_mobj_flags_parity()
+{
     cout << endl;
     cout << "  [MF_* mobjflag_t constants - expected values from legacy_one]" << endl;
     cout << "  MF_SOLID should = 0x0001" << endl;
@@ -259,7 +282,8 @@ void test_mobj_flags_parity() {
     PASS();
 }
 
-void test_mobj_flags2_parity() {
+void test_mobj_flags2_parity()
+{
     cout << endl;
     cout << "  [MF2_* mobjflag2_t constants - expected values from legacy_one]" << endl;
     cout << "  MF2_LOGRAV should = 0x0001" << endl;
@@ -277,13 +301,14 @@ void test_mobj_flags2_parity() {
 // MAP PARSING TESTS (Reference: legacy_one/src/g_mapinfo.c)
 //============================================================================
 
-void test_mapinfo_constants_parity() {
+void test_mapinfo_constants_parity()
+{
     cout << endl;
     cout << "  [MAP_* constants - expected values from legacy_one]" << endl;
     cout << "  MAP_UNLOADED should = -1" << endl;
     cout << "  MAP_RUNNING should = 0" << endl;
     cout << "  [Requires g_mapinfo.h with MAP_* definitions]" << endl;
-    
+
     // Test using the enum values from MapInfo::mapstate_e
     CHECK_EQ(MapInfo::MAP_UNLOADED, -1, "MAP_UNLOADED must equal -1");
     CHECK_EQ(MapInfo::MAP_RUNNING, 0, "MAP_RUNNING must equal 0");
@@ -292,7 +317,8 @@ void test_mapinfo_constants_parity() {
     PASS();
 }
 
-void test_mapcluster_constants_parity() {
+void test_mapcluster_constants_parity()
+{
     cout << endl;
     cout << "  [CLUSTER_* constants - expected values from legacy_one]" << endl;
     cout << "  CLUSTER_UNDEFINED should = -1" << endl;
@@ -312,7 +338,8 @@ void test_mapcluster_constants_parity() {
 // CONSOLE/UI TESTS (Reference: legacy_one/src/console.c)
 //============================================================================
 
-void test_console_colors_parity() {
+void test_console_colors_parity()
+{
     cout << endl;
     cout << "  [COLOR_* constants - expected values from legacy_one]" << endl;
     cout << "  COLOR_BLACK should = 0" << endl;
@@ -320,7 +347,7 @@ void test_console_colors_parity() {
     cout << "  COLOR_RED should = 4" << endl;
     cout << "  COLOR_GREEN should = 2" << endl;
     cout << "  COLOR_BLUE should = 1" << endl;
-    
+
     CHECK_EQ(COLOR_BLACK, 0, "COLOR_BLACK must equal 0");
     CHECK_EQ(COLOR_WHITE, 7, "COLOR_WHITE must equal 7");
     CHECK_EQ(COLOR_RED, 4, "COLOR_RED must equal 4");
@@ -335,7 +362,8 @@ void test_console_colors_parity() {
 // SAVE/LOAD TESTS (Reference: legacy_one/src/savegame.c)
 //============================================================================
 
-void test_savegame_constants_parity() {
+void test_savegame_constants_parity()
+{
     cout << endl;
     cout << "  [SAVE_VERSION constant - expected value from legacy_one]" << endl;
     cout << "  SAVE_VERSION should = 139" << endl;
@@ -351,14 +379,15 @@ void test_savegame_constants_parity() {
 // DEMO RECORDING TESTS (Reference: legacy_one/src/d_main.c)
 //============================================================================
 
-void test_demo_constants_parity() {
+void test_demo_constants_parity()
+{
     cout << endl;
     cout << "  [DEMOMARKER_* constants - expected values from legacy_one]" << endl;
     cout << "  DEMOMARKER_PLAYER should = 0" << endl;
     cout << "  DEMOMARKER_TOTAL should = 1" << endl;
     cout << "  DEMOMARKER_END should = 255" << endl;
     cout << "  [Requires d_main.h with DEMOMARKER_* definitions]" << endl;
-    
+
     CHECK_EQ(DEMOMARKER_PLAYER, 0, "DEMOMARKER_PLAYER must equal 0");
     CHECK_EQ(DEMOMARKER_TOTAL, 1, "DEMOMARKER_TOTAL must equal 1");
     CHECK_EQ(DEMOMARKER_END, 255, "DEMOMARKER_END must equal 255");
@@ -371,7 +400,8 @@ void test_demo_constants_parity() {
 // MAIN
 //============================================================================
 
-int main() {
+int main()
+{
     cout << "========================================" << endl;
     cout << "C++ vs C Parity Tests" << endl;
     cout << "Reference: legacy_one/trunk/src/" << endl;
@@ -380,7 +410,7 @@ int main() {
     cout << "These tests verify C++ implementation matches C version." << endl;
     cout << "FAILING tests indicate missing parity - implement to match C." << endl;
     cout << endl;
-    
+
     cout << "[Fixed-Point Math Tests]" << endl;
     cout << "Reference: legacy_one/src/m_fixed.c" << endl;
     test_fixed_add();
@@ -390,57 +420,59 @@ int main() {
     test_fixed_operators();
     test_fixed_fracbits();
     test_fixed_min_max();
-    
+
     cout << endl;
     cout << "[TICmd Tests]" << endl;
     cout << "Reference: legacy_one/src/d_ticcmd.h" << endl;
     test_ticcmd_structure();
     test_ticcmd_buttons_parity();
-    
+
     cout << endl;
     cout << "[Actor/Monster Tests]" << endl;
     cout << "Reference: legacy_one/src/info.c, p_enemy.c" << endl;
     test_mobj_types_parity();
     test_mobj_flags_parity();
     test_mobj_flags2_parity();
-    
+
     cout << endl;
     cout << "[Map Parsing Tests]" << endl;
     cout << "Reference: legacy_one/src/g_mapinfo.c" << endl;
     test_mapinfo_constants_parity();
     test_mapcluster_constants_parity();
-    
+
     cout << endl;
     cout << "[Console/UI Tests]" << endl;
     cout << "Reference: legacy_one/src/console.c" << endl;
     test_console_colors_parity();
-    
+
     cout << endl;
     cout << "[Save/Load Tests]" << endl;
     cout << "Reference: legacy_one/src/savegame.c" << endl;
     test_savegame_constants_parity();
-    
+
     cout << endl;
     cout << "[Demo Recording Tests]" << endl;
     cout << "Reference: legacy_one/src/d_main.c" << endl;
     test_demo_constants_parity();
-    
+
     cout << endl;
     cout << "========================================" << endl;
     cout << "Results: " << tests_passed << "/" << tests_run << " passed";
-    if (tests_failed > 0) {
+    if (tests_failed > 0)
+    {
         cout << ", " << tests_failed << " FAILED";
     }
     cout << endl;
     cout << "========================================" << endl;
-    
-    if (tests_failed > 0) {
+
+    if (tests_failed > 0)
+    {
         cout << endl;
         cout << "IMPLEMENTATION ROADMAP:" << endl;
         cout << "----------------------" << endl;
         cout << "Failed tests indicate C++ constants missing or incorrect." << endl;
         cout << "Add/update headers to match legacy_one C values." << endl;
     }
-    
+
     return (tests_failed > 0) ? 1 : 0;
 }

@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: i_video.h 498 2007-10-06 21:30:23Z smite-meister $
@@ -21,7 +21,6 @@
 /// \file
 /// \brief Video system interface.
 
-
 #ifndef i_video_h
 #define i_video_h 1
 
@@ -29,23 +28,22 @@
 
 enum rendermode_t
 {
-  render_soft   = 1,
-  render_opengl = 2
+    render_soft = 1,
+    render_opengl = 2
 };
 
 extern rendermode_t rendermode;
 
-
 bool I_StartupGraphics();
 void I_ShutdownGraphics();
 
-void I_SetPalette(RGB_t* palette); // Takes full 8 bit values.
+void I_SetPalette(RGB_t *palette);          // Takes full 8 bit values.
 void I_SetGamma(float r, float g, float b); // Set display gamma exponents.
 
-int  I_SetVideoMode(int modenum);
-int  I_NumVideoModes();
+int I_SetVideoMode(int modenum);
+int I_NumVideoModes();
 const char *I_GetVideoModeName(unsigned modenum);
-int  I_GetVideoModeForSize(int w, int h);
+int I_GetVideoModeForSize(int w, int h);
 
 void I_FinishUpdate();
 

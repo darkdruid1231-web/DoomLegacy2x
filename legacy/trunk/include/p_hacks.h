@@ -33,25 +33,23 @@
 ///
 /// In our implementation the doll is attached to a PlayerPawn (its victim).
 /// Basically whatever happens to the doll, happens to the pawn.
-/// Exceptions: recoil, sector damage. 
+/// Exceptions: recoil, sector damage.
 class VoodooDoll : public PlayerPawn
 {
-  PlayerPawn *victim;
+    PlayerPawn *victim;
 
-public:
-  VoodooDoll(const PlayerPawn &p);
-  virtual ~VoodooDoll();
+  public:
+    VoodooDoll(const PlayerPawn &p);
+    virtual ~VoodooDoll();
 
-  virtual void CheckPointers();
-  virtual void XYFriction(fixed_t oldx, fixed_t oldy);
-  virtual void Think();
+    virtual void CheckPointers();
+    virtual void XYFriction(fixed_t oldx, fixed_t oldy);
+    virtual void Think();
 
+    virtual bool Touch(Actor *a);
+    virtual bool Damage(Actor *inflictor, Actor *source, int damage, int dtype = dt_normal);
 
-  virtual bool Touch(Actor *a);
-  virtual bool Damage(Actor *inflictor, Actor *source, int damage, int dtype = dt_normal);
-
-  static void Spawn(PlayerInfo *p, struct mapthing_t *mthing);
+    static void Spawn(PlayerInfo *p, struct mapthing_t *mthing);
 };
-
 
 #endif

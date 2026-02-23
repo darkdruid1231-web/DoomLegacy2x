@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id:$
@@ -27,8 +27,10 @@
 
 // Forward-declare lnet::BitStream for Pack/Unpack method signatures.
 // r_sprite.cpp was migrated to lnet; md3.cpp stubs follow the same convention.
-namespace lnet { class BitStream; }
-
+namespace lnet
+{
+class BitStream;
+}
 
 //========================================================
 //                     Presentations
@@ -41,56 +43,61 @@ namespace lnet { class BitStream; }
 /// The actual implementation of the "graphic presentation" can be a sprite, MD3 or anything.
 class presentation_t
 {
-protected:
-  //vector<animation_t> anim; // all known animation sequences
-public:
-  enum animseq_e
-  {
-    // Legacy "animation sequences"
-    Idle = 0, ///< spawnstate
-    Run,      ///< seestate
-    Back,     ///< walk backwards (used only with players)
-    LAST_LOOPING = Back,
-    Pain,     ///< painstate
-    Melee,    ///< meleestate (attack 1)
-    Shoot,    ///< missilestate (attack 2)
-    
-    Death1,   ///< deathstate
-    Death2,   ///< xdeathstate (explode, die)
-    Death3,   ///< crashstate, one more way to die (heretic/hexen imps)
+  protected:
+    // vector<animation_t> anim; // all known animation sequences
+  public:
+    enum animseq_e
+    {
+        // Legacy "animation sequences"
+        Idle = 0, ///< spawnstate
+        Run,      ///< seestate
+        Back,     ///< walk backwards (used only with players)
+        LAST_LOOPING = Back,
+        Pain,  ///< painstate
+        Melee, ///< meleestate (attack 1)
+        Shoot, ///< missilestate (attack 2)
 
-    Raise     ///< raisestate, being raised from death by an arch-vile
-  };
+        Death1, ///< deathstate
+        Death2, ///< xdeathstate (explode, die)
+        Death3, ///< crashstate, one more way to die (heretic/hexen imps)
 
-  char  color;       ///< Skin colormap.
-  animseq_e animseq; ///< Current animation sequence.
-  int   flags;       ///< Effects. Translucency, fullbright etc.
-  int   lastupdate;  ///< Time of last update in tics.
+        Raise ///< raisestate, being raised from death by an arch-vile
+    };
 
-  virtual ~presentation_t() {};
+    char color;        ///< Skin colormap.
+    animseq_e animseq; ///< Current animation sequence.
+    int flags;         ///< Effects. Translucency, fullbright etc.
+    int lastupdate;    ///< Time of last update in tics.
 
-  virtual void SetFrame(const struct state_t *st) = 0; // Only used by DActors with sprites
-  virtual void SetAnim(animseq_e seq) = 0;  // starts a requested animation sequence
-  int GetAnim() { return animseq; };
+    virtual ~presentation_t(){};
 
-  virtual bool Update(int nowtic)      = 0; // Updates the animation, called before drawing
-  virtual void Project(class Actor *p) = 0; ///< Drawing in SW renderer. Generates a vissprite_t.
-  virtual bool Draw(const Actor *p) = 0; ///< Drawing in OpenGL.
-  virtual struct spriteframe_t *GetFrame() { return NULL; }; // Menu uses this.
-  virtual int Marshal(class LArchive &a) = 0;
+    virtual void SetFrame(const struct state_t *st) = 0; // Only used by DActors with sprites
+    virtual void SetAnim(animseq_e seq) = 0;             // starts a requested animation sequence
+    int GetAnim()
+    {
+        return animseq;
+    };
 
-  void *operator new(size_t size);
-  void  operator delete(void *mem);
+    virtual bool Update(int nowtic) = 0;      // Updates the animation, called before drawing
+    virtual void Project(class Actor *p) = 0; ///< Drawing in SW renderer. Generates a vissprite_t.
+    virtual bool Draw(const Actor *p) = 0;    ///< Drawing in OpenGL.
+    virtual struct spriteframe_t *GetFrame()
+    {
+        return NULL;
+    }; // Menu uses this.
+    virtual int Marshal(class LArchive &a) = 0;
 
-  static int Serialize(presentation_t *p, LArchive &a);
-  static presentation_t *Unserialize(LArchive &a);
+    void *operator new(size_t size);
+    void operator delete(void *mem);
 
-  /// Netcode
-  virtual void   Pack(lnet::BitStream &s) = 0;
-  virtual void Unpack(lnet::BitStream &s) = 0;
-  virtual void   PackAnim(lnet::BitStream &s) = 0;
-  virtual void UnpackAnim(lnet::BitStream &s) = 0;
+    static int Serialize(presentation_t *p, LArchive &a);
+    static presentation_t *Unserialize(LArchive &a);
+
+    /// Netcode
+    virtual void Pack(lnet::BitStream &s) = 0;
+    virtual void Unpack(lnet::BitStream &s) = 0;
+    virtual void PackAnim(lnet::BitStream &s) = 0;
+    virtual void UnpackAnim(lnet::BitStream &s) = 0;
 };
-
 
 #endif

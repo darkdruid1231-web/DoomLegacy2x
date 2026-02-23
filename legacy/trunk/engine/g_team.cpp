@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: g_team.cpp 307 2006-02-11 16:38:54Z jussip $
@@ -25,13 +25,10 @@
 
 #include "g_team.h"
 
-
 /// constructor
 TeamInfo::TeamInfo()
 {
-  name = "Romero's Roughnecks";
-  color = 0;
-  score = 0;
+    name = "Romero's Roughnecks";
+    color = 0;
+    score = 0;
 }
-
-

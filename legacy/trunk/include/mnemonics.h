@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id:$
@@ -25,56 +25,50 @@
 
 #include "doomtype.h"
 
-
 /// BEX/DECORATE DActor action function mnemonics
 struct dactor_mnemonic_t
 {
-  const char *name;
-  void (*ptr)(class DActor *actor);
+    const char *name;
+    void (*ptr)(class DActor *actor);
 };
 
 extern dactor_mnemonic_t BEX_DActorMnemonics[];
 
-
 /// BEX/DECORATE weapon action function mnemonics
 struct weapon_mnemonic_t
 {
-  const char *name;
-  void (*ptr)(class PlayerPawn *player, struct pspdef_t *psp);
+    const char *name;
+    void (*ptr)(class PlayerPawn *player, struct pspdef_t *psp);
 };
 
 extern weapon_mnemonic_t BEX_WeaponMnemonics[];
 
-
 /// BEX/DECORATE Actor flag mnemonics.
 struct flag_mnemonic_t
 {
-  const char *name;
-  int   flag;
-  int   flagword;
+    const char *name;
+    int flag;
+    int flagword;
 };
 
 extern flag_mnemonic_t BEX_FlagMnemonics[];
 
-
 /// Maps old-style numeric DeHackEd flags to internal Legacy flags.
 struct old_flag_t
 {
-  Uint32 old_flag;
-  Uint32 new_flag;
+    Uint32 old_flag;
+    Uint32 new_flag;
 };
 
 extern old_flag_t OriginalFlags[26];
 
-
 /// BEX/DECORATE game string mnemonics
 struct string_mnemonic_t
 {
-  const char *name;
-  int   num;
+    const char *name;
+    int num;
 };
 
 extern string_mnemonic_t BEX_StringMnemonics[];
-
 
 #endif

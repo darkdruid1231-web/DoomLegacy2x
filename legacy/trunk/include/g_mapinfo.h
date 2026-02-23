@@ -27,48 +27,45 @@
 #ifndef g_mapinfo_h
 #define g_mapinfo_h 1
 
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
 #include "doomtype.h"
 
 using namespace std;
 
-
 /// \brief Cluster type constants for map clustering
 enum clustertype_e
 {
-  CLUSTER_UNDEFINED = -1,         ///< No cluster features defined
-  CLUSTER_EXTERNAL_TEXTURES = 1,  ///< Map uses external texture definitions
-  CLUSTER_FOG = 2                 ///< Map has fog effects enabled
+    CLUSTER_UNDEFINED = -1,        ///< No cluster features defined
+    CLUSTER_EXTERNAL_TEXTURES = 1, ///< Map uses external texture definitions
+    CLUSTER_FOG = 2                ///< Map has fog effects enabled
 };
-
 
 /// \brief A deferred or "queued" ACS script in a currently inactive Map.
 struct acs_deferred_t
 {
-  unsigned script; ///< Script number (on target Map)
-  byte    args[4]; ///< 3 byte arguments, padded to 4 for alignment
+    unsigned script; ///< Script number (on target Map)
+    byte args[4];    ///< 3 byte arguments, padded to 4 for alignment
 };
-
 
 /// \brief Stores all kinds of metadata for an associated Map.
 /// \ingroup g_central
 /*!
   OK. Doom map format is (undestandably) primitive and has no place for
   general information about maps. There are at least two ways to fix this:
- 
+
   1)  MAPINFO lump (from Hexen and ZDoom)
       There can be one MAPINFO lump per wad. It is a text lump that consists of
       two kinds of blocks: MAP blocks and CLUSTERDEF blocks.
- 
+
   2)  LevelInfo lumps (Legacy, others?)
       There is one LevelInfo lump per Map. It is the same lump as the
-      mapname "separator", i.e. MAP16, E6M2, MYOWNMAP... 
+      mapname "separator", i.e. MAP16, E6M2, MYOWNMAP...
       LevelInfo only contains info about the one map to which it belongs.
       It is a text lump that consists of blocks, such as [script], ...
- 
+
   Internally, all the data for each map is combined into one class, MapInfo.
   It contains all the information regarding a Map that doesn't directly affect
   gameplay but can be of interest to human players, such as the Map
@@ -77,101 +74,102 @@ struct acs_deferred_t
 */
 class MapInfo
 {
-  friend class Map;
+    friend class Map;
 
-public:
-  /// \name Status variables for the associated Map
-  /// 
-  //@{
-  /// current state of the corresponding Map
-  enum mapstate_e
+  public:
+    /// \name Status variables for the associated Map
+    ///
+    //@{
+    /// current state of the corresponding Map
+    enum mapstate_e
     {
-      MAP_UNLOADED = -1, ///< not loaded, "me" should be NULL
-      MAP_RUNNING = 0,   ///< currently running, "me" is valid
-      MAP_INSTASIS,      ///< presently halted, but "me" is still valid
-      MAP_RESET,         ///< (single player) player has died, the map should be reset
-      MAP_FINISHED,      ///< Map will be saved or closed after the tick, but currently "me" is still valid
-      MAP_SAVED          ///< "me" should be NULL, the Map is saved on disk
+        MAP_UNLOADED = -1, ///< not loaded, "me" should be NULL
+        MAP_RUNNING = 0,   ///< currently running, "me" is valid
+        MAP_INSTASIS,      ///< presently halted, but "me" is still valid
+        MAP_RESET,         ///< (single player) player has died, the map should be reset
+        MAP_FINISHED, ///< Map will be saved or closed after the tick, but currently "me" is still
+                      ///< valid
+        MAP_SAVED     ///< "me" should be NULL, the Map is saved on disk
     };
 
-  mapstate_e   state;
-  class Map   *me;    ///< the actual running Map instance corresponding to this MapInfo
-  bool         found; ///< present in the resource pool (WAD files etc.)
+    mapstate_e state;
+    class Map *me; ///< the actual running Map instance corresponding to this MapInfo
+    bool found;    ///< present in the resource pool (WAD files etc.)
 
-  vector<acs_deferred_t> ACS_deferred; ///< Deferred ACS scripts for this map. Will be started when the Map is launched.
-  //@}
-  
-  string lumpname;   ///< map lump name ("MAP04")
-  string nicename;   ///< map long nice name ("The Nuclear Plant")
-  string savename;   ///< name of the file the map is currently saved in
+    vector<acs_deferred_t> ACS_deferred; ///< Deferred ACS scripts for this map. Will be started
+                                         ///< when the Map is launched.
+    //@}
 
-  int    cluster;    ///< in which cluster does this map belong?
-  int    mapnumber;  ///< real map number, used with Teleport_NewMap
-  bool   hub;        ///< same as cluster.hub
+    string lumpname; ///< map lump name ("MAP04")
+    string nicename; ///< map long nice name ("The Nuclear Plant")
+    string savename; ///< name of the file the map is currently saved in
 
-  string version;     ///< map version string
-  string author;      ///< map creator
-  string description; ///< optional map description
+    int cluster;   ///< in which cluster does this map belong?
+    int mapnumber; ///< real map number, used with Teleport_NewMap
+    bool hub;      ///< same as cluster.hub
 
-  string namepic;     ///< texture containing map's nice name
-  // string previewpic; // preview picture name
+    string version;     ///< map version string
+    string author;      ///< map creator
+    string description; ///< optional map description
 
-  int   scripts; ///< how many FS scripts in the map?
-  int   partime; ///< in seconds
-  float gravity; ///< temporary, could be part of ZoneInfo or sector_t?
+    string namepic; ///< texture containing map's nice name
+    // string previewpic; // preview picture name
 
-  // less essential stuff (can be replaced with scripting or other more efficient means)
-  string musiclump;
+    int scripts;   ///< how many FS scripts in the map?
+    int partime;   ///< in seconds
+    float gravity; ///< temporary, could be part of ZoneInfo or sector_t?
 
-  int    warptrans;    ///< a Hexen quirk, another map numbering for deathmatch
-  int    warpnext;     ///< this one uses warptrans numbers
-  int    nextlevel;    ///< next map number (normal Doom exit)
-  int    secretlevel;  ///< next map number (Doom secret exit)
+    // less essential stuff (can be replaced with scripting or other more efficient means)
+    string musiclump;
 
-  bool   doublesky;
-  bool   lightning;
-  string sky1;
-  float  sky1sp;
-  string sky2;
-  float  sky2sp;
+    int warptrans;   ///< a Hexen quirk, another map numbering for deathmatch
+    int warpnext;    ///< this one uses warptrans numbers
+    int nextlevel;   ///< next map number (normal Doom exit)
+    int secretlevel; ///< next map number (Doom secret exit)
 
-  int    cdtrack;
-  string fadetablelump;
+    bool doublesky;
+    bool lightning;
+    string sky1;
+    float sky1sp;
+    string sky2;
+    float sky2sp;
 
-  int BossDeathKey;  ///< bit flags to see which bosses end the map when killed.
+    int cdtrack;
+    string fadetablelump;
 
-  // intermission data
-  string interpic;   ///< intermission background texture name
-  string intermusic; ///< intermission music lumpname
+    int BossDeathKey; ///< bit flags to see which bosses end the map when killed.
 
-public:
-  MapInfo();
-  ~MapInfo();
+    // intermission data
+    string interpic;   ///< intermission background texture name
+    string intermusic; ///< intermission music lumpname
 
-  /// Ticks the map forward in time.
-  void Ticker();
+  public:
+    MapInfo();
+    ~MapInfo();
 
-  /// Inserts a player into the map and activates it if necessary.
-  bool Activate(class PlayerInfo *p);
+    /// Ticks the map forward in time.
+    void Ticker();
 
-  /// Throws out all players in the map.
-  int  EvictPlayers(int next, int ep = 0, bool force = false);
+    /// Inserts a player into the map and activates it if necessary.
+    bool Activate(class PlayerInfo *p);
 
-  /// Shuts down the map, throws out the players, deletes the hubsave.
-  void Close(int next, int ep = 0, bool force = false);
+    /// Throws out all players in the map.
+    int EvictPlayers(int next, int ep = 0, bool force = false);
 
-  /// Saves the map into a hubsave file
-  bool HubSave();
+    /// Shuts down the map, throws out the players, deletes the hubsave.
+    void Close(int next, int ep = 0, bool force = false);
 
-  /// Loads a hubsave
-  bool HubLoad();
+    /// Saves the map into a hubsave file
+    bool HubSave();
 
-  /// Reads data from a LevelInfo lump.
-  char *Read(int lumpnum);
+    /// Loads a hubsave
+    bool HubLoad();
 
-  int Serialize(class LArchive &a);
-  int Unserialize(LArchive &a);
+    /// Reads data from a LevelInfo lump.
+    char *Read(int lumpnum);
+
+    int Serialize(class LArchive &a);
+    int Unserialize(LArchive &a);
 };
-
 
 #endif

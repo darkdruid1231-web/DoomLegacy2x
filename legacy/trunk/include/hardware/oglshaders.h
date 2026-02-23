@@ -30,61 +30,65 @@
 
 struct shader_attribs_t
 {
-  float tangent[3]; ///< surface tangent, points towards increasing s texture coord.
+    float tangent[3]; ///< surface tangent, points towards increasing s texture coord.
 };
-
 
 #if defined(GL_VERSION_2_0) && !defined(NO_SHADERS) // GLSL is introduced in OpenGL 2.0
 
 /// GLSL shader object.
 class Shader : public cacheitem_t
 {
-protected:
-  static const GLuint NOSHADER = 0;
-  GLuint shader_id; ///< OpenGL handle for the shader.
-  GLenum type;      ///< Vertex or fragment shader?
-  bool   ready;     ///< Compiled and functional?
+  protected:
+    static const GLuint NOSHADER = 0;
+    GLuint shader_id; ///< OpenGL handle for the shader.
+    GLenum type;      ///< Vertex or fragment shader?
+    bool ready;       ///< Compiled and functional?
 
-  void Compile(const char *code, int len);
+    void Compile(const char *code, int len);
 
-public:
-  Shader(const char *name, bool vertex_shader = true);
-  Shader(const char *name, const char *code, bool vertex_shader = true);
-  ~Shader();
+  public:
+    Shader(const char *name, bool vertex_shader = true);
+    Shader(const char *name, const char *code, bool vertex_shader = true);
+    ~Shader();
 
-  inline GLuint GetID() const { return shader_id; }
-  inline bool IsReady() const { return ready; }
+    inline GLuint GetID() const
+    {
+        return shader_id;
+    }
+    inline bool IsReady() const
+    {
+        return ready;
+    }
 
-  void PrintInfoLog();
+    void PrintInfoLog();
 };
-
 
 /// GLSL Program object.
 class ShaderProg : public cacheitem_t
 {
-protected:
-  GLuint prog_id; ///< OpenGL handle for the program.
-  /// Variable locations in the linked program.
-  struct
-  {
-    GLint tex0, tex1; ///< Texture units
-    GLint time;
-    GLint tangent;
-  } loc;
+  protected:
+    GLuint prog_id; ///< OpenGL handle for the program.
+    /// Variable locations in the linked program.
+    struct
+    {
+        GLint tex0, tex1; ///< Texture units
+        GLint time;
+        GLint tangent;
+    } loc;
 
-public:
-  ShaderProg(const char *name);
-  ~ShaderProg();
+  public:
+    ShaderProg(const char *name);
+    ~ShaderProg();
 
-  static void DisableShaders();
+    static void DisableShaders();
 
-  void AttachShader(Shader *s);
-  void Link();
-  void Use();
-  void SetUniforms();
-  void SetAttributes(shader_attribs_t *a);
+    void AttachShader(Shader *s);
+    void Link();
+    void Use();
+    void SetUniforms();
+    void SetAttributes(shader_attribs_t *a);
 
-  void PrintInfoLog();
+    void PrintInfoLog();
 };
 
 #else // GL_VERSION_2_0
@@ -92,47 +96,59 @@ public:
 // Inert dummy implementation
 class Shader : public cacheitem_t
 {
-public:
-  Shader(const char *name, bool vertex_shader = true) : cacheitem_t(name) {}
+  public:
+    Shader(const char *name, bool vertex_shader = true) : cacheitem_t(name)
+    {
+    }
 };
-
 
 // Inert dummy implementation
 class ShaderProg : public cacheitem_t
 {
-public:
-  ShaderProg(const char *name) : cacheitem_t(name) {}
-  static void DisableShaders() {}
-  void AttachShader(Shader *s) {};
-  void Link() {};
-  void Use() {}
-  void SetUniforms() {}
-  void SetAttributes(shader_attribs_t *a) {}
+  public:
+    ShaderProg(const char *name) : cacheitem_t(name)
+    {
+    }
+    static void DisableShaders()
+    {
+    }
+    void AttachShader(Shader *s) {};
+    void Link() {};
+    void Use()
+    {
+    }
+    void SetUniforms()
+    {
+    }
+    void SetAttributes(shader_attribs_t *a)
+    {
+    }
 };
 
-
 #endif // GL_VERSION_2_0
-
 
 /// \brief Cache for Shaders
 class shader_cache_t : public cache_t<Shader>
 {
-protected:
-  virtual Shader *Load(const char *name) { return NULL; };
+  protected:
+    virtual Shader *Load(const char *name)
+    {
+        return NULL;
+    };
 };
 
 extern shader_cache_t shaders;
 
-
 /// \brief Cache for ShaderProgs
 class shaderprog_cache_t : public cache_t<ShaderProg>
 {
-protected:
-  virtual ShaderProg *Load(const char *name) { return new ShaderProg(name); };
+  protected:
+    virtual ShaderProg *Load(const char *name)
+    {
+        return new ShaderProg(name);
+    };
 };
 
 extern shaderprog_cache_t shaderprogs;
-
-
 
 #endif

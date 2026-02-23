@@ -25,7 +25,6 @@
 
 #include "g_actor.h"
 
-
 /// \brief Chasecam
 ///
 /// target is the Actor the camera is following ("chasing").
@@ -33,16 +32,15 @@
 /// This is a HACK which allows us to make use of Actor data members.
 class Camera : public Actor
 {
-  DECLARE_CLASS(Camera);
+    DECLARE_CLASS(Camera);
 
-public:
-  Camera(PlayerPawn *o, Actor *t);
+  public:
+    Camera(PlayerPawn *o, Actor *t);
 
-  void ClearCamera();
-  void ResetCamera(Actor *p);
+    void ClearCamera();
+    void ResetCamera(Actor *p);
 
-  virtual void Think();
+    virtual void Think();
 };
-
 
 #endif

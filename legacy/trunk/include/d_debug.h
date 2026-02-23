@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 //
@@ -21,12 +21,10 @@
 //
 //-----------------------------------------------------------------------------
 
-
 #ifndef d_debug_h
 #define d_debug_h 1
 
 #include <stdio.h>
-
 
 // ===========================
 // Internal parameters, fixed.
@@ -35,22 +33,26 @@
 //  according to user inputs. Partly load from
 //  WAD, partly set at startup time.
 
-#define localgametic  cmap.leveltic
-
+#define localgametic cmap.leveltic
 
 #ifdef __MACOS__
-# define DEBFILE(msg) I_OutputMsg(msg)
-extern  FILE*           debugfile;
+#define DEBFILE(msg) I_OutputMsg(msg)
+extern FILE *debugfile;
 #else
-# define DEBUGFILE
-# ifdef DEBUGFILE
-#  define DEBFILE(msg) { if(debugfile) fputs(msg,debugfile); }
-extern  FILE*           debugfile;
-# else
-#  define DEBFILE(msg) {}
-extern  FILE*           debugfile;
-# endif
+#define DEBUGFILE
+#ifdef DEBUGFILE
+#define DEBFILE(msg)                                                                               \
+    {                                                                                              \
+        if (debugfile)                                                                             \
+            fputs(msg, debugfile);                                                                 \
+    }
+extern FILE *debugfile;
+#else
+#define DEBFILE(msg)                                                                               \
+    {                                                                                              \
+    }
+extern FILE *debugfile;
+#endif
 #endif //__MACOS__
-
 
 #endif // d_debug_h

@@ -24,58 +24,52 @@
 #include "ntexture.tab.h"
 #include "w_wad.h"
 
-     
-ntexture_driver::ntexture_driver(int lump)
-  : dummy("crap", 0, 0, 0)
+ntexture_driver::ntexture_driver(int lump) : dummy("crap", 0, 0, 0)
 {
-  trace_scanning = false;
-  trace_parsing  = false;
+    trace_scanning = false;
+    trace_parsing = false;
 
-  lumpname = fc.FindNameForNum(lump);
-  buffer = static_cast<char *>(fc.CacheLumpNum(lump, PU_STATIC));
-  length = fc.LumpLength(lump);
+    lumpname = fc.FindNameForNum(lump);
+    buffer = static_cast<char *>(fc.CacheLumpNum(lump, PU_STATIC));
+    length = fc.LumpLength(lump);
 }
 
-
-ntexture_driver::~ntexture_driver ()
+ntexture_driver::~ntexture_driver()
 {
-  Z_Free(buffer);
+    Z_Free(buffer);
 }
-     
 
 int ntexture_driver::parse()
 {
-  scan_begin();
-  yy::ntexture_parser parser(*this);
-  parser.set_debug_level(trace_parsing);
-  int res = parser.parse();
-  scan_end();
-  return res;
-}
-     
-void ntexture_driver::error(const yy::location& l, const std::string& m)
-{
-  CONS_Printf("NTEXTURE lump '%s': (loc) %s\n", lumpname.c_str(), m.c_str()); 
-}
-     
-void ntexture_driver::error(const std::string& m)
-{
-  CONS_Printf("NTEXTURE lump '%s': %s\n", lumpname.c_str(), m.c_str()); 
+    scan_begin();
+    yy::ntexture_parser parser(*this);
+    parser.set_debug_level(trace_parsing);
+    int res = parser.parse();
+    scan_end();
+    return res;
 }
 
+void ntexture_driver::error(const yy::location &l, const std::string &m)
+{
+    CONS_Printf("NTEXTURE lump '%s': (loc) %s\n", lumpname.c_str(), m.c_str());
+}
 
+void ntexture_driver::error(const std::string &m)
+{
+    CONS_Printf("NTEXTURE lump '%s': %s\n", lumpname.c_str(), m.c_str());
+}
 
 bool Read_NTEXTURE(const char *lumpname)
 {
-  int lump = fc.FindNumForName(lumpname);
-  if (lump == -1)
-    return false;
+    int lump = fc.FindNumForName(lumpname);
+    if (lump == -1)
+        return false;
 
-  // caches the lump
-  ntexture_driver ddd(lump);
+    // caches the lump
+    ntexture_driver ddd(lump);
 
-  // parse the lump
-  int res = ddd.parse();
+    // parse the lump
+    int res = ddd.parse();
 
-  return (res == 0);
+    return (res == 0);
 }

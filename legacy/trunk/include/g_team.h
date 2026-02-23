@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: g_team.h 396 2006-12-06 22:43:40Z smite-meister $
@@ -44,25 +44,26 @@ using namespace std;
 */
 class TeamInfo
 {
-  friend class GameInfo;
-public:
-  enum team_e
-  {
-    TEAM_Individual = 0,
-    TEAM_Doom = -1,
-    TEAM_Heretic = -2,
-    TEAM_Hexen = -3,
-  };
+    friend class GameInfo;
 
-  string name;
-  int color;
-  int score;
-  // team flag/symbol ?
-  int resources; // number of men left etc.
+  public:
+    enum team_e
+    {
+        TEAM_Individual = 0,
+        TEAM_Doom = -1,
+        TEAM_Heretic = -2,
+        TEAM_Hexen = -3,
+    };
 
-  TeamInfo();
-  int  Serialize(class LArchive &a);
-  int  Unserialize(LArchive &a);
+    string name;
+    int color;
+    int score;
+    // team flag/symbol ?
+    int resources; // number of men left etc.
+
+    TeamInfo();
+    int Serialize(class LArchive &a);
+    int Unserialize(LArchive &a);
 };
 
 #endif

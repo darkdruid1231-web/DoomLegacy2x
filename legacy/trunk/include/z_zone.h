@@ -35,19 +35,18 @@
 /// \brief Zone Memory tags.
 enum memtag_t
 {
-  PU_STATIC = 0, ///< static entire execution time
-  PU_SOUND,      ///< sound effects
-  PU_MUSIC,      ///< music
-  PU_DAVE,       ///< anything else Dave wants static
-  PU_SPRITE,     ///< sprite structures
-  PU_MODEL,      ///< 3D models
-  PU_TEXTURE,    ///< 2D bitmaps (most graphics)
-  PU_LEVEL,      ///< map data
-  PU_LEVSPEC,    ///< special thinkers in a level
-  PU_OPENGL_GEOMETRY,
-  PU_NUMTAGS
+    PU_STATIC = 0, ///< static entire execution time
+    PU_SOUND,      ///< sound effects
+    PU_MUSIC,      ///< music
+    PU_DAVE,       ///< anything else Dave wants static
+    PU_SPRITE,     ///< sprite structures
+    PU_MODEL,      ///< 3D models
+    PU_TEXTURE,    ///< 2D bitmaps (most graphics)
+    PU_LEVEL,      ///< map data
+    PU_LEVSPEC,    ///< special thinkers in a level
+    PU_OPENGL_GEOMETRY,
+    PU_NUMTAGS
 };
-
 
 /// Initialize the memory subsystem.
 void Z_Init();
@@ -60,7 +59,7 @@ int Z_GetTag(void *ptr);
 
 /// Allocate memory.
 void *Z_Malloc(int size, int tag, void **user);
-#define Z_MallocAlign(s,t,p,a) Z_Malloc((s),(t),(p))
+#define Z_MallocAlign(s, t, p, a) Z_Malloc((s), (t), (p))
 #define ZZ_Alloc(x) Z_Malloc((x), PU_STATIC, NULL)
 
 /// Free memory.

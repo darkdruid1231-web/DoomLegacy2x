@@ -28,7 +28,6 @@
 
 using namespace std;
 
-
 /// \brief MapCluster class is used to group maps together into hubs or episodes.
 /// \ingroup g_central
 /*!
@@ -39,42 +38,41 @@ using namespace std;
 */
 class MapCluster
 {
-  friend class GameInfo;
-  friend class Map;
+    friend class GameInfo;
+    friend class Map;
 
-public:
-  int    number;      ///< unique levelcluster number
-  string clustername; ///< nice long name for the cluster ("Knee-deep in the dead")
+  public:
+    int number;         ///< unique levelcluster number
+    string clustername; ///< nice long name for the cluster ("Knee-deep in the dead")
 
-  bool   hub;       ///< if true, save the maps when they are exited.
-  bool   keepstuff; ///< if true, keys and powers are never taken away inside this cluster
+    bool hub;       ///< if true, save the maps when they are exited.
+    bool keepstuff; ///< if true, keys and powers are never taken away inside this cluster
 
-  vector<class MapInfo *> maps; ///< the maps which make up this level
+    vector<class MapInfo *> maps; ///< the maps which make up this level
 
-  int time, partime; ///< the time it took to complete cluster, partime (in s)
+    int time, partime; ///< the time it took to complete cluster, partime (in s)
 
-  /// \name Finale data
-  //@{
-  string entertext;
-  string exittext;
-  string finalepic;
-  string finalemusic;
-  int    episode; ///< which finale to show?
-  //@}
+    /// \name Finale data
+    //@{
+    string entertext;
+    string exittext;
+    string finalepic;
+    string finalemusic;
+    int episode; ///< which finale to show?
+                 //@}
 
-public:
-  MapCluster();
-  MapCluster(int n);
+  public:
+    MapCluster();
+    MapCluster(int n);
 
-  /// ticks all the active MapInfo's in the cluster
-  void Ticker();
-  /// shuts the cluster down, kicks out all players
-  void Finish(int nextmap, int entrypoint = 0); 
+    /// ticks all the active MapInfo's in the cluster
+    void Ticker();
+    /// shuts the cluster down, kicks out all players
+    void Finish(int nextmap, int entrypoint = 0);
 
-  int Serialize(class LArchive &a);
-  int Unserialize(LArchive &a);
+    int Serialize(class LArchive &a);
+    int Unserialize(LArchive &a);
 };
-
 
 /// \brief Game entrypoint
 /// \ingroup g_central
@@ -84,36 +82,35 @@ public:
 */
 class Episode
 {
-public:
-  string name;          ///< Episode name.
-  string namepic;       ///< Optional Texture containing the episode name.
-  string maplump;       ///< Map where the episode starts.
-  int    entrypoint;    ///< Starting entrypoint within the Map.
-  bool   active;        ///< Is the maplump found?
-  class MapInfo *minfo; ///< corresponding MapInfo
+  public:
+    string name;          ///< Episode name.
+    string namepic;       ///< Optional Texture containing the episode name.
+    string maplump;       ///< Map where the episode starts.
+    int entrypoint;       ///< Starting entrypoint within the Map.
+    bool active;          ///< Is the maplump found?
+    class MapInfo *minfo; ///< corresponding MapInfo
 
-public:
-  /// constructor for unserializing
-  Episode()
-  {
-    entrypoint = 0;
-    active = false;
-    minfo = NULL;
-  };
-  
-  /// normal constructor
-  Episode(const char *lump, const char *n)
-  {
-    name = n;
-    maplump = lump;
-    entrypoint = 0;
-    active = false;
-    minfo = NULL;
-  };
+  public:
+    /// constructor for unserializing
+    Episode()
+    {
+        entrypoint = 0;
+        active = false;
+        minfo = NULL;
+    };
 
-  int Serialize(class LArchive &a);
-  int Unserialize(LArchive &a);
+    /// normal constructor
+    Episode(const char *lump, const char *n)
+    {
+        name = n;
+        maplump = lump;
+        entrypoint = 0;
+        active = false;
+        minfo = NULL;
+    };
+
+    int Serialize(class LArchive &a);
+    int Unserialize(LArchive &a);
 };
-
 
 #endif

@@ -34,7 +34,7 @@ extern consvar_t cv_servername;
 extern consvar_t cv_publicserver;
 extern consvar_t cv_allownewplayers;
 extern consvar_t cv_maxplayers;
-//extern consvar_t cv_maxteams;
+// extern consvar_t cv_maxteams;
 
 // server demo
 extern consvar_t cv_playdemospeed;
@@ -91,7 +91,7 @@ extern consvar_t cv_mousemove[2];
 extern consvar_t cv_invertmouse[2];
 extern consvar_t cv_mouse2port;
 #ifdef LMOUSE2
- extern consvar_t cv_mouse2opt;
+extern consvar_t cv_mouse2opt;
 #endif
 
 // client console (console.cpp)
@@ -114,7 +114,6 @@ extern consvar_t cv_chatmacro7;
 extern consvar_t cv_chatmacro8;
 extern consvar_t cv_chatmacro9;
 extern consvar_t cv_chatmacro0;
-
 
 // client audio (s_sound.cpp)
 extern consvar_t cv_soundvolume;

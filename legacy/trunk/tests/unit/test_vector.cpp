@@ -19,10 +19,10 @@
 /// \file
 /// \brief Unit tests for vec_t (vector math) operations.
 
-#include <iostream>
-#include <cmath>
-#include <string>
 #include "vect.h"
+#include <cmath>
+#include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -30,38 +30,50 @@ static int tests_run = 0;
 static int tests_passed = 0;
 static string last_failure;
 
-#define TEST(name) do { \
-    tests_run++; \
-    last_failure = ""; \
-    cout << "  " << name << " ... "; \
-} while(0)
+#define TEST(name)                                                                                 \
+    do                                                                                             \
+    {                                                                                              \
+        tests_run++;                                                                               \
+        last_failure = "";                                                                         \
+        cout << "  " << name << " ... ";                                                           \
+    } while (0)
 
-#define PASS() do { \
-    tests_passed++; \
-    cout << "PASS" << endl; \
-} while(0)
+#define PASS()                                                                                     \
+    do                                                                                             \
+    {                                                                                              \
+        tests_passed++;                                                                            \
+        cout << "PASS" << endl;                                                                    \
+    } while (0)
 
-#define FAIL(msg) do { \
-    last_failure = msg; \
-    cout << "FAIL: " << msg << endl; \
-} while(0)
+#define FAIL(msg)                                                                                  \
+    do                                                                                             \
+    {                                                                                              \
+        last_failure = msg;                                                                        \
+        cout << "FAIL: " << msg << endl;                                                           \
+    } while (0)
 
-#define ASSERT_EQ(expected, actual, msg) do { \
-    if ((expected) != (actual)) { \
-        FAIL(msg); \
-        cout << "    Expected: " << (expected) << ", Got: " << (actual) << endl; \
-        return; \
-    } \
-} while(0)
+#define ASSERT_EQ(expected, actual, msg)                                                           \
+    do                                                                                             \
+    {                                                                                              \
+        if ((expected) != (actual))                                                                \
+        {                                                                                          \
+            FAIL(msg);                                                                             \
+            cout << "    Expected: " << (expected) << ", Got: " << (actual) << endl;               \
+            return;                                                                                \
+        }                                                                                          \
+    } while (0)
 
-#define ASSERT_NEAR(expected, actual, tolerance, msg) do { \
-    if (fabs((expected) - (actual)) > (tolerance)) { \
-        FAIL(msg); \
-        cout << "    Expected: " << (expected) << " +/- " << (tolerance) << ", Got: " << (actual) << endl; \
-        return; \
-    } \
-} while(0)
-
+#define ASSERT_NEAR(expected, actual, tolerance, msg)                                              \
+    do                                                                                             \
+    {                                                                                              \
+        if (fabs((expected) - (actual)) > (tolerance))                                             \
+        {                                                                                          \
+            FAIL(msg);                                                                             \
+            cout << "    Expected: " << (expected) << " +/- " << (tolerance)                       \
+                 << ", Got: " << (actual) << endl;                                                 \
+            return;                                                                                \
+        }                                                                                          \
+    } while (0)
 
 // Test default constructor
 void test_default_constructor()
@@ -353,7 +365,6 @@ void test_polar_coordinates()
     ASSERT_NEAR(0.0f, theta, 0.001f, "Theta on z-axis is 0");
     PASS();
 }
-
 
 int main()
 {

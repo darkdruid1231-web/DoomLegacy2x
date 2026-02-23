@@ -35,7 +35,6 @@ void I_ShutdownSound();
 void I_UpdateSound();
 void I_SubmitSound();
 
-
 //
 //  SFX I/O
 //
@@ -65,7 +64,7 @@ void I_ResumeSong(int handle);
 #ifdef __MACOS__
 int I_RegisterSong(int song);
 #else
-int I_RegisterSong(void* data, int len);
+int I_RegisterSong(void *data, int len);
 #endif
 
 // Called by anything that wishes to start music.
@@ -80,18 +79,17 @@ void I_StopSong(int handle);
 // See above (register), then think backwards
 void I_UnRegisterSong(int handle);
 
-
 // i_cdmus.h : cd music interface
 //
-extern byte    cdaudio_started;
+extern byte cdaudio_started;
 
-void   I_InitCD ();
-void   I_StopCD ();
-void   I_PauseCD ();
-void   I_ResumeCD ();
-void   I_ShutdownCD ();
-void   I_UpdateCD ();
-void   I_PlayCD (int track, bool looping);
-int    I_SetVolumeCD (int volume);  // return 0 on failure
+void I_InitCD();
+void I_StopCD();
+void I_PauseCD();
+void I_ResumeCD();
+void I_ShutdownCD();
+void I_UpdateCD();
+void I_PlayCD(int track, bool looping);
+int I_SetVolumeCD(int volume); // return 0 on failure
 
 #endif

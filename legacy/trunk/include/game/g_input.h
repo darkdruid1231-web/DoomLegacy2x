@@ -28,67 +28,66 @@
 
 enum gamecontrols_e
 {
-  gc_null = 0,        //a key/button mapped to gc_null has no effect
-  gc_forward,
-  gc_backward,
-  gc_strafe,
-  gc_straferight,
-  gc_strafeleft,
-  gc_speed,
-  gc_turnleft,
-  gc_turnright,
-  gc_lookup,
-  gc_lookdown,
-  gc_centerview,
-  gc_mouseaiming,     // mouse aiming is momentary (toggleable in the menu)
-  gc_fire,
-  gc_use,
-  gc_jump,
-  gc_flydown, // flyup is jump
-  gc_impulse, // controls after this need not be held down continuously
-  gc_weapon1 = gc_impulse,
-  gc_weapon2,
-  gc_weapon3,
-  gc_weapon4,
-  gc_weapon5,
-  gc_weapon6,
-  gc_weapon7,
-  gc_weapon8,
-  gc_nextweapon,
-  gc_prevweapon,
-  gc_bestweapon,
-  gc_invnext,
-  gc_invprev,
-  gc_invuse,
-  num_gamecontrols,
+    gc_null = 0, // a key/button mapped to gc_null has no effect
+    gc_forward,
+    gc_backward,
+    gc_strafe,
+    gc_straferight,
+    gc_strafeleft,
+    gc_speed,
+    gc_turnleft,
+    gc_turnright,
+    gc_lookup,
+    gc_lookdown,
+    gc_centerview,
+    gc_mouseaiming, // mouse aiming is momentary (toggleable in the menu)
+    gc_fire,
+    gc_use,
+    gc_jump,
+    gc_flydown, // flyup is jump
+    gc_impulse, // controls after this need not be held down continuously
+    gc_weapon1 = gc_impulse,
+    gc_weapon2,
+    gc_weapon3,
+    gc_weapon4,
+    gc_weapon5,
+    gc_weapon6,
+    gc_weapon7,
+    gc_weapon8,
+    gc_nextweapon,
+    gc_prevweapon,
+    gc_bestweapon,
+    gc_invnext,
+    gc_invprev,
+    gc_invuse,
+    num_gamecontrols,
 
-  // common controls
-  gk_console = 0,
-  gk_talk,
-  gk_scores,
-  num_commoncontrols
+    // common controls
+    gk_console = 0,
+    gk_talk,
+    gk_scores,
+    num_commoncontrols
 };
 
 //! All possible actions joystick axes can be bound to.
 enum joyactions_e
 {
-  ja_pitch,  //!< Set up/down looking angle.
-  ja_move,   //!< Moving front and back.
-  ja_turn,   //!< Turn left or right.
-  ja_strafe, //!< Strafing.
-  num_joyactions
+    ja_pitch,  //!< Set up/down looking angle.
+    ja_move,   //!< Moving front and back.
+    ja_turn,   //!< Turn left or right.
+    ja_strafe, //!< Strafing.
+    num_joyactions
 };
 
 //! Contains the mappings from joystick axises to game actions.
 struct joybinding_t
 {
-  int playnum;         //!< What player is controlled.
-  int joynum;          //!< Which joystick to use.
-  int axisnum;         //!< Which axis is the important one.
-  joyactions_e action; //!< What should be done.
-  float scale;         //!< A scaling factor. Set negative to flip axis.
+    int playnum;         //!< What player is controlled.
+    int joynum;          //!< Which joystick to use.
+    int axisnum;         //!< Which axis is the important one.
+    joyactions_e action; //!< What should be done.
+    float scale;         //!< A scaling factor. Set negative to flip axis.
 };
-
 
 // per-player keys (two (virtual) key codes per game control)
 extern short gamecontrol[NUM_LOCALHUMANS][num_gamecontrols][2];
@@ -100,17 +99,16 @@ extern short commoncontrols[num_commoncontrols][2];
 void G_ReleaseKeys();
 
 // remaps the input event to a game control.
-bool  G_MapEventsToControls(struct event_t *ev);
+bool G_MapEventsToControls(struct event_t *ev);
 
 // returns the name of a key
 char *G_KeynumToString(int keynum);
-int   G_KeyStringtoNum(const char *keystr);
+int G_KeyStringtoNum(const char *keystr);
 
 // detach any keys associated to the given game control
-void  G_ClearControlKeys(short (*setupcontrols)[2], int control);
-void  Command_Setcontrol_f();
-void  G_Controldefault();
-void  G_CheckDoubleUsage(int keynum);
-
+void G_ClearControlKeys(short (*setupcontrols)[2], int control);
+void Command_Setcontrol_f();
+void G_Controldefault();
+void G_CheckDoubleUsage(int keynum);
 
 #endif

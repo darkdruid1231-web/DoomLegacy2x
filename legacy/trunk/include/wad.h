@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //--------------------------------------------------------------
 //
 // $Id: wad.h 449 2007-05-05 20:45:25Z smite-meister $
@@ -28,41 +28,41 @@
 
 using namespace std;
 
-
 /// \brief Handles all IWAD/PWAD I/O and keeps a cache for the data lumps.
 ///
 /// (almost) no knowledge of a game type is assumed.
 
 class Wad : public VDataFile
 {
-  friend class FileCache;
-protected:
-  struct waddir_t *directory;  ///< wad directory
+    friend class FileCache;
 
-  virtual int Internal_ReadItem(int item, void *dest, unsigned size, unsigned offset = 0);
+  protected:
+    struct waddir_t *directory; ///< wad directory
 
-public:
-  // constructor and destructor
-  Wad();
-  virtual ~Wad();
+    virtual int Internal_ReadItem(int item, void *dest, unsigned size, unsigned offset = 0);
 
-  /// open a new wadfile
-  virtual bool Open(const char *fname);
-  virtual bool Create(const char *fname, const char *lumpname); ///< create a single-lump wad from a file
+  public:
+    // constructor and destructor
+    Wad();
+    virtual ~Wad();
 
-  // query data item properties
-  virtual const char *GetItemName(int i);
-  virtual int  GetItemSize(int i);
-  virtual void ListItems();
+    /// open a new wadfile
+    virtual bool Open(const char *fname);
+    virtual bool Create(const char *fname,
+                        const char *lumpname); ///< create a single-lump wad from a file
 
-  // search
-  virtual int FindNumForName(const char* name, int startlump = 0);
-  virtual int FindPartialName(Uint32 iname, int startlump, const char **fullname);
+    // query data item properties
+    virtual const char *GetItemName(int i);
+    virtual int GetItemSize(int i);
+    virtual void ListItems();
 
-  /// process any DeHackEd lumps in this wad
-  void LoadDehackedLumps();
+    // search
+    virtual int FindNumForName(const char *name, int startlump = 0);
+    virtual int FindPartialName(Uint32 iname, int startlump, const char **fullname);
+
+    /// process any DeHackEd lumps in this wad
+    void LoadDehackedLumps();
 };
-
 
 //========================================================================
 
@@ -73,29 +73,29 @@ public:
 
 class Wad3 : public VDataFile
 {
-  friend class FileCache;
-protected:
-  struct wad3dir_t *directory;  ///< wad directory
+    friend class FileCache;
 
-  virtual int Internal_ReadItem(int item, void *dest, unsigned size, unsigned offset = 0);
+  protected:
+    struct wad3dir_t *directory; ///< wad directory
 
-public:
-  // constructor and destructor
-  Wad3();
-  virtual ~Wad3();
+    virtual int Internal_ReadItem(int item, void *dest, unsigned size, unsigned offset = 0);
 
-  /// open a new wadfile
-  virtual bool Open(const char *fname);
+  public:
+    // constructor and destructor
+    Wad3();
+    virtual ~Wad3();
 
-  // query data item properties
-  virtual const char *GetItemName(int i);
-  virtual int  GetItemSize(int i);
-  virtual void ListItems();
+    /// open a new wadfile
+    virtual bool Open(const char *fname);
 
-  /// search
-  virtual int FindNumForName(const char* name, int startlump = 0);
+    // query data item properties
+    virtual const char *GetItemName(int i);
+    virtual int GetItemSize(int i);
+    virtual void ListItems();
+
+    /// search
+    virtual int FindNumForName(const char *name, int startlump = 0);
 };
-
 
 //========================================================================
 
@@ -103,23 +103,23 @@ public:
 
 class Pak : public VDataFile
 {
-protected:
-  struct pakdir_t *directory; ///< item directory
+  protected:
+    struct pakdir_t *directory; ///< item directory
 
-  virtual int Internal_ReadItem(int item, void *dest, unsigned size, unsigned offset = 0);
+    virtual int Internal_ReadItem(int item, void *dest, unsigned size, unsigned offset = 0);
 
-public:
-  // constructor and destructor
-  Pak();
-  virtual ~Pak();
+  public:
+    // constructor and destructor
+    Pak();
+    virtual ~Pak();
 
-  // open a new file
-  virtual bool Open(const char *fname);
+    // open a new file
+    virtual bool Open(const char *fname);
 
-  // query data item properties
-  virtual const char *GetItemName(int i);
-  virtual int  GetItemSize(int i);
-  virtual void ListItems();
+    // query data item properties
+    virtual const char *GetItemName(int i);
+    virtual int GetItemSize(int i);
+    virtual void ListItems();
 };
 
 //========================================================================
@@ -128,26 +128,26 @@ public:
 
 class ZipFile : public VDataFile
 {
-protected:
-  struct zipdir_t *directory; ///< item directory
+  protected:
+    struct zipdir_t *directory; ///< item directory
 
-  virtual int Internal_ReadItem(int item, void *dest, unsigned size, unsigned offset = 0);
+    virtual int Internal_ReadItem(int item, void *dest, unsigned size, unsigned offset = 0);
 
-public:
-  // constructor and destructor
-  ZipFile();
-  virtual ~ZipFile();
+  public:
+    // constructor and destructor
+    ZipFile();
+    virtual ~ZipFile();
 
-  /// open a new wadfile
-  virtual bool Open(const char *fname);
+    /// open a new wadfile
+    virtual bool Open(const char *fname);
 
-  // query data item properties
-  virtual const char *GetItemName(int i);
-  virtual int  GetItemSize(int i);
-  virtual void ListItems();
+    // query data item properties
+    virtual const char *GetItemName(int i);
+    virtual int GetItemSize(int i);
+    virtual void ListItems();
 
-  // search
-  //virtual int FindPartialName(Uint32 iname, int startlump, const char **fullname);
+    // search
+    // virtual int FindPartialName(Uint32 iname, int startlump, const char **fullname);
 };
 
 #endif

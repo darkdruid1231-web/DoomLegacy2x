@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: p_setup.h 306 2006-02-11 16:26:27Z jussip $
@@ -24,41 +24,37 @@
 #ifndef p_setup_h
 #define p_setup_h 1
 
-
 typedef unsigned char byte;
-
 
 // linedef conversion lookup table entry
 struct xtable_t
 {
-  byte type;
-  byte args[5];
-  byte trigger;
+    byte type;
+    byte args[5];
+    byte trigger;
 };
-
 
 // used in linedef conversion table
 enum trigger_e
 {
-  T_REPEAT = 0x01, // bit 0
+    T_REPEAT = 0x01, // bit 0
 
-  T_AMASK  = 0x0e, // bits 1--3
-  T_ASHIFT = 1,
+    T_AMASK = 0x0e, // bits 1--3
+    T_ASHIFT = 1,
 
-  T_CROSS  = 0, // W
-  T_USE    = 1,	// P, S
-  T_MCROSS = 2,	// when monster crosses line
-  T_IMPACT = 3,	// G
-  T_PUSH   = 4,	// when player/monster pushes line
-  T_PCROSS = 5, // when projectile crosses line
+    T_CROSS = 0,  // W
+    T_USE = 1,    // P, S
+    T_MCROSS = 2, // when monster crosses line
+    T_IMPACT = 3, // G
+    T_PUSH = 4,   // when player/monster pushes line
+    T_PCROSS = 5, // when projectile crosses line
 
-  T_ALLOWMONSTER = 0x10, // bit 4
+    T_ALLOWMONSTER = 0x10, // bit 4
 
-  //T_TAG_1 = 0x20 // bit 5
+    // T_TAG_1 = 0x20 // bit 5
 };
 
-
 extern xtable_t *linedef_xtable;
-extern int  linedef_xtable_size;
+extern int linedef_xtable_size;
 
 #endif

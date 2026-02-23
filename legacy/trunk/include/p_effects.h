@@ -30,30 +30,28 @@
 
 using namespace std;
 
-
 /// \brief Class for Map environmental effects.
 /*!
   Currently just the Hexen lightning effect.
 */
 class MapEffect
 {
-  class Map *mp; ///< parent Map
+    class Map *mp; ///< parent Map
 
-  int flash_duration; ///< remaining tics for the current flash
-  int flash_delay;    ///< tics before next flash
-  struct sectorflash_t
-  {
-    sector_t *sec;
-    short orig_light;
-  };
-  vector<sectorflash_t> flash_sectors; ///< sectors affected by the flashes, with additional info
+    int flash_duration; ///< remaining tics for the current flash
+    int flash_delay;    ///< tics before next flash
+    struct sectorflash_t
+    {
+        sector_t *sec;
+        short orig_light;
+    };
+    vector<sectorflash_t> flash_sectors; ///< sectors affected by the flashes, with additional info
 
- public:
-  MapEffect(Map *m);
+  public:
+    MapEffect(Map *m);
 
-  bool Force();
-  void LightningFlash();  
+    bool Force();
+    void LightningFlash();
 };
-
 
 #endif

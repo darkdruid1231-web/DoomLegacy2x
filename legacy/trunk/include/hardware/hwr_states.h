@@ -32,7 +32,7 @@
 #endif
 
 // undef CG_SHADER if you don't want to compile Legacy with Cg
-//#define CG_SHADER
+// #define CG_SHADER
 #ifdef CG_SHADER
 #include <Cg/cg.h>
 #include <Cg/cgGL.h>
@@ -45,8 +45,7 @@
 */
 class TextureModifier
 {
-private:
-
+  private:
     GLint gen_s;
     GLint gen_t;
     GLint env_mode;
@@ -57,8 +56,7 @@ private:
 
     static TextureModifier tm;
 
-public:
-
+  public:
     /// Create a TextureModifier using OpenGL defaults for TexGen, TexEnv and TexParameters
     TextureModifier();
     /// Destroy the TextureModifier
@@ -84,8 +82,7 @@ public:
 */
 class Fog
 {
-private:
-
+  private:
     GLfloat color[4];
     GLint mode;
     GLfloat density;
@@ -94,8 +91,7 @@ private:
 
     static Fog fog;
 
-public:
-
+  public:
     /// Create a Fog using OpenGL defaults
     Fog();
     /// Destroy the Fog
@@ -120,8 +116,7 @@ public:
 */
 class Shader
 {
-private:
-
+  private:
     static CGcontext cg_context;
     static CGprofile vertex_profile;
     static CGprofile fragment_profile;
@@ -132,8 +127,7 @@ private:
 
     static Shader *shader;
 
-public:
-
+  public:
     /// Create a default shader
     Shader(std::string shader_name);
     /// Destroy the Shader
@@ -150,20 +144,19 @@ public:
 */
 class State
 {
-public:
+  public:
     enum ColorModulation
     {
-        NONE     = 0x0000,
-        MEDIUM   = 0x0001,
-        ADD      = 0x0002,
+        NONE = 0x0000,
+        MEDIUM = 0x0001,
+        ADD = 0x0002,
         MULTIPLY = 0x0004,
-        INVERSE  = 0x0008,
-        ALPHA    = 0x0100
+        INVERSE = 0x0008,
+        ALPHA = 0x0100
     };
     static const int MAX_TEXTURE_UNITS = 8;
 
-private:
-
+  private:
     GLfloat color[4];
     GLenum blend_func_src;
     GLenum blend_func_dst;
@@ -201,8 +194,7 @@ private:
     static GLenum global_blend_func_src;
     static GLenum global_blend_func_dst;
 
-public:
-
+  public:
     /// Create a graphics state based on OpenGL defaults
     State();
     /// Destroy this graphics state
@@ -219,7 +211,8 @@ public:
     void SetCullFace(GLenum mode);
     /// Set the fog
     void SetFog(Fog *fog);
-    /// Change the texture modifier (TexGen, TexEnv and TexParameter) of a texture (it depends on the texture unit)
+    /// Change the texture modifier (TexGen, TexEnv and TexParameter) of a texture (it depends on
+    /// the texture unit)
     void SetTextureModifier(int tex_unit, TextureModifier *texture_modifier);
 #ifdef CG_SHADER
     /// Change the shader (vertex and/or fragment program) associated to this state
@@ -229,9 +222,12 @@ public:
     void Apply();
     /// Apply the default OpenGL states
     static void ApplyBasic();
-    /// Set the global color for palette changes (this modulate the global color with the state's color)
-    static void SetGlobalColor(GLfloat r, GLfloat g, GLfloat b, GLfloat a = 1.0f, int modulation = MEDIUM);
-    /// Set the global blend src and dst functions for palette changes (inverse video) (this override the state's blend functions)
+    /// Set the global color for palette changes (this modulate the global color with the state's
+    /// color)
+    static void
+    SetGlobalColor(GLfloat r, GLfloat g, GLfloat b, GLfloat a = 1.0f, int modulation = MEDIUM);
+    /// Set the global blend src and dst functions for palette changes (inverse video) (this
+    /// override the state's blend functions)
     static void SetGlobalBlendFunc(GLenum src, GLenum dst);
 };
 

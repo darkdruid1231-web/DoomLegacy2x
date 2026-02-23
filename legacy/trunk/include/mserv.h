@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: mserv.h 306 2006-02-11 16:26:27Z jussip $
@@ -28,13 +28,12 @@
 // I want that structure 8 bytes aligned (current size is 80)
 typedef struct
 {
-    char    header[16];     // information such as password
-    char    ip[16];
-    char    port[8];
-    char    name[32];       
-    char    version[8];     // format is: x.yy.z (like 1.30.2 or 1.31)
+    char header[16]; // information such as password
+    char ip[16];
+    char port[8];
+    char name[32];
+    char version[8]; // format is: x.yy.z (like 1.30.2 or 1.31)
 } msg_server_t;
-
 
 // ================================ GLOBALS ===============================
 

@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: n_connection.h 342 2006-07-13 19:48:06Z smite-meister $
@@ -24,12 +24,11 @@
 #ifndef n_connection_h
 #define n_connection_h 1
 
-#include <vector>
-#include <list>
 #include "tnl/tnlGhostConnection.h"
+#include <list>
+#include <vector>
 
 using namespace TNL;
-
 
 /// \brief TNL GhostConnection between a server and a client
 ///
@@ -37,97 +36,97 @@ using namespace TNL;
 
 class LConnection : public GhostConnection
 {
-  typedef GhostConnection Parent;
+    typedef GhostConnection Parent;
 
-public:
-  std::vector<class PlayerInfo *> player; ///< Serverside: Players beyond this connection.
+  public:
+    std::vector<class PlayerInfo *> player; ///< Serverside: Players beyond this connection.
 
-  /// Clientside: Local players that wish to join a remote game.
-  static std::list<class LocalPlayerInfo *> joining_players;
+    /// Clientside: Local players that wish to join a remote game.
+    static std::list<class LocalPlayerInfo *> joining_players;
 
-public:
-  LConnection();
+  public:
+    LConnection();
 
-  /// client sends info to server and requests a connection
-  virtual void writeConnectRequest(BitStream *stream);
+    /// client sends info to server and requests a connection
+    virtual void writeConnectRequest(BitStream *stream);
 
-  /// server decides whether to accept the connection
-  virtual bool readConnectRequest(BitStream *stream, const char **errorString);
+    /// server decides whether to accept the connection
+    virtual bool readConnectRequest(BitStream *stream, const char **errorString);
 
-  /// server sends info to client
-  virtual void writeConnectAccept(BitStream *stream);
+    /// server sends info to client
+    virtual void writeConnectAccept(BitStream *stream);
 
-  /// client decides whether to accept the connection
-  virtual bool readConnectAccept(BitStream *stream, const char **errorString);
+    /// client decides whether to accept the connection
+    virtual bool readConnectAccept(BitStream *stream, const char **errorString);
 
+    /// Called when a pending connection is terminated
+    virtual void onConnectTerminated(TerminationReason r, const char *reason);
 
-  /// Called when a pending connection is terminated
-  virtual void onConnectTerminated(TerminationReason r, const char *reason); 
+    /// Called when an established connection is terminated
+    virtual void onConnectionTerminated(TerminationReason r, const char *error);
 
-  /// Called when an established connection is terminated
-  virtual void onConnectionTerminated(TerminationReason r, const char *error); 
+    /// called on both ends of a connection when the connection is established.
+    virtual void onConnectionEstablished();
 
-  /// called on both ends of a connection when the connection is established.
-  virtual void onConnectionEstablished();
+    /// called when a connection or connection attempt is terminated, whether
+    /// from the local or remote hosts explicitly disconnecting, timing out or network error.
+    void ConnectionTerminated(bool established);
 
-  /// called when a connection or connection attempt is terminated, whether
-  /// from the local or remote hosts explicitly disconnecting, timing out or network error.
-  void ConnectionTerminated(bool established);
+    /// called at the client when ghosting starts
+    virtual void onStartGhosting();
 
-  /// called at the client when ghosting starts
-  virtual void onStartGhosting();
+    /// called at the client when ghosting stops
+    virtual void onEndGhosting();
 
-  /// called at the client when ghosting stops
-  virtual void onEndGhosting();
+    //============ RPCs ===============
 
+    TNL_DECLARE_RPC(rpcTest, (U8 num));
 
-  //============ RPCs =============== 
+    /// Transmits chat messages between client and server.
+    TNL_DECLARE_RPC(rpcChat, (S8 from, S8 to, StringPtr msg));
 
-  TNL_DECLARE_RPC(rpcTest, (U8 num));
+    /// Pauses/unpauses the game, or, when used by a client, requests this from the server.
+    TNL_DECLARE_RPC(rpcPause, (U8 pnum, bool on));
 
-  /// Transmits chat messages between client and server.
-  TNL_DECLARE_RPC(rpcChat, (S8 from, S8 to, StringPtr msg));
+    /// Server prints a message on client's console/HUD
+    TNL_DECLARE_RPC(rpcMessage_s2c, (S8 pnum, StringPtr msg, S8 priority, S8 type));
 
-  /// Pauses/unpauses the game, or, when used by a client, requests this from the server.
-  TNL_DECLARE_RPC(rpcPause, (U8 pnum, bool on));
+    /// When the server changes a netvar during the game, this RPC notifies the clients.
+    TNL_DECLARE_RPC(rpcSendNetVar_s2c, (U16 netid, StringPtr str));
 
+    /// Server asks client to load a map
+    // TNL_DECLARE_RPC(rpcStartMap_s2c, (U8 pnum));
 
-  /// Server prints a message on client's console/HUD
-  TNL_DECLARE_RPC(rpcMessage_s2c, (S8 pnum, StringPtr msg, S8 priority, S8 type));
+    /// server tells client to play a sound/music/sequence
+    // TNL_DECLARE_RPC(rpcStartAmbSound_s2c, (U8 pnum));
+    // TNL_DECLARE_RPC(rpcStart3DSound_s2c, (U8 pnum));
+    // TNL_DECLARE_RPC(rpcStop3DSound_s2c, (U8 pnum));
 
-  /// When the server changes a netvar during the game, this RPC notifies the clients.
-  TNL_DECLARE_RPC(rpcSendNetVar_s2c, (U16 netid, StringPtr str));
+    /// Server kicks a player away.
+    TNL_DECLARE_RPC(rpcKick_s2c, (U8 pnum, StringPtr str));
 
-  /// Server asks client to load a map
-  //TNL_DECLARE_RPC(rpcStartMap_s2c, (U8 pnum));
+    /// Client updates his player info.
+    TNL_DECLARE_RPC(rpcSendOptions_c2s, (U8 pnum, ByteBufferPtr buf));
 
-  /// server tells client to play a sound/music/sequence
-  //TNL_DECLARE_RPC(rpcStartAmbSound_s2c, (U8 pnum));
-  //TNL_DECLARE_RPC(rpcStart3DSound_s2c, (U8 pnum));
-  //TNL_DECLARE_RPC(rpcStop3DSound_s2c, (U8 pnum));
+    /// Client requests a suicide.
+    TNL_DECLARE_RPC(rpcSuicide_c2s, (U8 pnum));
 
-  /// Server kicks a player away.
-  TNL_DECLARE_RPC(rpcKick_s2c, (U8 pnum, StringPtr str));
+    /// Client asks for a new POV ("spy mode").
+    TNL_DECLARE_RPC(rpcRequestPOVchange_c2s, (S32 pnum));
 
+    /// Makes this a valid connection class to the TNL network system.
+    TNL_DECLARE_NETCONNECTION(LConnection);
 
-  /// Client updates his player info.
-  TNL_DECLARE_RPC(rpcSendOptions_c2s, (U8 pnum, ByteBufferPtr buf));
-
-  /// Client requests a suicide.
-  TNL_DECLARE_RPC(rpcSuicide_c2s, (U8 pnum));
-
-  /// Client asks for a new POV ("spy mode").
-  TNL_DECLARE_RPC(rpcRequestPOVchange_c2s, (S32 pnum));
-
-
-
-  /// Makes this a valid connection class to the TNL network system.
-  TNL_DECLARE_NETCONNECTION(LConnection);
-
-  /// A little shorthand for implementing RPCs
-#define LCONNECTION_RPC(rpc_name, args, call_args, guarantee, direction, version) \
-TNL_IMPLEMENT_RPC(LConnection, rpc_name, args, call_args, NetClassGroupGameMask, guarantee, direction, version)
+    /// A little shorthand for implementing RPCs
+#define LCONNECTION_RPC(rpc_name, args, call_args, guarantee, direction, version)                  \
+    TNL_IMPLEMENT_RPC(LConnection,                                                                 \
+                      rpc_name,                                                                    \
+                      args,                                                                        \
+                      call_args,                                                                   \
+                      NetClassGroupGameMask,                                                       \
+                      guarantee,                                                                   \
+                      direction,                                                                   \
+                      version)
 };
-
 
 #endif

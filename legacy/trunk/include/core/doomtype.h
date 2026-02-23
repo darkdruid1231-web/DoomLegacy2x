@@ -26,14 +26,14 @@
 
 // Standard library differences
 #ifdef __WIN32__
-// Fix GCC 13+ / MinGW-w64 header conflicts: prevent GCC from declaring its own _xgetbv and __cpuidex
-// Let MinGW-w64's intrin-impl.h provide the compatible versions
-# ifdef __MINGW32__
-#  define __XSAVEINTRIN_H
-#  define _XGETBV_DEFINED
-#  define __CPUID_H
-#  define _CPUID_H_INCLUDED
-# endif
+// Fix GCC 13+ / MinGW-w64 header conflicts: prevent GCC from declaring its own _xgetbv and
+// __cpuidex Let MinGW-w64's intrin-impl.h provide the compatible versions
+#ifdef __MINGW32__
+#define __XSAVEINTRIN_H
+#define _XGETBV_DEFINED
+#define __CPUID_H
+#define _CPUID_H_INCLUDED
+#endif
 
 // Don't include windows.h early - causes intrinsics conflict with GCC 13+
 // Provide portable Win32 type replacements only for non-Windows builds
@@ -48,114 +48,109 @@ typedef int BOOL;
 #endif
 // On Windows, let MinGW provide these types
 
-# define ASMCALL __cdecl
+#define ASMCALL __cdecl
 #else
-# define ASMCALL
+#define ASMCALL
 #endif
 
 #ifdef __APPLE_CC__
-# define __MACOS__
-# define DEBUG_LOG
-# ifndef O_BINARY
-#  define O_BINARY 0
-# endif
+#define __MACOS__
+#define DEBUG_LOG
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
 #endif
 
-#if defined(__MSC__) || defined(__OS2__)   // Microsoft VisualC++
-# define strncasecmp             strnicmp
-# define strcasecmp              stricmp
-# define inline                  __inline
+#if defined(__MSC__) || defined(__OS2__) // Microsoft VisualC++
+#define strncasecmp strnicmp
+#define strcasecmp stricmp
+#define inline __inline
 #elseif defined(__WATCOMC__)
-# define strncasecmp             strnicmp
-# define strcasecmp              strcmpi
+#define strncasecmp strnicmp
+#define strcasecmp strcmpi
 #endif
 
 #if defined(__linux__)
-# define O_BINARY 0
+#define O_BINARY 0
 #endif
-
 
 // Basic typedefs.
 // NOTE! Somewhere in the code we may still implicitly assume that int = 32 bits, short = 16 bits!
 // These should be replaced with the unambiguous types defined below.
 #ifdef SDL
-# include "SDL_types.h"
+#include "SDL_types.h"
 #else
-# include <stdint.h>
-typedef int8_t  Sint8;
+#include <stdint.h>
+typedef int8_t Sint8;
 typedef int16_t Sint16;
 typedef int32_t Sint32;
-# ifdef __WIN32__
+#ifdef __WIN32__
 typedef __int64 Sint64;
-# else
+#else
 typedef int64_t Sint64;
-# endif
+#endif
 
-typedef uint8_t  Uint8;
+typedef uint8_t Uint8;
 typedef uint16_t Uint16;
 typedef uint32_t Uint32;
 #endif
 
-typedef Uint8  byte;
+typedef Uint8 byte;
 typedef Uint32 tic_t;
 typedef Uint32 angle_t;
 
-
 struct RGB_t
 {
-  byte r, g, b;
+    byte r, g, b;
 };
-
 
 union RGBA_t
 {
-  Uint32 rgba;
-  struct
-  {
-    byte  red;
-    byte  green;
-    byte  blue;
-    byte  alpha;
-  };
+    Uint32 rgba;
+    struct
+    {
+        byte red;
+        byte green;
+        byte blue;
+        byte alpha;
+    };
 };
-
-
 
 // Predefined with some OS.
 #ifndef __WIN32__
-# ifndef __MACOS__
-#  ifndef FREEBSD
-#   include <values.h>
-#  else
-#   include <limits.h>
-#  endif
-# endif
+#ifndef __MACOS__
+#ifndef FREEBSD
+#include <values.h>
+#else
+#include <limits.h>
+#endif
+#endif
 #endif
 
 #ifndef MAXCHAR
-# define MAXCHAR   ((char)0x7f)
+#define MAXCHAR ((char)0x7f)
 #endif
 #ifndef MAXSHORT
-# define MAXSHORT  ((short)0x7fff)
+#define MAXSHORT ((short)0x7fff)
 #endif
 #ifndef MAXINT
-# define MAXINT    ((int)0x7fffffff)
+#define MAXINT ((int)0x7fffffff)
 #endif
 #ifndef MAXLONG
-# define MAXLONG   ((long)0x7fffffff)
+#define MAXLONG ((long)0x7fffffff)
 #endif
 
 #ifndef MINCHAR
-# define MINCHAR   ((char)0x80)
+#define MINCHAR ((char)0x80)
 #endif
 #ifndef MINSHORT
-# define MINSHORT  ((short)0x8000)
+#define MINSHORT ((short)0x8000)
 #endif
 #ifndef MININT
-# define MININT    ((int)0x80000000)
+#define MININT ((int)0x80000000)
 #endif
 #ifndef MINLONG
-# define MINLONG   ((long)0x80000000)
+#define MINLONG ((long)0x80000000)
 #endif
 
 #endif
