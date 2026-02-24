@@ -8,6 +8,8 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <SDL/SDL.h>
+#include <SDL/SDL_mixer.h>
 #include <map>
 
 // Type aliases
