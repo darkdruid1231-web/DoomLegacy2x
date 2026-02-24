@@ -288,8 +288,8 @@ jobs:
       run: |
         wget -q https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.8.0-mingw.tar.gz
         tar xzf SDL2_mixer-devel-2.8.0-mingw.tar.gz
-        sudo cp -r SDL2_mixer-2.8.0/x86_64-w64-mingw32/* /usr/x86_64-w64-mingw32/
-        cat << 'EOF' | sudo tee /usr/x86_64-w64-mingw32/lib/pkgconfig/SDL2_mixer.pc
+        cp -r SDL2_mixer-2.8.0/x86_64-w64-mingw32/* /usr/x86_64-w64-mingw32/
+        cat << 'EOF' | tee /usr/x86_64-w64-mingw32/lib/pkgconfig/SDL2_mixer.pc
         prefix=/usr/x86_64-w64-mingw32
         exec_prefix=${prefix}
         libdir=${exec_prefix}/lib
