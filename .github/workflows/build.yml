@@ -183,7 +183,7 @@ jobs:
 
     - name: Configure CMake for MinGW
       env:
-        PKG_CONFIG_PATH: /usr/x86_64-w64-mingw32/lib/pkgconfig
+        PKG_CONFIG_PATH: /usr/lib/x86_64-linux-gnu/pkgconfig:/usr/x86_64-w64-mingw32/lib/pkgconfig
       run: |
         cd legacy/trunk
         rm -rf build-win
@@ -322,7 +322,7 @@ jobs:
 
     - name: Configure CMake for Clang MinGW
       env:
-        PKG_CONFIG_PATH: /usr/x86_64-w64-mingw32/lib/pkgconfig
+        PKG_CONFIG_PATH: /usr/lib/x86_64-linux-gnu/pkgconfig:/usr/x86_64-w64-mingw32/lib/pkgconfig
       run: |
         cd legacy/trunk
         rm -rf build-win-clang
