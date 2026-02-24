@@ -227,7 +227,7 @@ bool I_SoundIsPlaying(int handle)
 // void I_UpdateSound () {}
 
 /* Pour une raison que j'ignore, la version SDL n'appelle jamais
-   ce truc directement. Fonction vide pour garder une compatibilité
+   ce truc directement. Fonction vide pour garder une compatibilitï¿½
    avec le point de vue de legacy... */
 
 // Himmel, Arsch und Zwirn
@@ -569,7 +569,7 @@ int I_RegisterSong(void *data, int len)
     }
 
     // SDL_mixer automatically frees the rwop when the music is stopped.
-    music.mus = Mix_LoadMUS_RW(music.rwop);
+    music.mus = Mix_LoadMUS_RW(music.rwop, 1);
     if (!music.mus)
     {
         CONS_Printf("Couldn't load music lump: %s\n", Mix_GetError());
