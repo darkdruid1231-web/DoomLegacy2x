@@ -235,10 +235,47 @@ jobs:
         retention-days: 30
         if-no-files-found: warn
 
-  # Windows cross-compilation with Clang + MinGW (disabled - header issues)
-  windows-clang-build:
-    if: false
+  # Windows cross-compilation with Docker + LLVM MinGW
+  windows-cross-build:
     runs-on: self-hosted
+    container: mstorsjo/llvm-mingw:latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        apt-get update
+        apt-get install -y cmake libsdl2-dev libenet-dev
+
+    - name: Configure and Build Windows
+      run: |
+        cd legacy/trunk
+        mkdir -p build-win
+        cd build-win
+
+        # Use container's MinGW tools - no toolchain file needed
+        cmake .. \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DUSE_SDL2=ON \
+          -DUSE_IMAGE_SUPPORT=OFF \
+          -DUSE_NETWORKING=ON
+
+        # Build test executables
+        cmake --build . --target test_fixed_t test_vector test_console test_actor test_save_load_unit --parallel
+
+    - name: Upload Windows cross-compile test artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: doomlegacy-windows-cross-tests
+        path: |
+          legacy/trunk/build-win/test_fixed_t.exe
+          legacy/trunk/build-win/test_vector.exe
+          legacy/trunk/build-win/test_console.exe
+          legacy/trunk/build-win/test_actor.exe
+          legacy/trunk/build-win/test_save_load_unit.exe
+        retention-days: 30
+        if-no-files-found: warn
 
     steps:
     - name: Checkout repository
