@@ -21,7 +21,7 @@
 /// \brief Game types
 
 #include "core/ISerializer.h"
-#include "tnl/tnlNetObject.h"
+#include "tnl_stub.h"
 #include <string>
 
 using namespace std;

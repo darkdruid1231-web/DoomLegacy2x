@@ -20,8 +20,7 @@
 /// \file
 /// \brief Game types (dm, coop, ctf...)
 
-#include "tnl/tnlBitStream.h"
-#include "tnl/tnlGhostConnection.h"
+#include "tnl_stub.h"
 
 #include "core/ISerializer.h"
 

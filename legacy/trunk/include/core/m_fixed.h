@@ -26,9 +26,7 @@
 #include "core/ISerializer.h"
 #include "doomtype.h"
 #include "lnet.h"
-#ifdef TNL_STUB_BUILD
 #include "tnl_stub.h"
-#endif
 #include <math.h>
 #include <stdlib.h>
 

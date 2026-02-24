@@ -29,7 +29,7 @@
 #include "g_think.h"  // We need the Thinker stuff.
 #include "info.h"     // mobjtype_t
 #include "m_fixed.h"  // Basics.
-#include "tnl/tnlNetObject.h"
+#include "tnl_stub.h"
 #include "vect.h"
 
 // using namespace TNL;  // Removed - conflicts with std

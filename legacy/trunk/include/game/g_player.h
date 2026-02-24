@@ -28,7 +28,7 @@
 #include "d_items.h"
 #include "d_ticcmd.h"
 #include "doomtype.h"
-#include "tnl/tnlNetObject.h"
+#include "tnl_stub.h"
 #include <deque>
 #include <map>
 #include <string>
