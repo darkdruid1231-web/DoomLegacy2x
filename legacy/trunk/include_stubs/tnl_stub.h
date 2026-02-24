@@ -276,19 +276,5 @@ public:
 };
 
 // Utility functions
-U32 computeClientIdentityToken(const Address& addr, const Nonce& nonce) { return 0; }
-
-// Stub SDL_mixer functions
-int Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize) { return 0; }
-int Mix_QuerySpec(int* frequency, Uint16* format, int* channels) { return 0; }
-void Mix_SetPostMix(void (*mix_func)(void *udata, Uint8 *stream, int len), void *arg) {}
-void Mix_Resume(int channel) {}
-void Mix_ResumeMusic() {}
-void Mix_CloseAudio() {}
-void Mix_FreeMusic(Mix_Music* music) {}
-Mix_Music* Mix_LoadMUS_RW(SDL_RWops* rw, int freesrc) { return nullptr; }
-int Mix_FadeInMusic(Mix_Music* music, int loops, int ms) { return 0; }
-int Mix_FadeOutMusic(int ms) { return 0; }
-int Mix_VolumeMusic(int volume) { return 0; }
 
 #endif // TNL_STUB_H
