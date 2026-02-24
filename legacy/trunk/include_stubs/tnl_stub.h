@@ -184,6 +184,13 @@ public:
     void setMaskBits(U32 mask) {}
 };
 
+class Actor : public NetObject {
+public:
+    virtual ~Actor() {}
+    virtual void packUpdate(GhostConnection* c, unsigned int mask, BitStream* s) {}
+    virtual void unpackUpdate(GhostConnection* c, BitStream* s) {}
+};
+
 class NetConnection {
 public:
     enum TerminationReason {
@@ -273,6 +280,5 @@ public:
     // Other methods if needed
 };
 
-U32 computeClientIdentityToken(const Address& addr, const Nonce& nonce) { return 0; }
 
 #endif // TNL_STUB_H
