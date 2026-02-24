@@ -269,6 +269,6 @@ public:
     // Other methods if needed
 };
 
-U32 computeClientIdentityToken(const Address& addr, const Nonce& nonce) { return 0; }
+U32 computeClientIdentityToken(const Address& addr, const Nonce& nonce);
 
 #endif // TNL_STUB_H
