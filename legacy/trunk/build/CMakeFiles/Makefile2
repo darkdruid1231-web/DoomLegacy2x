@@ -328,8 +328,8 @@ CMakeFiles/wadtool.dir/clean:
 # Target rules for target CMakeFiles/doomlegacy.dir
 
 # All Build rule for target.
-CMakeFiles/doomlegacy.dir/all: grammars/CMakeFiles/grammars.dir/all
 CMakeFiles/doomlegacy.dir/all: CMakeFiles/util.dir/all
+CMakeFiles/doomlegacy.dir/all: grammars/CMakeFiles/grammars.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78 "Built target doomlegacy"

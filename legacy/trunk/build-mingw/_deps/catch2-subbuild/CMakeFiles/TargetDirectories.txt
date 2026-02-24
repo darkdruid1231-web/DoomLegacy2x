@@ -1,0 +1,3 @@
+/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build-mingw/_deps/catch2-subbuild/CMakeFiles/catch2-populate.dir
+/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build-mingw/_deps/catch2-subbuild/CMakeFiles/edit_cache.dir
+/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build-mingw/_deps/catch2-subbuild/CMakeFiles/rebuild_cache.dir

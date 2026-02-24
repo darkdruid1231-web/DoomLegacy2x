@@ -33,7 +33,7 @@
 
 #include "g_game.h"
 
-using namespace TNL;
+// using namespace TNL;  // Removed to avoid std conflicts
 #include "g_type.h"
 
 #include "i_system.h"
@@ -42,7 +42,7 @@ using namespace TNL;
 #include "vfile.h"
 #include "w_wad.h"
 
-using namespace TNL;
+// using namespace TNL;  // Removed to avoid std conflicts
 
 //===================================================================
 //    Server lists

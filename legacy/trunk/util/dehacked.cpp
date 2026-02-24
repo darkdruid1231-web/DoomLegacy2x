@@ -33,7 +33,7 @@
 
 #include "d_items.h"
 
-using namespace TNL;
+// using namespace TNL;  // Removed to avoid std conflicts
 #include "dstrings.h"
 #include "info.h"
 #include "sounds.h"

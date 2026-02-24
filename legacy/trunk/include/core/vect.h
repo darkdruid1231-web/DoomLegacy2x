@@ -233,7 +233,7 @@ template <typename T> class vec_t
     }
 
     /// Legacy TNL BitStream serialization for compatibility
-    inline void Pack(TNL::BitStream *s)
+    inline void Pack(BitStream *s)
     {
         x.Pack(s);
         y.Pack(s);
@@ -249,7 +249,7 @@ template <typename T> class vec_t
     }
 
     /// Legacy TNL BitStream deserialization for compatibility
-    inline void Unpack(TNL::BitStream *s)
+    inline void Unpack(BitStream *s)
     {
         x.Unpack(s);
         y.Unpack(s);
