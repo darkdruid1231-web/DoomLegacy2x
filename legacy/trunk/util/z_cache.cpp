@@ -20,57 +20,52 @@
 /// \file
 /// \brief Abstract cache system with reference counting.
 
-#include "doomdef.h"
 #include "z_cache.h"
+#include "doomdef.h"
 #include "z_zone.h"
-
 
 //=================================================================================
 
 cacheitem_t::cacheitem_t(const char *n)
 {
-  strncpy(name, n, CACHE_NAME_LEN); // we make a copy so it stays intact as long as this cacheitem lives
-  name[CACHE_NAME_LEN] = '\0';      // NUL-terminated to be safe
-  refcount = 0;
-  usefulness = 0;
+    strncpy(name,
+            n,
+            CACHE_NAME_LEN); // we make a copy so it stays intact as long as this cacheitem lives
+    name[CACHE_NAME_LEN] = '\0'; // NUL-terminated to be safe
+    refcount = 0;
+    usefulness = 0;
 }
-
 
 void *cacheitem_t::operator new(size_t size)
 {
-  return Z_Malloc(size, PU_STATIC, NULL);
+    return Z_Malloc(size, PU_STATIC, NULL);
 }
-
 
 void cacheitem_t::operator delete(void *mem)
 {
-  Z_Free(mem);
+    Z_Free(mem);
 }
-
 
 bool cacheitem_t::Release()
 {
-  if (--refcount < 0)
-    I_Error("cacheitem_t '%s': Too many releases!\n", name);
+    if (--refcount < 0)
+        I_Error("cacheitem_t '%s': Too many releases!\n", name);
 
-  return (refcount == 0);
+    return (refcount == 0);
 }
 
 bool cacheitem_t::FreeIfUnused()
 {
-  if (refcount == 0)
+    if (refcount == 0)
     {
-      delete this; // delete the cacheitem itself
-      return true;
+        delete this; // delete the cacheitem itself
+        return true;
     }
 
-  return false;
+    return false;
 }
 
-
-
 //=================================================================================
-
 
 /// Pure virtual, renew. This is a sample implementation.
 /*

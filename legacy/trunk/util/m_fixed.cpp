@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: m_fixed.cpp 367 2006-08-10 16:26:53Z smite-meister $
@@ -21,22 +21,32 @@
 /// \file
 /// \brief Fixed point math.
 
-#include "tnl/tnlBitStream.h"
-#include "i_system.h"
 #include "m_fixed.h"
+#include "i_system.h"
+#include "tnl/tnlBitStream.h"
 
 /// smallest possible increment
-fixed_t fixed_epsilon(1/float(fixed_t::UNIT));
+fixed_t fixed_epsilon(1 / float(fixed_t::UNIT));
 
 /// Serialization using ISerializer abstraction
 void fixed_t::Pack(DoomLegacy::ISerializer &s)
 {
-  // TODO: save some bandwidth
-  s.write(static_cast<uint32_t>(val));
+    // TODO: save some bandwidth
+    s.write(static_cast<uint32_t>(val));
+}
+
+void fixed_t::Pack(TNL::BitStream *s)
+{
+    s->writeInt(val, 32);
 }
 
 /// Deserialization using ISerializer abstraction
 void fixed_t::Unpack(DoomLegacy::ISerializer &s)
 {
-  val = s.readInt32();
+    val = s.readInt32();
+}
+
+void fixed_t::Unpack(TNL::BitStream *s)
+{
+    val = s->readInt(32);
 }

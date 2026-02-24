@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: m_dll.cpp 309 2006-02-11 17:02:49Z jussip $
@@ -25,31 +25,31 @@
 #ifdef __MINGW32__
 // Prevent GCC from declaring conflicting _xgetbv and __cpuidex
 // Let MinGW-w64's intrin-impl.h provide the compatible versions
-# define _XSAVEINTRIN_H_INCLUDED 1
-# define _XGETBV_DEFINED 1
-# define __CPUID_H 1
+#define _XSAVEINTRIN_H_INCLUDED 1
+#define _XGETBV_DEFINED 1
+#define __CPUID_H 1
 #endif
 
 // Why oh why can't there be just one standard DLL system inteface?!?
 #ifdef __WIN32__
-  // windows
-# include <windows.h>
+// windows
+#include <windows.h>
 #else
-  // unices
-# include <dlfcn.h>
+// unices
+#include <dlfcn.h>
 #endif
 #include <string.h>
 
 #include "doomdef.h"
 #include "m_dll.h"
 
-// Dynamically loads a DLL file 
+// Dynamically loads a DLL file
 dll_handle_t OpenDLL(const char *dllname)
 {
 #ifdef __WIN32__
-  return LoadLibrary(dllname);
+    return LoadLibrary(dllname);
 #else
-  return dlopen(dllname, RTLD_LAZY);
+    return dlopen(dllname, RTLD_LAZY);
 #endif
 }
 
@@ -57,9 +57,9 @@ dll_handle_t OpenDLL(const char *dllname)
 void CloseDLL(dll_handle_t handle)
 {
 #ifdef __WIN32__
-  FreeLibrary(handle);
-#else  
-  dlclose(handle);
+    FreeLibrary(handle);
+#else
+    dlclose(handle);
 #endif
 }
 
@@ -69,57 +69,50 @@ void CloseDLL(dll_handle_t handle)
 void *GetSymbol(dll_handle_t handle, const char *symbol)
 {
 #ifdef __WIN32__
-  return (void *)GetProcAddress(handle, symbol);
+    return (void *)GetProcAddress(handle, symbol);
 #else
-  return dlsym(handle, symbol);
+    return dlsym(handle, symbol);
 #endif
 }
 
-
-
-
-
 LegacyDLL::LegacyDLL()
 {
-  handle = NULL;
+    handle = NULL;
 }
-
 
 LegacyDLL::~LegacyDLL()
 {
-  if (handle)
-    CloseDLL(handle);
+    if (handle)
+        CloseDLL(handle);
 }
-
 
 bool LegacyDLL::Open(const char *filename)
 {
-  handle = OpenDLL(filename);
-  if (!handle)
+    handle = OpenDLL(filename);
+    if (!handle)
     {
-      I_Error("Could not load DLL %s!\n", filename);
-      return false;
+        I_Error("Could not load DLL %s!\n", filename);
+        return false;
     }
 
-  dll_info_t *info = (dll_info_t *)GetSymbol(handle, "dll_info");
-  if (!info)
+    dll_info_t *info = (dll_info_t *)GetSymbol(handle, "dll_info");
+    if (!info)
     {
-      I_Error("DLL %s exports no dll_info!\n", filename);
-      return false;
+        I_Error("DLL %s exports no dll_info!\n", filename);
+        return false;
     }
 
-  api_version = info->api_version;
-  version = info->version;
-  strcpy(name, info->name);
-  
-  return true;
+    api_version = info->api_version;
+    version = info->version;
+    strcpy(name, info->name);
+
+    return true;
 }
-
 
 void *LegacyDLL::FindSymbol(const char *symbol)
 {
-  if (handle)
-    return GetSymbol(handle, symbol);
+    if (handle)
+        return GetSymbol(handle, symbol);
 
-  return NULL;
+    return NULL;
 }
