@@ -217,6 +217,10 @@ public:
     Address getNetAddress() const { return Address(); }
     virtual NetInterface* getInterface() { return nullptr; }
 
+    // Additional RPCs
+    virtual void c2sIntermissionDone() {}
+    virtual void s2cStartIntermission(unsigned char a, unsigned char b, unsigned int c, unsigned int d, unsigned int e, unsigned int f) {}
+
     void setGhostFrom(bool from) {}
     void setGhostTo(bool to) {}
     void activateGhosting() {}
