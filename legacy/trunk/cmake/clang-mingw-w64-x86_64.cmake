@@ -17,8 +17,8 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
 # Clang target and linker flags for MinGW cross-compilation
-set(CMAKE_C_FLAGS   "-target x86_64-w64-mingw32 --sysroot=/usr/x86_64-w64-mingw32 -I/usr/x86_64-w64-mingw32/include -L/usr/x86_64-w64-mingw32/lib -L/usr/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/13-posix")
-set(CMAKE_CXX_FLAGS "-target x86_64-w64-mingw32 --sysroot=/usr/x86_64-w64-mingw32 -I/usr/x86_64-w64-mingw32/include -L/usr/x86_64-w64-mingw32/lib -L/usr/x86_64-w64-mingw32/lib/gcc/x86_64-w64-mingw32/13-posix")
+set(CMAKE_C_FLAGS   "-target x86_64-w64-mingw32 --sysroot=/usr/x86_64-w64-mingw32 -I/usr/x86_64-w64-mingw32/include -L/usr/x86_64-w64-mingw32/lib -L/usr/lib/gcc/x86_64-w64-mingw32/13-posix")
+set(CMAKE_CXX_FLAGS "-target x86_64-w64-mingw32 --sysroot=/usr/x86_64-w64-mingw32 -I/usr/x86_64-w64-mingw32/include -L/usr/lib/gcc/x86_64-w64-mingw32/13-posix -L/usr/x86_64-w64-mingw32/lib")
 
 # Windows-specific link flags: bundle libgcc/libstdc++ statically so the
 # produced .exe doesn't require extra DLLs at runtime.
