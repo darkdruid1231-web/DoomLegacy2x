@@ -97,7 +97,22 @@ class PlayerInfo;
 class Material;
 class Actor;
 struct fline_t;
-struct quad;
+
+struct quadtexcoord {
+  GLfloat l;
+  GLfloat r;
+  GLfloat t;
+  GLfloat b;
+};
+
+struct quad {
+  Material *m;
+  struct quadtexcoord t;
+  vertex_t *v1;
+  vertex_t *v2;
+  GLfloat bottom;
+  GLfloat top;
+};
 
 /// \brief OpenGL renderer.
 /*!
