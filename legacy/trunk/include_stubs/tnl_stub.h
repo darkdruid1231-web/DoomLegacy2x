@@ -9,6 +9,11 @@
 #include <vector>
 #include <map>
 
+// Compatibility namespace
+namespace lnet {
+    using BitStream = ::BitStream;
+}
+
 // Type aliases
 typedef uint8_t U8;
 typedef uint16_t U16;
@@ -44,7 +49,7 @@ public:
 
     void write(uint32_t val) {}
     uint32_t read() { return 0; }
-    void writeFlag(bool val) {}
+    bool writeFlag(bool val) { return val; }
     bool readFlag() { return false; }
     void writeInt(uint32_t val, int bits) {}
     uint32_t readInt(int bits) { return 0; }
@@ -58,6 +63,7 @@ public:
     void read(S32* val, size_t bits) { *val = 0; }
     void read(bool* val, size_t bits) { *val = false; }
     void read(byte* buffer, int bits) {}
+    void read(unsigned char* val) { *val = 0; }
 
     uint8_t* getBuffer() { return nullptr; }
     uint32_t getPosition() const { return 0; }
@@ -87,6 +93,8 @@ public:
     GhostConnection() {}
     virtual ~GhostConnection() {}
     void objectInScope(void* obj) {}
+    S32 getGhostIndex(void* obj) { return -1; }
+    void* resolveGhost(S32 idx) { return nullptr; }
 };
 
 class NetObject {
@@ -159,6 +167,8 @@ void s2cEnterMap(U8 mapnum) {}
 #define BIT(x) (1 << (x))
 #define TNL_DECLARE_RPC(func, params) void func params {}
 #define TNL_IMPLEMENT_CLASS(cls)
+#define TNL_IMPLEMENT_NETOBJECT(cls)
+#define TNL_IMPLEMENT_NETOBJECT_RPC(...)
 #define TNL_RPC_CONSTRUCT_NETEVENT(player, rpc, args) nullptr
 
 U32 computeClientIdentityToken(const Address& addr, const Nonce& nonce) { return 0; }
@@ -167,6 +177,14 @@ U32 computeClientIdentityToken(const Address& addr, const Nonce& nonce) { return
 enum {
     FirstValidInfoPacketId = 0,
     PT_ServerPing = FirstValidInfoPacketId
+};
+
+// Networking constants
+enum {
+    NetClassGroupGameMask = 0,
+    RPCGuaranteedOrdered = 0,
+    RPCToGhost = 0,
+    RPCToGhostParent = 0
 };
 
 #endif // TNL_STUB_H

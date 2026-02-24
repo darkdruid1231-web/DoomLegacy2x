@@ -233,6 +233,11 @@ class Actor : public Thinker, public NetObject
     TNL_DECLARE_CLASS(Actor);
     DECLARE_CLASS(Actor);
 
+    // Stub networking members
+    struct NetFlags { void set(int) {} } mNetFlags;
+    enum { Ghostable = 1 };
+    bool isInitialUpdate() { return false; }
+
     /// netcode
     virtual bool onGhostAdd(GhostConnection *c);
     virtual void onGhostRemove();
