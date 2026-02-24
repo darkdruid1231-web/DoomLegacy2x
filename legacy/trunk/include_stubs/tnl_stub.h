@@ -1,5 +1,6 @@
 // Minimal TNL stub - no namespace conflicts with std
 // Forward declarations only - no actual implementation
+// Updated for CI fix
 
 #ifndef TNL_STUB_H
 #define TNL_STUB_H
