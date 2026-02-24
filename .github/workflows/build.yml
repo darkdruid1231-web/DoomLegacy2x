@@ -51,8 +51,8 @@ jobs:
         else
           echo "Build failed - see summary below"
           echo "Looking for error summarizer script..."
-          find ../../../ -name "build_error_summarizer.py" 2>/dev/null || echo "Script not found"
-          python3 ../../../build_error_summarizer.py < build.log || echo "Error summarizer failed"
+          find ../../ -name "build_error_summarizer.py" 2>/dev/null || echo "Script not found"
+          python3 ../../build_error_summarizer.py < build.log || echo "Error summarizer failed"
           exit 1
         fi
 
