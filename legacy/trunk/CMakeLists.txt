@@ -181,10 +181,6 @@ include_directories(${CMAKE_SOURCE_DIR}/include_stubs)
     endif()
 else()
     message(STATUS "Using legacy TNL networking")
-    # Skip stub headers when networking is disabled
-    
-    # Skip TNL library finding when networking is disabled (Windows cross-compile)
-    if(USE_NETWORKING)
     # TNL (legacy)
     if(EXISTS "/home/geoffrey/tnl/lib/libtnl.a")
         set(TNL_LIBRARY "/home/geoffrey/tnl/lib/libtnl.a")
@@ -202,8 +198,7 @@ else()
     if(${TOMCRYPT_LIBRARY} STREQUAL "TOMCRYPT_LIBRARY-NOTFOUND")
         message(FATAL_ERROR "Tomcrypt library not found.")
     endif()
-    endif()  # USE_NETWORKING
-    
+
     check_include_file_cxx("tnl/tnl.h" HAS_TNL_HEADER)
     if(NOT ${HAS_TNL_HEADER})
         if(EXISTS "/home/geoffrey/tnl/tnl/tnl.h")
@@ -212,7 +207,7 @@ else()
             message(FATAL_ERROR "TNL headers not found.")
         endif()
     endif()
-    endif()  # USE_MODERN_NETWORKING
+endif()  # USE_MODERN_NETWORKING
 endif()  # USE_NETWORKING
 
 # Graphics - PNG/JPEG support (can be disabled for Windows cross-compilation)
