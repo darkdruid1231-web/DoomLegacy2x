@@ -184,12 +184,6 @@ public:
     void setMaskBits(U32 mask) {}
 };
 
-class Map {
-public:
-    void SN_StartSequence(void*, int) {}
-    void SN_StopSequence(void*, bool) {}
-};
-
 class NetConnection {
 public:
     enum TerminationReason {
@@ -280,16 +274,5 @@ public:
 };
 
 U32 computeClientIdentityToken(const Address& addr, const Nonce& nonce);
-
-#ifndef HAVE_MIXER
-class SoundSystem {
-public:
-    static void StartMusic(const char*, bool) {}
-    void UpdateSounds() {}
-    void Stop3DSounds() {}
-    void Stop3DSound(void*) {}
-};
-SoundSystem* S = nullptr;
-#endif
 
 #endif // TNL_STUB_H
