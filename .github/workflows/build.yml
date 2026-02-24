@@ -241,8 +241,9 @@ jobs:
         retention-days: 30
         if-no-files-found: warn
 
-  # Windows cross-compilation with Docker + LLVM MinGW
+  # Windows cross-compilation with Docker + LLVM MinGW (temporarily disabled)
   windows-cross-build:
+    if: false
     runs-on: self-hosted
     container: mstorsjo/llvm-mingw:latest
     steps:
