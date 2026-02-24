@@ -404,10 +404,7 @@ endif()
 add_test(NAME fixed_t_tests COMMAND test_fixed_t)
 
 # Individual fixed_t test using Catch2 (Phase 1 - new framework)
-add_executable(test_fixed_catch2 tests/unit/test_fixed_catch2.cpp)
-target_include_directories(test_fixed_catch2 PRIVATE include include_stubs)
-target_link_libraries(test_fixed_catch2 PRIVATE Catch2::Catch2WithMain)
-add_test(NAME fixed_t_catch2_tests COMMAND test_fixed_catch2)
+# Removed test_fixed_catch2 - Catch2 dependency removed for faster builds
 
 # Note: The run_tests target was removed because each unit test file has its own main()
 # Individual unit tests are covered by their own executables below
