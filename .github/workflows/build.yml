@@ -272,7 +272,10 @@ jobs:
   # Windows cross-compilation with Docker + LLVM MinGW
   windows-cross-build:
     runs-on: self-hosted
-    container: mstorsjo/llvm-mingw:latest
+    container:
+      image: mstorsjo/llvm-mingw:latest
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
