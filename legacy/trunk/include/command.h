@@ -210,9 +210,9 @@ struct consvar_t
     static void SaveVariables(FILE *f);
 
     /// save all CV_NETVAR variables into a buffer
-    static void SaveNetVars(TNL::BitStream &s);
+    static void SaveNetVars(BitStream &s);
     /// load all CV_NETVAR variables from a buffer
-    static void LoadNetVars(TNL::BitStream &s);
+    static void LoadNetVars(BitStream &s);
 
     /// save all CV_NETVAR variables using abstraction (TNL-independent)
     static void SaveNetVars(DoomLegacy::ISerializer &s);

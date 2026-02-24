@@ -76,7 +76,7 @@ class FileCache
     /// Number of lumps in the VFile
     unsigned int GetNumLumps(int filenum);
     /// Writes miscellaneous info about the VFile into the BitStream.
-    void WriteNetInfo(TNL::BitStream &s);
+    void WriteNetInfo(BitStream &s);
 
     // Search methods return a lump number. Return -1 if nothing is found.
 

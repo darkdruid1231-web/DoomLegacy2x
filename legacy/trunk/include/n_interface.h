@@ -167,8 +167,8 @@ class serverinfo_t
 
     serverinfo_t(const Address &a);
     void Draw(int x, int y);
-    void Read(TNL::BitStream &s);
-    static void Write(TNL::BitStream &s);
+    void Read(BitStream &s);
+    static void Write(BitStream &s);
 };
 
 #endif
