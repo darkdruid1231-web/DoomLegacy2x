@@ -23,8 +23,6 @@ typedef float F32;
 typedef double F64;
 typedef uint32_t IPAddress;
 typedef unsigned char byte;
-typedef void* mappoint_t;
-typedef void* PlayerInfo;
 
 // Forward declarations
 class BitStream;
@@ -186,16 +184,9 @@ public:
     void setMaskBits(U32 mask) {}
 };
 
-class Actor : public NetObject {
-public:
-    virtual ~Actor() {}
-    virtual void packUpdate(GhostConnection* c, unsigned int mask, BitStream* s) {}
-    virtual void unpackUpdate(GhostConnection* c, BitStream* s) {}
-};
-
 class Map {
 public:
-    void SN_StartSequence(mappoint_t, int) {}
+    void SN_StartSequence(void*, int) {}
     void SN_StopSequence(void*, bool) {}
 };
 
@@ -299,10 +290,6 @@ public:
     void Stop3DSound(void*) {}
 };
 SoundSystem* S = nullptr;
-void S_StartSound(Actor*, int, float) {}
-void S_StartSound(mappoint_t*, int, float) {}
-void S_StartAmbSound(PlayerInfo*, int, float) {}
-void S_StartLocalAmbSound(int, float) {}
 #endif
 
 #endif // TNL_STUB_H
