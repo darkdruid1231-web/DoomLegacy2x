@@ -183,8 +183,7 @@ if(USE_NETWORKING)
     endif()
 else()
     message(STATUS "Using legacy TNL networking")
-    # Include stub headers if TNL not available
-    include_directories(${CMAKE_SOURCE_DIR}/include_stubs)
+    # Skip stub headers when networking is disabled
     
     # Skip TNL library finding when networking is disabled (Windows cross-compile)
     if(USE_NETWORKING)
