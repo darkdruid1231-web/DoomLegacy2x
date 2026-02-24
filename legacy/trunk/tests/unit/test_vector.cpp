@@ -35,21 +35,21 @@ static string last_failure;
     {                                                                                              \
         tests_run++;                                                                               \
         last_failure = "";                                                                         \
-        cout << "  " << name << " ... ";                                                           \
+        std::cout << "  " << name << " ... ";                                                      \
     } while (0)
 
 #define PASS()                                                                                     \
     do                                                                                             \
     {                                                                                              \
         tests_passed++;                                                                            \
-        cout << "PASS" << endl;                                                                    \
+        std::cout << "PASS" << std::endl;                                                          \
     } while (0)
 
 #define FAIL(msg)                                                                                  \
     do                                                                                             \
     {                                                                                              \
         last_failure = msg;                                                                        \
-        cout << "FAIL: " << msg << endl;                                                           \
+        std::cout << "FAIL: " << msg << std::endl;                                                 \
     } while (0)
 
 #define ASSERT_EQ(expected, actual, msg)                                                           \
@@ -58,7 +58,7 @@ static string last_failure;
         if ((expected) != (actual))                                                                \
         {                                                                                          \
             FAIL(msg);                                                                             \
-            cout << "    Expected: " << (expected) << ", Got: " << (actual) << endl;               \
+            std::cout << "    Expected: " << (expected) << ", Got: " << (actual) << std::endl;     \
             return;                                                                                \
         }                                                                                          \
     } while (0)
@@ -69,8 +69,8 @@ static string last_failure;
         if (fabs((expected) - (actual)) > (tolerance))                                             \
         {                                                                                          \
             FAIL(msg);                                                                             \
-            cout << "    Expected: " << (expected) << " +/- " << (tolerance)                       \
-                 << ", Got: " << (actual) << endl;                                                 \
+            std::cout << "    Expected: " << (expected) << " +/- " << (tolerance)                  \
+                 << ", Got: " << (actual) << std::endl;                                            \
             return;                                                                                \
         }                                                                                          \
     } while (0)
@@ -368,7 +368,7 @@ void test_polar_coordinates()
 
 int main()
 {
-    cout << "=== Vector Math Tests ===" << endl;
+    std::cout << "=== Vector Math Tests ===" << std::endl;
 
     // Constructor tests
     test_default_constructor();
@@ -401,8 +401,8 @@ int main()
     test_inequality();
     test_bit_shift();
 
-    cout << endl;
-    cout << "Results: " << tests_passed << "/" << tests_run << " tests passed" << endl;
+    std::cout << std::endl;
+    std::cout << "Results: " << tests_passed << "/" << tests_run << " tests passed" << std::endl;
 
     return (tests_passed == tests_run) ? 0 : 1;
 }

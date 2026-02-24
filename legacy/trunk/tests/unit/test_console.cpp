@@ -35,21 +35,21 @@ static string last_failure;
     {                                                                                              \
         tests_run++;                                                                               \
         last_failure = "";                                                                         \
-        cout << "  " << name << " ... ";                                                           \
+        std::cout << "  " << name << " ... ";                                                      \
     } while (0)
 
 #define PASS()                                                                                     \
     do                                                                                             \
     {                                                                                              \
         tests_passed++;                                                                            \
-        cout << "PASS" << endl;                                                                    \
+        std::cout << "PASS" << std::endl;                                                          \
     } while (0)
 
 #define FAIL(msg)                                                                                  \
     do                                                                                             \
     {                                                                                              \
         last_failure = msg;                                                                        \
-        cout << "FAIL: " << msg << endl;                                                           \
+        std::cout << "FAIL: " << msg << std::endl;                                                 \
     } while (0)
 
 #define ASSERT_EQ(expected, actual, msg)                                                           \
@@ -58,7 +58,7 @@ static string last_failure;
         if ((expected) != (actual))                                                                \
         {                                                                                          \
             FAIL(msg);                                                                             \
-            cout << "    Expected: " << (expected) << ", Got: " << (actual) << endl;               \
+            std::cout << "    Expected: " << (expected) << ", Got: " << (actual) << std::endl;     \
             return;                                                                                \
         }                                                                                          \
     } while (0)
@@ -190,7 +190,7 @@ void test_consvar_flags()
 
 int main()
 {
-    cout << "=== Command Buffer Tests ===" << endl;
+    std::cout << "=== Command Buffer Tests ===" << std::endl;
 
     test_command_buffer_class_exists();
     test_command_buffer_fields();
@@ -204,8 +204,8 @@ int main()
     test_consvar_t_exists();
     test_consvar_flags();
 
-    cout << endl;
-    cout << "Results: " << tests_passed << "/" << tests_run << " tests passed" << endl;
+    std::cout << std::endl;
+    std::cout << "Results: " << tests_passed << "/" << tests_run << " tests passed" << std::endl;
 
     return (tests_passed == tests_run) ? 0 : 1;
 }
