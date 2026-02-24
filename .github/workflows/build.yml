@@ -245,17 +245,12 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Set up Clang
-      uses: egor-tensin/setup-clang@v2
-      with:
-        version: latest
-        platform: x64
-
     - name: Install additional tools
       run: |
         sudo apt-get update
         sudo apt-get install -y \
             build-essential \
+            clang \
             lld \
             mingw-w64 \
             libstdc++-12-dev \
