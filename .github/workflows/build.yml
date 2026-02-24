@@ -41,7 +41,7 @@ jobs:
         rm -rf build
         mkdir -p build
         cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_MODERN_NETWORKING=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_MODERN_NETWORKING=OFF -DUSE_CDROM=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
         # Build main executable, tools, and tests
         cmake --build . --target doomlegacy d2h wadtool test_fixed_t test_vector test_console test_actor test_save_load_unit --parallel 4 2>&1 | tee build.log
         if [ ${PIPESTATUS[0]} -eq 0 ]; then
