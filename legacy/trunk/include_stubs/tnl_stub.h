@@ -10,10 +10,14 @@
 #include <vector>
 #ifdef SDL2
 #include <SDL2/SDL.h>
+#ifdef HAVE_SDL2_MIXER
 #include <SDL2/SDL_mixer.h>
+#endif
 #else
 #include <SDL/SDL.h>
+#ifdef HAVE_SDL2_MIXER
 #include <SDL/SDL_mixer.h>
+#endif
 #endif
 #include <map>
 
