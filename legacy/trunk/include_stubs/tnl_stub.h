@@ -72,11 +72,6 @@ public:
     uint32_t readBits(int bits) { return 0; }
 };
 
-// Compatibility namespace
-namespace lnet {
-    using BitStream = ::BitStream;
-}
-
 class NetConnection {
 public:
     NetConnection() {}
