@@ -111,6 +111,7 @@ jobs:
             mingw-w64 \
             g++-mingw-w64-x86-64 \
             gcc-mingw-w64-x86-64 \
+            mingw-w64-headers \
             cmake \
             libsdl1.2-dev \
             wget \
@@ -251,6 +252,7 @@ jobs:
             clang \
             lld \
             mingw-w64 \
+            mingw-w64-headers \
             libstdc++-12-dev \
             libsdl1.2-dev \
             cmake \

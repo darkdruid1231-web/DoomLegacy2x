@@ -16,8 +16,10 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
-# Set sysroot to prevent host header leakage
-set(CMAKE_SYSROOT /usr/x86_64-w64-mingw32)
+# Do NOT set CMAKE_SYSROOT here.  Setting it passes --sysroot to the compiler
+# which disrupts the C++ stdlib's #include_next chain and breaks <ctime> /
+# <chrono> when they try to pull clock_t / tm from the system time.h.
+# The MinGW cross-compiler already knows its own sysroot path internally.
 
 # Windows-specific link flags: bundle libgcc/libstdc++ statically so the
 # produced .exe doesn't require extra DLLs at runtime.
