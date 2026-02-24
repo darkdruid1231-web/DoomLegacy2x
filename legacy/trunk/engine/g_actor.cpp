@@ -331,8 +331,11 @@ void Actor::serialize(DoomLegacy::ISerializer &s, Uint32 mask)
             // as often as possible
             pos.Pack(s);
             vel.Pack(s);
-            s.write(static_cast<uint32_t>(yaw >> (32 - ACTOR_AR)), ACTOR_AR);
-            s.write(static_cast<uint32_t>(pitch >> (32 - ACTOR_AR)), ACTOR_AR);
+            // Write only the high ACTOR_AR bits of yaw/pitch
+            // ISerializer doesn't have writeInt, so we write full 32 bits
+            // (less efficient than BitStream but compatible)
+            s.write(static_cast<uint32_t>(yaw >> (32 - ACTOR_AR)));
+            s.write(static_cast<uint32_t>(pitch >> (32 - ACTOR_AR)));
         }
 
         // TODO: M_PRES and M_ANIM would need presentation serialization
@@ -348,6 +351,8 @@ void Actor::serialize(DoomLegacy::ISerializer &s, Uint32 mask)
             // movement data
             apos.Unpack(s);
             avel.Unpack(s);
+            // Read the value and shift back to full angle
+            // BitStream reads only ACTOR_AR bits, ISerializer reads 32 bits
             yaw = static_cast<angle_t>(s.readUInt32() << (32 - ACTOR_AR));
             pitch = static_cast<angle_t>(s.readUInt32() << (32 - ACTOR_AR));
         }
