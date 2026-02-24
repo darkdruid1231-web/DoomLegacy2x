@@ -24,7 +24,7 @@ jobs:
             cmake \
             g++ \
             libsdl1.2-dev \
-            libsdl2-mixer-dev \
+            libsdl-mixer1.2-dev \
             libpng-dev \
             libjpeg-dev \
             libenet-dev \
