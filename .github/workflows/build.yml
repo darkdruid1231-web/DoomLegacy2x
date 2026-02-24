@@ -239,9 +239,10 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_CXX_FLAGS="-Wno-inline -Wno-missing-attributes" \
           -DUSE_SDL2=ON \
-          -DUSE_SOUND=OFF \
+          -DUSE_SOUND=ON \
           -DUSE_IMAGE_SUPPORT=OFF \
           -DUSE_NETWORKING=ON \
+          -DCMAKE_PREFIX_PATH=/usr/x86_64-w64-mingw32 \
           -DENET_INCLUDE_DIR=/usr/x86_64-w64-mingw32/include \
           -DENET_LIBRARY=/usr/x86_64-w64-mingw32/lib/libenet.a
 
