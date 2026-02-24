@@ -39,7 +39,7 @@ jobs:
         rm -rf build
         mkdir -p build
         cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_MODERN_NETWORKING=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_MODERN_NETWORKING=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
         # Build test executables
         cmake --build . --target test_fixed_t test_vector test_console test_actor test_save_load_unit --parallel 2>&1 | tee build.log
 
