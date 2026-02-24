@@ -863,7 +863,7 @@ void consvar_t::GotNetVar(unsigned short id, const char *str)
 }
 
 // write the netvars into a packet
-void consvar_t::SaveNetVars(TNL::BitStream &s)
+void consvar_t::SaveNetVars(BitStream &s)
 {
     for (consvar_t *cvar = cvar_list; cvar; cvar = cvar->next)
         if (cvar->flags & CV_NETVAR)
@@ -874,7 +874,7 @@ void consvar_t::SaveNetVars(TNL::BitStream &s)
 }
 
 // read the netvars from a packet
-void consvar_t::LoadNetVars(TNL::BitStream &s)
+void consvar_t::LoadNetVars(BitStream &s)
 {
     for (consvar_t *cvar = cvar_list; cvar; cvar = cvar->next)
         if (cvar->flags & CV_NETVAR)

@@ -13,6 +13,9 @@
 class BitStream;
 class NetConnection;
 class GhostConnection;
+class NetObject;
+class Address;
+class Nonce;
 
 // Simple stubs in global namespace
 class BitStream {
@@ -56,6 +59,33 @@ public:
     virtual ~GhostConnection() {}
 };
 
+class NetObject {
+public:
+    NetObject() {}
+    virtual ~NetObject() {}
+    virtual bool onGhostAdd(GhostConnection *c) { return true; }
+    virtual void onGhostRemove() {}
+    virtual void performScopeQuery(GhostConnection *c) {}
+};
+
+class Address {
+public:
+    Address() {}
+    Address(const char* str) {}
+    std::string toString() const { return ""; }
+    bool isEqualAddress(const Address& other) const { return false; }
+};
+
+class Nonce {
+public:
+    Nonce() {}
+    void generate() {}
+};
+
+// Macros
+#define BIT(x) (1 << (x))
+#define TNL_DECLARE_RPC(func, params) void func params {}
+
 // Type aliases
 typedef uint8_t U8;
 typedef uint16_t U16;
@@ -68,5 +98,11 @@ typedef int64_t S64;
 typedef float F32;
 typedef double F64;
 typedef uint32_t IPAddress;
+
+// Packet type constants
+enum {
+    FirstValidInfoPacketId = 0,
+    PT_ServerPing = FirstValidInfoPacketId
+};
 
 #endif // TNL_STUB_H
