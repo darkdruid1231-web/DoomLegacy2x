@@ -53,7 +53,8 @@ enum TerminationReason {
 };
 
 enum TransportProtocol {
-    // Placeholder
+    IPProtocol,
+    IPXProtocol
 };
 
 enum NetClassGroup {
@@ -94,6 +95,7 @@ class Address {
 public:
     Address() {}
     Address(const char* str) {}
+    Address(TransportProtocol ptc, Address (*func)(), S32 port) {}  // Match the call
     std::string toString() const { return ""; }  // Changed from toString() to getNetAddressString() if needed
     bool isEqualAddress(const Address& other) const { return false; }
     bool operator==(const Address& other) const { return false; }
@@ -189,6 +191,11 @@ public:
 
 class NetConnection {
 public:
+    enum TerminationReason {
+        ReasonNone = 0,
+        ReasonSelfDisconnect
+    };
+
     NetConnection() {}
     virtual ~NetConnection() {}
     virtual void connect(NetInterface* iface, const Address& addr) {}
