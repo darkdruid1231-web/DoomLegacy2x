@@ -16,7 +16,7 @@ mkdir -p build
 cd build
 
 # Configure with CMake
-cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_SDL2=ON
+cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_SDL2=ON -DUSE_SOUND=OFF -DUSE_CDROM=OFF
 
 # Build
 make -j$(nproc)
