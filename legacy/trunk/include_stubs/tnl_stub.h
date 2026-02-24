@@ -31,7 +31,6 @@ class NetObject;
 class NetInterface;
 class NetEvent;
 class PacketStream;
-class LConnection;
 class Address;
 class Nonce;
 class StringPtr;
@@ -146,13 +145,6 @@ class NetEvent {
 public:
     NetEvent() {}
     virtual ~NetEvent() {}
-};
-
-class LConnection : public NetConnection {
-public:
-    LConnection() {}
-    bool isGhostAvailable(void* p) { return false; }
-    void postNetEvent(NetEvent* e) {}
 };
 
 // Enums
