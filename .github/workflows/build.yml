@@ -95,10 +95,9 @@ jobs:
     #     retention-days: 14
     #     if-no-files-found: ignore
 
-  # Windows cross-compilation with GCC + MinGW (disabled)
+  # Windows cross-compilation with GCC + MinGW
   windows-gcc-build:
-    if: false
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
     - name: Checkout repository
@@ -237,10 +236,9 @@ jobs:
         retention-days: 30
         if-no-files-found: warn
 
-  # Windows cross-compilation with Clang + MinGW (disabled)
+  # Windows cross-compilation with Clang + MinGW
   windows-clang-build:
-    if: false
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
     - name: Checkout repository
