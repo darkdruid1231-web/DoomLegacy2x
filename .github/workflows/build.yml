@@ -259,7 +259,8 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release \
           -DUSE_SDL2=ON \
           -DUSE_IMAGE_SUPPORT=OFF \
-          -DUSE_NETWORKING=ON
+          -DUSE_NETWORKING=ON \
+          -DCMAKE_CXX_FLAGS="-DSDL2"
 
         # Build test executables
         cmake --build . --target test_fixed_t test_vector test_console test_actor test_save_load_unit --parallel
