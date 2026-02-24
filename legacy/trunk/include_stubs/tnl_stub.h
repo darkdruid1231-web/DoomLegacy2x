@@ -21,6 +21,7 @@ typedef int64_t S64;
 typedef float F32;
 typedef double F64;
 typedef uint32_t IPAddress;
+typedef unsigned char byte;
 
 // Forward declarations
 class BitStream;
