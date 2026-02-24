@@ -9,6 +9,19 @@
 #include <vector>
 #include <map>
 
+// Type aliases
+typedef uint8_t U8;
+typedef uint16_t U16;
+typedef uint32_t U32;
+typedef uint64_t U64;
+typedef int8_t S8;
+typedef int16_t S16;
+typedef int32_t S32;
+typedef int64_t S64;
+typedef float F32;
+typedef double F64;
+typedef uint32_t IPAddress;
+
 // Forward declarations
 class BitStream;
 class NetConnection;
@@ -131,19 +144,6 @@ enum TerminationReason {
 #define TNL_DECLARE_RPC(func, params) void func params {}
 
 U32 computeClientIdentityToken(const Address& addr, const Nonce& nonce) { return 0; }
-
-// Type aliases
-typedef uint8_t U8;
-typedef uint16_t U16;
-typedef uint32_t U32;
-typedef uint64_t U64;
-typedef int8_t S8;
-typedef int16_t S16;
-typedef int32_t S32;
-typedef int64_t S64;
-typedef float F32;
-typedef double F64;
-typedef uint32_t IPAddress;
 
 // Packet type constants
 enum {
