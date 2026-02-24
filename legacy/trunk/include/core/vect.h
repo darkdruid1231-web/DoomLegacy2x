@@ -27,6 +27,7 @@
 // #include<iostream>
 
 #include "core/ISerializer.h"
+#include "tnl_stub.h"
 
 /// \brief Simple template class for three-vectors
 ///
