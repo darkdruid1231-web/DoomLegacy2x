@@ -44,10 +44,10 @@ jobs:
         # Build main executable, tools, and tests
         if cmake --build . --target doomlegacy d2h wadtool test_fixed_t test_vector test_console test_actor test_save_load_unit --parallel 4 2>&1 | tee build.log; then
           echo "Build succeeded"
-          python3 ../../../../build_error_summarizer.py < build.log || true
+          python3 ../../../build_error_summarizer.py < build.log || true
         else
           echo "Build failed - see summary below"
-          python3 ../../../../build_error_summarizer.py < build.log
+          python3 ../../../build_error_summarizer.py < build.log
           exit 1
         fi
 
