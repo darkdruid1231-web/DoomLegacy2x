@@ -267,7 +267,7 @@ public:
     void* mSocket;
     bool mAllowConnections;
 
-    virtual void disconnect(NetConnection* con, TerminationReason r, const char* reason) {}
+    virtual void disconnect(NetConnection* con, NetConnection::TerminationReason r, const char* reason) {}
     virtual void checkIncomingPackets() {}
     virtual void processConnections() {}
 
