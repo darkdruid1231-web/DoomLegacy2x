@@ -233,6 +233,13 @@ jobs:
         # Set pkg-config libdir for MinGW
         export PKG_CONFIG_LIBDIR=/usr/x86_64-w64-mingw32/lib/pkgconfig
 
+        # Debug: Check SDL2_mixer setup
+        echo "PKG_CONFIG_LIBDIR: $PKG_CONFIG_LIBDIR"
+        ls -la /usr/x86_64-w64-mingw32/lib/pkgconfig/
+        cat /usr/x86_64-w64-mingw32/lib/pkgconfig/SDL2_mixer.pc || echo "SDL2_mixer.pc not found"
+        ls -la /usr/x86_64-w64-mingw32/lib/ | grep SDL
+        pkg-config --exists SDL2_mixer && echo "SDL2_mixer found" || echo "SDL2_mixer not found"
+
         # Cross-compile with MinGW.
         cmake .. \
           -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw-w64-x86_64.cmake \
