@@ -28,6 +28,9 @@
 #include <list>
 #include <vector>
 
+// Forward declarations
+class NetEvent;
+
 // using namespace TNL;  // Commented out to avoid std namespace conflicts
 
 /// \brief TNL GhostConnection between a server and a client
@@ -52,6 +55,10 @@ class LConnection : public GhostConnection
 
     /// server decides whether to accept the connection
     virtual bool readConnectRequest(BitStream *stream, const char **errorString);
+
+    // Stub methods for networking disabled builds
+    bool isGhostAvailable(void* p) { return false; }
+    void postNetEvent(class NetEvent* e) {}
 
     /// server sends info to client
     virtual void writeConnectAccept(BitStream *stream);
