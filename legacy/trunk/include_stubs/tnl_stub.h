@@ -36,10 +36,83 @@ class Nonce;
 class StringPtr;
 class ByteBufferPtr;
 
-// Simple stubs in global namespace
+// Macros
+#define BIT(x) (1 << (x))
+#define TNL_DECLARE_RPC(func, params) void func params {}
+#define TNL_IMPLEMENT_CLASS(cls)
+#define TNL_IMPLEMENT_NETOBJECT(cls)
+#define TNL_IMPLEMENT_NETCONNECTION(cls, group, flag)
+#define TNL_IMPLEMENT_NETOBJECT_RPC(...)
+#define TNL_RPC_CONSTRUCT_NETEVENT(player, rpc, args) nullptr
+
+// Enums
+enum TerminationReason {
+    ReasonNone = 0,
+    ReasonSelfDisconnect
+};
+
+enum NetClassGroup {
+    NetClassGroupGame
+};
+
+// Packet type constants
+enum {
+    FirstValidInfoPacketId = 0,
+    PT_ServerPing = FirstValidInfoPacketId,
+    PT_PingResponse,
+    PT_ServerQuery,
+    PT_QueryResponse
+};
+
+// Networking constants
+enum {
+    NetClassGroupGameMask = 0,
+    RPCGuaranteedOrdered = 0,
+    RPCToGhost = 0,
+    RPCToGhostParent = 0
+};
+
+enum ConnectionStateEnum {
+    StateNotConnected = 0,
+    StateAwaitingChallengeResponse,
+    StateSendingPunchPackets,
+    StateComputingPuzzleSolution,
+    StateAwaitingConnectResponse,
+    StateConnectTimeout,
+    StateConnectionRejected,
+    StateConnected,
+    StateDisconnected,
+    StateConnectionTimedOut
+};
+
+class Address {
+public:
+    Address() {}
+    Address(const char* str) {}
+    std::string toString() const { return ""; }  // Changed from toString() to getNetAddressString() if needed
+    bool isEqualAddress(const Address& other) const { return false; }
+    bool operator==(const Address& other) const { return false; }
+    bool operator!=(const Address& other) const { return !(*this == other); }
+    U32 hash() const { return 0; }
+};
+
+class Socket {};  // Stub for Socket if needed
+
+class Nonce {
+public:
+    Nonce() {}
+    void generate() {}
+    void getRandom() {}
+    void read(BitStream* s) {}
+    void write(BitStream* s) {}
+    bool operator==(const Nonce& other) const { return false; }
+    bool operator!=(const Nonce& other) const { return !(*this == other); }
+};
+
 class BitStream {
 public:
     BitStream() {}
+    BitStream(U8* buffer, U32 size) {}
     ~BitStream() {}
 
     void write(uint32_t val) {}
@@ -72,17 +145,97 @@ public:
     void alignBits() {}
     void writeBits(uint32_t val, int bits) {}
     uint32_t readBits(int bits) { return 0; }
+    U32 getBufferSize() const { return 0; }
+    U32 getBytePosition() const { return 0; }
+};
+
+class PacketStream : public BitStream {
+public:
+    PacketStream() {}
+    void sendto(void* socket, const Address& addr) {}
+};
+
+class StringPtr {
+public:
+    StringPtr() {}
+    StringPtr(const char* s) {}
+    const char* getString() const { return ""; }
+};
+
+class ByteBufferPtr {
+public:
+    ByteBufferPtr() {}
+    U8* getBuffer() { return nullptr; }
+    U32 getBufferSize() const { return 0; }
+};
+
+class NetEvent {
+public:
+    NetEvent() {}
+    virtual ~NetEvent() {}
+};
+
+class NetObject {
+public:
+    NetObject() {}
+    virtual ~NetObject() {}
+    virtual bool onGhostAdd(GhostConnection *c) { return true; }
+    virtual void onGhostRemove() {}
+    virtual void performScopeQuery(GhostConnection *c) {}
+    void setMaskBits(U32 mask) {}
 };
 
 class NetConnection {
 public:
     NetConnection() {}
     virtual ~NetConnection() {}
+    virtual void connect(NetInterface* iface, const Address& addr) {}
     virtual void connect(const char* address, uint16_t port) {}
     virtual void disconnect() {}
     virtual bool isConnected() const { return false; }
     virtual void processPacket() {}
     virtual void sendPacket(const void* data, uint32_t size) {}
+
+    virtual void writeConnectRequest(BitStream* stream) {}
+    virtual bool readConnectRequest(BitStream* stream, const char** errorString) { return false; }
+    virtual void writeConnectAccept(BitStream* stream) {}
+    virtual bool readConnectAccept(BitStream* stream, const char** errorString) { return false; }
+
+    virtual void onConnectTerminated(TerminationReason r, const char* reason) {}
+    virtual void onConnectionEstablished() {}
+    virtual void onConnectionTerminated(TerminationReason r, const char* error) {}
+    virtual void onStartGhosting() {}
+    virtual void onEndGhosting() {}
+
+    bool isInitiator() const { return false; }
+    bool isConnectionToServer() const { return false; }
+    const char* getNetAddressString() const { return ""; }
+    Address getNetAddress() const { return Address(); }
+
+    void setGhostFrom(bool from) {}
+    void setGhostTo(bool to) {}
+    void activateGhosting() {}
+    void resetGhosting() {}
+    void setScopeObject(NetObject* obj) {}
+    void postNetEvent(NetEvent* event) {}
+
+    void setIsAdaptive() {}
+    void setTranslatesStrings() {}
+    void setFixedRateParameters(U32 a, U32 b, U32 c, U32 d) {}
+    void setSimulatedNetParams(float loss, int delay) {}
+
+    int getConnectionState() const { return StateNotConnected; }
+
+    // RPC stubs
+    void rpcTest(U8 num) {}
+    void rpcChat(S8 from, S8 to, StringPtr msg) {}
+    void rpcPause(U8 pnum, bool on) {}
+    void rpcMessage_s2c(S8 pnum, StringPtr msg, S8 priority, S8 type) {}
+    void rpcSendNetVar_s2c(U16 netid, StringPtr s) {}
+    void rpcKick_s2c(U8 pnum, StringPtr str) {}
+    void rpcSendOptions_c2s(U8 pnum, ByteBufferPtr buf) {}
+    void rpcSuicide_c2s(U8 pnum) {}
+    void rpcRequestPOVchange_c2s(S32 pnum) {}
 };
 
 class GhostConnection : public NetConnection {
@@ -94,94 +247,22 @@ public:
     void* resolveGhost(S32 idx) { return nullptr; }
 };
 
-class NetObject {
-public:
-    NetObject() {}
-    virtual ~NetObject() {}
-    virtual bool onGhostAdd(GhostConnection *c) { return true; }
-    virtual void onGhostRemove() {}
-    virtual void performScopeQuery(GhostConnection *c) {}
-};
-
 class NetInterface {
 public:
-    NetInterface() {}
-    NetInterface(const Address& addr) {}
+    NetInterface() : mSocket(nullptr) {}
+    NetInterface(const Address& addr) : mSocket(nullptr) {}
     virtual ~NetInterface() {}
     void setAllowsConnections(bool allow) {}
+
+    void* mSocket;
+
+    virtual void disconnect(NetConnection* con, TerminationReason r, const char* reason) {}
+    virtual void checkIncomingPackets() {}
+    virtual void processConnections() {}
+
+    // Other methods if needed
 };
-
-class Address {
-public:
-    Address() {}
-    Address(const char* str) {}
-    std::string toString() const { return ""; }
-    bool isEqualAddress(const Address& other) const { return false; }
-    bool operator==(const Address& other) const { return false; }
-};
-
-class Nonce {
-public:
-    Nonce() {}
-    void generate() {}
-    void getRandom() {}
-    void read(BitStream* s) {}
-    void write(BitStream* s) {}
-};
-
-class StringPtr {
-public:
-    StringPtr() {}
-    StringPtr(const char* s) {}
-};
-
-class ByteBufferPtr {
-public:
-    ByteBufferPtr() {}
-};
-
-class PacketStream : public BitStream {
-public:
-    PacketStream() {}
-    void sendto(void* socket, const Address& addr) {}
-};
-
-class NetEvent {
-public:
-    NetEvent() {}
-    virtual ~NetEvent() {}
-};
-
-// Enums
-enum TerminationReason {
-    ReasonNone = 0
-};
-
-// RPC functions
-void s2cEnterMap(U8 mapnum) {}
-
-// Macros
-#define BIT(x) (1 << (x))
-#define TNL_DECLARE_RPC(func, params) void func params {}
-#define TNL_IMPLEMENT_CLASS(cls)
-#define TNL_IMPLEMENT_NETOBJECT(cls)
-#define TNL_IMPLEMENT_NETOBJECT_RPC(...)
-#define TNL_RPC_CONSTRUCT_NETEVENT(player, rpc, args) nullptr
 
 U32 computeClientIdentityToken(const Address& addr, const Nonce& nonce) { return 0; }
-
-// Packet type constants
-enum {
-    FirstValidInfoPacketId = 0,
-    PT_ServerPing = FirstValidInfoPacketId
-};
-
-// Networking constants
-enum {
-    NetClassGroupGameMask = 0,
-    RPCGuaranteedOrdered = 0,
-    RPCToGhost = 0,
-    RPCToGhostParent = 0
-};
 
 #endif // TNL_STUB_H
