@@ -138,9 +138,6 @@ class PlayerInfo : public NetConnection
     virtual U32 packUpdate(GhostConnection *c, U32 updateMask, class BitStream *s) { return 0; }
     virtual void unpackUpdate(GhostConnection *c, BitStream *s) { }
 
-    virtual void c2sIntermissionDone() {}
-    virtual void s2cStartIntermission(unsigned char, unsigned char, unsigned int, unsigned int, unsigned int, unsigned int) { }
-
   public:
     /// Ghosting flags
     enum mask_e
