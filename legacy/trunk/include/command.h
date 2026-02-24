@@ -28,6 +28,7 @@
 
 #include "core/ISerializer.h"
 #include "doomtype.h"
+#include "tnl_stub.h"
 
 using namespace std;
 

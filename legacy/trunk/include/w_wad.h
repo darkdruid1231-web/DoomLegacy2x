@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "doomtype.h"
+#include "tnl_stub.h"
 
 using namespace std;
 // namespace TNL  // Removed - conflicts with std
