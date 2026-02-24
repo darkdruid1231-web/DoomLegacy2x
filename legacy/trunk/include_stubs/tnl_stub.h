@@ -191,6 +191,12 @@ public:
     virtual void unpackUpdate(GhostConnection* c, BitStream* s) {}
 };
 
+class Map {
+public:
+    void SN_StartSequence(void*, int) {}
+    void SN_StopSequence(void*, bool) {}
+};
+
 class NetConnection {
 public:
     enum TerminationReason {
