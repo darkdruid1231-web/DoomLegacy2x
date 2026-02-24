@@ -41,8 +41,8 @@ jobs:
         mkdir -p build
         cd build
         cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_MODERN_NETWORKING=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-        # Build test executables
-        if cmake --build . --target test_fixed_t test_vector test_console test_actor test_save_load_unit --parallel 2>&1 | tee build.log; then
+        # Build main executable, tools, and tests
+        if cmake --build . --target doomlegacy d2h wadtool test_fixed_t test_vector test_console test_actor test_save_load_unit --parallel 2>&1 | tee build.log; then
           echo "Build succeeded"
           python3 ../../build_error_summarizer.py < build.log || true
         else
@@ -57,8 +57,19 @@ jobs:
 
     - name: Run Tests
       run: |
-        cd legacy/trunk/build
+        cd linux-build/legacy/trunk/build
         ctest --output-on-failure -R "fixed_t|vector|console|save_load" || true
+
+    - name: Upload Linux executables and tools
+      uses: actions/upload-artifact@v4
+      with:
+        name: doomlegacy-linux-executables
+        path: |
+          linux-build/legacy/trunk/build/doomlegacy
+          linux-build/legacy/trunk/build/d2h
+          linux-build/legacy/trunk/build/wadtool
+        retention-days: 30
+        if-no-files-found: warn
 
     # cppcheck disabled - takes too long
     # - name: cppcheck static analysis
@@ -245,7 +256,7 @@ jobs:
         apt-get update
         apt-get install -y cmake libsdl2-dev libenet-dev libglu1-mesa-dev flex lemon
 
-    - name: Configure and Build Windows
+    - name: Configure and Build Windows Executables
       run: |
         cd windows-build/legacy/trunk
         mkdir -p build-win
@@ -259,19 +270,17 @@ jobs:
           -DUSE_NETWORKING=ON \
           -DCMAKE_CXX_FLAGS="-DSDL2"
 
-        # Build test executables
-        cmake --build . --target test_fixed_t test_vector test_console test_actor test_save_load_unit --parallel
+        # Build main executable and tools
+        cmake --build . --target doomlegacy d2h wadtool --parallel
 
-    - name: Upload Windows cross-compile test artifacts
+    - name: Upload Windows executables and tools
       uses: actions/upload-artifact@v4
       with:
-        name: doomlegacy-windows-cross-tests
+        name: doomlegacy-windows-executables
         path: |
-          windows-build/legacy/trunk/build-win/test_fixed_t.exe
-          windows-build/legacy/trunk/build-win/test_vector.exe
-          windows-build/legacy/trunk/build-win/test_console.exe
-          windows-build/legacy/trunk/build-win/test_actor.exe
-          windows-build/legacy/trunk/build-win/test_save_load_unit.exe
+          windows-build/legacy/trunk/build-win/doomlegacy.exe
+          windows-build/legacy/trunk/build-win/d2h.exe
+          windows-build/legacy/trunk/build-win/wadtool.exe
         retention-days: 30
         if-no-files-found: warn
 
