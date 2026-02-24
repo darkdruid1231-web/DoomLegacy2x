@@ -14,6 +14,7 @@ class BitStream;
 class NetConnection;
 class GhostConnection;
 class NetObject;
+class NetInterface;
 class Address;
 class Nonce;
 
@@ -22,14 +23,18 @@ class BitStream {
 public:
     BitStream() {}
     ~BitStream() {}
-    
+
     void write(uint32_t val) {}
     uint32_t read() { return 0; }
     void writeFlag(bool val) {}
     bool readFlag() { return false; }
     void writeInt(uint32_t val, int bits) {}
     uint32_t readInt(int bits) { return 0; }
-    
+
+    void writeString(const char* str) {}
+    void readString(char* buffer) {}
+    void read(uint16_t* val) { *val = 0; }
+
     uint8_t* getBuffer() { return nullptr; }
     uint32_t getPosition() const { return 0; }
     void setPosition(uint32_t pos) {}
@@ -66,6 +71,12 @@ public:
     virtual bool onGhostAdd(GhostConnection *c) { return true; }
     virtual void onGhostRemove() {}
     virtual void performScopeQuery(GhostConnection *c) {}
+};
+
+class NetInterface {
+public:
+    NetInterface() {}
+    virtual ~NetInterface() {}
 };
 
 class Address {
