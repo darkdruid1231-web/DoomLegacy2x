@@ -303,7 +303,7 @@ jobs:
         Name: SDL2_mixer
         Description: mixer library for Simple DirectMedia Layer
         Version: 2.8.0
-        Requires: SDL2
+        Requires: sdl2
         Libs: -L${libdir} -lSDL2_mixer
         Cflags: -I${includedir}/SDL2
         EOF
