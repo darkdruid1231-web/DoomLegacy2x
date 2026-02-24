@@ -128,6 +128,11 @@ class PlayerInfo : public NetObject
     typedef NetObject Parent;
     TNL_DECLARE_CLASS(PlayerInfo);
 
+    // Stub networking members
+    struct NetFlags { void set(int) {} } mNetFlags;
+    enum { Ghostable = 1 };
+    bool isInitialUpdate() { return false; }
+
     virtual bool onGhostAdd(class GhostConnection *c);
     virtual void onGhostRemove();
     virtual U32 packUpdate(GhostConnection *c, U32 updateMask, class BitStream *s);
@@ -228,6 +233,9 @@ class PlayerInfo : public NetObject
 
     void SavePawn();
     void LoadPawn();
+
+    // Stub method for networking disabled builds
+    void setMaskBits(U32 mask) {}
 
     void Ticker(); ///< called once a tic for each player
 
