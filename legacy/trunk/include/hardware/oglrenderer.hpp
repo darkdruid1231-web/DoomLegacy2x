@@ -42,7 +42,7 @@
 
 // SDL2 headers - use SDL2/SDL.h on MSYS2/MinGW or SDL/SDL.h fallback
 // SDL1 code (USE_SDL2 not defined) falls back to same headers for compatibility
-#ifdef USE_SDL2
+#ifdef SDL2
 #  include <SDL2/SDL.h>
 #else
 #  include <SDL/SDL.h>
