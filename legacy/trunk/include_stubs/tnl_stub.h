@@ -23,7 +23,6 @@ typedef float F32;
 typedef double F64;
 typedef uint32_t IPAddress;
 typedef unsigned char byte;
-typedef BitStream* ByteBufferPtr;
 
 // Forward declarations
 class BitStream;
@@ -36,6 +35,7 @@ class PacketStream;
 class Address;
 class Nonce;
 class StringPtr;
+typedef BitStream* ByteBufferPtr;
 
 // Macros
 #define BIT(x) (1 << (x))
