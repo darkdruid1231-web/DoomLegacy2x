@@ -1,0 +1,3 @@
+/usr/bin/cmake -E rm -f CMakeFiles/wadtool.dir/objects.a
+/usr/bin/x86_64-w64-mingw32-ar qc CMakeFiles/wadtool.dir/objects.a @CMakeFiles/wadtool.dir/objects1.rsp
+/usr/bin/x86_64-w64-mingw32-g++-posix -static-libgcc -static-libstdc++ -Wno-missing-attributes -Wno-error -O3 -DNDEBUG  -static -Wl,--whole-archive CMakeFiles/wadtool.dir/objects.a -Wl,--no-whole-archive -o wadtool.exe -Wl,--out-implib,libwadtool.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/wadtool.dir/linkLibs.rsp

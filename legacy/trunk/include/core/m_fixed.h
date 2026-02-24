@@ -316,8 +316,8 @@ class fixed_t
     void Unpack(DoomLegacy::ISerializer &s);
 
     /// Legacy TNL BitStream serialization for compatibility
-    void Pack(TNL::BitStream *s);
-    void Unpack(TNL::BitStream *s);
+    void Pack(BitStream *s);
+    void Unpack(BitStream *s);
 };
 
 /// specialization for assignment-multiplying two fixed_t objects

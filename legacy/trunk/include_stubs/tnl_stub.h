@@ -31,9 +31,6 @@ typedef signed long long S64;
 #define TNL_DECLARE_CLASS(name)
 #define TNL_DECLARE_NETCONNECTION(name) TNL_DECLARE_CLASS(name)
 
-namespace TNL
-{
-
 // Stub for StringPtr
 class StringPtr
 {
@@ -777,8 +774,6 @@ inline void activateGhosting()
 inline bool isConnectionToServer()
 {
     return false;
-}
-
 // ============================================================
 // RPC / NetEvent macros  (outside namespace — they are text substitutions)
 // ============================================================

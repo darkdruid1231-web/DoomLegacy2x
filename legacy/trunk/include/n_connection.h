@@ -34,9 +34,9 @@
 ///
 /// Does connection housekeeping, ghosting, RPC's etc.
 
-class LConnection : public TNL::GhostConnection
+class LConnection : public GhostConnection
 {
-    typedef TNL::GhostConnection Parent;
+    typedef GhostConnection Parent;
 
   public:
     std::vector<class PlayerInfo *> player; ///< Serverside: Players beyond this connection.
@@ -48,16 +48,16 @@ class LConnection : public TNL::GhostConnection
     LConnection();
 
     /// client sends info to server and requests a connection
-    virtual void writeConnectRequest(TNL::BitStream *stream);
+    virtual void writeConnectRequest(BitStream *stream);
 
     /// server decides whether to accept the connection
-    virtual bool readConnectRequest(TNL::BitStream *stream, const char **errorString);
+    virtual bool readConnectRequest(BitStream *stream, const char **errorString);
 
     /// server sends info to client
-    virtual void writeConnectAccept(TNL::BitStream *stream);
+    virtual void writeConnectAccept(BitStream *stream);
 
     /// client decides whether to accept the connection
-    virtual bool readConnectAccept(TNL::BitStream *stream, const char **errorString);
+    virtual bool readConnectAccept(BitStream *stream, const char **errorString);
 
     /// Called when a pending connection is terminated
     virtual void onConnectTerminated(TerminationReason r, const char *reason);

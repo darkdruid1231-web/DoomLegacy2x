@@ -120,7 +120,7 @@ Have polymorphed class GameType which creates these into GameInfo containers
 #include "w_wad.h"
 #include "z_zone.h"
 
-using namespace TNL;
+// using namespace TNL;  // Removed to avoid std conflicts
 
 #define DEFAULT_PORT 5029;
 
