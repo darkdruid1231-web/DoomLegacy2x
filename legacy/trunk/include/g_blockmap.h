@@ -7,4 +7,7 @@
 
 #pragma once
 
+// Forward declaration
+struct polyobj_t;
+
 #include "game/g_blockmap.h"
