@@ -136,12 +136,12 @@ class LNetInterface : public NetInterface
     //  RPC callers
     //================================================
 
-    void SendChat(int from, int to, const char *msg);
-    void Pause(int pnum, bool on);
-    void SendNetVar(U16 netid, const char *str);
-    void SendPlayerOptions(int pnum, class LocalPlayerInfo &p);
-    void RequestSuicide(int pnum);
-    void Kick(class PlayerInfo *p);
+    void SendChat(int from, int to, const char *msg) {}
+    void Pause(int pnum, bool on) {}
+    void SendNetVar(U16 netid, const char *str) {}
+    void SendPlayerOptions(int pnum, class LocalPlayerInfo &p) {}
+    void RequestSuicide(int pnum) {}
+    void Kick(class PlayerInfo *p) {}
 };
 
 /// \brief Vital server properties visible to prospective clients
