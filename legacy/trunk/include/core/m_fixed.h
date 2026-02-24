@@ -26,7 +26,7 @@
 #include "core/ISerializer.h"
 #include "doomtype.h"
 #include "lnet.h"
-#include "tnl/tnlBitStream.h"
+#include "tnl_stub.h"
 #include <math.h>
 #include <stdlib.h>
 
