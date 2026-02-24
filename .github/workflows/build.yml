@@ -10,17 +10,11 @@ jobs:
   # Linux build with tests
   linux-build:
     runs-on: self-hosted
-    runs-on: self-hosted
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0
-
-    - name: Pull latest changes
-      run: |
-        git pull origin main
+        path: linux-build
 
     - name: Install dependencies
       run: |
@@ -42,7 +36,7 @@ jobs:
 
     - name: Configure and Build
       run: |
-        cd legacy/trunk
+        cd linux-build/legacy/trunk
         rm -rf build
         mkdir -p build
         cd build
@@ -238,12 +232,13 @@ jobs:
 
   # Windows cross-compilation with Docker + LLVM MinGW
   windows-cross-build:
-    needs: linux-build
     runs-on: self-hosted
     container: mstorsjo/llvm-mingw:latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        path: windows-build
 
     - name: Install dependencies
       run: |
@@ -252,7 +247,7 @@ jobs:
 
     - name: Configure and Build Windows
       run: |
-        cd legacy/trunk
+        cd windows-build/legacy/trunk
         mkdir -p build-win
         cd build-win
 
@@ -272,11 +267,11 @@ jobs:
       with:
         name: doomlegacy-windows-cross-tests
         path: |
-          legacy/trunk/build-win/test_fixed_t.exe
-          legacy/trunk/build-win/test_vector.exe
-          legacy/trunk/build-win/test_console.exe
-          legacy/trunk/build-win/test_actor.exe
-          legacy/trunk/build-win/test_save_load_unit.exe
+          windows-build/legacy/trunk/build-win/test_fixed_t.exe
+          windows-build/legacy/trunk/build-win/test_vector.exe
+          windows-build/legacy/trunk/build-win/test_console.exe
+          windows-build/legacy/trunk/build-win/test_actor.exe
+          windows-build/legacy/trunk/build-win/test_save_load_unit.exe
         retention-days: 30
         if-no-files-found: warn
 
