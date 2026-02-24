@@ -276,5 +276,6 @@ public:
 };
 
 // Utility functions
+U32 computeClientIdentityToken(const Address& addr, const Nonce& nonce);
 
 #endif // TNL_STUB_H
