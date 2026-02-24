@@ -23,7 +23,7 @@ jobs:
         sudo apt-get install -y \
             cmake \
             g++ \
-            libsdl12-compat-dev \
+            libsdl2-dev \
             libsdl2-mixer-dev \
             libpng-dev \
             libjpeg-dev \
@@ -32,10 +32,20 @@ jobs:
             flex \
             lemon \
             cppcheck
+        # Install SDL12-compat from source
+        wget -q https://github.com/libsdl-org/sdl12-compat/releases/download/release-1.2.74/sdl12-compat-1.2.74.tar.gz
+        tar -xzf sdl12-compat-1.2.74.tar.gz
+        cd sdl12-compat-1.2.74
+        ./configure --prefix=/usr/local
+        make -j$(nproc)
+        sudo make install
+        cd ..
         # Create SDL symlink if missing (code uses SDL/SDL.h)
-        sudo ln -sf /usr/include/SDL2 /usr/include/SDL || true
+        sudo ln -sf /usr/local/include/SDL /usr/include/SDL || true
 
     - name: Configure and Build
+      env:
+        PKG_CONFIG_PATH: /usr/local/lib/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig
       run: |
         cd linux-build/legacy/trunk
         rm -rf build
