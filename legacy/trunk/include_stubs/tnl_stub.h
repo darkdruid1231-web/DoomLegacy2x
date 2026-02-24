@@ -47,11 +47,6 @@ typedef BitStream* ByteBufferPtr;
 #define TNL_RPC_CONSTRUCT_NETEVENT(player, rpc, args) nullptr
 
 // Enums
-enum TerminationReason {
-    ReasonNone = 0,
-    ReasonSelfDisconnect
-};
-
 enum TransportProtocol {
     IPProtocol,
     IPXProtocol
