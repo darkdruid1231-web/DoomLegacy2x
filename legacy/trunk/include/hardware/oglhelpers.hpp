@@ -31,23 +31,7 @@
 class Material;
 struct vertex_t;
 
-struct quadtexcoord {
-  GLfloat l;
-  GLfloat r;
-  GLfloat t;
-  GLfloat b;
-};
-
-// Data required to render one single textured quad.
-
-struct quad {
-  Material *m;
-  struct quadtexcoord t;
-  vertex_t *v1;
-  vertex_t *v2;
-  GLfloat bottom;
-  GLfloat top;
-};
+// Structs moved to oglrenderer.hpp
 
 
 struct viewportdef_t
