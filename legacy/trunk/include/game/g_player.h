@@ -135,8 +135,11 @@ class PlayerInfo : public NetConnection
 
     virtual bool onGhostAdd(class GhostConnection *c);
     virtual void onGhostRemove();
-    virtual U32 packUpdate(GhostConnection *c, U32 updateMask, class BitStream *s);
-    virtual void unpackUpdate(GhostConnection *c, BitStream *s);
+    virtual U32 packUpdate(GhostConnection *c, U32 updateMask, class BitStream *s) { return 0; }
+    virtual void unpackUpdate(GhostConnection *c, BitStream *s) { }
+
+    virtual void c2sIntermissionDone() {}
+    virtual void s2cStartIntermission(unsigned char, unsigned char, unsigned int, unsigned int, unsigned int, unsigned int) { }
 
   public:
     /// Ghosting flags
