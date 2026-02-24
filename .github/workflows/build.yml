@@ -230,6 +230,9 @@ jobs:
         echo "CPATH after unset: '$CPATH'"
         echo "INCLUDE after unset: '$INCLUDE'"
 
+        # Set pkg-config path for MinGW
+        export PKG_CONFIG_PATH=/usr/x86_64-w64-mingw32/lib/pkgconfig:$PKG_CONFIG_PATH
+
         # Cross-compile with MinGW.
         cmake .. \
           -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw-w64-x86_64.cmake \
