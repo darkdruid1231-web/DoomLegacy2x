@@ -9,11 +9,6 @@
 #include <vector>
 #include <map>
 
-// Compatibility namespace
-namespace lnet {
-    using BitStream = ::BitStream;
-}
-
 // Type aliases
 typedef uint8_t U8;
 typedef uint16_t U16;
@@ -76,6 +71,11 @@ public:
     void writeBits(uint32_t val, int bits) {}
     uint32_t readBits(int bits) { return 0; }
 };
+
+// Compatibility namespace
+namespace lnet {
+    using BitStream = ::BitStream;
+}
 
 class NetConnection {
 public:
