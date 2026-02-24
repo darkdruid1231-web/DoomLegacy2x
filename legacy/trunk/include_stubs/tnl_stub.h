@@ -28,7 +28,9 @@ class NetConnection;
 class GhostConnection;
 class NetObject;
 class NetInterface;
+class NetEvent;
 class PacketStream;
+class LConnection;
 class Address;
 class Nonce;
 class StringPtr;
@@ -49,9 +51,13 @@ public:
 
     void writeString(const char* str) {}
     void readString(char* buffer) {}
+    void readString(char* buffer, size_t maxLen) {}
     void read(uint16_t* val) { *val = 0; }
     void read(int* val) { *val = 0; }
     void read(U32* val) { *val = 0; }
+    void read(S32* val, size_t bits) { *val = 0; }
+    void read(bool* val, size_t bits) { *val = false; }
+    void read(byte* buffer, int bits) {}
 
     uint8_t* getBuffer() { return nullptr; }
     uint32_t getPosition() const { return 0; }
@@ -80,6 +86,7 @@ class GhostConnection : public NetConnection {
 public:
     GhostConnection() {}
     virtual ~GhostConnection() {}
+    void objectInScope(void* obj) {}
 };
 
 class NetObject {
@@ -134,14 +141,32 @@ public:
     void sendto(void* socket, const Address& addr) {}
 };
 
+class NetEvent {
+public:
+    NetEvent() {}
+    virtual ~NetEvent() {}
+};
+
+class LConnection : public NetConnection {
+public:
+    LConnection() {}
+    bool isGhostAvailable(void* p) { return false; }
+    void postNetEvent(NetEvent* e) {}
+};
+
 // Enums
 enum TerminationReason {
     ReasonNone = 0
 };
 
+// RPC functions
+void s2cEnterMap(U8 mapnum) {}
+
 // Macros
 #define BIT(x) (1 << (x))
 #define TNL_DECLARE_RPC(func, params) void func params {}
+#define TNL_IMPLEMENT_CLASS(cls)
+#define TNL_RPC_CONSTRUCT_NETEVENT(player, rpc, args) nullptr
 
 U32 computeClientIdentityToken(const Address& addr, const Nonce& nonce) { return 0; }
 
