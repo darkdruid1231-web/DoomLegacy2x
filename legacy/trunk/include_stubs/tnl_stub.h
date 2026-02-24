@@ -23,6 +23,7 @@ typedef float F32;
 typedef double F64;
 typedef uint32_t IPAddress;
 typedef unsigned char byte;
+typedef BitStream* ByteBufferPtr;
 
 // Forward declarations
 class BitStream;
@@ -35,11 +36,10 @@ class PacketStream;
 class Address;
 class Nonce;
 class StringPtr;
-class ByteBufferPtr;
 
 // Macros
 #define BIT(x) (1 << (x))
-#define TNL_DECLARE_RPC(func, params) void func params {}
+#define TNL_DECLARE_RPC(func, params) void func params
 #define TNL_IMPLEMENT_CLASS(cls)
 #define TNL_IMPLEMENT_NETOBJECT(cls)
 #define TNL_IMPLEMENT_NETCONNECTION(cls, group, flag)
@@ -50,6 +50,10 @@ class ByteBufferPtr;
 enum TerminationReason {
     ReasonNone = 0,
     ReasonSelfDisconnect
+};
+
+enum TransportProtocol {
+    // Placeholder
 };
 
 enum NetClassGroup {
@@ -95,6 +99,9 @@ public:
     bool operator==(const Address& other) const { return false; }
     bool operator!=(const Address& other) const { return !(*this == other); }
     U32 hash() const { return 0; }
+
+    static Address Any() { return Address("0.0.0.0"); }
+    static Address Broadcast() { return Address("255.255.255.255"); }
 };
 
 class Socket {};  // Stub for Socket if needed
@@ -164,13 +171,6 @@ public:
     const char* getString() const { return ""; }
 };
 
-class ByteBufferPtr {
-public:
-    ByteBufferPtr() {}
-    U8* getBuffer() { return nullptr; }
-    U32 getBufferSize() const { return 0; }
-};
-
 class NetEvent {
 public:
     NetEvent() {}
@@ -189,11 +189,6 @@ public:
 
 class NetConnection {
 public:
-    enum TerminationReason {
-        ReasonNone = 0,
-        ReasonSelfDisconnect
-    };
-
     NetConnection() {}
     virtual ~NetConnection() {}
     virtual void connect(NetInterface* iface, const Address& addr) {}
@@ -218,6 +213,7 @@ public:
     bool isConnectionToServer() const { return false; }
     const char* getNetAddressString() const { return ""; }
     Address getNetAddress() const { return Address(); }
+    virtual NetInterface* getInterface() { return nullptr; }
 
     void setGhostFrom(bool from) {}
     void setGhostTo(bool to) {}
