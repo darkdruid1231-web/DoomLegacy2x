@@ -29,7 +29,7 @@
 #include <vector>
 
 using namespace std;
-using namespace TNL;
+// using namespace TNL;  // Commented out to avoid std namespace conflicts
 
 /// \brief TNL NetInterface class for Legacy
 ///
