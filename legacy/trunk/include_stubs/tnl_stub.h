@@ -52,6 +52,7 @@ public:
     void writeString(const char* str) {}
     void readString(char* buffer) {}
     void readString(char* buffer, size_t maxLen) {}
+    void readString(char* buffer, int maxLen) {}
     void read(uint16_t* val) { *val = 0; }
     void read(int* val) { *val = 0; }
     void read(U32* val) { *val = 0; }
@@ -59,6 +60,7 @@ public:
     void read(bool* val, size_t bits) { *val = false; }
     void read(byte* buffer, int bits) {}
     void read(unsigned char* val) { *val = 0; }
+    void read(bool* val) { *val = false; }
 
     uint8_t* getBuffer() { return nullptr; }
     uint32_t getPosition() const { return 0; }
