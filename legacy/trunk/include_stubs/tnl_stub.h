@@ -15,8 +15,11 @@ class NetConnection;
 class GhostConnection;
 class NetObject;
 class NetInterface;
+class PacketStream;
 class Address;
 class Nonce;
+class StringPtr;
+class ByteBufferPtr;
 
 // Simple stubs in global namespace
 class BitStream {
@@ -34,6 +37,8 @@ public:
     void writeString(const char* str) {}
     void readString(char* buffer) {}
     void read(uint16_t* val) { *val = 0; }
+    void read(int* val) { *val = 0; }
+    void read(U32* val) { *val = 0; }
 
     uint8_t* getBuffer() { return nullptr; }
     uint32_t getPosition() const { return 0; }
@@ -76,7 +81,9 @@ public:
 class NetInterface {
 public:
     NetInterface() {}
+    NetInterface(const Address& addr) {}
     virtual ~NetInterface() {}
+    void setAllowsConnections(bool allow) {}
 };
 
 class Address {
@@ -85,17 +92,45 @@ public:
     Address(const char* str) {}
     std::string toString() const { return ""; }
     bool isEqualAddress(const Address& other) const { return false; }
+    bool operator==(const Address& other) const { return false; }
 };
 
 class Nonce {
 public:
     Nonce() {}
     void generate() {}
+    void getRandom() {}
+    void read(BitStream* s) {}
+    void write(BitStream* s) {}
+};
+
+class StringPtr {
+public:
+    StringPtr() {}
+    StringPtr(const char* s) {}
+};
+
+class ByteBufferPtr {
+public:
+    ByteBufferPtr() {}
+};
+
+class PacketStream : public BitStream {
+public:
+    PacketStream() {}
+    void sendto(void* socket, const Address& addr) {}
+};
+
+// Enums
+enum TerminationReason {
+    ReasonNone = 0
 };
 
 // Macros
 #define BIT(x) (1 << (x))
 #define TNL_DECLARE_RPC(func, params) void func params {}
+
+U32 computeClientIdentityToken(const Address& addr, const Nonce& nonce) { return 0; }
 
 // Type aliases
 typedef uint8_t U8;
