@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: m_swap.cpp 309 2006-02-11 17:02:49Z jussip $
@@ -23,7 +23,6 @@
 //
 //-----------------------------------------------------------------------------
 
-
 // Not needed with big endian.
 #ifdef __BIG_ENDIAN__
 
@@ -31,18 +30,13 @@
 unsigned short SwapSHORT(unsigned short x)
 {
     // No masking with 0xFF should be necessary.
-    return (x>>8) | (x<<8);
+    return (x >> 8) | (x << 8);
 }
 
 // Swapping 32bit.
 unsigned long SwapLONG(unsigned long x)
 {
-    return
-        (x>>24)
-        | ((x>>8) & 0xff00)
-        | ((x<<8) & 0xff0000)
-        | (x<<24);
+    return (x >> 24) | ((x >> 8) & 0xff00) | ((x << 8) & 0xff0000) | (x << 24);
 }
-
 
 #endif

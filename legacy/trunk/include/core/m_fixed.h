@@ -313,6 +313,10 @@ class fixed_t
 
     /// Deserialization method
     void Unpack(DoomLegacy::ISerializer &s);
+
+    /// Legacy TNL BitStream serialization for compatibility
+    void Pack(TNL::BitStream *s);
+    void Unpack(TNL::BitStream *s);
 };
 
 /// specialization for assignment-multiplying two fixed_t objects

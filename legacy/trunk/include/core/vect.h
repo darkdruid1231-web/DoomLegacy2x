@@ -232,8 +232,24 @@ template <typename T> class vec_t
         z.Pack(s);
     }
 
+    /// Legacy TNL BitStream serialization for compatibility
+    inline void Pack(TNL::BitStream *s)
+    {
+        x.Pack(s);
+        y.Pack(s);
+        z.Pack(s);
+    }
+
     /// Deserialization method using ISerializer abstraction
     inline void Unpack(DoomLegacy::ISerializer &s)
+    {
+        x.Unpack(s);
+        y.Unpack(s);
+        z.Unpack(s);
+    }
+
+    /// Legacy TNL BitStream deserialization for compatibility
+    inline void Unpack(TNL::BitStream *s)
     {
         x.Unpack(s);
         y.Unpack(s);

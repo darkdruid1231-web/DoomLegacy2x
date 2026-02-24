@@ -25,182 +25,174 @@
 
 #include "core/ISerializer.h"
 
-#include "n_interface.h"
 #include "n_connection.h"
+#include "n_interface.h"
 
 #include "command.h"
 #include "cvars.h"
 
-#include "g_type.h"
 #include "g_game.h"
-#include "g_team.h"
 #include "g_map.h"
-#include "g_player.h"
 #include "g_pawn.h"
+#include "g_player.h"
+#include "g_team.h"
+#include "g_type.h"
 
 #include "w_wad.h"
-
 
 TNL_IMPLEMENT_CLASS(GameType);
 
 GameType::GameType()
 {
-  gt_name = "Coop";
-  gt_version = 0;
-  e.game = &game;
+    gt_name = "Coop";
+    gt_version = 0;
+    e.game = &game;
 }
-
 
 void GameType::WriteServerInfo(BitStream &s)
 {
-  consvar_t::SaveNetVars(s);
-  fc.WriteNetInfo(s); // file names, sizes and md5 sums
-  s.writeString(game.mapinfo_lump.c_str()); // HACK
-  // TODO how long it has been running, how long to go,  gamestate, tick, serverplayer?
+    consvar_t::SaveNetVars(s);
+    fc.WriteNetInfo(s);                       // file names, sizes and md5 sums
+    s.writeString(game.mapinfo_lump.c_str()); // HACK
+    // TODO how long it has been running, how long to go,  gamestate, tick, serverplayer?
 }
 
 void GameType::ReadServerInfo(BitStream &s)
 {
-  consvar_t::LoadNetVars(s);
+    consvar_t::LoadNetVars(s);
 
-  //void ReadNetInfo(BitStream &s)
-  S32 n;
-  s.read(&n, sizeof(S32)*8); // number of files
+    // void ReadNetInfo(BitStream &s)
+    S32 n;
+    s.read(&n, sizeof(S32) * 8); // number of files
 
-  bool dl;
-  char name[128];
-  S32 size;
-  byte md5[16];
+    bool dl;
+    char name[128];
+    S32 size;
+    byte md5[16];
 
-  for (int i=0; i<n; i++)
+    for (int i = 0; i < n; i++)
     {
-      s.read(&dl, sizeof(bool)*8);  // downloadable?
-      s.readString(name, sizeof(name)); // fixed: add max length
-      s.read(&size, sizeof(S32)*8);
-      s.read(md5, 16); // fixed: read 16 bits
+        s.read(&dl, sizeof(bool) * 8);    // downloadable?
+        s.readString(name, sizeof(name)); // fixed: add max length
+        s.read(&size, sizeof(S32) * 8);
+        s.read(md5, 16); // fixed: read 16 bits
     }
 
-  s.readString(name, sizeof(name)); // HACK, mapinfo lump name
-  game.mapinfo_lump = name;
+    s.readString(name, sizeof(name)); // HACK, mapinfo lump name
+    game.mapinfo_lump = name;
 }
 
 // ISerializer overloads - TNL-free serialization
 void GameType::WriteServerInfo(DoomLegacy::ISerializer &s)
 {
-  consvar_t::SaveNetVars(s);
-  // TODO: fc.WriteNetInfo() has no ISerializer overload - stub for now
-  // fc.WriteNetInfo(s); // file names, sizes and md5 sums
-  s.writeString(game.mapinfo_lump.c_str()); // HACK
+    consvar_t::SaveNetVars(s);
+    // TODO: fc.WriteNetInfo() has no ISerializer overload - stub for now
+    // fc.WriteNetInfo(s); // file names, sizes and md5 sums
+    s.writeString(game.mapinfo_lump.c_str()); // HACK
 }
 
 void GameType::ReadServerInfo(DoomLegacy::ISerializer &s)
 {
-  consvar_t::LoadNetVars(s);
+    consvar_t::LoadNetVars(s);
 
-  //void ReadNetInfo(ISerializer &s)
-  S32 n;
-  s.read(&n, sizeof(S32)*8); // number of files
+    // void ReadNetInfo(ISerializer &s)
+    S32 n;
+    s.read(&n, sizeof(S32) * 8); // number of files
 
-  bool dl;
-  std::string tmpname; // ISerializer.readString takes std::string&
-  S32 size;
-  byte md5[16];
+    bool dl;
+    std::string tmpname; // ISerializer.readString takes std::string&
+    S32 size;
+    byte md5[16];
 
-  for (int i=0; i<n; i++)
+    for (int i = 0; i < n; i++)
     {
-      s.read(&dl, sizeof(bool)*8);  // downloadable?
-      s.readString(tmpname); // ISerializer.readString takes std::string&
-      // copy to char array if needed
-      s.read(&size, sizeof(S32)*8);
-      s.read(md5, 16);
+        s.read(&dl, sizeof(bool) * 8); // downloadable?
+        s.readString(tmpname);         // ISerializer.readString takes std::string&
+        // copy to char array if needed
+        s.read(&size, sizeof(S32) * 8);
+        s.read(md5, 16);
     }
 
-  std::string mapname;
-  s.readString(mapname); // HACK, mapinfo lump name
-  game.mapinfo_lump = mapname;
+    std::string mapname;
+    s.readString(mapname); // HACK, mapinfo lump name
+    game.mapinfo_lump = mapname;
 }
-
 
 // scope query on server
 void GameType::performScopeQuery(GhostConnection *c)
 {
-  //CONS_Printf("doing scope query\n");
+    // CONS_Printf("doing scope query\n");
 
-  // first scope the players and their pawns
-  for (GameInfo::player_iter_t t = e.game->Players.begin(); t != e.game->Players.end(); t++)
+    // first scope the players and their pawns
+    for (GameInfo::player_iter_t t = e.game->Players.begin(); t != e.game->Players.end(); t++)
     {
-      PlayerInfo *p = t->second;
-      bool owner = (p->connection == c); // connection c owns this player
+        PlayerInfo *p = t->second;
+        bool owner = (p->connection == c); // connection c owns this player
 
-      c->objectInScope(p); // player information is always in scope for everyone
+        c->objectInScope(p); // player information is always in scope for everyone
 
-      // pawns and pov's are usually in scope only to their owners
-      if (!cv_hiddenplayers.value || owner)
-	{
-	  if (p->pawn)
-	    c->objectInScope(p->pawn);
+        // pawns and pov's are usually in scope only to their owners
+        if (!cv_hiddenplayers.value || owner)
+        {
+            if (p->pawn)
+                c->objectInScope(p->pawn);
 
-	  if (p->pov)
-	    c->objectInScope(p->pov);
-	}
+            if (p->pov)
+                c->objectInScope(p->pov);
+        }
     }
 
-  // TODO in mods, here you could scope bases, flags etc.
+    // TODO in mods, here you could scope bases, flags etc.
 
-  LConnection *lc = static_cast<LConnection*>(c);
-  // then actors (and thinkers?) in PVSs of the players of this connection 
-  int n = lc->player.size();
-  for (int i=0; i<n; i++)
+    LConnection *lc = static_cast<LConnection *>(c);
+    // then actors (and thinkers?) in PVSs of the players of this connection
+    int n = lc->player.size();
+    for (int i = 0; i < n; i++)
     {
-      PlayerInfo *p = lc->player[i];
-      /*
-      if (p->playerstate == PST_RESPAWN ||
-	  p->playerstate == PST_INMAP ||
-	  p->playerstate == PST_FINISHEDMAP)
-      */
-      Map *m = p->mp;
-      if (m)
-	{
-	  // player is in a Map, can see something
-	  
-	  // TODO for now, ignore PVS, scope all stuff in Map
-	  // TODO use IterateThinkers?
-	  for (Thinker *t = m->thinkercap.next; t != &m->thinkercap; t = t->next)
-	    {
-	      Actor *a = t->Inherits<Actor>();
-	      if (a)
-		c->objectInScope(a);
-	    }
-	}
+        PlayerInfo *p = lc->player[i];
+        /*
+        if (p->playerstate == PST_RESPAWN ||
+        p->playerstate == PST_INMAP ||
+        p->playerstate == PST_FINISHEDMAP)
+        */
+        Map *m = p->mp;
+        if (m)
+        {
+            // player is in a Map, can see something
+
+            // TODO for now, ignore PVS, scope all stuff in Map
+            // TODO use IterateThinkers?
+            for (Thinker *t = m->thinkercap.next; t != &m->thinkercap; t = t->next)
+            {
+                Actor *a = t->Inherits<Actor>();
+                if (a)
+                    c->objectInScope(a);
+            }
+        }
     }
 }
-
-
 
 void GameType::Frag(PlayerInfo *killer, PlayerInfo *victim)
 {
-  killer->Frags[victim->number]++;
-  
-  // scoring rule
-  if (killer->team == 0)
-    if (killer != victim)
-      killer->score++;
-    else
-      killer->score--;
-  else if (killer->team != victim->team)
+    killer->Frags[victim->number]++;
+
+    // scoring rule
+    if (killer->team == 0)
+        if (killer != victim)
+            killer->score++;
+        else
+            killer->score--;
+    else if (killer->team != victim->team)
     {
-      e.game->teams[killer->team]->score++;
-      killer->score++;
+        e.game->teams[killer->team]->score++;
+        killer->score++;
     }
-  else
+    else
     {
-      e.game->teams[killer->team]->score--;
-      killer->score--;
+        e.game->teams[killer->team]->score--;
+        killer->score--;
     }
 }
-
-
-
 
 /*
   // subclass Map, give Map class virtual methods: Setup...
@@ -234,5 +226,5 @@ cv_teamplay::
  teamstarts
  scoring, scoreboards
  intermission
- 
+
 */

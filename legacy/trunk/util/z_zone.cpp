@@ -21,127 +21,120 @@
 /// \file
 /// \brief Zone Memory Allocation. Neat. Obsolete.
 
-#include <vector>
 #include <cstdlib>
 #include <cstring>
+#include <vector>
 
 #include "doomdef.h"
-#include "z_zone.h"
 #include "i_system.h"
 #include "i_video.h"
-
+#include "z_zone.h"
 
 using namespace std;
 
 struct mem_extra_t
 {
-  int    size;
-  int    tag;
-  void **user;
+    int size;
+    int tag;
+    void **user;
 };
 
 static unsigned int mem_usage[PU_NUMTAGS];
 
 void Z_Init()
 {
-  //CONS_Printf("Z_Init: Init zone memory allocation daemon.\n");
-  for (int i=0; i<PU_NUMTAGS; i++)
-    mem_usage[i] = 0;
+    // CONS_Printf("Z_Init: Init zone memory allocation daemon.\n");
+    for (int i = 0; i < PU_NUMTAGS; i++)
+        mem_usage[i] = 0;
 }
-
 
 unsigned Z_TagUsage(unsigned tagnum)
 {
-  if (tagnum >= PU_NUMTAGS)
-    return 0;
+    if (tagnum >= PU_NUMTAGS)
+        return 0;
 
-  return mem_usage[tagnum];
+    return mem_usage[tagnum];
 }
-
 
 int Z_GetTag(void *ptr)
 {
-  if (!ptr)
+    if (!ptr)
     {
-      I_Error("Z_GetTag: NULL given!\n");
-      return -1;
+        I_Error("Z_GetTag: NULL given!\n");
+        return -1;
     }
 
-  mem_extra_t *p = reinterpret_cast<mem_extra_t*>(static_cast<byte*>(ptr) - sizeof(mem_extra_t));
-  return p->tag;
+    mem_extra_t *p =
+        reinterpret_cast<mem_extra_t *>(static_cast<byte *>(ptr) - sizeof(mem_extra_t));
+    return p->tag;
 }
-
 
 void *Z_Malloc(int size, int tag, void **user)
 {
-  mem_extra_t *p = static_cast<mem_extra_t*>(malloc(sizeof(mem_extra_t) + size));
-  p->size = size;
-  p->tag = tag;
-  p->user = user;
+    mem_extra_t *p = static_cast<mem_extra_t *>(malloc(sizeof(mem_extra_t) + size));
+    p->size = size;
+    p->tag = tag;
+    p->user = user;
 
-  if (tag < PU_NUMTAGS)
-    mem_usage[tag] += size;
+    if (tag < PU_NUMTAGS)
+        mem_usage[tag] += size;
 
-  byte *ret = reinterpret_cast<byte*>(p) + sizeof(mem_extra_t);
-  if (user)
-    *user = ret;
-  return ret;
+    byte *ret = reinterpret_cast<byte *>(p) + sizeof(mem_extra_t);
+    if (user)
+        *user = ret;
+    return ret;
 }
-
 
 void Z_Free(void *ptr)
 {
-  if (!ptr)
+    if (!ptr)
     {
-      I_Error("Z_Free: NULL given!\n");
-      return;
+        I_Error("Z_Free: NULL given!\n");
+        return;
     }
 
-  mem_extra_t *p = reinterpret_cast<mem_extra_t*>(static_cast<byte*>(ptr) - sizeof(mem_extra_t));
+    mem_extra_t *p =
+        reinterpret_cast<mem_extra_t *>(static_cast<byte *>(ptr) - sizeof(mem_extra_t));
 
-  if (p->tag < PU_NUMTAGS)
-    mem_usage[p->tag] -= p->size;
+    if (p->tag < PU_NUMTAGS)
+        mem_usage[p->tag] -= p->size;
 
-  if (p->user)
-    *p->user = NULL;
-  free(p);
+    if (p->user)
+        *p->user = NULL;
+    free(p);
 }
-
 
 char *Z_Strdup(const char *s, int tag, void **user)
 {
-  return strcpy(static_cast<char*>(Z_Malloc(strlen(s)+1, tag, user)), s);
+    return strcpy(static_cast<char *>(Z_Malloc(strlen(s) + 1, tag, user)), s);
 }
-
 
 void Command_Meminfo_f()
 {
-  CONS_Printf("\2Memory Info\n");
+    CONS_Printf("\2Memory Info\n");
 
-  CONS_Printf("Unspecified:  %8d kB\n", Z_TagUsage(PU_STATIC) >> 10);
-  CONS_Printf("Sounds:       %8d kB\n", Z_TagUsage(PU_SOUND) >> 10);
-  CONS_Printf("Music:        %8d kB\n", Z_TagUsage(PU_MUSIC) >> 10);
-  CONS_Printf("Textures:     %8d kB\n", Z_TagUsage(PU_TEXTURE) >> 10);
-  CONS_Printf("Sprites:      %8d kB\n", Z_TagUsage(PU_SPRITE) >> 10);
-  CONS_Printf("3D models:    %8d kB\n", Z_TagUsage(PU_MODEL) >> 10);
-  CONS_Printf("\nMap data:     %8d kB\n", Z_TagUsage(PU_LEVEL) >> 10);
-  CONS_Printf("Thinkers:     %8d kB\n", Z_TagUsage(PU_LEVSPEC) >> 10);
-  CONS_Printf("Dave demands: %8d kB\n", Z_TagUsage(PU_DAVE) >> 10);
-  //CONS_Printf("OpenGL stuff: %8d kB\n", Z_TagUsage(PU_OPENGL_GEOMETRY) >> 10);
+    CONS_Printf("Unspecified:  %8d kB\n", Z_TagUsage(PU_STATIC) >> 10);
+    CONS_Printf("Sounds:       %8d kB\n", Z_TagUsage(PU_SOUND) >> 10);
+    CONS_Printf("Music:        %8d kB\n", Z_TagUsage(PU_MUSIC) >> 10);
+    CONS_Printf("Textures:     %8d kB\n", Z_TagUsage(PU_TEXTURE) >> 10);
+    CONS_Printf("Sprites:      %8d kB\n", Z_TagUsage(PU_SPRITE) >> 10);
+    CONS_Printf("3D models:    %8d kB\n", Z_TagUsage(PU_MODEL) >> 10);
+    CONS_Printf("\nMap data:     %8d kB\n", Z_TagUsage(PU_LEVEL) >> 10);
+    CONS_Printf("Thinkers:     %8d kB\n", Z_TagUsage(PU_LEVSPEC) >> 10);
+    CONS_Printf("Dave demands: %8d kB\n", Z_TagUsage(PU_DAVE) >> 10);
+    // CONS_Printf("OpenGL stuff: %8d kB\n", Z_TagUsage(PU_OPENGL_GEOMETRY) >> 10);
 
-  int total = 0;
-  for (int i=0; i<PU_NUMTAGS; i++)
-    total += mem_usage[i];
-  CONS_Printf("\nTotal:        %8d kB\n", total >> 10);
+    int total = 0;
+    for (int i = 0; i < PU_NUMTAGS; i++)
+        total += mem_usage[i];
+    CONS_Printf("\nTotal:        %8d kB\n", total >> 10);
 
-  CONS_Printf("\2\nSystem Memory Info\n");
-  Uint32 freebytes, totalbytes;
-  freebytes = I_GetFreeMem(&totalbytes);
-  CONS_Printf("Total     physical memory: %8d kB\n", totalbytes>>10);
-  CONS_Printf("Available physical memory: %8d kB\n", freebytes>>10);
+    CONS_Printf("\2\nSystem Memory Info\n");
+    Uint32 freebytes, totalbytes;
+    freebytes = I_GetFreeMem(&totalbytes);
+    CONS_Printf("Total     physical memory: %8d kB\n", totalbytes >> 10);
+    CONS_Printf("Available physical memory: %8d kB\n", freebytes >> 10);
 }
-
-
 
 #if 0 // the rest is obsolete
 
@@ -161,7 +154,7 @@ void Command_Meminfo_f()
 //  because it will get overwritten automatically if needed.
 //
 
-#define ZONEID  0x1d4a11
+#define ZONEID 0x1d4a11
 
 // New memory allocation system, by Jussi Pakkanen, written into a class by smite-meister
 //
@@ -492,7 +485,7 @@ void* memzone_t::Malloc(int size, int tag, void **user, int alignbits)
 #else
   Uint32 alignmask = (1 << alignbits) - 1;
 
-#define ALIGN(a) (((Uint32)(a)+alignmask) & ~alignmask)
+#define ALIGN(a) (((Uint32)(a) + alignmask) & ~alignmask)
 
   size = (size + 3) & ~3; // align size to next multiple of 4
   size += sizeof(memblock_t); // account for size of block header

@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 //  $Id: g_player.cpp 527 2008-01-27 02:25:14Z smite-meister $
@@ -20,228 +20,217 @@
 /// \file
 /// \brief PlayerInfo class implementation
 
-#include "tnl/tnlNetObject.h"
-#include "core/ISerializer.h"
-#include "doomdef.h"
 #include "command.h"
+#include "core/ISerializer.h"
 #include "cvars.h"
+#include "doomdef.h"
+#include "tnl/tnlNetObject.h"
 
-#include "g_player.h"
+#include "b_bot.h"
+#include "g_actor.h"
+#include "g_decorate.h"
 #include "g_game.h"
 #include "g_map.h"
 #include "g_mapinfo.h"
-#include "g_actor.h"
 #include "g_pawn.h"
-#include "g_decorate.h"
-#include "b_bot.h"
+#include "g_player.h"
 
 #include "a_functions.h"
 
 #include "n_connection.h"
 #include "n_interface.h"
 
-#include "r_sprite.h"
 #include "hardware/md3.h"
+#include "r_sprite.h"
 
-#include "wi_stuff.h"
-#include "tables.h"
-#include "z_zone.h"
 #include "hud.h"
+#include "tables.h"
+#include "wi_stuff.h"
+#include "z_zone.h"
 
 //============================================================
 //           Global (nonstatic) client data
 //============================================================
 
 /// Local human players, then local bot player
-LocalPlayerInfo LocalPlayers[NUM_LOCALPLAYERS] =
-{
-  // these constructors are required only define correct control key sets for the human players, otherwise the default constructor is enough
-  LocalPlayerInfo("Bruce", 0), LocalPlayerInfo("Dick", 1), LocalPlayerInfo("Alfred", 2), LocalPlayerInfo("Barbara", 3)
-};
+LocalPlayerInfo LocalPlayers[NUM_LOCALPLAYERS] = {
+    // these constructors are required only define correct control key sets for the human players,
+    // otherwise the default constructor is enough
+    LocalPlayerInfo("Bruce", 0),
+    LocalPlayerInfo("Dick", 1),
+    LocalPlayerInfo("Alfred", 2),
+    LocalPlayerInfo("Barbara", 3)};
 
 /// Locally observed players (multiple viewports...)
 vector<PlayerInfo *> ViewPlayers;
 
-
 bool G_RemoveLocalPlayer(PlayerInfo *p)
 {
-  if (p)
+    if (p)
     {
-      // remove the given player
-      for (int k=0; k < NUM_LOCALPLAYERS; k++)
-	if (LocalPlayers[k].info == p)
-	  {
-	    LocalPlayers[k].info = NULL;
-	    return true;
-	  }
+        // remove the given player
+        for (int k = 0; k < NUM_LOCALPLAYERS; k++)
+            if (LocalPlayers[k].info == p)
+            {
+                LocalPlayers[k].info = NULL;
+                return true;
+            }
 
-      return false;
+        return false;
     }
 
-  // remove all players
-  for (int k=0; k < NUM_LOCALPLAYERS; k++)
-    LocalPlayers[k].info = NULL;
+    // remove all players
+    for (int k = 0; k < NUM_LOCALPLAYERS; k++)
+        LocalPlayers[k].info = NULL;
 
-  return true;
+    return true;
 }
-
 
 //============================================================
 //   PlayerOptions class
 //============================================================
 
-static char default_weaponpref[NUMWEAPONS] =
-{
-  1,4,5,6,8,7,3,9,2,  // Doom
-  1,4,5,7,8,3,9,6,0,  // Heretic
-  2,2,2,4,4,4,6,6,6,0,0,0,0 // Hexen
+static char default_weaponpref[NUMWEAPONS] = {
+    1, 4, 5, 6, 8, 7, 3, 9, 2,            // Doom
+    1, 4, 5, 7, 8, 3, 9, 6, 0,            // Heretic
+    2, 2, 2, 4, 4, 4, 6, 6, 6, 0, 0, 0, 0 // Hexen
 };
-
 
 PlayerOptions::PlayerOptions(const string &n)
 {
-  name = n;
+    name = n;
 
-  ptype = -1;
-  color = 0;
-  skin  = 0; // "marine"?
+    ptype = -1;
+    color = 0;
+    skin = 0; // "marine"?
 
-  autoaim = true;
-  originalweaponswitch = true;
-  for (int i=0; i<NUMWEAPONS; i++)
-    weaponpref[i] = default_weaponpref[i];
+    autoaim = true;
+    originalweaponswitch = true;
+    for (int i = 0; i < NUMWEAPONS; i++)
+        weaponpref[i] = default_weaponpref[i];
 
-  messagefilter = 2;
+    messagefilter = 2;
 }
-
 
 /// Sends the player preferences to the server.
 void PlayerOptions::Write(BitStream *stream)
 {
-  stream->writeString(name.c_str());
-  stream->write(ptype);
-  stream->write(color);
-  stream->write(skin);
+    stream->writeString(name.c_str());
+    stream->write(ptype);
+    stream->write(color);
+    stream->write(skin);
 
-  stream->write(autoaim);
-  stream->write(originalweaponswitch);
-  for (int i=0; i<NUMWEAPONS; i++)
-    stream->write(weaponpref[i]);
+    stream->write(autoaim);
+    stream->write(originalweaponswitch);
+    for (int i = 0; i < NUMWEAPONS; i++)
+        stream->write(weaponpref[i]);
 
-  stream->write(messagefilter);
+    stream->write(messagefilter);
 }
 
 /// server reads remote player preferences sent by client
 void PlayerOptions::Read(BitStream *stream)
 {
-  char temp[256];
+    char temp[256];
 
-  stream->readString(temp);
-  temp[32] = '\0'; // limit name length
-  name = temp;
+    stream->readString(temp);
+    temp[32] = '\0'; // limit name length
+    name = temp;
 
-  stream->read(&ptype);
-  stream->read(&color);
-  stream->read(&skin);
+    stream->read(&ptype);
+    stream->read(&color);
+    stream->read(&skin);
 
-  stream->read(&autoaim);
-  stream->read(&originalweaponswitch);
-  for (int i=0; i<NUMWEAPONS; i++)
-    stream->read(&weaponpref[i]);
+    stream->read(&autoaim);
+    stream->read(&originalweaponswitch);
+    for (int i = 0; i < NUMWEAPONS; i++)
+        stream->read(&weaponpref[i]);
 
-  stream->read(&messagefilter);
+    stream->read(&messagefilter);
 }
 
-
 /// Write player preferences to ISerializer (TNL-independent)
-void PlayerOptions::Write(DoomLegacy::ISerializer& s)
+void PlayerOptions::Write(DoomLegacy::ISerializer &s)
 {
-  s.writeString(name.c_str());
-  s.write(static_cast<int32_t>(ptype));
-  s.write(static_cast<int32_t>(color));
-  s.write(static_cast<int32_t>(skin));
+    s.writeString(name.c_str());
+    s.write(static_cast<int32_t>(ptype));
+    s.write(static_cast<int32_t>(color));
+    s.write(static_cast<int32_t>(skin));
 
-  s.writeBool(autoaim);
-  s.writeBool(originalweaponswitch);
-  for (int i=0; i<NUMWEAPONS; i++)
-    s.write(static_cast<int32_t>(weaponpref[i]));
+    s.writeBool(autoaim);
+    s.writeBool(originalweaponswitch);
+    for (int i = 0; i < NUMWEAPONS; i++)
+        s.write(static_cast<int32_t>(weaponpref[i]));
 
-  s.write(static_cast<int32_t>(messagefilter));
+    s.write(static_cast<int32_t>(messagefilter));
 }
 
 /// Read player preferences from ISerializer (TNL-independent)
-void PlayerOptions::Read(DoomLegacy::ISerializer& s)
+void PlayerOptions::Read(DoomLegacy::ISerializer &s)
 {
-  std::string temp;
-  s.readString(temp);
-  if (temp.length() > 31)
-    temp[31] = '\0'; // limit name length
-  name = temp;
+    std::string temp;
+    s.readString(temp);
+    if (temp.length() > 31)
+        temp[31] = '\0'; // limit name length
+    name = temp;
 
-  ptype = static_cast<int>(s.readInt32());
-  color = static_cast<int>(s.readInt32());
-  skin = static_cast<int>(s.readInt32());
+    ptype = static_cast<int>(s.readInt32());
+    color = static_cast<int>(s.readInt32());
+    skin = static_cast<int>(s.readInt32());
 
-  autoaim = s.readBool();
-  originalweaponswitch = s.readBool();
-  for (int i=0; i<NUMWEAPONS; i++)
-    weaponpref[i] = static_cast<unsigned char>(s.readInt32());
+    autoaim = s.readBool();
+    originalweaponswitch = s.readBool();
+    for (int i = 0; i < NUMWEAPONS; i++)
+        weaponpref[i] = static_cast<unsigned char>(s.readInt32());
 
-  messagefilter = static_cast<int>(s.readInt32());
+    messagefilter = static_cast<int>(s.readInt32());
 }
-
-
 
 //============================================================
 //   LocalPlayerInfo class
 //============================================================
 
-LocalPlayerInfo::LocalPlayerInfo(const string &n, int keyset)
-  : PlayerOptions(n)
+LocalPlayerInfo::LocalPlayerInfo(const string &n, int keyset) : PlayerOptions(n)
 {
-  controlkeyset = keyset;
-  autorun = false;
-  crosshair = 0;
+    controlkeyset = keyset;
+    autorun = false;
+    crosshair = 0;
 
-  info = NULL;
-  ai = NULL;
+    info = NULL;
+    ai = NULL;
 }
-
 
 /// Builds the control struct (ticcmd) based on human input or AI decisions
 void LocalPlayerInfo::GetInput(int elapsed)
 {
-  if (!info)
-    return;
+    if (!info)
+        return;
 
-  // inventory timer (TODO does it belong here?)
-  if (info->invTics)
-    info->invTics--;
+    // inventory timer (TODO does it belong here?)
+    if (info->invTics)
+        info->invTics--;
 
-  if (ai)
-    ai->BuildInput(info, elapsed);
-  else
-    info->cmd.Build(this, elapsed);
+    if (ai)
+        ai->BuildInput(info, elapsed);
+    else
+        info->cmd.Build(this, elapsed);
 }
-
 
 // Propagates the preferences to the PlayerInfo or sends them to the server.
 void LocalPlayerInfo::UpdatePreferences()
 {
-  if (!info)
-    return; // nothing else to do if we have no PlayerInfo yet
+    if (!info)
+        return; // nothing else to do if we have no PlayerInfo yet
 
-  if (game.server)
+    if (game.server)
     {
-      info->options = *this;
-      info->name = name;
-      info->setMaskBits(PlayerInfo::M_IDENTITY);
+        info->options = *this;
+        info->name = name;
+        info->setMaskBits(PlayerInfo::M_IDENTITY);
     }
-  else
-    game.net->SendPlayerOptions(info->number, *this);
+    else
+        game.net->SendPlayerOptions(info->number, *this);
 }
-
-
 
 //============================================================
 //   PlayerInfo class
@@ -251,297 +240,285 @@ TNL_IMPLEMENT_NETOBJECT(PlayerInfo);
 
 PlayerInfo::PlayerInfo(const LocalPlayerInfo *p)
 {
-  if (p)
+    if (p)
     {
-      options = *p;
-      name = options.name;
+        options = *p;
+        name = options.name;
     }
 
-  number = 0;
-  team = 0;
+    number = 0;
+    team = 0;
 
-  connection = NULL;
-  client_hash = 0;
+    connection = NULL;
+    client_hash = 0;
 
-  playerstate = PST_NEEDMAP;
-  spectator = false;
+    playerstate = PST_NEEDMAP;
+    spectator = false;
 
-  requestmap = entrypoint = 0;
+    requestmap = entrypoint = 0;
 
-  mp = NULL;
-  pawn = NULL;
-  pov = NULL;
-  hubsavepawn = NULL;
+    mp = NULL;
+    pawn = NULL;
+    pov = NULL;
+    hubsavepawn = NULL;
 
-  viewz = viewheight = deltaviewheight = 0;
-  palette = -1;
-  damagecount = bonuscount = 0;
-  itemuse = 0;
+    viewz = viewheight = deltaviewheight = 0;
+    palette = -1;
+    damagecount = bonuscount = 0;
+    itemuse = 0;
 
-  Reset(false, true);  // clear score, frags...
+    Reset(false, true); // clear score, frags...
 
-  cmd.Clear();
-  invTics = invSlot = invPos = 0;
+    cmd.Clear();
+    invTics = invSlot = invPos = 0;
 
-  // net stuff
-  mNetFlags.set(Ghostable);
+    // net stuff
+    mNetFlags.set(Ghostable);
 };
-
 
 /// This is called on clients when a new player joins
 bool PlayerInfo::onGhostAdd(class GhostConnection *c)
 {
-  CONS_Printf("%s has joined the game (player %d)\n", name.c_str(), number);
-  game.AddPlayer(this);
+    CONS_Printf("%s has joined the game (player %d)\n", name.c_str(), number);
+    game.AddPlayer(this);
 
-  if (!LConnection::joining_players.empty())
+    if (!LConnection::joining_players.empty())
     {
-      list<LocalPlayerInfo *>::iterator t = LConnection::joining_players.begin();
-      for ( ; t != LConnection::joining_players.end(); t++)
-	{
-	  LocalPlayerInfo *p = *t;
-	  if (p->pnumber == number)
-	    {
-	      if (p->info)
-		I_Error("Multiple ghostadds!\n");
+        list<LocalPlayerInfo *>::iterator t = LConnection::joining_players.begin();
+        for (; t != LConnection::joining_players.end(); t++)
+        {
+            LocalPlayerInfo *p = *t;
+            if (p->pnumber == number)
+            {
+                if (p->info)
+                    I_Error("Multiple ghostadds!\n");
 
-	      p->info = this;
-	      LConnection::joining_players.erase(t); // the PlayerInfo found its owner
+                p->info = this;
+                LConnection::joining_players.erase(t); // the PlayerInfo found its owner
 
-	      ViewPlayers.push_back(this); // let's see it too!
-	      //hud.ST_Start(this); // TODO
-	      break;
-	    }
-	}
+                ViewPlayers.push_back(this); // let's see it too!
+                // hud.ST_Start(this); // TODO
+                break;
+            }
+        }
     }
-  // NOTE playerstate should not mean anything to the client...yet?
+    // NOTE playerstate should not mean anything to the client...yet?
 
-  return true;
+    return true;
 }
-
 
 /// This is called on clients when a player leaves
 void PlayerInfo::onGhostRemove()
 {
-  CONS_Printf("%s has left the game.\n", name.c_str());
-  //game.RemovePlayer(number);
-  playerstate = PST_REMOVE;
+    CONS_Printf("%s has left the game.\n", name.c_str());
+    // game.RemovePlayer(number);
+    playerstate = PST_REMOVE;
 }
-
 
 /// This is the function the server uses to ghost PlayerInfo data to clients.
 U32 PlayerInfo::packUpdate(GhostConnection *c, U32 mask, class BitStream *stream)
 {
-  if (isInitialUpdate())
-    mask = M_IDENTITY; // everything else is at default value at this point
+    if (isInitialUpdate())
+        mask = M_IDENTITY; // everything else is at default value at this point
 
+    int ret = 0;
+    // check which states need to be updated, and write updates
 
-  int ret = 0;
-  // check which states need to be updated, and write updates
-
-  if (stream->writeFlag(mask & M_IDENTITY))
+    if (stream->writeFlag(mask & M_IDENTITY))
     {
-      // very rarely
-      CONS_Printf("---PI: sent identity\n");
-      stream->writeString(name.c_str());
-      stream->write(number);
-      stream->write(team);
+        // very rarely
+        CONS_Printf("---PI: sent identity\n");
+        stream->writeString(name.c_str());
+        stream->write(number);
+        stream->write(team);
     }
 
-  if (mask & M_PAWN)
+    if (mask & M_PAWN)
     {
-      // rarely
-      S32 idx = c->getGhostIndex(pawn); // these indices replace pointers to other ghosts!
-      S32 idx2 = c->getGhostIndex(pov);
+        // rarely
+        S32 idx = c->getGhostIndex(pawn); // these indices replace pointers to other ghosts!
+        S32 idx2 = c->getGhostIndex(pov);
 
-      if (stream->writeFlag(idx != -1 && idx2 != -1))
-	{
-	  stream->write(idx);
-	  stream->write(idx2);
-	  CONS_Printf("---PI: sent pawn\n");
-	}
-      else
-	{
-	  ret |= M_PAWN; // try again later
-	  CONS_Printf("---PI: postponed pawn send\n");
-	}
+        if (stream->writeFlag(idx != -1 && idx2 != -1))
+        {
+            stream->write(idx);
+            stream->write(idx2);
+            CONS_Printf("---PI: sent pawn\n");
+        }
+        else
+        {
+            ret |= M_PAWN; // try again later
+            CONS_Printf("---PI: postponed pawn send\n");
+        }
     }
-  else
-    stream->writeFlag(false);
+    else
+        stream->writeFlag(false);
 
-  if (stream->writeFlag(mask & M_SCORE))
+    if (stream->writeFlag(mask & M_SCORE))
     {
-      CONS_Printf("---PI: sent score\n");
-      // occasionally
-      stream->write(score);
-      // kills, items, secrets?
-    }
-
-  // feedback (goes only to the owner)
-  if (c != connection)
-    {
-      stream->writeFlag(false); // nothing further for others
-      return 0;
-    }
-  else
-    stream->writeFlag(true);
-
-
-  if (stream->writeFlag(mask & M_PALETTE))
-    {
-      // often
-      stream->write(palette);
-      palette = -1;
+        CONS_Printf("---PI: sent score\n");
+        // occasionally
+        stream->write(score);
+        // kills, items, secrets?
     }
 
-  if (stream->writeFlag(mask & M_HUDFLASH))
+    // feedback (goes only to the owner)
+    if (c != connection)
     {
-      // often
-      // palette change overrides flashes
-      if (stream->writeFlag(damagecount))
-	stream->write(damagecount);
-      if (stream->writeFlag(bonuscount))
-	stream->write(bonuscount);
+        stream->writeFlag(false); // nothing further for others
+        return 0;
+    }
+    else
+        stream->writeFlag(true);
 
-      stream->writeFlag(itemuse);
+    if (stream->writeFlag(mask & M_PALETTE))
+    {
+        // often
+        stream->write(palette);
+        palette = -1;
     }
 
+    if (stream->writeFlag(mask & M_HUDFLASH))
+    {
+        // often
+        // palette change overrides flashes
+        if (stream->writeFlag(damagecount))
+            stream->write(damagecount);
+        if (stream->writeFlag(bonuscount))
+            stream->write(bonuscount);
 
+        stream->writeFlag(itemuse);
+    }
 
-
-  // the return value from packUpdate can set which states still
-  // need to be updated for this object.
-  return ret;
+    // the return value from packUpdate can set which states still
+    // need to be updated for this object.
+    return ret;
 }
-
 
 ///
 void PlayerInfo::unpackUpdate(GhostConnection *c, BitStream *stream)
 {
-  char temp[256];
+    char temp[256];
 
-  // NOTE: the unpackUpdate function must be symmetrical to packUpdate
-  if (stream->readFlag()) // M_IDENTITY
+    // NOTE: the unpackUpdate function must be symmetrical to packUpdate
+    if (stream->readFlag()) // M_IDENTITY
     {
-      CONS_Printf("---PI: got identity\n");
-      stream->readString(temp);
-      name = temp;
-      stream->read(&number);
-      stream->read(&team);
+        CONS_Printf("---PI: got identity\n");
+        stream->readString(temp);
+        name = temp;
+        stream->read(&number);
+        stream->read(&team);
     }
 
-  if (stream->readFlag()) // M_PAWN
+    if (stream->readFlag()) // M_PAWN
     {
-      CONS_Printf("---PI: got pawn\n");
-      S32 idx;
-      stream->read(&idx);
-      pawn = reinterpret_cast<PlayerPawn *>(c->resolveGhost(idx)); // these indices replace pointers to other ghosts!
+        CONS_Printf("---PI: got pawn\n");
+        S32 idx;
+        stream->read(&idx);
+        pawn = reinterpret_cast<PlayerPawn *>(
+            c->resolveGhost(idx)); // these indices replace pointers to other ghosts!
 
-      stream->read(&idx);
-      pov = reinterpret_cast<Actor *>(c->resolveGhost(idx));
+        stream->read(&idx);
+        pov = reinterpret_cast<Actor *>(c->resolveGhost(idx));
     }
 
-  if (stream->readFlag()) // M_SCORE
+    if (stream->readFlag()) // M_SCORE
     {
-      CONS_Printf("---PI: got score\n");
-      stream->read(&score);
+        CONS_Printf("---PI: got score\n");
+        stream->read(&score);
     }
 
-  if (!stream->readFlag())
-    return; // nothing more
+    if (!stream->readFlag())
+        return; // nothing more
 
-  // feedback
+    // feedback
 
-  if (stream->readFlag()) // M_PALETTE
-    stream->read(&palette);
+    if (stream->readFlag()) // M_PALETTE
+        stream->read(&palette);
 
-  if (stream->readFlag()) // M_HUDFLASH
+    if (stream->readFlag()) // M_HUDFLASH
     {
-      // palette change overrides flashes
-      if (stream->readFlag())
-	stream->read(&damagecount);
-      if (stream->readFlag())
-	stream->read(&bonuscount);
+        // palette change overrides flashes
+        if (stream->readFlag())
+            stream->read(&damagecount);
+        if (stream->readFlag())
+            stream->read(&bonuscount);
 
-      itemuse = stream->readFlag();
+        itemuse = stream->readFlag();
     }
-
-
 }
 
-
 /// Serialize PlayerInfo to ISerializer (TNL-independent)
-void PlayerInfo::Serialize(DoomLegacy::ISerializer& s)
+void PlayerInfo::Serialize(DoomLegacy::ISerializer &s)
 {
-  // Identity (name, number, team)
-  s.writeString(name.c_str());
-  s.write(static_cast<int32_t>(number));
-  s.write(static_cast<int32_t>(team));
+    // Identity (name, number, team)
+    s.writeString(name.c_str());
+    s.write(static_cast<int32_t>(number));
+    s.write(static_cast<int32_t>(team));
 
-  // Player state
-  s.write(static_cast<int32_t>(playerstate));
-  s.writeBool(spectator);
+    // Player state
+    s.write(static_cast<int32_t>(playerstate));
+    s.writeBool(spectator);
 
-  // Score data
-  s.write(static_cast<int32_t>(score));
-  s.write(static_cast<int32_t>(kills));
-  s.write(static_cast<int32_t>(items));
-  s.write(static_cast<int32_t>(secrets));
-  s.write(static_cast<int32_t>(time));
+    // Score data
+    s.write(static_cast<int32_t>(score));
+    s.write(static_cast<int32_t>(kills));
+    s.write(static_cast<int32_t>(items));
+    s.write(static_cast<int32_t>(secrets));
+    s.write(static_cast<int32_t>(time));
 
-  // View data
-  // Note: fixed_t has no implicit float conversion; use .Float()
-  s.writeFloat(viewz.Float());
-  s.writeFloat(viewheight.Float());
-  s.writeFloat(deltaviewheight.Float());
+    // View data
+    // Note: fixed_t has no implicit float conversion; use .Float()
+    s.writeFloat(viewz.Float());
+    s.writeFloat(viewheight.Float());
+    s.writeFloat(deltaviewheight.Float());
 
-  // HUD/feedback data
-  s.write(static_cast<int32_t>(palette));
-  s.write(static_cast<int32_t>(damagecount));
-  s.write(static_cast<int32_t>(bonuscount));
-  s.write(static_cast<int32_t>(itemuse));
+    // HUD/feedback data
+    s.write(static_cast<int32_t>(palette));
+    s.write(static_cast<int32_t>(damagecount));
+    s.write(static_cast<int32_t>(bonuscount));
+    s.write(static_cast<int32_t>(itemuse));
 
-  // Options (delegate to PlayerOptions)
-  options.Write(s);
+    // Options (delegate to PlayerOptions)
+    options.Write(s);
 }
 
 /// Deserialize PlayerInfo from ISerializer (TNL-independent)
-void PlayerInfo::Unserialize(DoomLegacy::ISerializer& s)
+void PlayerInfo::Unserialize(DoomLegacy::ISerializer &s)
 {
-  std::string temp;
+    std::string temp;
 
-  // Identity
-  s.readString(temp);
-  name = temp;
-  number = static_cast<int>(s.readInt32());
-  team = static_cast<int>(s.readInt32());
+    // Identity
+    s.readString(temp);
+    name = temp;
+    number = static_cast<int>(s.readInt32());
+    team = static_cast<int>(s.readInt32());
 
-  // Player state
-  playerstate = static_cast<playerstate_t>(s.readInt32());
-  spectator = s.readBool();
+    // Player state
+    playerstate = static_cast<playerstate_t>(s.readInt32());
+    spectator = s.readBool();
 
-  // Score data
-  score = static_cast<int>(s.readInt32());
-  kills = static_cast<int>(s.readInt32());
-  items = static_cast<int>(s.readInt32());
-  secrets = static_cast<int>(s.readInt32());
-  time = static_cast<int>(s.readInt32());
+    // Score data
+    score = static_cast<int>(s.readInt32());
+    kills = static_cast<int>(s.readInt32());
+    items = static_cast<int>(s.readInt32());
+    secrets = static_cast<int>(s.readInt32());
+    time = static_cast<int>(s.readInt32());
 
-  // View data
-  viewz = static_cast<fixed_t>(s.readFloat());
-  viewheight = static_cast<fixed_t>(s.readFloat());
-  deltaviewheight = static_cast<fixed_t>(s.readFloat());
+    // View data
+    viewz = static_cast<fixed_t>(s.readFloat());
+    viewheight = static_cast<fixed_t>(s.readFloat());
+    deltaviewheight = static_cast<fixed_t>(s.readFloat());
 
-  // HUD/feedback data
-  palette = static_cast<int>(s.readInt32());
-  damagecount = static_cast<int>(s.readInt32());
-  bonuscount = static_cast<int>(s.readInt32());
-  itemuse = static_cast<int>(s.readInt32());
+    // HUD/feedback data
+    palette = static_cast<int>(s.readInt32());
+    damagecount = static_cast<int>(s.readInt32());
+    bonuscount = static_cast<int>(s.readInt32());
+    itemuse = static_cast<int>(s.readInt32());
 
-  // Options (delegate to PlayerOptions)
-  options.Read(s);
+    // Options (delegate to PlayerOptions)
+    options.Read(s);
 }
-
 
 // In stub builds, these RPC methods are already defined as inline no-ops via
 // TNL_DECLARE_RPC in the class body.  The real implementations below are only
@@ -551,266 +528,254 @@ void PlayerInfo::Unserialize(DoomLegacy::ISerializer& s)
 /// server notifies the client that this player has entered a new map
 PLAYERINFO_RPC_S2C(s2cEnterMap, (U8 mapnum), (mapnum))
 {
-  CONS_Printf("player sent to map %d\n", mapnum);
+    CONS_Printf("player sent to map %d\n", mapnum);
 
-  MapInfo *m = game.FindMapInfo(mapnum);
-  if (!m)
-    I_Error("Server sent a player to an unknown map %d!", mapnum);
+    MapInfo *m = game.FindMapInfo(mapnum);
+    if (!m)
+        I_Error("Server sent a player to an unknown map %d!", mapnum);
 
-  //requestmap = mapnum;
-  /*
-  if (mp)
-    playerstate = PST_LEAVINGMAP;
-  else
-    playerstate = PST_NEEDMAP;
-  */
+    // requestmap = mapnum;
+    /*
+    if (mp)
+      playerstate = PST_LEAVINGMAP;
+    else
+      playerstate = PST_NEEDMAP;
+    */
 
-  if (mp)
-    mp->RemovePlayer(this);
+    if (mp)
+        mp->RemovePlayer(this);
 
-  if (!m->Activate(this)) // clientside map activation
-    I_Error("Crap!\n");
+    if (!m->Activate(this)) // clientside map activation
+        I_Error("Crap!\n");
 
-  // TEST FIXME
-  game.currentcluster = game.FindCluster(m->cluster);
+    // TEST FIXME
+    game.currentcluster = game.FindCluster(m->cluster);
 }
 
-
-PLAYERINFO_RPC_S2C(s2cStartIntermission, (U8 finished, U8 next, U32 maptic, U32 kills, U32 items, U32 secrets), (finished, next, maptic, kills, items, secrets))
+PLAYERINFO_RPC_S2C(s2cStartIntermission,
+                   (U8 finished, U8 next, U32 maptic, U32 kills, U32 items, U32 secrets),
+                   (finished, next, maptic, kills, items, secrets))
 {
-  CONS_Printf("server ordered intermission for player %d\n", number);
+    CONS_Printf("server ordered intermission for player %d\n", number);
 
-  MapInfo *f = game.FindMapInfo(finished);
-  MapInfo *n = game.FindMapInfo(next);
+    MapInfo *f = game.FindMapInfo(finished);
+    MapInfo *n = game.FindMapInfo(next);
 
-  if (f && n)
+    if (f && n)
     {
-      wi.Start(f, n, maptic, kills, items, secrets);
-      game.StartIntermission();
+        wi.Start(f, n, maptic, kills, items, secrets);
+        game.StartIntermission();
     }
-  else
-    game.EndIntermission();
+    else
+        game.EndIntermission();
 }
-
 
 PLAYERINFO_RPC_C2S(c2sIntermissionDone, (), ())
 {
-  CONS_Printf("client player %d has finished intermission\n", number);
-  playerstate = PST_NEEDMAP; 
+    CONS_Printf("client player %d has finished intermission\n", number);
+    playerstate = PST_NEEDMAP;
 }
 
 #endif // TNL_STUB_BUILD
 
-
-
 void PlayerInfo::Ticker()
 {
-  if (bonuscount > 0)
-    bonuscount--;
+    if (bonuscount > 0)
+        bonuscount--;
 
-  if (damagecount > 100)
-    damagecount = 100;  // teleport stomp does 10k points...
-  else if (damagecount > 0)
-    damagecount--;
+    if (damagecount > 100)
+        damagecount = 100; // teleport stomp does 10k points...
+    else if (damagecount > 0)
+        damagecount--;
 
-  // inventory
-  if (itemuse > 0)
-    itemuse--;
+    // inventory
+    if (itemuse > 0)
+        itemuse--;
 }
 
 // send a message to the player
 void PlayerInfo::SetMessage(const char *msg, int priority, int type, int extradata)
 {
-  if (priority > options.messagefilter)
-    return;  // not interested (lesser is more important!)
+    if (priority > options.messagefilter)
+        return; // not interested (lesser is more important!)
 
-  if (connection)
-    connection->rpcMessage_s2c(number, msg, priority, type); // send it over network (usually server does this)
-  else if (messages.size() < 20)
+    if (connection)
+        connection->rpcMessage_s2c(
+            number, msg, priority, type); // send it over network (usually server does this)
+    else if (messages.size() < 20)
     {
-      // the player is local and has room in her message queue
-      // TODO high priority overrides low priority messages?
-      message_t temp;
-      temp.msg = msg; // makes a copy of msg, so we can use va() etc.
-      temp.priority = priority;
-      temp.type = type;
-      temp.extradata = extradata;
+        // the player is local and has room in her message queue
+        // TODO high priority overrides low priority messages?
+        message_t temp;
+        temp.msg = msg; // makes a copy of msg, so we can use va() etc.
+        temp.priority = priority;
+        temp.type = type;
+        temp.extradata = extradata;
 
-      messages.push_back(temp);
+        messages.push_back(temp);
     }
 }
-
 
 // Sets the new destination Map for the player. Does _not_ finish the current Map.
 void PlayerInfo::ExitLevel(int nextmap, int ep)
 {
-  // if a player is already going somewhere, let him keep his destination:
-  if (!requestmap)
+    // if a player is already going somewhere, let him keep his destination:
+    if (!requestmap)
     {
-      requestmap = nextmap;
-      entrypoint = ep;
+        requestmap = nextmap;
+        entrypoint = ep;
     }
 
-  playerstate = PST_LEAVINGMAP;
+    playerstate = PST_LEAVINGMAP;
 }
-
-
-
 
 // Reset players between levels
 void PlayerInfo::Reset(bool rpawn, bool rfrags)
 {
-  kills = items = secrets = time = 0;
+    kills = items = secrets = time = 0;
 
-  if (pawn)
+    if (pawn)
     {
-      if (rpawn)
-	pawn->Reset();
-      pawn->powers[pw_allmap] = 0; // automap never carries over to the next map 
+        if (rpawn)
+            pawn->Reset();
+        pawn->powers[pw_allmap] = 0; // automap never carries over to the next map
     }
 
-  pov = NULL;
-  setMaskBits(PlayerInfo::M_PAWN);
+    pov = NULL;
+    setMaskBits(PlayerInfo::M_PAWN);
 
-  // Initial height of PointOfView
-  // will be set by player think.
-  viewz = 1;
+    // Initial height of PointOfView
+    // will be set by player think.
+    viewz = 1;
 
-  if (rfrags)
+    if (rfrags)
     {
-      score = 0;
-      Frags.clear();
-      setMaskBits(PlayerInfo::M_SCORE);
+        score = 0;
+        Frags.clear();
+        setMaskBits(PlayerInfo::M_SCORE);
     }
 
-  return;
+    return;
 }
-
-
-
 
 /// Client: Calculate the walking / running viewpoint bobbing and weapon swing
 void PlayerInfo::CalcViewHeight()
 {
-  if (!pawn)
-    return;
+    if (!pawn)
+        return;
 
-  bool onground = (pawn->Feet() <= pawn->floorz);
+    bool onground = (pawn->Feet() <= pawn->floorz);
 
-  const fixed_t MAXBOB = 16; // 16 pixels of bob
-  const fixed_t FLYBOB = 0.5f;
+    const fixed_t MAXBOB = 16; // 16 pixels of bob
+    const fixed_t FLYBOB = 0.5f;
 
-  // Regular movement bobbing
-  // basically pawn speed squared, affects weapon swing
-  fixed_t bob_amplitude; 
+    // Regular movement bobbing
+    // basically pawn speed squared, affects weapon swing
+    fixed_t bob_amplitude;
 
-  if ((pawn->eflags & MFE_FLY) && !onground)
-    bob_amplitude = FLYBOB;
-  else
+    if ((pawn->eflags & MFE_FLY) && !onground)
+        bob_amplitude = FLYBOB;
+    else
     {
-      bob_amplitude = pawn->vel.XYNorm2() >> 2;
+        bob_amplitude = pawn->vel.XYNorm2() >> 2;
 
-      if (bob_amplitude > MAXBOB)
-	bob_amplitude = MAXBOB;
+        if (bob_amplitude > MAXBOB)
+            bob_amplitude = MAXBOB;
     }
 
-  fixed_t eyes = (pawn->height * cv_viewheight.value) / 56; // default eye view height
+    fixed_t eyes = (pawn->height * cv_viewheight.value) / 56; // default eye view height
 
-  if ((pawn->cheats & CF_NOMOMENTUM) || !onground)
+    if ((pawn->cheats & CF_NOMOMENTUM) || !onground)
     {
-      viewheight = eyes;
-      viewz = pawn->Feet() + eyes;
+        viewheight = eyes;
+        viewz = pawn->Feet() + eyes;
     }
-  else
+    else
     {
-      int phase = (FINEANGLES/20 * game.tic) & FINEMASK;
-      fixed_t bob = (bob_amplitude/2) * finesine[phase];
+        int phase = (FINEANGLES / 20 * game.tic) & FINEMASK;
+        fixed_t bob = (bob_amplitude / 2) * finesine[phase];
 
-      if (!(pawn->flags & MF_CORPSE))
-	{
-	  viewheight += deltaviewheight;
+        if (!(pawn->flags & MF_CORPSE))
+        {
+            viewheight += deltaviewheight;
 
-	  if (viewheight > eyes)
-	    {
-	      viewheight = eyes;
-	      deltaviewheight = 0;
-	    }
+            if (viewheight > eyes)
+            {
+                viewheight = eyes;
+                deltaviewheight = 0;
+            }
 
-	  if (viewheight < eyes/2)
-	    {
-	      viewheight = eyes/2;
-	      if (deltaviewheight <= 0)
-		deltaviewheight = 1;
-	    }
+            if (viewheight < eyes / 2)
+            {
+                viewheight = eyes / 2;
+                if (deltaviewheight <= 0)
+                    deltaviewheight = 1;
+            }
 
-	  if (deltaviewheight != 0)
-	    {
-	      deltaviewheight += 0.25f;
-	      if (!deltaviewheight)
-		deltaviewheight = 1;
-	    }
-	}
+            if (deltaviewheight != 0)
+            {
+                deltaviewheight += 0.25f;
+                if (!deltaviewheight)
+                    deltaviewheight = 1;
+            }
+        }
 
-      viewz = pawn->Feet() + viewheight + bob - pawn->floorclip;
+        viewz = pawn->Feet() + viewheight + bob - pawn->floorclip;
 
-      if (viewz < pawn->floorz + 4)
-	viewz = pawn->floorz + 4;
+        if (viewz < pawn->floorz + 4)
+            viewz = pawn->floorz + 4;
     }
 
-  if (viewz > pawn->ceilingz - 4)
-    viewz = pawn->ceilingz - 4;
+    if (viewz > pawn->ceilingz - 4)
+        viewz = pawn->ceilingz - 4;
 
+    // server decides the rising/lowering of weapons (sy coord),
+    // but client does the bobbing independently
 
-  // server decides the rising/lowering of weapons (sy coord),
-  // but client does the bobbing independently
+    pspdef_t *psp = pawn->psprites;
 
-  pspdef_t *psp = pawn->psprites;
-
-  if (psp[ps_weapon].state && psp[ps_weapon].state->action == A_WeaponReady)
+    if (psp[ps_weapon].state && psp[ps_weapon].state->action == A_WeaponReady)
     {
-      // bob the weapon based on movement speed
-      int angle = (128 * game.tic) & FINEMASK;
-      psp[ps_weapon].sx = 1 + bob_amplitude*finecosine[angle];
-      angle &= FINEANGLES/2-1;
-      psp[ps_weapon].sy = WEAPONTOP + bob_amplitude*finesine[angle];
+        // bob the weapon based on movement speed
+        int angle = (128 * game.tic) & FINEMASK;
+        psp[ps_weapon].sx = 1 + bob_amplitude * finecosine[angle];
+        angle &= FINEANGLES / 2 - 1;
+        psp[ps_weapon].sy = WEAPONTOP + bob_amplitude * finesine[angle];
 
-      psp[ps_flash].sx = psp[ps_weapon].sx;
-      psp[ps_flash].sy = psp[ps_weapon].sy;
+        psp[ps_flash].sx = psp[ps_weapon].sx;
+        psp[ps_flash].sy = psp[ps_weapon].sy;
     }
 }
-
-
-
 
 /// Makes a copy of the pawn (when the player enters a map)
 void PlayerInfo::SavePawn()
 {
-  if (hubsavepawn)
-    delete hubsavepawn;
+    if (hubsavepawn)
+        delete hubsavepawn;
 
-  if (pawn)
+    if (pawn)
     {
-      hubsavepawn = new PlayerPawn(*pawn);
-      hubsavepawn->player = NULL; // to avoid conflicts with the real pawn... ok, it's bad design:)
-      hubsavepawn->pres = NULL;
+        hubsavepawn = new PlayerPawn(*pawn);
+        hubsavepawn->player =
+            NULL; // to avoid conflicts with the real pawn... ok, it's bad design:)
+        hubsavepawn->pres = NULL;
     }
-  else
-    hubsavepawn = NULL;
+    else
+        hubsavepawn = NULL;
 }
-
 
 /// Copies the saved pawn as the actual pawn
 void PlayerInfo::LoadPawn()
 {
-  if (!hubsavepawn)
-    return;
+    if (!hubsavepawn)
+        return;
 
-  pawn = new PlayerPawn(*hubsavepawn);
-  pawn->player = this;
+    pawn = new PlayerPawn(*hubsavepawn);
+    pawn->player = this;
 
-  // and a new presentation
-  if (!pawn->info->modelname.empty())
-    pawn->pres = new modelpres_t(pawn->info->modelname.c_str());
-  else
-    pawn->pres = new spritepres_t(pawn->info, 0);
+    // and a new presentation
+    if (!pawn->info->modelname.empty())
+        pawn->pres = new modelpres_t(pawn->info->modelname.c_str());
+    else
+        pawn->pres = new spritepres_t(pawn->info, 0);
 }

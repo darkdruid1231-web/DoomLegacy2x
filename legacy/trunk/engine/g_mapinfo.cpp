@@ -28,25 +28,24 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "doomdef.h"
 #include "command.h"
 #include "cvars.h"
+#include "doomdef.h"
 #include "parser.h"
 
-#include "g_mapinfo.h"
 #include "g_level.h"
+#include "g_mapinfo.h"
 
 #include "g_game.h"
 #include "g_map.h"
-#include "g_player.h"
 #include "g_pawn.h"
+#include "g_player.h"
 
-#include "m_misc.h"
 #include "m_archive.h"
+#include "m_misc.h"
 
 #include "w_wad.h"
 #include "z_zone.h"
-
 
 //=================================
 //    MapInfo class methods
@@ -55,247 +54,239 @@
 /// default constructor
 MapInfo::MapInfo()
 {
-  state = MAP_UNLOADED;
-  me = NULL;
-  found = false;
-  nicename = "Unnamed Map";
+    state = MAP_UNLOADED;
+    me = NULL;
+    found = false;
+    nicename = "Unnamed Map";
 
-  mapnumber = 0;
-  cluster = 100; // this is so that maps with no cluster are placed in a cluster of their own
-  hub = false;
+    mapnumber = 0;
+    cluster = 100; // this is so that maps with no cluster are placed in a cluster of their own
+    hub = false;
 
-  scripts = 0;
-  partime = 0;
-  gravity = 1.0f;
+    scripts = 0;
+    partime = 0;
+    gravity = 1.0f;
 
-  warptrans = warpnext = nextlevel = secretlevel = -1;
-  //nextmaplump[0] = secretmaplump[0] = '\0';
+    warptrans = warpnext = nextlevel = secretlevel = -1;
+    // nextmaplump[0] = secretmaplump[0] = '\0';
 
-  doublesky = lightning = false;
-  sky1 = "SKY1";
-  sky1sp = sky2sp = 0;
+    doublesky = lightning = false;
+    sky1 = "SKY1";
+    sky1sp = sky2sp = 0;
 
-  cdtrack = 1;
-  BossDeathKey = 0;
+    cdtrack = 1;
+    BossDeathKey = 0;
 
-  fadetablelump = "COLORMAP";
+    fadetablelump = "COLORMAP";
 
-  interpic = "INTERPIC"; // fallback for lazy map authors
-  intermusic = "-";
+    interpic = "INTERPIC"; // fallback for lazy map authors
+    intermusic = "-";
 }
-
 
 /// destructor
 MapInfo::~MapInfo()
 {
-  Close(-1);
+    Close(-1);
 }
-
 
 /// ticks the map forward
 void MapInfo::Ticker()
 {
-  if (me && state != MAP_INSTASIS)
+    if (me && state != MAP_INSTASIS)
     {
-      me->Ticker();
+        me->Ticker();
 
-      // check fraglimit cvar TODO how does this work? when are the scores (or teamscores) zeroed?
-      if (game.server && cv_fraglimit.value && game.CheckScoreLimit())
-	{
-	  // go on to the next map
-	  Close(-1);
-	}
+        // check fraglimit cvar TODO how does this work? when are the scores (or teamscores) zeroed?
+        if (game.server && cv_fraglimit.value && game.CheckScoreLimit())
+        {
+            // go on to the next map
+            Close(-1);
+        }
 
-      if (state == MAP_FINISHED)
-	{
-	  // TODO spectators have no destinations set, they should perhaps follow the last exiting player...
-	  if (hub && game.server)
-	    HubSave();
-	  else
-	    Close(-1);
-	}
-      else if (state == MAP_RESET)
-	{
-	  if (!savename.empty())
-	    {
-	      delete me; // the current map goes
-	      state = MAP_SAVED;
-	      HubLoad(); // revert to last hubsave
-	    }
-	  else
-	    Close(-1);
-	}
+        if (state == MAP_FINISHED)
+        {
+            // TODO spectators have no destinations set, they should perhaps follow the last exiting
+            // player...
+            if (hub && game.server)
+                HubSave();
+            else
+                Close(-1);
+        }
+        else if (state == MAP_RESET)
+        {
+            if (!savename.empty())
+            {
+                delete me; // the current map goes
+                state = MAP_SAVED;
+                HubLoad(); // revert to last hubsave
+            }
+            else
+                Close(-1);
+        }
     }
 }
-
 
 /// if this returns true, "me" must be valid
 bool MapInfo::Activate(PlayerInfo *p)
 {
-  const char *temp;
-  //CONS_Printf("Activating map %d\n", mapnumber);
+    const char *temp;
+    // CONS_Printf("Activating map %d\n", mapnumber);
 
-  switch (state)
+    switch (state)
     {
-    case MAP_UNLOADED:
-      temp = lumpname.c_str();
-      if (fc.FindNumForName(temp) == -1)
-	{
-	  CONS_Printf("\2Map '%s' not found!\n", temp);
-	  return false;
-	}
+        case MAP_UNLOADED:
+            temp = lumpname.c_str();
+            if (fc.FindNumForName(temp) == -1)
+            {
+                CONS_Printf("\2Map '%s' not found!\n", temp);
+                return false;
+            }
 
-      me = new Map(this);
-      if (me->Setup(game.tic))
-	state = MAP_RUNNING;
-      else
-	{
-	  delete me;
-	  me = NULL;
-	  I_Error("Error during map setup.\n");
-	  return false;
-	}
+            me = new Map(this);
+            if (me->Setup(game.tic))
+                state = MAP_RUNNING;
+            else
+            {
+                delete me;
+                me = NULL;
+                I_Error("Error during map setup.\n");
+                return false;
+            }
 
-      if (game.server)
-	me->ACS_StartDeferredScripts(); // execute waiting scripts
-      break;
+            if (game.server)
+                me->ACS_StartDeferredScripts(); // execute waiting scripts
+            break;
 
-    case MAP_RUNNING:
-    case MAP_RESET:
-    case MAP_FINISHED:
-      break;
+        case MAP_RUNNING:
+        case MAP_RESET:
+        case MAP_FINISHED:
+            break;
 
-    case MAP_INSTASIS:
-      state = MAP_RUNNING;
-      break;
+        case MAP_INSTASIS:
+            state = MAP_RUNNING;
+            break;
 
-    case MAP_SAVED:
-      if (!HubLoad())
-	return false;
+        case MAP_SAVED:
+            if (!HubLoad())
+                return false;
     }
 
-  if (!p)
-    return true; // map activated without players
+    if (!p)
+        return true; // map activated without players
 
-  me->AddPlayer(p);
-  return true;
+    me->AddPlayer(p);
+    return true;
 }
-
 
 /// throws out all the players from the map
 int MapInfo::EvictPlayers(int next, int ep, bool force)
 {
-  if (!me)
-    return 0; // not active, no players
+    if (!me)
+        return 0; // not active, no players
 
-  if (next < 0)
-    next = nextlevel;
+    if (next < 0)
+        next = nextlevel;
 
-  int n = me->players.size();
-  for (int i = 0; i < n; i++)
+    int n = me->players.size();
+    for (int i = 0; i < n; i++)
     {
-      PlayerInfo *p = me->players[i];
-      if (force)
-	{
-	  p->requestmap = 0;
-	  p->Reset(true, true); // and everything goes.
-	}
+        PlayerInfo *p = me->players[i];
+        if (force)
+        {
+            p->requestmap = 0;
+            p->Reset(true, true); // and everything goes.
+        }
 
-      p->ExitLevel(next, ep); // puts them in the PST_LEAVINGMAP state
+        p->ExitLevel(next, ep); // puts them in the PST_LEAVINGMAP state
     }
 
-  me->HandlePlayers(); // kicks them out, starts intermissions
+    me->HandlePlayers(); // kicks them out, starts intermissions
 
-  return n;
+    return n;
 }
-
 
 /// shuts the map down
 void MapInfo::Close(int next, int ep, bool force)
 {
-  // delete the save file
-  if (!savename.empty())
+    // delete the save file
+    if (!savename.empty())
     {
-      unlink(savename.c_str());
-      savename.clear();
+        unlink(savename.c_str());
+        savename.clear();
     }
 
-  if (me)
+    if (me)
     {
-      EvictPlayers(next, ep, force);
-      delete me; // and then the map goes
-      me = NULL;
+        EvictPlayers(next, ep, force);
+        delete me; // and then the map goes
+        me = NULL;
     }
-  state = MAP_UNLOADED;
+    state = MAP_UNLOADED;
 }
-
 
 /// for making hub saves
 bool MapInfo::HubSave()
 {
-  if (!me)
-    return false;
+    if (!me)
+        return false;
 
-  EvictPlayers(-1);
-  CONS_Printf("Making a hubsave...");
+    EvictPlayers(-1);
+    CONS_Printf("Making a hubsave...");
 
-  char fname[256];
-  sprintf(fname, hubsavename, mapnumber);
-  savename = fname;
+    char fname[256];
+    sprintf(fname, hubsavename, mapnumber);
+    savename = fname;
 
-  LArchive a;
-  a.Create("Hubsave");
-  me->Serialize(a);
+    LArchive a;
+    a.Create("Hubsave");
+    me->Serialize(a);
 
-  byte *buffer;
-  unsigned length = a.Compress(&buffer, 1);
+    byte *buffer;
+    unsigned length = a.Compress(&buffer, 1);
 
-  FIL_WriteFile(savename.c_str(), buffer, length);
-  CONS_Printf("done. %d bytes written.\n", length);
-  Z_Free(buffer);
+    FIL_WriteFile(savename.c_str(), buffer, length);
+    CONS_Printf("done. %d bytes written.\n", length);
+    Z_Free(buffer);
 
-  delete me;
-  me = NULL;
+    delete me;
+    me = NULL;
 
-  state = MAP_SAVED;
-  return true;
+    state = MAP_SAVED;
+    return true;
 }
-
 
 /// well, loading the hub saves
 bool MapInfo::HubLoad()
 {
-  if (!game.server || state != MAP_SAVED)
-    return false;
+    if (!game.server || state != MAP_SAVED)
+        return false;
 
-  CONS_Printf("Loading a hubsave...");
+    CONS_Printf("Loading a hubsave...");
 
-  byte *buffer;
-  int length = FIL_ReadFile(savename.c_str(), &buffer);
-  if (!length)
+    byte *buffer;
+    int length = FIL_ReadFile(savename.c_str(), &buffer);
+    if (!length)
     {
-      I_Error("\nCouldn't open hubsave file '%s'", savename.c_str());
-      return false;
+        I_Error("\nCouldn't open hubsave file '%s'", savename.c_str());
+        return false;
     }
-  
-  LArchive a;
-  if (!a.Open(buffer, length))
-    I_Error("\nCouldn't uncompress hubsave!\n");
 
-  Z_Free(buffer);
+    LArchive a;
+    if (!a.Open(buffer, length))
+        I_Error("\nCouldn't uncompress hubsave!\n");
 
-  // dearchive the map
-  me = new Map(this);
-  if (me->Unserialize(a))
-    I_Error("\nHubsave corrupted!\n");
+    Z_Free(buffer);
 
-  CONS_Printf("done.");
+    // dearchive the map
+    me = new Map(this);
+    if (me->Unserialize(a))
+        I_Error("\nHubsave corrupted!\n");
 
-  state = MAP_RUNNING;
-  return true;
+    CONS_Printf("done.");
+
+    state = MAP_RUNNING;
+    return true;
 }
-
-
 
 //==================================================================
 //   Legacy MapInfo parser
@@ -309,7 +300,6 @@ bool MapInfo::HubLoad()
 //  '=' sign is optional: all equals signs are internally turned to spaces
 //
 
-
 // FIXME NOTE:
 // We need offsets of data fields inside the MapInfo, MapCluster and Episode classes.
 // These structs contain std::string members (non-POD), so standard offsetof() is UB.
@@ -318,435 +308,436 @@ bool MapInfo::HubLoad()
 #define CD_offset(field) __builtin_offsetof(MapCluster, field)
 #define EP_offset(field) __builtin_offsetof(Episode, field)
 
-//#define MI_offset(field) ((char*)&(((MapInfo*)0)->field) - (char*)0)
-//#define MI_offset(field) (size_t(&((MapInfo *)0)->field))
+// #define MI_offset(field) ((char*)&(((MapInfo*)0)->field) - (char*)0)
+// #define MI_offset(field) (size_t(&((MapInfo *)0)->field))
 
-static parsercmd_t MapInfo_commands[]=
-{
-  {P_ITEM_STR, "levelname",  MI_offset(nicename)},
-  {P_ITEM_STR, "name",       MI_offset(nicename)},
-  {P_ITEM_STR, "version",    MI_offset(version)},
-  {P_ITEM_STR, "creator",    MI_offset(author)},
-  {P_ITEM_STR, "author",     MI_offset(author)},
-  {P_ITEM_STR, "description", MI_offset(description)},
-  {P_ITEM_INT, "partime",    MI_offset(partime)},
-  {P_ITEM_STR, "music",      MI_offset(musiclump)},
+static parsercmd_t MapInfo_commands[] = {
+    {P_ITEM_STR, "levelname", MI_offset(nicename)},
+    {P_ITEM_STR, "name", MI_offset(nicename)},
+    {P_ITEM_STR, "version", MI_offset(version)},
+    {P_ITEM_STR, "creator", MI_offset(author)},
+    {P_ITEM_STR, "author", MI_offset(author)},
+    {P_ITEM_STR, "description", MI_offset(description)},
+    {P_ITEM_INT, "partime", MI_offset(partime)},
+    {P_ITEM_STR, "music", MI_offset(musiclump)},
 
-  {P_ITEM_PERCENT_FLOAT, "gravity",  MI_offset(gravity)}, 
-  {P_ITEM_STR, "skyname",    MI_offset(sky1)},
+    {P_ITEM_PERCENT_FLOAT, "gravity", MI_offset(gravity)},
+    {P_ITEM_STR, "skyname", MI_offset(sky1)},
 
-  //{P_ITEM_STR, "nextlevel",  MI_offset(nextlevel)},
-  //{P_ITEM_STR, "nextsecret", MI_offset(nextsecret)},
+    //{P_ITEM_STR, "nextlevel",  MI_offset(nextlevel)},
+    //{P_ITEM_STR, "nextsecret", MI_offset(nextsecret)},
 
-  {P_ITEM_STR, "interpic", MI_offset(interpic)},
-  {P_ITEM_STR, "intermusic", MI_offset(intermusic)},
-  /*
-    {P_ITEM_STR,    "levelpic",     &info_levelpic},
-    {P_ITEM_STR,    "inter-backdrop",&info_backdrop},
-    {P_ITEM_STR,    "defaultweapons",&info_weapons},
-  */
-  {P_ITEM_IGNORE, "consolecmd", 0}, // TODO at least for now
-  {P_ITEM_IGNORE, NULL, 0} // terminator
+    {P_ITEM_STR, "interpic", MI_offset(interpic)},
+    {P_ITEM_STR, "intermusic", MI_offset(intermusic)},
+    /*
+      {P_ITEM_STR,    "levelpic",     &info_levelpic},
+      {P_ITEM_STR,    "inter-backdrop",&info_backdrop},
+      {P_ITEM_STR,    "defaultweapons",&info_weapons},
+    */
+    {P_ITEM_IGNORE, "consolecmd", 0}, // TODO at least for now
+    {P_ITEM_IGNORE, NULL, 0}          // terminator
 };
-
-
 
 /// Reads a MapInfo lump for a map.
 char *MapInfo::Read(int lump)
 {
-  Parser p;
-  string scriptblock;
+    Parser p;
+    string scriptblock;
 
-  if (p.Open(lump))
+    if (p.Open(lump))
     {
-      CONS_Printf("Reading MapInfo...\n");
+        CONS_Printf("Reading MapInfo...\n");
 
-      enum {PS_CLEAR, PS_SCRIPT, PS_INTERTEXT, PS_MAPINFO} parsestate = PS_CLEAR;
-      char line[40];
+        enum
+        {
+            PS_CLEAR,
+            PS_SCRIPT,
+            PS_INTERTEXT,
+            PS_MAPINFO
+        } parsestate = PS_CLEAR;
+        char line[40];
 
-      p.RemoveComments('/'); // TODO can we also remove other types of comments?
-      p.DeleteChars('\r');
-      while (p.NewLine())
-	{
-	  if (parsestate != PS_SCRIPT) // not for scripts
-	    p.LineReplaceChars('=', ' ');
-	  // unprintable chars to whitespace?
+        p.RemoveComments('/'); // TODO can we also remove other types of comments?
+        p.DeleteChars('\r');
+        while (p.NewLine())
+        {
+            if (parsestate != PS_SCRIPT) // not for scripts
+                p.LineReplaceChars('=', ' ');
+            // unprintable chars to whitespace?
 
-	  if (p.Peek() == '[')  // a new section seperator
-	    {
-	      p.GetStringN(line, 12);
-	      if (!strncasecmp(line, "[level info]", 12))
-		parsestate = PS_MAPINFO;
-	      else if (!strncasecmp(line, "[scripts]", 9))
-		{
-		  parsestate = PS_SCRIPT;
-		  scripts++; // has scripts
-		}
-	      else if(!strncasecmp(line, "[intertext]", 11))
-		parsestate = PS_INTERTEXT;
-	    }
-	  else switch (parsestate)
-	    {
-	    case PS_MAPINFO:
-	      p.ParseCmd(MapInfo_commands, (char *)this);
-	      break;
+            if (p.Peek() == '[') // a new section seperator
+            {
+                p.GetStringN(line, 12);
+                if (!strncasecmp(line, "[level info]", 12))
+                    parsestate = PS_MAPINFO;
+                else if (!strncasecmp(line, "[scripts]", 9))
+                {
+                    parsestate = PS_SCRIPT;
+                    scripts++; // has scripts
+                }
+                else if (!strncasecmp(line, "[intertext]", 11))
+                    parsestate = PS_INTERTEXT;
+            }
+            else
+                switch (parsestate)
+                {
+                    case PS_MAPINFO:
+                        p.ParseCmd(MapInfo_commands, (char *)this);
+                        break;
 
-	    case PS_SCRIPT:
-	      scriptblock += p.Pointer(); // add the new (NUL-terminated!) line to the current data
-	      break;
+                    case PS_SCRIPT:
+                        scriptblock +=
+                            p.Pointer(); // add the new (NUL-terminated!) line to the current data
+                        break;
 
-	    case PS_INTERTEXT: // TODO
-	      //intertext += '\n';
-	      //intertext += s;
-	      break;
+                    case PS_INTERTEXT: // TODO
+                        // intertext += '\n';
+                        // intertext += s;
+                        break;
 
-	    case PS_CLEAR:
-	      break;
-	    }
-	}
+                    case PS_CLEAR:
+                        break;
+                }
+        }
     }
 
-  // FS script data
-  return (scriptblock.size() > 0) ? Z_Strdup(scriptblock.c_str(), PU_LEVEL, NULL) : NULL;
+    // FS script data
+    return (scriptblock.size() > 0) ? Z_Strdup(scriptblock.c_str(), PU_LEVEL, NULL) : NULL;
 }
-
-
 
 //==============================================
 //   Hexen/ZDoom MAPINFO parser.
 //==============================================
 
 /// MAPINFO map commands
-static parsercmd_t MAPINFO_MAP_commands[] =
-{
-  {P_ITEM_INT, "cluster", MI_offset(cluster)},
+static parsercmd_t MAPINFO_MAP_commands[] = {
+    {P_ITEM_INT, "cluster", MI_offset(cluster)},
 
-  {P_ITEM_INT, "warptrans", MI_offset(warptrans)}, // Damnation!
-  {P_ITEM_INT, "next", MI_offset(warpnext)}, // Hexen 'next' refers to warptrans numbers, not levelnums!
+    {P_ITEM_INT, "warptrans", MI_offset(warptrans)}, // Damnation!
+    {P_ITEM_INT,
+     "next",
+     MI_offset(warpnext)}, // Hexen 'next' refers to warptrans numbers, not levelnums!
 
-  // TODO implement ZDoom lumpname-fields?
-  //{P_ITEM_STR16, "next", MI_offset(nextmaplump)},
-  //{P_ITEM_STR16, "secretnext", MI_offset(secretmaplump)},
+    // TODO implement ZDoom lumpname-fields?
+    //{P_ITEM_STR16, "next", MI_offset(nextmaplump)},
+    //{P_ITEM_STR16, "secretnext", MI_offset(secretmaplump)},
 
-  // our own solution (because the Hexen way SUCKS and ZDoom is not much better :)
-  {P_ITEM_INT_INT, "nextlevel", MI_offset(nextlevel), MI_offset(secretlevel)}, // refers to levelnums
+    // our own solution (because the Hexen way SUCKS and ZDoom is not much better :)
+    {P_ITEM_INT_INT,
+     "nextlevel",
+     MI_offset(nextlevel),
+     MI_offset(secretlevel)}, // refers to levelnums
 
-  {P_ITEM_BOOL, "doublesky", MI_offset(doublesky)},
-  {P_ITEM_STR16_FLOAT, "sky1", MI_offset(sky1), MI_offset(sky1sp)},
-  {P_ITEM_STR16_FLOAT, "sky2", MI_offset(sky2), MI_offset(sky2sp)},
-  {P_ITEM_BOOL, "lightning", MI_offset(lightning)},
-  {P_ITEM_STR, "fadetable", MI_offset(fadetablelump)},
-  {P_ITEM_INT, "cdtrack", MI_offset(cdtrack)},
-  {P_ITEM_STR, "music", MI_offset(musiclump)},
-  {P_ITEM_INT, "par", MI_offset(partime)},
-  {P_ITEM_INT, "bossdeath", MI_offset(BossDeathKey)},
+    {P_ITEM_BOOL, "doublesky", MI_offset(doublesky)},
+    {P_ITEM_STR16_FLOAT, "sky1", MI_offset(sky1), MI_offset(sky1sp)},
+    {P_ITEM_STR16_FLOAT, "sky2", MI_offset(sky2), MI_offset(sky2sp)},
+    {P_ITEM_BOOL, "lightning", MI_offset(lightning)},
+    {P_ITEM_STR, "fadetable", MI_offset(fadetablelump)},
+    {P_ITEM_INT, "cdtrack", MI_offset(cdtrack)},
+    {P_ITEM_STR, "music", MI_offset(musiclump)},
+    {P_ITEM_INT, "par", MI_offset(partime)},
+    {P_ITEM_INT, "bossdeath", MI_offset(BossDeathKey)},
 
-  {P_ITEM_STR, "interpic", MI_offset(interpic)},
-  {P_ITEM_STR, "intermusic", MI_offset(intermusic)},
+    {P_ITEM_STR, "interpic", MI_offset(interpic)},
+    {P_ITEM_STR, "intermusic", MI_offset(intermusic)},
 
-  {P_ITEM_STR, "picname", MI_offset(namepic)},
+    {P_ITEM_STR, "picname", MI_offset(namepic)},
 
-  {P_ITEM_IGNORE, "cd_start_track", 0},
-  {P_ITEM_IGNORE, "cd_end1_track", 0},
-  {P_ITEM_IGNORE, "cd_end2_track", 0},
-  {P_ITEM_IGNORE, "cd_end3_track", 0},
-  {P_ITEM_IGNORE, "cd_intermission_track", 0},
-  {P_ITEM_IGNORE, "cd_title_track", 0},
-  {P_ITEM_IGNORE, NULL, 0}
-};
+    {P_ITEM_IGNORE, "cd_start_track", 0},
+    {P_ITEM_IGNORE, "cd_end1_track", 0},
+    {P_ITEM_IGNORE, "cd_end2_track", 0},
+    {P_ITEM_IGNORE, "cd_end3_track", 0},
+    {P_ITEM_IGNORE, "cd_intermission_track", 0},
+    {P_ITEM_IGNORE, "cd_title_track", 0},
+    {P_ITEM_IGNORE, NULL, 0}};
 #undef MI_offset
 
-
 /// ZDoom clusterdef commands
-static parsercmd_t MAPINFO_CLUSTERDEF_commands[] =
-{
-  {P_ITEM_INT, "finale", CD_offset(episode)},
-  {P_ITEM_STR, "entertext", CD_offset(entertext)},
-  {P_ITEM_STR, "exittext", CD_offset(exittext)},
-  {P_ITEM_STR, "flat", CD_offset(finalepic)},
-  {P_ITEM_STR, "music", CD_offset(finalemusic)},
+static parsercmd_t MAPINFO_CLUSTERDEF_commands[] = {{P_ITEM_INT, "finale", CD_offset(episode)},
+                                                    {P_ITEM_STR, "entertext", CD_offset(entertext)},
+                                                    {P_ITEM_STR, "exittext", CD_offset(exittext)},
+                                                    {P_ITEM_STR, "flat", CD_offset(finalepic)},
+                                                    {P_ITEM_STR, "music", CD_offset(finalemusic)},
 
-  {P_ITEM_BOOL, "hub", CD_offset(hub)},
-  {P_ITEM_IGNORE, NULL, 0}
-};
+                                                    {P_ITEM_BOOL, "hub", CD_offset(hub)},
+                                                    {P_ITEM_IGNORE, NULL, 0}};
 #undef CD_offset
 
-
-
 /// MAPINFO episode commands
-static parsercmd_t MAPINFO_EPISODE_commands[] =
-{
-  {P_ITEM_STR, "picname", EP_offset(namepic)},
-  {P_ITEM_STR, "name", EP_offset(name)}, // ZDoom support
-  {P_ITEM_IGNORE, NULL, 0}
-};
+static parsercmd_t MAPINFO_EPISODE_commands[] = {
+    {P_ITEM_STR, "picname", EP_offset(namepic)},
+    {P_ITEM_STR, "name", EP_offset(name)}, // ZDoom support
+    {P_ITEM_IGNORE, NULL, 0}};
 #undef EP_offset
-
 
 /// Reads the MAPINFO lump, filling mapinfo and clustermap with data
 int GameInfo::Read_MAPINFO()
 {
-  int lump = fc.FindNumForName(mapinfo_lump.c_str());
-  if (lump < 0)
+    int lump = fc.FindNumForName(mapinfo_lump.c_str());
+    if (lump < 0)
     {
-      I_Error("MAPINFO lump '%s' not found.\n", mapinfo_lump.c_str());
-      return -1;
+        I_Error("MAPINFO lump '%s' not found.\n", mapinfo_lump.c_str());
+        return -1;
     }
 
-  CONS_Printf("Reading MAPINFO...\n");
+    CONS_Printf("Reading MAPINFO...\n");
 
-  Parser p;
-  if (!p.Open(lump))
-    return -1;
+    Parser p;
+    if (!p.Open(lump))
+        return -1;
 
-  Clear_mapinfo_clustermap();
+    Clear_mapinfo_clustermap();
 
-  enum {PS_CLEAR, PS_MAP, PS_CLUSTERDEF, PS_EPISODE} parsestate = PS_CLEAR;
-  int i, n;
-  vector<MapInfo *> tempinfo;
-
-  Episode    *ep = NULL;
-  MapCluster *cl = NULL;
-  MapInfo  *info = NULL;
-  MapInfo   def; // default map
-
-  p.RemoveComments(';');
-  p.DeleteChars('\r');
-  while (p.NewLine())
+    enum
     {
-      char line[61], ln[17]; // read in max. 60 (16) character strings
-      char *start = p.Pointer(); // small hack, store location
-      i = p.GetString(line, 30); // pass whitespace, read first word
+        PS_CLEAR,
+        PS_MAP,
+        PS_CLUSTERDEF,
+        PS_EPISODE
+    } parsestate = PS_CLEAR;
+    int i, n;
+    vector<MapInfo *> tempinfo;
 
-      // block starters?
-      if (!strcasecmp(line, "DEFAULTMAP"))
-	{
-	  // default map definition block begins
-	  parsestate = PS_MAP;
-	  info = &def;
-	}
-      else if (!strcasecmp(line, "MAP"))
-	{
-	  parsestate = PS_MAP;
-	  // map definition block begins. accepted formats:
+    Episode *ep = NULL;
+    MapCluster *cl = NULL;
+    MapInfo *info = NULL;
+    MapInfo def; // default map
 
-	  // standard:  map xxx   nicename 2
-	  // shorthand: map MAP02 nicename
-	  // old Hexen: map 2     nicename
+    p.RemoveComments(';');
+    p.DeleteChars('\r');
+    while (p.NewLine())
+    {
+        char line[61], ln[17];     // read in max. 60 (16) character strings
+        char *start = p.Pointer(); // small hack, store location
+        i = p.GetString(line, 30); // pass whitespace, read first word
 
-	  i = sscanf(p.Pointer(), "%16s \"%60[^\"]\" %d", ln, line, &n);
-	  if (i == 1) // nicename not quoted
-	    i = sscanf(p.Pointer(), "%16s %60s %d", ln, line, &n);
+        // block starters?
+        if (!strcasecmp(line, "DEFAULTMAP"))
+        {
+            // default map definition block begins
+            parsestate = PS_MAP;
+            info = &def;
+        }
+        else if (!strcasecmp(line, "MAP"))
+        {
+            parsestate = PS_MAP;
+            // map definition block begins. accepted formats:
 
-	  info = new MapInfo(def); // copy construction
-	  tempinfo.push_back(info);
+            // standard:  map xxx   nicename 2
+            // shorthand: map MAP02 nicename
+            // old Hexen: map 2     nicename
 
-	  if (i == 3)
-	    {
-	      info->lumpname = ln;
-	      if (n >= 0 && n <= 99)
-		info->mapnumber = n;
-	    }
-	  else if (i == 2)
-	    {
-	      // no mapnumber given, deduce it
-	      if (IsNumeric(ln))
-		{
-		  // assume deprecated Hexen format
-		  n = atoi(ln);
-		  char temp[10];
-		  if (n >= 0 && n <= 99)
-		    {
-		      sprintf(temp, "MAP%02d", n);
-		      info->lumpname = temp;
-		      info->mapnumber = n;
-		    }
-		}
-	      else
-		{
-		  // lumpname must be in MAPxx format
-		  i = sscanf(ln, "MAP%2d", &n);
-		  info->lumpname = ln;
-		  info->mapnumber = n;
-		}
-	    }
-	  else
-	    CONS_Printf(" Bad map definition at char %d!\n", p.Location());
+            i = sscanf(p.Pointer(), "%16s \"%60[^\"]\" %d", ln, line, &n);
+            if (i == 1) // nicename not quoted
+                i = sscanf(p.Pointer(), "%16s %60s %d", ln, line, &n);
 
-	  info->nicename = line;
+            info = new MapInfo(def); // copy construction
+            tempinfo.push_back(info);
 
-	  // check that the map can be found
-	  const char *temp = info->lumpname.c_str();
-	  if (fc.FindNumForName(temp) == -1)
-	    {
-	      CONS_Printf(" Map '%s' not present!\n", temp);
-	    }
-	  else
-	    info->found = true;
-	}
-      else if (!strcasecmp(line, "CLUSTERDEF"))
-	{
-	  // cluster definition block begins (ZDoom)
-	  parsestate = PS_CLUSTERDEF;
+            if (i == 3)
+            {
+                info->lumpname = ln;
+                if (n >= 0 && n <= 99)
+                    info->mapnumber = n;
+            }
+            else if (i == 2)
+            {
+                // no mapnumber given, deduce it
+                if (IsNumeric(ln))
+                {
+                    // assume deprecated Hexen format
+                    n = atoi(ln);
+                    char temp[10];
+                    if (n >= 0 && n <= 99)
+                    {
+                        sprintf(temp, "MAP%02d", n);
+                        info->lumpname = temp;
+                        info->mapnumber = n;
+                    }
+                }
+                else
+                {
+                    // lumpname must be in MAPxx format
+                    i = sscanf(ln, "MAP%2d", &n);
+                    info->lumpname = ln;
+                    info->mapnumber = n;
+                }
+            }
+            else
+                CONS_Printf(" Bad map definition at char %d!\n", p.Location());
 
-	  n = p.GetInt();
+            info->nicename = line;
 
-	  if (clustermap.count(n))
-	    {
-	      CONS_Printf(" Cluster number %d defined more than once!\n", n);
-	      cl = clustermap[n]; // already there, update the existing cluster
-	    }
-	  else
-	    clustermap[n] = cl = new MapCluster(n);
+            // check that the map can be found
+            const char *temp = info->lumpname.c_str();
+            if (fc.FindNumForName(temp) == -1)
+            {
+                CONS_Printf(" Map '%s' not present!\n", temp);
+            }
+            else
+                info->found = true;
+        }
+        else if (!strcasecmp(line, "CLUSTERDEF"))
+        {
+            // cluster definition block begins (ZDoom)
+            parsestate = PS_CLUSTERDEF;
 
-	  if (sscanf(p.Pointer(), " \"%60[^\"]\"", line) == 1)
-	    cl->clustername = line;
-	}
-      else if (!strcasecmp(line, "EPISODE"))
-	{
-	  // game entrypoint definition
-	  i = sscanf(p.Pointer(), "%16s \"%60[^\"]\" %d", ln, line, &n);
+            n = p.GetInt();
 
-	  if (i >= 1)
-	    {
-	      parsestate = PS_EPISODE;
+            if (clustermap.count(n))
+            {
+                CONS_Printf(" Cluster number %d defined more than once!\n", n);
+                cl = clustermap[n]; // already there, update the existing cluster
+            }
+            else
+                clustermap[n] = cl = new MapCluster(n);
 
-	      if (i == 1)
-		line[0] = '\0'; // ZDoom support, get episode name later
+            if (sscanf(p.Pointer(), " \"%60[^\"]\"", line) == 1)
+                cl->clustername = line;
+        }
+        else if (!strcasecmp(line, "EPISODE"))
+        {
+            // game entrypoint definition
+            i = sscanf(p.Pointer(), "%16s \"%60[^\"]\" %d", ln, line, &n);
 
-	      ep = new Episode(ln, line);
-	      if (i == 3)
-		ep->entrypoint = n;
+            if (i >= 1)
+            {
+                parsestate = PS_EPISODE;
 
-	      episodes.push_back(ep);
-	    }
-	  else
-	    CONS_Printf("Bad episode definition at char %d!\n", p.Location());
-	}
-      else switch (parsestate)
-	{
-	case PS_CLEAR:
-	  CONS_Printf(" Unknown MAPINFO block at char %d!\n", p.Location());
-	  break;
+                if (i == 1)
+                    line[0] = '\0'; // ZDoom support, get episode name later
 
-	case PS_MAP:
-	  p.SetPointer(start);
-	  p.ParseCmd(MAPINFO_MAP_commands, (char *)info);
-	  break;
+                ep = new Episode(ln, line);
+                if (i == 3)
+                    ep->entrypoint = n;
 
-	case PS_CLUSTERDEF:
-	  p.SetPointer(start);
-	  p.ParseCmd(MAPINFO_CLUSTERDEF_commands, (char *)cl);
-	  break;
+                episodes.push_back(ep);
+            }
+            else
+                CONS_Printf("Bad episode definition at char %d!\n", p.Location());
+        }
+        else
+            switch (parsestate)
+            {
+                case PS_CLEAR:
+                    CONS_Printf(" Unknown MAPINFO block at char %d!\n", p.Location());
+                    break;
 
-	case PS_EPISODE:
-	  p.SetPointer(start);
-	  p.ParseCmd(MAPINFO_EPISODE_commands, (char *)ep);
-	  break;
-	}
+                case PS_MAP:
+                    p.SetPointer(start);
+                    p.ParseCmd(MAPINFO_MAP_commands, (char *)info);
+                    break;
+
+                case PS_CLUSTERDEF:
+                    p.SetPointer(start);
+                    p.ParseCmd(MAPINFO_CLUSTERDEF_commands, (char *)cl);
+                    break;
+
+                case PS_EPISODE:
+                    p.SetPointer(start);
+                    p.ParseCmd(MAPINFO_EPISODE_commands, (char *)ep);
+                    break;
+            }
     }
 
-
-  // now "remap" tempinfo into mapinfo
-  n = tempinfo.size();
-  for (i=0; i<n; i++)
+    // now "remap" tempinfo into mapinfo
+    n = tempinfo.size();
+    for (i = 0; i < n; i++)
     {
-      info = tempinfo[i];
-      int j = info->mapnumber;
+        info = tempinfo[i];
+        int j = info->mapnumber;
 
-      if (mapinfo.count(j)) // already there
-	{
-	  CONS_Printf(" Map number %d found more than once!\n", j);
-	  delete mapinfo[j]; // later one takes precedence
-	}
+        if (mapinfo.count(j)) // already there
+        {
+            CONS_Printf(" Map number %d found more than once!\n", j);
+            delete mapinfo[j]; // later one takes precedence
+        }
 
-      mapinfo[j] = info;
+        mapinfo[j] = info;
     }
 
-  mapinfo_iter_t r;
+    mapinfo_iter_t r;
 
-  // generate the missing clusters and fill them all with maps
-  for (r = mapinfo.begin(); r != mapinfo.end(); r++)
+    // generate the missing clusters and fill them all with maps
+    for (r = mapinfo.begin(); r != mapinfo.end(); r++)
     {
-      info = r->second;
-      if (info->mapnumber <= 0)
-	I_Error("Map numbers must be positive (%s)!\n", info->lumpname.c_str());
+        info = r->second;
+        if (info->mapnumber <= 0)
+            I_Error("Map numbers must be positive (%s)!\n", info->lumpname.c_str());
 
-      if (!info->found)
-	continue; // non-present maps are not assigned to clusters
+        if (!info->found)
+            continue; // non-present maps are not assigned to clusters
 
-      n = info->cluster;
-      if (!clustermap.count(n))
-	{
-	  CONS_Printf(" New cluster %d (map %d)\n", n, info->mapnumber);
-	  // create the cluster
-	  cl = clustermap[n] = new MapCluster(n);
-	  cl->hub = cl->keepstuff = true; // for original Hexen
-	}
-      else
-	cl = clustermap[n];
+        n = info->cluster;
+        if (!clustermap.count(n))
+        {
+            CONS_Printf(" New cluster %d (map %d)\n", n, info->mapnumber);
+            // create the cluster
+            cl = clustermap[n] = new MapCluster(n);
+            cl->hub = cl->keepstuff = true; // for original Hexen
+        }
+        else
+            cl = clustermap[n];
 
-      cl->maps.push_back(info);
-      info->hub = cl->hub; // TEST copy the hub info to MapInfos
+        cl->maps.push_back(info);
+        info->hub = cl->hub; // TEST copy the hub info to MapInfos
     }
 
-  // and then check that all clusters have at least one map
-  cluster_iter_t t, s;
-  for (s = clustermap.begin(); s != clustermap.end(); )
+    // and then check that all clusters have at least one map
+    cluster_iter_t t, s;
+    for (s = clustermap.begin(); s != clustermap.end();)
     {
-      t = s++; // erase will invalidate t
+        t = s++; // erase will invalidate t
 
-      cl = t->second;
-      if (cl->maps.empty())
-	{
-	  CONS_Printf(" Cluster %d has no maps!\n", cl->number);
-	  clustermap.erase(t);
-	  delete cl;
-	}
+        cl = t->second;
+        if (cl->maps.empty())
+        {
+            CONS_Printf(" Cluster %d has no maps!\n", cl->number);
+            clustermap.erase(t);
+            delete cl;
+        }
     }
 
-  // time to unravel the warptrans numbering.
-  map<int, MapInfo *> warptransmap;
-  for (r = mapinfo.begin(); r != mapinfo.end(); r++)
+    // time to unravel the warptrans numbering.
+    map<int, MapInfo *> warptransmap;
+    for (r = mapinfo.begin(); r != mapinfo.end(); r++)
     {
-      info = r->second;
-      warptransmap[info->warptrans] = info;
+        info = r->second;
+        warptransmap[info->warptrans] = info;
     }
 
-  // now just put the correct exit data in the MapInfos
-  for (r = mapinfo.begin(); r != mapinfo.end(); r++)
+    // now just put the correct exit data in the MapInfos
+    for (r = mapinfo.begin(); r != mapinfo.end(); r++)
     {
-      info = r->second;
+        info = r->second;
 
-      // set normal and secret exits
-      // 'nextlevel' overrides 'next'
-      if (info->nextlevel < 0 && info->warpnext > 0)
-	info->nextlevel = warptransmap[info->warpnext]->mapnumber;
+        // set normal and secret exits
+        // 'nextlevel' overrides 'next'
+        if (info->nextlevel < 0 && info->warpnext > 0)
+            info->nextlevel = warptransmap[info->warpnext]->mapnumber;
     }
 
-  // backwards compatibility
-  if (episodes.empty() && !mapinfo.empty())
+    // backwards compatibility
+    if (episodes.empty() && !mapinfo.empty())
     {
-      info = mapinfo.begin()->second;
-      episodes.push_back(new Episode(info->lumpname.c_str(), "Episode"));
+        info = mapinfo.begin()->second;
+        episodes.push_back(new Episode(info->lumpname.c_str(), "Episode"));
     }
 
-  // find direct pointers for convenience
-  n = episodes.size();
-  for (i=0; i<n; i++)
+    // find direct pointers for convenience
+    n = episodes.size();
+    for (i = 0; i < n; i++)
     {
-      ep = episodes[i];
-      ep->minfo = FindMapInfo(ep->maplump.c_str());
-      if (ep->minfo)
-	ep->active = ep->minfo->found;
+        ep = episodes[i];
+        ep->minfo = FindMapInfo(ep->maplump.c_str());
+        if (ep->minfo)
+            ep->active = ep->minfo->found;
     }
 
-  n = mapinfo.size();
-  CONS_Printf(" %d maps found.\n", n);
-  return n;
+    n = mapinfo.size();
+    CONS_Printf(" %d maps found.\n", n);
+    return n;
 }
-
-
 
 //==============================================================
 //   GameInfo utilities related to MapInfo and MapCluster
@@ -754,91 +745,86 @@ int GameInfo::Read_MAPINFO()
 
 void GameInfo::Clear_mapinfo_clustermap()
 {
-  // delete old mapinfo and clusterdef
-  mapinfo_iter_t s;
-  for (s = mapinfo.begin(); s != mapinfo.end(); s++)
-    delete s->second;
-  mapinfo.clear(); 
+    // delete old mapinfo and clusterdef
+    mapinfo_iter_t s;
+    for (s = mapinfo.begin(); s != mapinfo.end(); s++)
+        delete s->second;
+    mapinfo.clear();
 
-  cluster_iter_t t;
-  for (t = clustermap.begin(); t != clustermap.end(); t++)
-    delete t->second;
-  clustermap.clear();
+    cluster_iter_t t;
+    for (t = clustermap.begin(); t != clustermap.end(); t++)
+        delete t->second;
+    clustermap.clear();
 
-  currentcluster = NULL;
+    currentcluster = NULL;
 
-  for (unsigned i=0; i < episodes.size(); i++)
-    delete episodes[i];
-  episodes.clear();
+    for (unsigned i = 0; i < episodes.size(); i++)
+        delete episodes[i];
+    episodes.clear();
 }
-
 
 MapCluster *GameInfo::FindCluster(int c)
 {
-  cluster_iter_t i = clustermap.find(c);
-  if (i == clustermap.end())
-    return NULL;
+    cluster_iter_t i = clustermap.find(c);
+    if (i == clustermap.end())
+        return NULL;
 
-  return i->second;
+    return i->second;
 }
-
 
 MapInfo *GameInfo::FindMapInfo(int c)
 {
-  mapinfo_iter_t i = mapinfo.find(c);
+    mapinfo_iter_t i = mapinfo.find(c);
 
-  if (i == mapinfo.end())
-    return NULL;
+    if (i == mapinfo.end())
+        return NULL;
 
-  return i->second;
+    return i->second;
 }
-
 
 MapInfo *GameInfo::FindMapInfo(const char *name)
 {
-  char *tail;
-  int n = strtol(name, &tail, 10);
+    char *tail;
+    int n = strtol(name, &tail, 10);
 
-  if (tail != name)
-    return FindMapInfo(n); // by number
+    if (tail != name)
+        return FindMapInfo(n); // by number
 
-  for (mapinfo_iter_t i = mapinfo.begin(); i != mapinfo.end(); i++)
-    if (i->second->lumpname == name)
-      return i->second;
+    for (mapinfo_iter_t i = mapinfo.begin(); i != mapinfo.end(); i++)
+        if (i->second->lumpname == name)
+            return i->second;
 
-  return NULL;
+    return NULL;
 }
-
 
 MapInfo *GameInfo::FindNextMap(int mapnum, int incr)
 {
-  mapinfo_iter_t i = mapinfo.find(mapnum);
-  if (i == mapinfo.end())
-    i = mapinfo.begin();
+    mapinfo_iter_t i = mapinfo.find(mapnum);
+    if (i == mapinfo.end())
+        i = mapinfo.begin();
 
-  if (incr == -1)
+    if (incr == -1)
     {
-      if (i != mapinfo.begin())
-	i--;
-      else
-	return mapinfo.rbegin()->second;
+        if (i != mapinfo.begin())
+            i--;
+        else
+            return mapinfo.rbegin()->second;
     }
-  else if (incr == 1)
+    else if (incr == 1)
     {
-      i++;
-      if (i == mapinfo.end())
-	i = mapinfo.begin();
+        i++;
+        if (i == mapinfo.end())
+            i = mapinfo.begin();
     }
 
-  return i->second;
+    return i->second;
 }
-
 
 const Episode *GameInfo::GetEpisode(int n)
 {
-  int num = episodes.size();
-  if (!num)
-    return NULL;
-  n = (n >= num) ? num-1 : ((n < 0) ? 0 : n);
-  return episodes[n];
+    int num = episodes.size();
+    if (!num)
+        return NULL;
+    n = (n >= num) ? num - 1 : ((n < 0) ? 0 : n);
+    return episodes[n];
 }
