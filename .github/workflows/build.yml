@@ -254,7 +254,7 @@ jobs:
     - name: Install dependencies
       run: |
         apt-get update
-        apt-get install -y cmake libsdl2-dev libenet-dev libglu1-mesa-dev flex lemon
+        apt-get install -y cmake libsdl2-dev libenet-dev libglu1-mesa-dev libpng-dev libjpeg-dev flex lemon
 
     - name: Configure and Build Windows Executables
       run: |
