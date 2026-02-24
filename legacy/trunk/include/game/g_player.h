@@ -122,7 +122,7 @@ class LocalPlayerInfo : public PlayerOptions
   Created when a player joins the game, deleted when he leaves.
   Ghosted over the network.
 */
-class PlayerInfo : public NetObject
+class PlayerInfo : public NetConnection
 {
     friend class GameInfo;
     typedef NetObject Parent;
