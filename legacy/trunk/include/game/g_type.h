@@ -25,7 +25,7 @@
 #include <string>
 
 using namespace std;
-using namespace TNL;
+// using namespace TNL;  // Removed - conflicts with std
 
 struct engine_export_t
 {
