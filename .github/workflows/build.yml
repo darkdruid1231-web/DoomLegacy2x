@@ -111,6 +111,7 @@ jobs:
             g++-mingw-w64-x86-64 \
             gcc-mingw-w64-x86-64 \
             cmake \
+            libsdl1.2-dev \
             wget \
             unzip \
             lemon
@@ -258,6 +259,7 @@ jobs:
             lld \
             mingw-w64 \
             libstdc++-12-dev \
+            libsdl1.2-dev \
             cmake \
             wget \
             unzip \
