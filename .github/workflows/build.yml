@@ -246,7 +246,7 @@ jobs:
     - name: Install dependencies
       run: |
         apt-get update
-        apt-get install -y cmake libsdl2-dev libenet-dev
+        apt-get install -y cmake libsdl2-dev libenet-dev flex lemon
 
     - name: Configure and Build Windows
       run: |
