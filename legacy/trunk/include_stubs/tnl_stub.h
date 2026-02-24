@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
-#ifdef USE_SDL2
+#ifdef SDL2
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 #else
