@@ -28,15 +28,15 @@
 #include <list>
 #include <vector>
 
-using namespace TNL;
+// using namespace TNL;  // Commented out to avoid std namespace conflicts
 
 /// \brief TNL GhostConnection between a server and a client
 ///
 /// Does connection housekeeping, ghosting, RPC's etc.
 
-class LConnection : public GhostConnection
+class LConnection : public TNL::GhostConnection
 {
-    typedef GhostConnection Parent;
+    typedef TNL::GhostConnection Parent;
 
   public:
     std::vector<class PlayerInfo *> player; ///< Serverside: Players beyond this connection.
@@ -48,16 +48,16 @@ class LConnection : public GhostConnection
     LConnection();
 
     /// client sends info to server and requests a connection
-    virtual void writeConnectRequest(BitStream *stream);
+    virtual void writeConnectRequest(TNL::BitStream *stream);
 
     /// server decides whether to accept the connection
-    virtual bool readConnectRequest(BitStream *stream, const char **errorString);
+    virtual bool readConnectRequest(TNL::BitStream *stream, const char **errorString);
 
     /// server sends info to client
-    virtual void writeConnectAccept(BitStream *stream);
+    virtual void writeConnectAccept(TNL::BitStream *stream);
 
     /// client decides whether to accept the connection
-    virtual bool readConnectAccept(BitStream *stream, const char **errorString);
+    virtual bool readConnectAccept(TNL::BitStream *stream, const char **errorString);
 
     /// Called when a pending connection is terminated
     virtual void onConnectTerminated(TerminationReason r, const char *reason);
