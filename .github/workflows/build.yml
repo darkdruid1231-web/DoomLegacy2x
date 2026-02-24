@@ -10,6 +10,7 @@ jobs:
   # Linux build with tests
   linux-build:
     runs-on: self-hosted
+    runs-on: self-hosted
 
     steps:
     - name: Checkout repository
@@ -237,6 +238,7 @@ jobs:
 
   # Windows cross-compilation with Docker + LLVM MinGW
   windows-cross-build:
+    needs: linux-build
     runs-on: self-hosted
     container: mstorsjo/llvm-mingw:latest
     steps:
