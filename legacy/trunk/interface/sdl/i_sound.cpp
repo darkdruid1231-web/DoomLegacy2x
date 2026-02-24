@@ -569,7 +569,7 @@ int I_RegisterSong(void *data, int len)
     }
 
     // SDL_mixer automatically frees the rwop when the music is stopped.
-    music.mus = Mix_LoadMUS_RW(music.rwop, 1);
+    music.mus = Mix_LoadMUS_RW(music.rwop);
     if (!music.mus)
     {
         CONS_Printf("Couldn't load music lump: %s\n", Mix_GetError());
