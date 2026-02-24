@@ -258,6 +258,9 @@ public:
     void* resolveGhost(S32 idx) { return nullptr; }
 };
 
+class PlayerInfo;
+class LocalPlayerInfo;
+
 class NetInterface {
 public:
     NetInterface() : mSocket(nullptr), mAllowConnections(false) {}
