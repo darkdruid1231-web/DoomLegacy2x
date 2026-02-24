@@ -367,8 +367,9 @@ jobs:
         retention-days: 30
         if-no-files-found: warn
 
-  # Native Windows build using MSYS2
+  # Native Windows build using MSYS2 (disabled - using cross-compilation instead)
   windows-native-build:
+    if: false
     runs-on: windows-latest
 
     steps:
