@@ -142,10 +142,10 @@ extern CV_PossibleValue_t CV_OnOff[];
 extern CV_PossibleValue_t CV_YesNo[];
 extern CV_PossibleValue_t CV_Unsigned[];
 
-namespace TNL
-{
-class BitStream;
-};
+// namespace TNL  // Removed - conflicts with std
+// {
+// class BitStream;
+// };
 
 /// \brief console variables
 ///

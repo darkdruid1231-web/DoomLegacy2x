@@ -29,10 +29,10 @@
 #include "doomtype.h"
 
 using namespace std;
-namespace TNL
-{
-class BitStream;
-};
+// namespace TNL  // Removed - conflicts with std
+// {
+// class BitStream;
+// };
 
 #define MAX_WADPATH 128
 #define MAX_WADFILES 32 // maximum of wad files used at the same time

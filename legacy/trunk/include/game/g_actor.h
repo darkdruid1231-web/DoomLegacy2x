@@ -32,7 +32,7 @@
 #include "tnl/tnlNetObject.h"
 #include "vect.h"
 
-using namespace TNL;
+// using namespace TNL;  // Removed - conflicts with std
 
 const fixed_t ONFLOORZ = fixed_t::FMIN;
 const fixed_t ONCEILINGZ = fixed_t::FMAX;

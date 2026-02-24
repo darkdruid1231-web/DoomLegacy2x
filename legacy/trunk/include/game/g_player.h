@@ -35,7 +35,7 @@
 #include <vector>
 
 using namespace std;
-using namespace TNL;
+// using namespace TNL;  // Removed - conflicts with std
 
 /// \brief Player states.
 ///
