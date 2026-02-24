@@ -103,6 +103,9 @@ option(USE_IMAGE_SUPPORT "Enable image (PNG/JPEG) support" ON)
 if(USE_NETWORKING)
     # Include TNL stub headers for compatibility only when networking is enabled
     include_directories(${CMAKE_SOURCE_DIR}/include_stubs)
+else()
+    # Include stub headers for declarations even when networking is disabled
+    include_directories(${CMAKE_SOURCE_DIR}/include_stubs)
     option(USE_MODERN_NETWORKING "Use lnet for modern networking" ON)
     
     if(USE_MODERN_NETWORKING)
