@@ -32,6 +32,8 @@
 #include "n_interface.h"
 
 #include "g_game.h"
+
+using namespace TNL;
 #include "g_type.h"
 
 #include "i_system.h"
