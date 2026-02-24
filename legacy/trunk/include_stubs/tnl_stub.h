@@ -184,19 +184,6 @@ public:
     void setMaskBits(U32 mask) {}
 };
 
-class Actor : public NetObject {
-public:
-    virtual ~Actor() {}
-    virtual void packUpdate(GhostConnection* c, unsigned int mask, BitStream* s) {}
-    virtual void unpackUpdate(GhostConnection* c, BitStream* s) {}
-};
-
-class Map {
-public:
-    void SN_StartSequence(void*, int) {}
-    void SN_StopSequence(void*, bool) {}
-};
-
 class NetConnection {
 public:
     enum TerminationReason {
