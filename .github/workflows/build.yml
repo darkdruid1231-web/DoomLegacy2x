@@ -266,6 +266,17 @@ jobs:
         clang test.c -o test_app
         ./test_app
 
+    - name: Diagnose MinGW libgcc
+      run: |
+        echo "Finding libgcc.a locations:"
+        find /usr -name "libgcc.a" 2>/dev/null | head -10
+        echo ""
+        echo "MinGW ld version:"
+        /usr/bin/x86_64-w64-mingw32-ld --version | head -3
+        echo ""
+        echo "Testing clang target:"
+        clang --target=x86_64-w64-mingw32 --sysroot=/usr/x86_64-w64-mingw32 -c -x c /dev/null -o /tmp/test.o && echo "Clang target works" || echo "Clang target fails"
+
     - name: Download SDL2 for Windows
       run: |
         mkdir -p /tmp/sdl2
