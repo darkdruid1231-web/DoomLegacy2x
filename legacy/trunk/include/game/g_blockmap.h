@@ -26,6 +26,9 @@
 #include "m_fixed.h"
 #include "vect.h"
 
+// Forward declaration
+struct polyobj_t;
+
 typedef bool (*traverser_t)(struct intercept_t *in);
 typedef bool (*line_iterator_t)(struct line_t *l);
 typedef bool (*thing_iterator_t)(class Actor *a);
