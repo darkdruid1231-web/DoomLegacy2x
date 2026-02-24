@@ -32,6 +32,8 @@
 #include "g_pawn.h"
 
 #include "d_items.h"
+
+using namespace TNL;
 #include "dstrings.h"
 #include "info.h"
 #include "sounds.h"
