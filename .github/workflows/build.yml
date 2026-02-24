@@ -42,7 +42,7 @@ jobs:
         cd build
         cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_MODERN_NETWORKING=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
         # Build main executable, tools, and tests
-        if cmake --build . --target doomlegacy d2h wadtool test_fixed_t test_vector test_console test_actor test_save_load_unit --parallel 1 2>&1 | tee build.log; then
+        if cmake --build . --target doomlegacy d2h wadtool test_fixed_t test_vector test_console test_actor test_save_load_unit --parallel 4 2>&1 | tee build.log; then
           echo "Build succeeded"
           python3 ../../build_error_summarizer.py < build.log || true
         else
@@ -270,8 +270,8 @@ jobs:
           -DUSE_NETWORKING=ON \
           -DCMAKE_CXX_FLAGS="-DSDL2"
 
-        # Build main executable and tools (lower parallelism to prevent hangs)
-        cmake --build . --target doomlegacy d2h wadtool --parallel 1
+        # Build main executable and tools
+        cmake --build . --target doomlegacy d2h wadtool --parallel 4
 
     - name: Upload Windows executables and tools
       uses: actions/upload-artifact@v4
