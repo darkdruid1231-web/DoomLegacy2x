@@ -41,7 +41,7 @@ jobs:
         cd build
         cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_MODERN_NETWORKING=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
         # Build test executables
-        cmake --build . --target test_fixed_t test_fixed_catch2 test_vector test_console test_actor test_save_load_unit --parallel 2>&1 | tee build.log
+        cmake --build . --target test_fixed_t test_vector test_console test_actor test_save_load_unit --parallel 2>&1 | tee build.log
 
     - name: Summarize Build Errors
       if: failure()
@@ -220,7 +220,7 @@ jobs:
         # Build test targets only - the full game requires additional code fixes
         # (missing mobjtype_t entries, g_mapinfo cast issues) that are tracked
         # separately.  Tests validate the core logic compiles for Windows ABI.
-        cmake --build . --target test_fixed_t test_fixed_catch2 test_vector test_console test_actor test_save_load_unit --parallel
+        cmake --build . --target test_fixed_t test_vector test_console test_actor test_save_load_unit --parallel
 
     - name: Upload Windows cross-compile test artifacts
       uses: actions/upload-artifact@v4
@@ -352,7 +352,7 @@ jobs:
         # Build test targets only - the full game requires additional code fixes
         # (missing mobjtype_t entries, g_mapinfo cast issues) that are tracked
         # separately.  Tests validate the core logic compiles for Windows ABI.
-        cmake --build . --target test_fixed_t test_fixed_catch2 test_vector test_console test_actor test_save_load_unit --parallel
+        cmake --build . --target test_fixed_t test_vector test_console test_actor test_save_load_unit --parallel
 
     - name: Upload Windows Clang cross-compile test artifacts
       uses: actions/upload-artifact@v4
