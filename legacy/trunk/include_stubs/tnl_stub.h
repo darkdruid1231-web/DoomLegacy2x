@@ -116,6 +116,7 @@ public:
     ~BitStream() {}
 
     void write(uint32_t val) {}
+    void write(int size, const byte* data) {}
     uint32_t read() { return 0; }
     bool writeFlag(bool val) { return val; }
     bool readFlag() { return false; }
@@ -187,6 +188,11 @@ public:
 
 class NetConnection {
 public:
+    enum TerminationReason {
+        ReasonNone = 0,
+        ReasonSelfDisconnect
+    };
+
     NetConnection() {}
     virtual ~NetConnection() {}
     virtual void connect(NetInterface* iface, const Address& addr) {}
@@ -249,12 +255,13 @@ public:
 
 class NetInterface {
 public:
-    NetInterface() : mSocket(nullptr) {}
-    NetInterface(const Address& addr) : mSocket(nullptr) {}
+    NetInterface() : mSocket(nullptr), mAllowConnections(false) {}
+    NetInterface(const Address& addr) : mSocket(nullptr), mAllowConnections(false) {}
     virtual ~NetInterface() {}
-    void setAllowsConnections(bool allow) {}
+    void setAllowsConnections(bool allow) { mAllowConnections = allow; }
 
     void* mSocket;
+    bool mAllowConnections;
 
     virtual void disconnect(NetConnection* con, TerminationReason r, const char* reason) {}
     virtual void checkIncomingPackets() {}
