@@ -29,7 +29,7 @@
 ///
 /// Code shamelessly inspired by the QuakeC sources, thanks Id :)
 
-#include "tnl/tnlBitStream.h"
+#include "tnl_stub.h"
 
 #include "command.h"
 #include "console.h"

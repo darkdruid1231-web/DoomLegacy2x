@@ -23,9 +23,7 @@
 
 #include "m_fixed.h"
 #include "i_system.h"
-#ifdef TNL_STUB_BUILD
-#include "tnl/tnlBitStream.h"
-#endif
+#include "tnl_stub.h"
 
 /// smallest possible increment
 fixed_t fixed_epsilon(1 / float(fixed_t::UNIT));
