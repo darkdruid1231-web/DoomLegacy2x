@@ -36,10 +36,12 @@ jobs:
         wget -q https://github.com/libsdl-org/sdl12-compat/releases/download/release-1.2.74/sdl12-compat-1.2.74.tar.gz
         tar -xzf sdl12-compat-1.2.74.tar.gz
         cd sdl12-compat-1.2.74
-        ./configure --prefix=/usr/local
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local
         make -j$(nproc)
         sudo make install
-        cd ..
+        cd ../..
         # Create SDL symlink if missing (code uses SDL/SDL.h)
         sudo ln -sf /usr/local/include/SDL /usr/include/SDL || true
 
