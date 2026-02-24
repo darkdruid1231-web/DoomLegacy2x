@@ -314,8 +314,8 @@ jobs:
         mkdir -p build-win
         cd build-win
 
-        # Set pkg-config for MinGW
-        export PKG_CONFIG_LIBDIR=/usr/x86_64-w64-mingw32/lib/pkgconfig
+        # Set pkg-config for MinGW and Linux
+        export PKG_CONFIG_LIBDIR=/usr/x86_64-w64-mingw32/lib/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig
 
         # Use container's MinGW tools - no toolchain file needed
         cmake .. \
