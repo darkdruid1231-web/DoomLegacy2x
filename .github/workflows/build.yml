@@ -166,17 +166,11 @@ jobs:
         Cflags: -I${includedir}/SDL2
         EOF
         cat << 'EOF' | sudo tee /usr/x86_64-w64-mingw32/lib/pkgconfig/SDL2_mixer.pc
-        prefix=/usr/x86_64-w64-mingw32
-        exec_prefix=${prefix}
-        libdir=${exec_prefix}/lib
-        includedir=${prefix}/include
-
         Name: SDL2_mixer
         Description: Simple DirectMedia Layer Mixer
         Version: 2.8.0
-        Libs: -L${libdir} -lSDL2_mixer
-        Cflags: -I${includedir}/SDL2
-        Requires: SDL2
+        Libs: -L/usr/x86_64-w64-mingw32/lib -lSDL2_mixer
+        Cflags: -I/usr/x86_64-w64-mingw32/include/SDL2
         EOF
 
     - name: Build and install zlib for MinGW
