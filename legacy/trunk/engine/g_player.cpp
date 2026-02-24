@@ -779,3 +779,7 @@ void PlayerInfo::LoadPawn()
     else
         pawn->pres = new spritepres_t(pawn->info, 0);
 }
+
+// RPC implementations for PlayerInfo
+void PlayerInfo::c2sIntermissionDone() {}
+void PlayerInfo::s2cStartIntermission(unsigned char, unsigned char, unsigned int, unsigned int, unsigned int, unsigned int) {}
