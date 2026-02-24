@@ -24,8 +24,8 @@
 #ifndef r_plane_h
 #define r_plane_h 1
 
-#include "r_segs.h"
 #include "screen.h" //needs MAXVIDWIDTH/MAXVIDHEIGHT
+#include "r_segs.h"
 
 //
 // Now what is a visplane, anyway?
