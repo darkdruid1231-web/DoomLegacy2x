@@ -23,7 +23,9 @@
 
 #include "m_fixed.h"
 #include "i_system.h"
+#ifdef TNL_STUB_BUILD
 #include "tnl/tnlBitStream.h"
+#endif
 
 /// smallest possible increment
 fixed_t fixed_epsilon(1 / float(fixed_t::UNIT));
@@ -35,7 +37,7 @@ void fixed_t::Pack(DoomLegacy::ISerializer &s)
     s.write(static_cast<uint32_t>(val));
 }
 
-void fixed_t::Pack(TNL::BitStream *s)
+void fixed_t::Pack(BitStream *s)
 {
     s->writeInt(val, 32);
 }
@@ -46,7 +48,7 @@ void fixed_t::Unpack(DoomLegacy::ISerializer &s)
     val = s.readInt32();
 }
 
-void fixed_t::Unpack(TNL::BitStream *s)
+void fixed_t::Unpack(BitStream *s)
 {
     val = s->readInt(32);
 }
