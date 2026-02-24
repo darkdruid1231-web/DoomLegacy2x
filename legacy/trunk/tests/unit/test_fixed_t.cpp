@@ -37,21 +37,21 @@ static string last_failure;
     {                                                                                              \
         tests_run++;                                                                               \
         last_failure = "";                                                                         \
-        cout << "  " << name << " ... ";                                                           \
+        std::cout << "  " << name << " ... ";                                                      \
     } while (0)
 
 #define PASS()                                                                                     \
     do                                                                                             \
     {                                                                                              \
         tests_passed++;                                                                            \
-        cout << "PASS" << endl;                                                                    \
+        std::cout << "PASS" << std::endl;                                                          \
     } while (0)
 
 #define FAIL(msg)                                                                                  \
     do                                                                                             \
     {                                                                                              \
         last_failure = msg;                                                                        \
-        cout << "FAIL: " << msg << endl;                                                           \
+        std::cout << "FAIL: " << msg << std::endl;                                                 \
         return;                                                                                    \
     } while (0)
 
@@ -522,18 +522,18 @@ void test_negative_division()
 
 int main()
 {
-    cout << "========================================" << endl;
-    cout << "fixed_t Unit Tests" << endl;
-    cout << "========================================" << endl;
+    std::cout << "========================================" << std::endl;
+    std::cout << "fixed_t Unit Tests" << std::endl;
+    std::cout << "========================================" << std::endl;
 
-    cout << "\n[Constructor Tests]" << endl;
+    std::cout << "\n[Constructor Tests]" << std::endl;
     test_default_constructor();
     test_int_constructor();
     test_float_constructor();
     test_double_constructor();
     test_copy_constructor();
 
-    cout << "\n[Arithmetic Tests]" << endl;
+    std::cout << "\n[Arithmetic Tests]" << std::endl;
     test_addition();
     test_subtraction();
     test_multiplication_fixed_fixed();
@@ -543,7 +543,7 @@ int main()
     test_division_fixed_int();
     test_unary_minus();
 
-    cout << "\n[Assignment Operator Tests]" << endl;
+    std::cout << "\n[Assignment Operator Tests]" << std::endl;
     test_assignment();
     test_add_assignment();
     test_sub_assignment();
@@ -552,7 +552,7 @@ int main()
     test_div_assignment_fixed();
     test_div_assignment_int();
 
-    cout << "\n[Comparison Operator Tests]" << endl;
+    std::cout << "\n[Comparison Operator Tests]" << std::endl;
     test_equality();
     test_inequality();
     test_less_than();
@@ -560,13 +560,13 @@ int main()
     test_less_equal();
     test_greater_equal();
 
-    cout << "\n[Bit Shift Tests]" << endl;
+    std::cout << "\n[Bit Shift Tests]" << std::endl;
     test_left_shift();
     test_right_shift();
     test_left_shift_assignment();
     test_right_shift_assignment();
 
-    cout << "\n[Edge Case Tests]" << endl;
+    std::cout << "\n[Edge Case Tests]" << std::endl;
     test_limits();
     test_abs();
     test_frac();
@@ -575,25 +575,25 @@ int main()
     test_floor();
     test_ceil();
 
-    cout << "\n[Modulus Tests]" << endl;
+    std::cout << "\n[Modulus Tests]" << std::endl;
     test_modulus();
 
-    cout << "\n[Logical Tests]" << endl;
+    std::cout << "\n[Logical Tests]" << std::endl;
     test_logical_not();
 
-    cout << "\n[Precision Tests]" << endl;
+    std::cout << "\n[Precision Tests]" << std::endl;
     test_precision_half();
     test_precision_quarter();
     test_precision_small();
 
-    cout << "\n[Negative Value Tests]" << endl;
+    std::cout << "\n[Negative Value Tests]" << std::endl;
     test_negative_addition();
     test_negative_multiplication();
     test_negative_division();
 
-    cout << "\n========================================" << endl;
-    cout << "Results: " << tests_passed << "/" << tests_run << " tests passed" << endl;
-    cout << "========================================" << endl;
+    std::cout << "\n========================================" << std::endl;
+    std::cout << "Results: " << tests_passed << "/" << tests_run << " tests passed" << std::endl;
+    std::cout << "========================================" << std::endl;
 
     return (tests_passed == tests_run) ? 0 : 1;
 }
