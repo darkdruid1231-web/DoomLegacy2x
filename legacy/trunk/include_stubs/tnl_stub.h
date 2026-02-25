@@ -46,7 +46,7 @@ class PacketStream;
 class Address;
 class Nonce;
 class StringPtr;
-typedef BitStream* ByteBufferPtr;
+typedef lnet::BitStream* ByteBufferPtr;
 
 // Macros
 #define BIT(x) (1 << (x))
@@ -125,6 +125,7 @@ public:
     bool operator!=(const Nonce& other) const { return !(*this == other); }
 };
 
+namespace lnet {
 class BitStream {
 public:
     BitStream() {}
@@ -165,6 +166,8 @@ public:
     U32 getBufferSize() const { return 0; }
     U32 getBytePosition() const { return 0; }
 };
+}
+using lnet::BitStream;
 
 class PacketStream : public BitStream {
 public:
