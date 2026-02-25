@@ -369,7 +369,7 @@ jobs:
 
   # Windows native build (MSVC)
   windows-native-build:
-    runs-on: windows-latest
+    runs-on: ["self-hosted", "windows"]
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
