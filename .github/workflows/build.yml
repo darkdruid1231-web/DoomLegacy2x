@@ -262,7 +262,7 @@ jobs:
 
   # Windows cross-compilation with Docker + LLVM MinGW
   windows-cross-build:
-    runs-on: self-hosted
+    runs-on: ["self-hosted"]
     runs-on: self-hosted
     container:
       image: mstorsjo/llvm-mingw:latest
