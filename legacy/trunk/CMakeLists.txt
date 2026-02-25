@@ -311,8 +311,8 @@ process_subdir(interface)
 # grammars is a special directory.
 add_subdirectory(grammars)
 
-add_executable(d2h tools/d2h.cpp)
-add_executable(wadtool tools/wadtool.cpp util/md5.cpp)
+add_executable(d2h ../common/tools/d2h.cpp)
+add_executable(wadtool ../common/tools/wadtool.cpp util/md5.cpp)
 
 add_executable(doomlegacy ${LEGACY_SRC})
 
