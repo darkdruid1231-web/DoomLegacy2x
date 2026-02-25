@@ -240,7 +240,7 @@ U32 Actor::packUpdate(GhostConnection *c, U32 mask, class BitStream *stream)
     {
         // very rarely
         // send over model/sprite info (mobjinfo/modeltype, color, drawing flags)
-        pres->Pack(stream);
+        pres->Pack(*stream);
         mask &= ~M_ANIM; // it's already included here
     }
 
@@ -248,7 +248,7 @@ U32 Actor::packUpdate(GhostConnection *c, U32 mask, class BitStream *stream)
     {
         // often
         // send over animation sequence and interpolation / state
-        pres->PackAnim(stream);
+        pres->PackAnim(*stream);
     }
 
     if (isInitialUpdate())
@@ -283,13 +283,13 @@ void Actor::unpackUpdate(GhostConnection *connection, BitStream *stream)
         // TODO read presentation type, create it
         if (pres)
             delete pres;
-        pres = new spritepres_t(stream);
+        pres = new spritepres_t(*stream);
     }
 
     if (stream->readFlag()) // M_ANIM
     {
         // get animation sequence and interpolation
-        pres->UnpackAnim(stream);
+        pres->UnpackAnim(*stream);
     }
 
     if (isInitialUpdate())
