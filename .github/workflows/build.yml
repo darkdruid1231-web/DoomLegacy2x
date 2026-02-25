@@ -108,7 +108,6 @@ jobs:
   windows-gcc-build:
     if: false
     runs-on: ubuntu-latest
-    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
