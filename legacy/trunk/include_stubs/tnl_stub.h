@@ -36,7 +36,9 @@ typedef uint32_t IPAddress;
 typedef unsigned char byte;
 
 // Forward declarations
+#ifdef TNL_STUB_BUILD
 class BitStream;
+#endif
 class NetConnection;
 class GhostConnection;
 class NetObject;
@@ -46,7 +48,7 @@ class PacketStream;
 class Address;
 class Nonce;
 class StringPtr;
-typedef lnet::BitStream* ByteBufferPtr;
+typedef BitStream* ByteBufferPtr;
 
 // Macros
 #define BIT(x) (1 << (x))
@@ -129,7 +131,7 @@ public:
     bool operator!=(const Nonce& other) const { return !(*this == other); }
 };
 
-namespace lnet {
+#ifdef TNL_STUB_BUILD
 class BitStream {
 public:
     BitStream() {}
@@ -170,8 +172,7 @@ public:
     U32 getBufferSize() const { return 0; }
     U32 getBytePosition() const { return 0; }
 };
-}
-using lnet::BitStream;
+#endif
 
 class PacketStream : public BitStream {
 public:
