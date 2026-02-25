@@ -241,8 +241,8 @@ class Actor : public Thinker, public NetObject
     /// netcode
     virtual bool onGhostAdd(GhostConnection *c);
     virtual void onGhostRemove();
-    virtual U32 packUpdate(GhostConnection *c, U32 updateMask, BitStream *s) { return 0; }
-    virtual void unpackUpdate(GhostConnection *c, BitStream *s) { }
+    virtual U32 packUpdate(GhostConnection *c, U32 updateMask, BitStream *s);
+    virtual void unpackUpdate(GhostConnection *c, BitStream *s);
 
     // ISerializer-based serialization (TNL-independent)
     virtual void serialize(DoomLegacy::ISerializer &s, Uint32 mask);
