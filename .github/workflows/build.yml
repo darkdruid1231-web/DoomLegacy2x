@@ -390,7 +390,8 @@ jobs:
     - name: Configure and Build
       run: |
         cd windows-native/legacy/trunk
-        mkdir build
+        Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue
+        New-Item -ItemType Directory -Force -Path build
         cd build
         cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_SDL2=ON -DUSE_IMAGE_SUPPORT=OFF -DUSE_NETWORKING=ON -DCMAKE_PREFIX_PATH="$PWD/../../SDL2-2.30.10"
         cmake --build . --target doomlegacy d2h wadtool --parallel
