@@ -291,12 +291,12 @@ jobs:
         # SDL2_mixer
         wget -q https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.8.0-mingw.tar.gz
         tar xzf SDL2_mixer-devel-2.8.0-mingw.tar.gz
-        mkdir -p /usr/x86_64-w64-mingw32
-        cp -r SDL2-2.30.10/x86_64-w64-mingw32/* /usr/x86_64-w64-mingw32/
-        cp -r SDL2_mixer-2.8.0/x86_64-w64-mingw32/* /usr/x86_64-w64-mingw32/
-        mkdir -p /usr/x86_64-w64-mingw32/lib/pkgconfig
-        cat << 'EOF' | tee /usr/x86_64-w64-mingw32/lib/pkgconfig/sdl2.pc
-        prefix=/usr/x86_64-w64-mingw32
+        mkdir -p /mingw64
+        cp -r SDL2-2.30.10/x86_64-w64-mingw32/* /mingw64/
+        cp -r SDL2_mixer-2.8.0/x86_64-w64-mingw32/* /mingw64/
+        mkdir -p /mingw64/lib/pkgconfig
+        cat << 'EOF' | tee /mingw64/lib/pkgconfig/sdl2.pc
+        prefix=/mingw64
         exec_prefix=${prefix}
         libdir=${exec_prefix}/lib
         includedir=${prefix}/include
@@ -307,8 +307,8 @@ jobs:
         Libs: -L${libdir} -lSDL2
         Cflags: -I${includedir}/SDL2
         EOF
-        cat << 'EOF' | tee /usr/x86_64-w64-mingw32/lib/pkgconfig/SDL2_mixer.pc
-        prefix=/usr/x86_64-w64-mingw32
+        cat << 'EOF' | tee /mingw64/lib/pkgconfig/SDL2_mixer.pc
+        prefix=/mingw64
         exec_prefix=${prefix}
         libdir=${exec_prefix}/lib
         includedir=${prefix}/include
@@ -403,7 +403,7 @@ jobs:
           /bin/mkdir build
           cd build
           export PATH=/c/actions-runner/_work/DoomLegacy/DoomLegacy/cmake-3.28.0-windows-x86_64/bin:`$PATH
-          cmake .. -G 'MinGW Makefiles' -DCMAKE_BUILD_TYPE=Release -DUSE_SDL2=ON -DUSE_IMAGE_SUPPORT=OFF -DUSE_NETWORKING=ON -DCMAKE_PREFIX_PATH=`$PWD/../../SDL2-2.30.10/x86_64-w64-mingw32 -DCMAKE_MAKE_PROGRAM=/usr/bin/mingw32-make -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+          cmake .. -G 'MinGW Makefiles' -DCMAKE_BUILD_TYPE=Release -DUSE_SDL2=ON -DUSE_IMAGE_SUPPORT=OFF -DUSE_NETWORKING=ON -DCMAKE_MAKE_PROGRAM=/mingw64/bin/mingw32-make -DCMAKE_C_COMPILER=/mingw64/bin/gcc -DCMAKE_CXX_COMPILER=/mingw64/bin/g++
           cmake --build . --target doomlegacy d2h wadtool --parallel 4
         "
 
