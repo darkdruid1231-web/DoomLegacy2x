@@ -375,6 +375,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         path: windows-native
+        submodules: true
 
     - name: Install dependencies
       run: |
