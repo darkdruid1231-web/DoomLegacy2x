@@ -384,6 +384,7 @@ jobs:
       run: |
         # Download SDL2 development libraries for Windows
         Invoke-WebRequest -Uri "https://www.libsdl.org/release/SDL2-devel-2.30.10-VC.zip" -OutFile "SDL2.zip"
+        Remove-Item -Recurse -Force SDL2-2.30.10 -ErrorAction SilentlyContinue
         Expand-Archive -Path "SDL2.zip" -DestinationPath "."
         # Assume it extracts to SDL2-2.30.10/
 
