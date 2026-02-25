@@ -69,7 +69,10 @@ if(USE_SDL2)
             message(STATUS "SDL2_mixer not found, disabling sound")
         endif()
     endif()
-    include_directories(${SDL2_INCLUDE_DIRS} ${SDL2MIXER_INCLUDE_DIRS})
+    # Add SDL2 include path - use ONLY SDL2-specific paths to avoid SDL1 header conflicts
+    if(SDL2_FOUND)
+        include_directories(C:/msys64/mingw64/include/SDL2)
+    endif()
 else()
     message(STATUS "SDL2 disabled, using SDL1")
     find_package(PkgConfig REQUIRED)
@@ -195,6 +198,9 @@ if(USE_NETWORKING)
             IMPORTED_LINK_DEPENDENT_LIBRARIES "ws2_32;winmm")
         message(STATUS "ENet Windows dependencies: ws2_32, winmm")
     endif()
+
+    # Use TNL stubs for type declarations even with lnet
+    add_definitions(-DTNL_STUB_BUILD)
 else()
     message(STATUS "Using legacy TNL networking")
     add_definitions(-DTNL_STUB_BUILD)
@@ -336,7 +342,7 @@ endif()
 # SDL define only when SDL2 is actually enabled (otherwise doomtype.h tries to
 # include SDL_types.h which won't be in the include path)
 if(USE_SDL2)
-    target_compile_definitions(doomlegacy PRIVATE SDL)
+    target_compile_definitions(doomlegacy PRIVATE SDL SDL2)
 endif()
 
 # Link libraries after target is defined
