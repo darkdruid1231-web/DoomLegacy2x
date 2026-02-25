@@ -330,7 +330,13 @@ jobs:
           -DCMAKE_C_COMPILER=clang \
           -DCMAKE_CXX_COMPILER=clang++ \
           -DCMAKE_C_COMPILER_TARGET=x86_64-w64-mingw32 \
-          -DCMAKE_CXX_COMPILER_TARGET=x86_64-w64-mingw32
+          -DCMAKE_CXX_COMPILER_TARGET=x86_64-w64-mingw32 \
+          -DCMAKE_SYSROOT=/opt/llvm-mingw/x86_64-w64-mingw32 \
+          -DCMAKE_FIND_ROOT_PATH=/opt/llvm-mingw/x86_64-w64-mingw32 \
+          -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER \
+          -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
+          -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
+          -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=ONLY
 
         # Build main executable and tools
         cmake --build . --target doomlegacy d2h wadtool --parallel 4
