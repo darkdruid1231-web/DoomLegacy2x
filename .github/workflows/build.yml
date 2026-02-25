@@ -105,7 +105,7 @@ jobs:
     #     if-no-files-found: ignore
 
   # Windows cross-compilation with GCC + MinGW (disabled)
-  windows-gcc-build:
+  windows-gcc-build-disabled:
     if: false
     runs-on: ubuntu-latest
 
