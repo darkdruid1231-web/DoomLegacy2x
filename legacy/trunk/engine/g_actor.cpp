@@ -318,7 +318,15 @@ void Actor::unpackUpdate(GhostConnection *connection, BitStream *stream)
     }
 }
 
-#endif // TNL_STUB_BUILD
+#else
+U32 Actor::packUpdate(GhostConnection *c, U32 mask, BitStream *stream)
+{
+    return 0;
+}
+void Actor::unpackUpdate(GhostConnection *c, BitStream *stream)
+{
+}
+#endif
 
 /// ISerializer-based serialization (TNL-independent)
 void Actor::serialize(DoomLegacy::ISerializer &s, Uint32 mask)
