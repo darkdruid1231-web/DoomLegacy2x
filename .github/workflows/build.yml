@@ -273,7 +273,6 @@ jobs:
       image: mstorsjo/llvm-mingw:latest
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
-      options: --user root
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
