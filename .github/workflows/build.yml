@@ -397,13 +397,13 @@ jobs:
 
     - name: Configure and Build
       run: |
-        & C:\msys64\usr\bin\bash.exe -c "
+        & 'C:\msys64\usr\bin\bash.exe' -c "
           cd /c/actions-runner/_work/DoomLegacy/DoomLegacy/windows-native/legacy/trunk
           rm -rf build
           mkdir build
           cd build
-          export PATH=/c/actions-runner/_work/DoomLegacy/DoomLegacy/cmake-3.28.0-windows-x86_64/bin:$PATH
-          cmake .. -G 'MinGW Makefiles' -DCMAKE_BUILD_TYPE=Release -DUSE_SDL2=ON -DUSE_IMAGE_SUPPORT=OFF -DUSE_NETWORKING=ON -DCMAKE_PREFIX_PATH=$PWD/../../SDL2-2.30.10/x86_64-w64-mingw32 -DCMAKE_MAKE_PROGRAM=mingw32-make -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
+          export PATH=/c/actions-runner/_work/DoomLegacy/DoomLegacy/cmake-3.28.0-windows-x86_64/bin:`$PATH
+          cmake .. -G 'MinGW Makefiles' -DCMAKE_BUILD_TYPE=Release -DUSE_SDL2=ON -DUSE_IMAGE_SUPPORT=OFF -DUSE_NETWORKING=ON -DCMAKE_PREFIX_PATH=`$PWD/../../SDL2-2.30.10/x86_64-w64-mingw32 -DCMAKE_MAKE_PROGRAM=mingw32-make -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
           cmake --build . --target doomlegacy d2h wadtool --parallel 4
         "
 
