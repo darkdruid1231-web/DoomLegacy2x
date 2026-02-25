@@ -50,7 +50,11 @@ typedef lnet::BitStream* ByteBufferPtr;
 
 // Macros
 #define BIT(x) (1 << (x))
+#ifdef TNL_STUB_BUILD
+#define TNL_DECLARE_RPC(func, params) void func params {}
+#else
 #define TNL_DECLARE_RPC(func, params) void func params
+#endif
 #define TNL_IMPLEMENT_CLASS(cls)
 #define TNL_IMPLEMENT_NETOBJECT(cls)
 #define TNL_IMPLEMENT_NETCONNECTION(cls, group, flag)
