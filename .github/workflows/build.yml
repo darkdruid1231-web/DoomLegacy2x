@@ -107,7 +107,7 @@ jobs:
   # Windows cross-compilation with GCC + MinGW (disabled)
   windows-gcc-build:
     if: false
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
