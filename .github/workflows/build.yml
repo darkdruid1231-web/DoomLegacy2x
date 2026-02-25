@@ -104,9 +104,9 @@ jobs:
     #     retention-days: 14
     #     if-no-files-found: ignore
 
-  # Windows cross-compilation with GCC + MinGW (disabled - header issues)
+  # Windows cross-compilation with GCC + MinGW
   windows-gcc-build:
-    if: false
+    if: true
     runs-on: self-hosted
 
     steps:
@@ -247,30 +247,26 @@ jobs:
           -DENET_INCLUDE_DIR=/usr/x86_64-w64-mingw32/include \
           -DENET_LIBRARY=/usr/x86_64-w64-mingw32/lib/libenet.a
 
-    - name: Build Windows test executables (cross-compile)
+    - name: Build Windows executables (cross-compile)
       run: |
         cd legacy/trunk/build-win
-        # Build test targets only - the full game requires additional code fixes
-        # (missing mobjtype_t entries, g_mapinfo cast issues) that are tracked
-        # separately.  Tests validate the core logic compiles for Windows ABI.
-        cmake --build . --target test_fixed_t test_vector test_console test_actor test_save_load_unit --parallel
+        # Build main executable and tools
+        cmake --build . --target doomlegacy d2h wadtool --parallel 4
 
-    - name: Upload Windows cross-compile test artifacts
+    - name: Upload Windows executables and tools
       uses: actions/upload-artifact@v4
       with:
-        name: doomlegacy-windows-cross-tests
+        name: doomlegacy-windows-executables
         path: |
-          legacy/trunk/build-win/test_fixed_t.exe
-          legacy/trunk/build-win/test_fixed_catch2.exe
-          legacy/trunk/build-win/test_vector.exe
-          legacy/trunk/build-win/test_console.exe
-          legacy/trunk/build-win/test_actor.exe
-          legacy/trunk/build-win/test_save_load_unit.exe
+          legacy/trunk/build-win/doomlegacy.exe
+          legacy/trunk/build-win/d2h.exe
+          legacy/trunk/build-win/wadtool.exe
         retention-days: 30
         if-no-files-found: warn
 
-  # Windows cross-compilation with Docker + LLVM MinGW
+  # Windows cross-compilation with Docker + LLVM MinGW (disabled)
   windows-cross-build:
+    if: false
     runs-on: self-hosted
     container:
       image: mstorsjo/llvm-mingw:latest
