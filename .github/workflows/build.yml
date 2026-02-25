@@ -403,7 +403,7 @@ jobs:
           /bin/mkdir build
           cd build
           export PATH=/c/actions-runner/_work/DoomLegacy/DoomLegacy/cmake-3.28.0-windows-x86_64/bin:`$PATH
-          cmake .. -G 'MinGW Makefiles' -DCMAKE_BUILD_TYPE=Release -DUSE_SDL2=ON -DUSE_IMAGE_SUPPORT=OFF -DUSE_NETWORKING=ON -DCMAKE_MAKE_PROGRAM=/mingw64/bin/mingw32-make -DCMAKE_C_COMPILER=/mingw64/bin/gcc -DCMAKE_CXX_COMPILER=/mingw64/bin/g++
+          cmake .. -G 'MinGW Makefiles' -DCMAKE_BUILD_TYPE=Release -DUSE_SDL2=ON -DUSE_IMAGE_SUPPORT=OFF -DUSE_NETWORKING=ON -DCMAKE_MAKE_PROGRAM=/mingw64/bin/mingw32-make.exe -DCMAKE_C_COMPILER=/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=/mingw64/bin/g++.exe
           cmake --build . --target doomlegacy d2h wadtool --parallel 4
         "
 
