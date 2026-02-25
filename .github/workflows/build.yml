@@ -389,10 +389,10 @@ jobs:
 
     - name: Download SDL2 for Windows
       run: |
-        # Download SDL2 development libraries for Windows
-        Invoke-WebRequest -Uri "https://www.libsdl.org/release/SDL2-devel-2.30.10-VC.zip" -OutFile "SDL2.zip"
+        # Download SDL2 development libraries for MinGW
+        Invoke-WebRequest -Uri "https://www.libsdl.org/release/SDL2-devel-2.30.10-mingw.tar.gz" -OutFile "SDL2.tar.gz"
         Remove-Item -Recurse -Force SDL2-2.30.10 -ErrorAction SilentlyContinue
-        Expand-Archive -Path "SDL2.zip" -DestinationPath "."
+        & tar xzf SDL2.tar.gz
         # Assume it extracts to SDL2-2.30.10/
 
     - name: Configure and Build
@@ -401,7 +401,7 @@ jobs:
         Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue
         New-Item -ItemType Directory -Force -Path build
         cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_SDL2=ON -DUSE_IMAGE_SUPPORT=OFF -DUSE_NETWORKING=ON -DCMAKE_PREFIX_PATH="$PWD/../../SDL2-2.30.10"
+        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DUSE_SDL2=ON -DUSE_IMAGE_SUPPORT=OFF -DUSE_NETWORKING=ON -DCMAKE_PREFIX_PATH="$PWD/../../SDL2-2.30.10/x86_64-w64-mingw32" -DCMAKE_MAKE_PROGRAM=mingw32-make
         cmake --build . --target doomlegacy d2h wadtool --parallel
 
     - name: Upload Windows native executables
