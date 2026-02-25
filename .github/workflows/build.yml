@@ -104,11 +104,7 @@ jobs:
     #     retention-days: 14
     #     if-no-files-found: ignore
 
-  # Windows cross-compilation with GCC + MinGW (disabled)
-  # windows-gcc-build-disabled:
-    if: false
-
-    steps:
+  # Disabled job removed
     - name: Checkout repository
       uses: actions/checkout@v4
 
