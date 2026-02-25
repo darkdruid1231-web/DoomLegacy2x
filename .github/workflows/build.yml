@@ -238,7 +238,8 @@ jobs:
         cmake .. \
           -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw-w64-x86_64.cmake \
           -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_CXX_FLAGS="-Wno-inline -Wno-missing-attributes" \
+          -DCMAKE_C_FLAGS="-isysroot /usr/x86_64-w64-mingw32" \
+          -DCMAKE_CXX_FLAGS="-Wno-inline -Wno-missing-attributes -isysroot /usr/x86_64-w64-mingw32" \
           -DUSE_SDL2=ON \
           -DUSE_SOUND=ON \
           -DUSE_IMAGE_SUPPORT=OFF \
