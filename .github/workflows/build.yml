@@ -104,9 +104,9 @@ jobs:
     #     retention-days: 14
     #     if-no-files-found: ignore
 
-  # Windows cross-compilation with GCC + MinGW
+  # Windows cross-compilation with GCC + MinGW (disabled)
   windows-gcc-build:
-    if: true
+    if: false
     runs-on: self-hosted
 
     steps:
@@ -265,9 +265,9 @@ jobs:
         retention-days: 30
         if-no-files-found: warn
 
-  # Windows cross-compilation with Docker + LLVM MinGW (disabled)
+  # Windows cross-compilation with Docker + LLVM MinGW
   windows-cross-build:
-    if: false
+    runs-on: self-hosted
     runs-on: self-hosted
     container:
       image: mstorsjo/llvm-mingw:latest
@@ -283,15 +283,32 @@ jobs:
     - name: Install dependencies
       run: |
         apt-get update
-        apt-get install -y cmake libsdl2-dev libenet-dev libglu1-mesa-dev libpng-dev libjpeg-dev flex lemon
+        apt-get install -y cmake libenet-dev libglu1-mesa-dev libpng-dev libjpeg-dev flex lemon
 
-    - name: Download and setup SDL2_mixer for MinGW
+    - name: Download and setup SDL2 and SDL2_mixer for MinGW
       run: |
+        # SDL2
+        wget -q https://www.libsdl.org/release/SDL2-devel-2.30.10-mingw.tar.gz
+        tar xzf SDL2-devel-2.30.10-mingw.tar.gz
+        # SDL2_mixer
         wget -q https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.8.0-mingw.tar.gz
         tar xzf SDL2_mixer-devel-2.8.0-mingw.tar.gz
         mkdir -p /usr/x86_64-w64-mingw32
+        cp -r SDL2-2.30.10/x86_64-w64-mingw32/* /usr/x86_64-w64-mingw32/
         cp -r SDL2_mixer-2.8.0/x86_64-w64-mingw32/* /usr/x86_64-w64-mingw32/
         mkdir -p /usr/x86_64-w64-mingw32/lib/pkgconfig
+        cat << 'EOF' | tee /usr/x86_64-w64-mingw32/lib/pkgconfig/sdl2.pc
+        prefix=/usr/x86_64-w64-mingw32
+        exec_prefix=${prefix}
+        libdir=${exec_prefix}/lib
+        includedir=${prefix}/include
+
+        Name: sdl2
+        Description: Simple DirectMedia Layer
+        Version: 2.30.10
+        Libs: -L${libdir} -lSDL2
+        Cflags: -I${includedir}/SDL2
+        EOF
         cat << 'EOF' | tee /usr/x86_64-w64-mingw32/lib/pkgconfig/SDL2_mixer.pc
         prefix=/usr/x86_64-w64-mingw32
         exec_prefix=${prefix}
