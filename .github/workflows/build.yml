@@ -401,7 +401,7 @@ jobs:
         Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue
         New-Item -ItemType Directory -Force -Path build
         cd build
-        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DUSE_SDL2=ON -DUSE_IMAGE_SUPPORT=OFF -DUSE_NETWORKING=ON -DCMAKE_PREFIX_PATH="$PWD/../../SDL2-2.30.10/x86_64-w64-mingw32" -DCMAKE_MAKE_PROGRAM=mingw32-make -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++
+        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DUSE_SDL2=ON -DUSE_IMAGE_SUPPORT=OFF -DUSE_NETWORKING=ON -DCMAKE_PREFIX_PATH="$PWD/../../SDL2-2.30.10/x86_64-w64-mingw32" -DCMAKE_MAKE_PROGRAM=mingw32-make -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
         cmake --build . --target doomlegacy d2h wadtool --parallel
 
     - name: Upload Windows native executables
