@@ -326,7 +326,11 @@ jobs:
           -DUSE_NETWORKING=ON \
           -DCMAKE_CXX_FLAGS="-DSDL2" \
           -DCMAKE_SYSTEM_NAME=Windows \
-          -DCMAKE_SYSTEM_PROCESSOR=x86_64
+          -DCMAKE_SYSTEM_PROCESSOR=x86_64 \
+          -DCMAKE_C_COMPILER=clang \
+          -DCMAKE_CXX_COMPILER=clang++ \
+          -DCMAKE_C_COMPILER_TARGET=x86_64-w64-mingw32 \
+          -DCMAKE_CXX_COMPILER_TARGET=x86_64-w64-mingw32
 
         # Build main executable and tools
         cmake --build . --target doomlegacy d2h wadtool --parallel 4
