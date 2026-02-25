@@ -397,12 +397,15 @@ jobs:
 
     - name: Configure and Build
       run: |
-        cd windows-native/legacy/trunk
-        Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue
-        New-Item -ItemType Directory -Force -Path build
-        cd build
-        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DUSE_SDL2=ON -DUSE_IMAGE_SUPPORT=OFF -DUSE_NETWORKING=ON -DCMAKE_PREFIX_PATH="$PWD/../../SDL2-2.30.10/x86_64-w64-mingw32" -DCMAKE_MAKE_PROGRAM=C:/msys64/mingw64/bin/mingw32-make.exe -DCMAKE_C_COMPILER=C:/msys64/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=C:/msys64/mingw64/bin/g++.exe
-        cmake --build . --target doomlegacy d2h wadtool --parallel
+        & C:\msys64\usr\bin\bash.exe -c "
+          cd /c/actions-runner/_work/DoomLegacy/DoomLegacy/windows-native/legacy/trunk
+          rm -rf build
+          mkdir build
+          cd build
+          export PATH=/c/actions-runner/_work/DoomLegacy/DoomLegacy/cmake-3.28.0-windows-x86_64/bin:$PATH
+          cmake .. -G 'MinGW Makefiles' -DCMAKE_BUILD_TYPE=Release -DUSE_SDL2=ON -DUSE_IMAGE_SUPPORT=OFF -DUSE_NETWORKING=ON -DCMAKE_PREFIX_PATH=`$PWD/../../SDL2-2.30.10/x86_64-w64-mingw32` -DCMAKE_MAKE_PROGRAM=mingw32-make -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
+          cmake --build . --target doomlegacy d2h wadtool --parallel 4
+        "
 
     - name: Upload Windows native executables
       uses: actions/upload-artifact@v4
