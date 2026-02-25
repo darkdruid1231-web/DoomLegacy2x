@@ -378,7 +378,10 @@ jobs:
 
     - name: Install dependencies
       run: |
-        # CMake and build tools are pre-installed on windows-latest
+        # Install CMake if not present
+        if (!(Get-Command cmake -ErrorAction SilentlyContinue)) {
+          choco install cmake --yes
+        }
 
     - name: Download SDL2 for Windows
       run: |
