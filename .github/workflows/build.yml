@@ -336,8 +336,8 @@ jobs:
           -DUSE_SDL2=ON \
           -DUSE_IMAGE_SUPPORT=OFF \
           -DUSE_NETWORKING=ON \
-          -DCMAKE_C_FLAGS="-I /usr/include -nostdinc --sysroot=/opt/llvm-mingw/x86_64-w64-mingw32 -isystem /opt/llvm-mingw/x86_64-w64-mingw32/include" \
-          -DCMAKE_CXX_FLAGS="-DSDL2 -I /usr/include -nostdinc++ --sysroot=/opt/llvm-mingw/x86_64-w64-mingw32 -isystem /opt/llvm-mingw/x86_64-w64-mingw32/include/c++/v1 -isystem /opt/llvm-mingw/x86_64-w64-mingw32/include" \
+          -DCMAKE_C_FLAGS="-I /usr/include -I /usr/include/x86_64-linux-gnu --sysroot=/opt/llvm-mingw/x86_64-w64-mingw32 -isystem /opt/llvm-mingw/x86_64-w64-mingw32/include" \
+          -DCMAKE_CXX_FLAGS="-DSDL2 -I /usr/include -I /usr/include/x86_64-linux-gnu --sysroot=/opt/llvm-mingw/x86_64-w64-mingw32 -isystem /opt/llvm-mingw/x86_64-w64-mingw32/include/c++/v1 -isystem /opt/llvm-mingw/x86_64-w64-mingw32/include" \
           -DCMAKE_SYSTEM_NAME=Windows \
           -DCMAKE_SYSTEM_PROCESSOR=x86_64 \
           -DCMAKE_C_COMPILER=clang \
