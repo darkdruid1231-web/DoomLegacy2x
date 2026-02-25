@@ -38,6 +38,8 @@ typedef unsigned char byte;
 // Forward declarations
 #ifdef TNL_STUB_BUILD
 class BitStream;
+#else
+using lnet::BitStream;
 #endif
 class NetConnection;
 class GhostConnection;
