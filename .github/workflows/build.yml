@@ -381,6 +381,7 @@ jobs:
         # Install CMake if not present
         if (!(Get-Command cmake -ErrorAction SilentlyContinue)) {
           Invoke-WebRequest -Uri "https://github.com/Kitware/CMake/releases/download/v3.28.0/cmake-3.28.0-windows-x86_64.zip" -OutFile "cmake.zip"
+          Remove-Item -Recurse -Force cmake-3.28.0-windows-x86_64 -ErrorAction SilentlyContinue
           Expand-Archive -Path "cmake.zip" -DestinationPath "."
           $env:PATH = "$PWD/cmake-3.28.0-windows-x86_64/bin;$env:PATH"
           echo "$PWD/cmake-3.28.0-windows-x86_64/bin" | Out-File -FilePath $env:GITHUB_PATH -Append
