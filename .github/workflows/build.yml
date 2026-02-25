@@ -263,7 +263,6 @@ jobs:
           legacy/trunk/build-win/d2h.exe
           legacy/trunk/build-win/wadtool.exe
         retention-days: 30
-        if-no-files-found: warn
 
   # Windows cross-compilation with Docker + LLVM MinGW
   windows-cross-build:
