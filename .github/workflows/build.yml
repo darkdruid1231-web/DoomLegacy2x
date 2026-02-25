@@ -366,3 +366,42 @@ jobs:
         retention-days: 30
         if-no-files-found: warn
 
+  # Windows native build (MSVC)
+  windows-native-build:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        path: windows-native
+
+    - name: Install dependencies
+      run: |
+        # CMake and build tools are pre-installed on windows-latest
+
+    - name: Download SDL2 for Windows
+      run: |
+        # Download SDL2 development libraries for Windows
+        Invoke-WebRequest -Uri "https://www.libsdl.org/release/SDL2-devel-2.30.10-VC.zip" -OutFile "SDL2.zip"
+        Expand-Archive -Path "SDL2.zip" -DestinationPath "."
+        # Assume it extracts to SDL2-2.30.10/
+
+    - name: Configure and Build
+      run: |
+        cd windows-native/legacy/trunk
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_SDL2=ON -DUSE_IMAGE_SUPPORT=OFF -DUSE_NETWORKING=ON -DCMAKE_PREFIX_PATH="$PWD/../../SDL2-2.30.10"
+        cmake --build . --target doomlegacy d2h wadtool --parallel
+
+    - name: Upload Windows native executables
+      uses: actions/upload-artifact@v4
+      with:
+        name: doomlegacy-windows-native-executables
+        path: |
+          windows-native/legacy/trunk/build/doomlegacy.exe
+          windows-native/legacy/trunk/build/d2h.exe
+          windows-native/legacy/trunk/build/wadtool.exe
+        retention-days: 30
+        if-no-files-found: warn
+
