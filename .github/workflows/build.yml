@@ -320,7 +320,8 @@ jobs:
           -DUSE_SDL2=ON \
           -DUSE_IMAGE_SUPPORT=OFF \
           -DUSE_NETWORKING=ON \
-          -DCMAKE_CXX_FLAGS="-DSDL2" \
+          -DCMAKE_C_FLAGS="-isysroot /opt/llvm-mingw/x86_64-w64-mingw32" \
+          -DCMAKE_CXX_FLAGS="-DSDL2 -isysroot /opt/llvm-mingw/x86_64-w64-mingw32" \
           -DCMAKE_SYSTEM_NAME=Windows \
           -DCMAKE_SYSTEM_PROCESSOR=x86_64 \
           -DCMAKE_C_COMPILER=clang \
