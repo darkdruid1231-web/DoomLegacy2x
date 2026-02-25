@@ -264,9 +264,10 @@ jobs:
           legacy/trunk/build-win/wadtool.exe
         retention-days: 30
 
-  # Windows cross-compilation with Docker + LLVM MinGW
+  # Windows cross-compilation with Docker + LLVM MinGW (disabled)
   windows-cross-build:
-    runs-on: self-hosted
+    if: false
+    runs-on: ubuntu-latest
     container:
       image: mstorsjo/llvm-mingw:latest
       volumes:
