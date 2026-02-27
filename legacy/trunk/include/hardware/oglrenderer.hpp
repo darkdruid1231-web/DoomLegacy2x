@@ -72,6 +72,16 @@
 #endif
 #endif
 
+#ifdef SDL2
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_video.h>
+#include <SDL2/SDL_opengl.h>
+#else
+#include <SDL/SDL.h>
+#include <SDL/SDL_video.h>
+#include <SDL/SDL_opengl.h>
+#endif
+
 #include<GL/gl.h>
 #include<GL/glext.h>
 
@@ -136,7 +146,11 @@ private:
   bool  workinggl;  ///< Do we have a working OpenGL context?
   GLfloat glversion;  ///< Current (runtime) OpenGL version (major.minor).
 
-  SDL_Surface *screen; ///< Main screen turn on.
+#ifdef SDL2
+  SDL_Window *screen; ///< Main screen window (SDL2)
+#else
+  SDL_Surface *screen; ///< Main screen surface (SDL1)
+#endif
   GLint viewportw; ///< Width of current viewport in pixels.
   GLint viewporth; ///< Height of current viewport in pixels.
 

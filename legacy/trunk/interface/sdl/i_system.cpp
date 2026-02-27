@@ -51,6 +51,18 @@
 
 #include "SDL.h"
 
+#ifdef SDL2
+// SDL2 compatibility macros for SDL1 code
+#define SDLKey SDL_Keycode
+#define SDL_Keysym SDL_Keysym
+#define SDL_WarpMouse(x, y) SDL_WarpMouseInWindow(NULL, x, y)
+#define SDL_WM_GrabInput(x) SDL_SetWindowGrab(NULL, x)
+#define SDL_GRAB_QUERY SDL_GRAB_QUERY
+#define SDL_GRAB_OFF SDL_GRAB_OFF
+#define SDL_GRAB_ON SDL_GRAB_ON
+#define SDL_WM_SetCaption(t, i) SDL_SetWindowTitle(NULL, t)
+#endif
+
 #include "command.h"
 #include "cvars.h"
 #include "doomdef.h"

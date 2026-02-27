@@ -22,6 +22,23 @@
 
 #define GL_GLEXT_PROTOTYPES 1
 
+#ifdef SDL2
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
+#else
+#include <SDL/SDL.h>
+#include <SDL/SDL_opengl.h>
+#endif
+
+// Compatibility macros for SDL1/SDL2 screen dimension access
+#ifdef SDL2
+#define SCREEN_W(w) SDL_GetWindowWidth(w)
+#define SCREEN_H(h) SDL_GetWindowHeight(h)
+#else
+#define SCREEN_W(s) ((s)->w)
+#define SCREEN_H(s) ((s)->h)
+#endif
+
 #include "command.h"
 #include "cvars.h"
 #include "doomdef.h"
@@ -194,7 +211,11 @@ void OGLRenderer::StartFrame()
 /// Done with drawing. Swap buffers.
 void OGLRenderer::FinishFrame()
 {
+#ifdef SDL2
+    SDL_GL_SwapWindow(screen); // Double buffered OpenGL goodness.
+#else
     SDL_GL_SwapBuffers(); // Double buffered OpenGL goodness.
+#endif
 }
 
 // Set default material colors and lights to bright white with full
@@ -214,6 +235,7 @@ void OGLRenderer::SetGlobalColor(GLfloat *rgba)
 // Writes a screen shot to the specified file. Writing is done in BMP
 // format, as SDL has direct support of that. Adds proper file suffix
 // when necessary. Returns true on success.
+#ifndef SDL2
 bool OGLRenderer::WriteScreenshot(const char *fname)
 {
     int fnamelength;
@@ -280,6 +302,15 @@ bool OGLRenderer::WriteScreenshot(const char *fname)
     SDL_FreeSurface(buffer);
     return success;
 }
+#else
+// SDL2 screenshot not yet implemented
+bool OGLRenderer::WriteScreenshot(const char *fname)
+{
+    (void)fname;
+    CONS_Printf("Screenshot not yet implemented for SDL2\n");
+    return false;
+}
+#endif
 
 bool OGLRenderer::InitVideoMode(const int w, const int h, const bool fullscreen)
 {
@@ -296,6 +327,34 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const bool fullscreen)
 
     workinggl = false;
 
+#ifdef SDL2
+    surfaceflags = SDL_WINDOW_OPENGL;
+    if (fullscreen)
+        surfaceflags |= SDL_WINDOW_FULLSCREEN;
+
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+    // In SDL2, we just try to create the window - no need for SDL_VideoModeOK
+    screen = SDL_CreateWindow("Doom Legacy",
+                              SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                              w, h, surfaceflags);
+    if (!screen)
+    {
+        CONS_Printf(" Could not obtain requested resolution.\n");
+        return false;
+    }
+
+    // Create OpenGL context
+    SDL_GLContext glcontext = SDL_GL_CreateContext(screen);
+    if (!glcontext)
+    {
+        CONS_Printf(" Could not create OpenGL context.\n");
+        return false;
+    }
+
+    int cbpp = 24; // Assume 24-bit for SDL2
+#else
     surfaceflags = SDL_OPENGL;
     if (fullscreen)
         surfaceflags |= SDL_FULLSCREEN;
@@ -317,6 +376,7 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const bool fullscreen)
         CONS_Printf(" Could not obtain requested resolution.\n");
         return false;
     }
+#endif
 
     // This is the earlies possible point to print these since GL
     // context is not guaranteed to exist until the call to
@@ -353,6 +413,14 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const bool fullscreen)
     CONS_Printf(fullscreen ? " (fullscreen)\n" : " (windowed)\n");
 
     // Calculate the screen's aspect ratio. Assumes square pixels.
+#ifdef SDL2
+    if (w == 1280 && h == 1024 && fullscreen)
+        screenar = 4.0 / 3.0;
+    else if (w == 320 && h == 200 && fullscreen)
+        screenar = 4.0 / 3.0;
+    else
+        screenar = GLfloat(w) / h;
+#else
     if (w == 1280 && h == 1024 && // Check a couple of exceptions.
         surfaceflags & SDL_FULLSCREEN)
         screenar = 4.0 / 3.0;
@@ -360,6 +428,7 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const bool fullscreen)
         screenar = 4.0 / 3.0;
     else
         screenar = GLfloat(w) / h;
+#endif
 
     CONS_Printf(" Screen aspect ratio %.2f.\n", screenar);
     CONS_Printf(" HUD aspect ratio %.2f.\n", hudar);
@@ -391,8 +460,13 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const bool fullscreen)
 // Set up viewport projection matrix, and 2D mode using the new aspect ratio.
 void OGLRenderer::SetFullScreenViewport()
 {
+#ifdef SDL2
+    viewportw = SDL_GetWindowWidth(screen);
+    viewporth = SDL_GetWindowHeight(screen);
+#else
     viewportw = screen->w;
     viewporth = screen->h;
+#endif
     viewportar = GLfloat(viewportw) / viewporth;
     glViewport(0, 0, viewportw, viewporth);
     Setup2DMode();
@@ -408,10 +482,17 @@ void OGLRenderer::SetViewport(unsigned vp)
 
     viewportdef_t *v = &gl_viewports[n][vp];
 
+#ifdef SDL2
+    viewportw = GLint(SDL_GetWindowWidth(screen) * v->w);
+    viewporth = GLint(SDL_GetWindowHeight(screen) * v->h);
+    viewportar = GLfloat(viewportw) / viewporth;
+    glViewport(GLint(SDL_GetWindowWidth(screen) * v->x), GLint(SDL_GetWindowHeight(screen) * v->y), viewportw, viewporth);
+#else
     viewportw = GLint(screen->w * v->w);
     viewporth = GLint(screen->h * v->h);
     viewportar = GLfloat(viewportw) / viewporth;
     glViewport(GLint(screen->w * v->x), GLint(screen->h * v->y), viewportw, viewporth);
+#endif
 }
 
 /// Set up the GL matrices so that we can draw 2D stuff like menus.
@@ -538,8 +619,13 @@ void OGLRenderer::Draw2DGraphic_Doom(GLfloat x, GLfloat y, Material *mat, int fl
     }
     else
     {
+#ifdef SDL2
+        l = x / SDL_GetWindowWidth(screen);
+        t = y / SDL_GetWindowHeight(screen);
+#else
         l = x / screen->w;
         t = y / screen->h;
+#endif
     }
 
     Material::TextureRef &tr = mat->tex[0];
@@ -556,11 +642,19 @@ void OGLRenderer::Draw2DGraphic_Doom(GLfloat x, GLfloat y, Material *mat, int fl
     }
     else
     {
+#ifdef SDL2
+        l -= mat->leftoffs / SDL_GetWindowWidth(screen);
+        r = l + tr.worldwidth / SDL_GetWindowWidth(screen);
+
+        t -= mat->topoffs / SDL_GetWindowHeight(screen);
+        b = t + tr.worldheight / SDL_GetWindowHeight(screen);
+#else
         l -= mat->leftoffs / screen->w;
         r = l + tr.worldwidth / screen->w;
 
         t -= mat->topoffs / screen->h;
         b = t + tr.worldheight / screen->h;
+#endif
     }
 
     Draw2DGraphic(l, 1 - b, r, 1 - t, mat);
