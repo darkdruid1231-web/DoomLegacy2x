@@ -24,9 +24,11 @@
 
 #ifdef SDL2
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_video.h>
 #include <SDL2/SDL_opengl.h>
 #else
 #include <SDL/SDL.h>
+#include <SDL/SDL_video.h>
 #include <SDL/SDL_opengl.h>
 #endif
 
