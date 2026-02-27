@@ -51,16 +51,24 @@
 
 #include "SDL.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #ifdef SDL2
 // SDL2 compatibility macros for SDL1 code
+#include <SDL2/SDL_video.h>
 #define SDLKey SDL_Keycode
 #define SDL_Keysym SDL_Keysym
 #define SDL_WarpMouse(x, y) SDL_WarpMouseInWindow(NULL, x, y)
 #define SDL_WM_GrabInput(x) SDL_SetWindowGrab(NULL, x)
-#define SDL_GRAB_QUERY SDL_GRAB_QUERY
-#define SDL_GRAB_OFF SDL_GRAB_OFF
-#define SDL_GRAB_ON SDL_GRAB_ON
+#define SDL_GRAB_QUERY 0  // SDL2 uses SDL_GetWindowGrab instead
+#define SDL_GRAB_OFF 0
+#define SDL_GRAB_ON 1
 #define SDL_WM_SetCaption(t, i) SDL_SetWindowTitle(NULL, t)
+#define SDL_EnableUNICODE(x) // no-op in SDL2
+// SDL2 removed unicode field in keysym - we use text input events instead
+#define SDL_Keysym_unicode(keysym) 0
 #endif
 
 #include "command.h"
@@ -189,9 +197,13 @@ void I_GetEvent()
                 altdown = mod & KMOD_ALT;
 
                 // Corresponding ASCII char, if applicable (for console etc.), otherwise zero.
+#ifdef SDL2
+                event.data2 = SDL_Keysym_unicode(inputEvent.key.keysym);
+#else
                 event.data2 =
                     inputEvent.key.keysym
                         .unicode; // SDL uses UCS-2 encoding (or maybe UTF-16???), we use UCS-4
+#endif
 
                 D_PostEvent(&event);
             }
