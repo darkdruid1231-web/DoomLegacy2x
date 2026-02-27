@@ -21,6 +21,8 @@
 /// \file
 /// \brief CD music interface
 
+#ifndef SDL2
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -491,3 +493,5 @@ int I_SetVolumeCD(int volume)
 
     return 0;
 }
+
+#endif // SDL2
