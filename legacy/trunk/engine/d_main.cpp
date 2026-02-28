@@ -295,7 +295,7 @@ static void D_IdentifyVersion()
 
         // try to find implied gamemode
         auto it = std::find_if(iwads, iwads + NUM_IWADS,
-            [s](const iwad_t& iwad) { return !strcasecmp(s, iwad.wadname); });
+            [s](const auto& iwad) { return !strcasecmp(s, iwad.wadname); });
         if (it != iwads + NUM_IWADS)
         {
             game.mode = it->mode;
