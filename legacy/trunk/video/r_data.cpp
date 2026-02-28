@@ -757,9 +757,8 @@ Material::Material(const char *name, Texture *t, float xs, float ys) : cacheitem
 
 Material::~Material()
 {
-    int n = tex.size(); // number of texture units
-    for (int i = 0; i < n; i++)
-        tex[i].t->Release();
+    for (auto& tr : tex)
+        tr.t->Release();
 }
 
 Material::TextureRef::TextureRef()
@@ -798,11 +797,12 @@ int Material::GLUse()
     else
         ShaderProg::DisableShaders();
 
-    int n = tex.size(); // number of texture units
-    for (int i = 0; i < n; i++)
+    int n = 0;
+    for (auto& tr : tex)
     {
-        glActiveTexture(GL_TEXTURE0 + i); // activate correct texture unit
-        tex[i].GLSetTextureParams();      // and set its parameters
+        glActiveTexture(GL_TEXTURE0 + n); // activate correct texture unit
+        tr.GLSetTextureParams();           // and set its parameters
+        n++;
     }
 
     return n;

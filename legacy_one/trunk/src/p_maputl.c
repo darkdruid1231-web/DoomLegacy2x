@@ -69,6 +69,9 @@
 #include "r_main.h"
 #include "p_maputl.h"
 #include "doomstat.h"
+
+#include <stdlib.h>
+  // qsort
   // deathmatch
 
 //
@@ -81,8 +84,8 @@ fixed_t  P_AproxDistance ( fixed_t dx, fixed_t dy )
     dx = abs(dx);
     dy = abs(dy);
     if (dx < dy)
-        return dx+dy-(dx>>1);
-    return dx+dy-(dy>>1);
+        return (int64_t)dx + dy - (dx >> 1);
+    return (int64_t)dx + dy - (dy >> 1);
 }
 
 fixed_t  P_AproxDistance_mobj ( mobj_t * mo1, mobj_t * mo2 )
@@ -889,55 +892,52 @@ boolean PIT_AddThingIntercepts (mobj_t* thing)
 
 
 //
+// intercept_frac_compare
+// Comparator for qsort - sorts intercepts by frac value ascending.
+// This replaces the O(n^2) selection sort with O(n log n) quicksort.
+//
+static int intercept_frac_compare(const void* a, const void* b)
+{
+    const intercept_t* ia = (const intercept_t*)a;
+    const intercept_t* ib = (const intercept_t*)b;
+    
+    if (ia->frac < ib->frac) return -1;
+    if (ia->frac > ib->frac) return 1;
+    return 0;
+}
+
+
+//
 // P_TraverseIntercepts
 // Returns true if the traverser function returns true
 // for all lines.
+// Optimized: uses qsort O(n log n) instead of selection sort O(n^2).
 //
 boolean P_TraverseIntercepts ( traverser_t   func,
                                fixed_t       maxfrac )
 {
     int                 count;
-    fixed_t             dist;
     intercept_t*        scan;
-    intercept_t*        in;
 
     count = intercept_p - intercepts;
 
-    in = 0;                     // shut up compiler warning
+    // Handle empty case
+    if (count <= 0)
+        return true;
 
-    while (count--)
+    // Sort intercepts by fraction - O(n log n) instead of O(n^2)
+    qsort(intercepts, count, sizeof(intercept_t), intercept_frac_compare);
+
+    // Traverse in sorted order (closest first)
+    for (scan = intercepts; scan < intercept_p; scan++)
     {
-        dist = FIXED_MAX;
-        for (scan = intercepts ; scan<intercept_p ; scan++)
-        {
-            if (scan->frac < dist)
-            {
-                dist = scan->frac;
-                in = scan;
-            }
-        }
-
-        if (dist > maxfrac)
+        if (scan->frac > maxfrac)
             return true;        // checked everything in range
-
-#if 0  // UNUSED
-    {
-        // don't check these yet, there may be others inserted
-        in = scan = intercepts;
-        for ( scan = intercepts ; scan<intercept_p ; scan++)
-            if (scan->frac > maxfrac)
-                *in++ = *scan;
-        intercept_p = in;
-        return false;
-    }
-#endif
 
         // appelle la fonction en commencant par l' intercept_t le plus
         // proche
-        if ( !func (in) )
+        if ( !func(scan) )
             return false;       // don't bother going farther
-
-        in->frac = FIXED_MAX;
     }
 
     return true;                // everything was traversed

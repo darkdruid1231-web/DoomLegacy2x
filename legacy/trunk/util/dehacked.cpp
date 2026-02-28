@@ -1190,9 +1190,9 @@ void dehacked_t::Read_STRINGS()
             continue;
         }
 
-        // FIXME backslash-continued lines...
-        char *newtext = p.GetToken("=");
-        text[m->num] = Z_StrDup(newtext);
+        // Handle backslash-continued lines and symbol escaping
+        char *newtext = ReadEscapedString();
+        text[m->num] = newtext;
     }
 }
 
@@ -1220,6 +1220,124 @@ void dehacked_t::Read_PARS()
             error("PARS: unknown command '%s'\n", word1);
         }
     }
+        char *type = p.GetToken(" \t");
+        if (!type)
+            continue;
+
+        if (strcasecmp(type, "SPRITE") == 0)
+        {
+            char *oldname = p.GetToken(" \t");
+            if (!oldname)
+                continue;
+            char *eq = p.GetToken("=");
+            if (!eq || strcmp(eq, "=") != 0)
+                continue;
+            char *newname = p.GetToken(" \t\n");
+            if (!newname)
+                continue;
+
+            // Find the sprite index
+            for (int i = 0; i < NUMSPRITES; i++)
+            {
+                if (strncasecmp(save_sprnames[i], oldname, 4) == 0)
+                {
+                    strncpy(orig_sprnames[i], newname, 4);
+                    orig_sprnames[i][4] = '\0';
+                    break;
+                }
+            }
+        }
+        else if (strcasecmp(type, "SOUND") == 0)
+        {
+            char *oldname = p.GetToken(" \t");
+            if (!oldname)
+                continue;
+            char *eq = p.GetToken("=");
+            if (!eq || strcmp(eq, "=") != 0)
+                continue;
+            char *newname = p.GetToken(" \t\n");
+            if (!newname)
+                continue;
+
+            // Find the sound index
+            extern sfxinfo_t S_sfx[NUMSFX];
+            for (int i = 1; i < NUMSFX; i++) // Skip dummy 0
+            {
+                if (strcasecmp(S_sfx[i].lumpname, oldname) == 0)
+                {
+                    strncpy(S_sfx[i].lumpname, newname, 8);
+                    S_sfx[i].lumpname[8] = '\0';
+                    break;
+                }
+            }
+        }
+        else
+        {
+            error("[PARS]: Unknown type '%s'\n", type);
+        }
+    }
+}
+
+// Read a string value with backslash continuation and escaping
+char *dehacked_t::ReadEscapedString()
+{
+    char buffer[1024]; // Sufficient for most strings
+    int bufpos = 0;
+
+    while (true)
+    {
+        // Read the rest of the current line
+        char *line = p.GetToken("\n");
+        if (!line)
+            break;
+
+        int len = strlen(line);
+        bool has_continue = false;
+        for (int i = 0; i < len && bufpos < sizeof(buffer) - 1; i++)
+        {
+            if (line[i] == '\\')
+            {
+                if (i + 1 < len)
+                {
+                    i++;
+                    switch (line[i])
+                    {
+                        case 'n':
+                            buffer[bufpos++] = '\n';
+                            break;
+                        case 't':
+                            buffer[bufpos++] = '\t';
+                            break;
+                        case '\\':
+                            buffer[bufpos++] = '\\';
+                            break;
+                        default:
+                            buffer[bufpos++] = line[i];
+                            break;
+                    }
+                }
+                else
+                {
+                    // Backslash at end of line, continuation
+                    has_continue = true;
+                }
+            }
+            else
+            {
+                buffer[bufpos++] = line[i];
+            }
+        }
+
+        if (!has_continue)
+            break;
+
+        // Continue to next line
+        if (!p.NewLine(false))
+            break;
+    }
+
+    buffer[bufpos] = '\0';
+    return Z_StrDup(buffer);
 }
 
 // dehacked command parser

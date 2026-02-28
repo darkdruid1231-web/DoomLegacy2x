@@ -148,7 +148,7 @@ class Thinker
 
   public:
     /// RTTI helper function. If the Thinker descendant in question descends from T, returns (T
-    /// *)this, otherwise NULL. Usage: XXX *p = thing->Inherits<XXX>();
+    /// *)this, otherwise nullptr. Usage: XXX *p = thing->Inherits<XXX>();
     template <typename T> inline T *Inherits()
     {
         TypeInfo *p = Type();
@@ -158,7 +158,7 @@ class Thinker
                 return reinterpret_cast<T *>(this);
             p = p->parent;
         }
-        return NULL;
+        return nullptr;
     }
 
     /// the map where the Thinker is situated

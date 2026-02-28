@@ -45,6 +45,7 @@ class dehacked_t
     void Read_Misc();
     void Read_Cheat();
     void Read_CODEPTR();
+    void Read_PARS();
     void Read_STRINGS();
     void Read_PARS();
 

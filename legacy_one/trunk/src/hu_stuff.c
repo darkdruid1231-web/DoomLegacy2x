@@ -265,8 +265,12 @@ void HU_Release_Graphics( void )
 // SAY: Broadcast to all players.
 void Command_Say_f (void)
 {
-    char buf[255];
-    int i,j;
+    // Buffer needs to hold: broadcast byte + all args separated by spaces + null
+    // Max args: MAX_CMD_ARGS (32), each arg could be up to MAX_STRING_LENGTH (256)
+    // Plus 1 for broadcast byte, plus 31 for spaces between args
+    char buf[256 + 32 + 1];
+    int i, j;
+    size_t buflen;
 
     if((j=COM_Argc())<2)
     {
@@ -275,15 +279,27 @@ void Command_Say_f (void)
     }
 
     buf[0]=(unsigned char)255;  // broadcast
-    strcpy(&buf[1], COM_Argv(1));
-    for(i=2; i<j; i++)
+    buf[1] = '\0';  // start with empty string
+
+    // Safely build the string with bounds checking
+    for(i=1; i<j; i++)
     {
-        strcat(&buf[1]," ");
-        strcat(&buf[1], COM_Argv(i));
+        const char *arg = COM_Argv(i);
+        size_t arglen = strlen(arg);
+        size_t curlen = strlen(&buf[1]);
+
+        // Check if we have room for: current + space + arg + null
+        if (curlen + 1 + arglen + 1 >= sizeof(buf) - 1)
+            break;  // would overflow, stop adding arguments
+
+        if (i > 1)
+            strcat(&buf[1], " ");  // add separator
+        strcat(&buf[1], arg);
     }
+
+    buflen = strlen(buf+1) + 2;  // +1 for broadcast byte, +1 for null terminator
     // as mainplayer
-    Send_NetXCmd(XD_SAY, buf, strlen(buf+1)+2);
-       // +2 because 1 for buf[0] and the other for null terminated string
+    Send_NetXCmd(XD_SAY, buf, buflen);
 }
 
 // SAYTO: Send to a player.
@@ -291,7 +307,9 @@ void Command_Sayto_f (void)
 {
     byte playernum;
     int i,j;
-    char buf[255];
+    // Buffer needs to hold: player byte + all args separated by spaces + null
+    char buf[256 + 32 + 1];
+    size_t buflen;
 
     if((j=COM_Argc())<3)
     {
@@ -305,21 +323,36 @@ void Command_Sayto_f (void)
         return;  // not found
 
     buf[0] = (unsigned char)playernum;    // 0..127
-    strcpy(&buf[1],COM_Argv(2));
-    for(i=3; i<j; i++)
+    buf[1] = '\0';  // start with empty string
+
+    // Safely build the string with bounds checking
+    for(i=2; i<j; i++)
     {
-        strcat(&buf[1]," ");
-        strcat(&buf[1],COM_Argv(i));
+        const char *arg = COM_Argv(i);
+        size_t arglen = strlen(arg);
+        size_t curlen = strlen(&buf[1]);
+
+        // Check if we have room for: current + space + arg + null
+        if (curlen + 1 + arglen + 1 >= sizeof(buf) - 1)
+            break;  // would overflow, stop adding arguments
+
+        if (i > 2)
+            strcat(&buf[1], " ");  // add separator
+        strcat(&buf[1], arg);
     }
+
+    buflen = strlen(buf+1) + 2;
     // as mainplayer
-    Send_NetXCmd(XD_SAY, buf, strlen(buf+1)+2);
+    Send_NetXCmd(XD_SAY, buf, buflen);
 }
 
 // SAYTEAM: To all team members of this player.
 void Command_Sayteam_f (void)
 {
-    char buf[255];
-    int i,j;
+    // Buffer needs to hold: team byte + all args separated by spaces + null
+    char buf[256 + 32 + 1];
+    int i, j;
+    size_t buflen;
 
     if((j=COM_Argc())<2)
     {
@@ -329,15 +362,27 @@ void Command_Sayteam_f (void)
 
     // Players 0..(MAX_PLAYERS-1) are known as Player 1 to MAX_PLAYERS to user.
     buf[0] = (unsigned char)( consoleplayer & 0x80 );  // 128..254
-    strcpy(&buf[1],COM_Argv(1));
-    for(i=2; i<j; i++)
+    buf[1] = '\0';  // start with empty string
+
+    // Safely build the string with bounds checking
+    for(i=1; i<j; i++)
     {
-        strcat(&buf[1]," ");
-        strcat(&buf[1],COM_Argv(i));
+        const char *arg = COM_Argv(i);
+        size_t arglen = strlen(arg);
+        size_t curlen = strlen(&buf[1]);
+
+        // Check if we have room for: current + space + arg + null
+        if (curlen + 1 + arglen + 1 >= sizeof(buf) - 1)
+            break;  // would overflow, stop adding arguments
+
+        if (i > 1)
+            strcat(&buf[1], " ");  // add separator
+        strcat(&buf[1], arg);
     }
+
+    buflen = strlen(buf+1) + 2;
     // as mainplayer
-    Send_NetXCmd(XD_SAY, buf, strlen(buf+1)+2);
-        // +2 because 1 for buf[0] and the other for null terminated string
+    Send_NetXCmd(XD_SAY, buf, buflen);
 }
 
 // [WDJ] Previous Say/Sayto/Sayteam system was broken.

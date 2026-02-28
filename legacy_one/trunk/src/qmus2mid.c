@@ -111,7 +111,8 @@ typedef struct MUSheader_s MUSheader;
 // Modified by WDJ.
 void* S_CacheMusicLump(int lump)
 {
-#ifdef __BIG_ENDIAN__
+// Use both __BIG_ENDIAN__ and PLATFORM_BIG_ENDIAN for broader platform support
+#if defined(__BIG_ENDIAN__) || defined(PLATFORM_BIG_ENDIAN)
     // Cache Music Lump Endian
     void *data = W_CacheLumpNum(lump, PU_MUSIC); 
     if (lump_read && memcmp(data, MUSHEADER, 4) == 0) {
