@@ -1335,7 +1335,7 @@ static boolean  CL_Send_Join( void )
     byte flg = 0;
     if( cv_download_savegame.EV )  flg |= NF_download_savegame;
     if( cl_drone )  flg |= NF_drone;
-#ifdef __BIG_ENDIAN__
+#if defined(__BIG_ENDIAN__) || defined(PLATFORM_BIG_ENDIAN)
     flg |= NF_big_endian;
 #endif
 
@@ -1384,11 +1384,17 @@ static void SV_Send_ServerInfo(int to_node, tic_t reqtime)
     if(game_map_filename[0])
     {
         // Map command external wad file.
-        strcpy(netbuffer->u.serverinfo.mapname,game_map_filename);
+        // NOTE: mapname is only 8 bytes, but game_map_filename can be up to MAX_WADPATH (128).
+        // Truncate to fit - take the last 7 chars of filename + null, as mapname is typically
+        // used for display and the extension (.wad) is not needed.
+        size_t fn_len = strlen(game_map_filename);
+        size_t copy_len = (fn_len > 7) ? (fn_len - 7) : 0;
+        strncpy(netbuffer->u.serverinfo.mapname, game_map_filename + copy_len, 7);
+        netbuffer->u.serverinfo.mapname[7] = '\0';  // ensure null termination
     }
     else
     {
-        // existing map       
+        // existing map
         strcpy(netbuffer->u.serverinfo.mapname,G_BuildMapName(gameepisode,gamemap));
     }
 
@@ -3054,10 +3060,11 @@ void CL_Update_ServerList( boolean internetsearch )
             for (i=0; server_list[i].header[0]; i++)
             {
                 int  node;
-                char addr_str[24];
+                // addr_str needs to hold ip[16] + ":" + port[8] + null = 25 bytes minimum
+                char addr_str[32];
 
                 // insert ip (and optionaly port) in node list
-                sprintf(addr_str, "%s:%s", server_list[i].ip, server_list[i].port);
+                snprintf(addr_str, sizeof(addr_str), "%s:%s", server_list[i].ip, server_list[i].port);
                 node = I_NetMakeNode(addr_str);
                 if( node >= MAX_NETNODES )
                     break; // no more node free
@@ -4484,7 +4491,7 @@ static void client_join_handler( byte nnode )
             command = CTRL_wait_game_start;
 
         // For savegame downloads to work, the endian must match.
-#ifdef __BIG_ENDIAN__
+#if defined(__BIG_ENDIAN__) || defined(PLATFORM_BIG_ENDIAN)
         // Server is big-endian
         if( (join_flags & NF_big_endian) == 0 )  // joiner is little-endian
 #else
