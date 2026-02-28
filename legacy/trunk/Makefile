@@ -98,7 +98,7 @@ export CXX = g++
 
 export CF += -std=c++0x -Wall $(platform) $(interface) $(linkage)
 
-INCLUDES = -Iinclude
+INCLUDES = -Iinclude -Iinclude_stubs
 CFLAGS = $(CF) $(INCLUDES)
 
 # linker
