@@ -20,6 +20,13 @@
 /// \file
 /// \brief Main program, simply calls D_DoomMain and the main game loop D_DoomLoop.
 
+#ifdef SDL2
+#define SDL_MAIN_HANDLED
+#include <SDL2/SDL.h>
+#endif
+
+#include <stdio.h>
+
 // in m_argv.h
 extern int myargc;
 extern char **myargv;
@@ -29,8 +36,18 @@ bool D_DoomMain();
 
 int main(int argc, char **argv)
 {
+    fprintf(stderr, "DEBUG: main() reached\n");
+    fflush(stderr);
+
     myargc = argc;
     myargv = argv;
+
+#ifdef SDL2
+    SDL_SetMainReady();
+#endif
+
+    fprintf(stderr, "DEBUG: calling D_DoomMain\n");
+    fflush(stderr);
 
     if (D_DoomMain())
         D_DoomLoop();

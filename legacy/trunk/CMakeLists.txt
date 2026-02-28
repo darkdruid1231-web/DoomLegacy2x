@@ -6,7 +6,7 @@ project(doomlegacy C CXX)
 # -fpermissive: allow implicit conversions, etc.
 # Fix GCC 13+ / MinGW-w64 intrinsics conflict: define these BEFORE any includes
 # to prevent GCC's xsaveintrin.h from declaring conflicting signed versions
-add_compile_definitions(__XSAVEINTRIN_H _XGETBV_DEFINED)
+add_compile_definitions(_XSAVEINTRIN_H_INCLUDED _CPUID_H_INCLUDED _XGETBV_DEFINED SDL SDL2)
 
 add_compile_options(-w -fpermissive)
 
@@ -59,9 +59,15 @@ option(USE_SDL2 "Enable SDL2 support" ON)
 if(USE_SDL2)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(SDL2 REQUIRED sdl2)
+    if(SDL2_LIBRARY_DIRS)
+        link_directories(${SDL2_LIBRARY_DIRS})
+    endif()
     option(USE_SOUND "Enable sound support" ON)
     if(USE_SOUND STREQUAL "ON")
         pkg_check_modules(SDL2MIXER SDL2_mixer)
+        if(SDL2MIXER_LIBRARY_DIRS)
+            link_directories(${SDL2MIXER_LIBRARY_DIRS})
+        endif()
         if(SDL2MIXER_FOUND)
             set(HAVE_MIXER 1)
             list(APPEND SOURCES interface/sdl/i_sound.cpp)
@@ -69,7 +75,10 @@ if(USE_SDL2)
             message(STATUS "SDL2_mixer not found, disabling sound")
         endif()
     endif()
-    include_directories(${SDL2_INCLUDE_DIRS} ${SDL2MIXER_INCLUDE_DIRS})
+    # Add SDL2 include path - use ONLY SDL2-specific paths to avoid SDL1 header conflicts
+    if(SDL2_FOUND)
+        include_directories(${SDL2_INCLUDE_DIRS})
+    endif()
 else()
     message(STATUS "SDL2 disabled, using SDL1")
     find_package(PkgConfig REQUIRED)
@@ -105,6 +114,23 @@ endif()
 # OpenGL
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
+
+# GLEW for OpenGL extension loading (required on Windows)
+find_package(GLEW QUIET)
+if(GLEW_FOUND)
+    message(STATUS "Found GLEW: ${GLEW_LIBRARIES}")
+    set(USE_GLEW TRUE)
+else()
+    message(STATUS "GLEW not found, trying pkg-config...")
+    pkg_check_modules(GLEW QUIET glew)
+    if(GLEW_FOUND)
+        message(STATUS "Found GLEW via pkg-config: ${GLEW_LIBRARIES}")
+        set(USE_GLEW TRUE)
+    else()
+        message(STATUS "GLEW not found - OpenGL extensions may not work")
+        set(USE_GLEW FALSE)
+    endif()
+endif()
 
 # Option to disable networking entirely (for platforms without networking support)
 option(USE_NETWORKING "Enable networking support" ON)
@@ -195,6 +221,9 @@ if(USE_NETWORKING)
             IMPORTED_LINK_DEPENDENT_LIBRARIES "ws2_32;winmm")
         message(STATUS "ENet Windows dependencies: ws2_32, winmm")
     endif()
+
+    # Use TNL stubs for type declarations even with lnet
+    add_definitions(-DTNL_STUB_BUILD)
 else()
     message(STATUS "Using legacy TNL networking")
     add_definitions(-DTNL_STUB_BUILD)
@@ -314,7 +343,7 @@ add_subdirectory(grammars)
 add_executable(d2h ../../common/tools/d2h.cpp)
 add_executable(wadtool ../../common/tools/wadtool.cpp util/md5.cpp)
 
-add_executable(doomlegacy ${LEGACY_SRC})
+add_executable(doomlegacy ${LEGACY_SRC} debug_init.cpp)
 
 # Modern target-based definitions (replacing deprecated add_definitions)
 # NOTE: Do NOT redefine __GNUC__ here — it's a compiler built-in and redefining it
@@ -331,16 +360,29 @@ target_compile_definitions(doomlegacy PRIVATE
 # those headers are included — passing it as a compile definition guarantees that.
 if(WIN32)
     target_compile_definitions(doomlegacy PRIVATE _USE_MATH_DEFINES)
+    if(USE_GLEW)
+        target_compile_definitions(doomlegacy PRIVATE GLEW_STATIC)
+    endif()
 endif()
 
 # SDL define only when SDL2 is actually enabled (otherwise doomtype.h tries to
 # include SDL_types.h which won't be in the include path)
 if(USE_SDL2)
-    target_compile_definitions(doomlegacy PRIVATE SDL)
+    target_compile_definitions(doomlegacy PRIVATE SDL SDL2)
 endif()
+
+# Disable shaders on Windows MSYS2 MinGW because OpenGL extension loading
+# is complex and requires more work
+target_compile_definitions(doomlegacy PRIVATE NO_SHADERS)
 
 # Link libraries after target is defined
 target_link_libraries(doomlegacy ${SDL2_LIBRARIES})
+# On Windows, SDL2 requires SDL2main (WinMain shim) and mingw32, plus -mwindows subsystem flag
+if(WIN32)
+    # SDL_MAIN_HANDLED in i_main.cpp means we don't need SDL2main
+    target_link_libraries(doomlegacy -lmingw32)
+    target_link_options(doomlegacy PRIVATE -mconsole)
+endif()
 if(HAVE_MIXER)
     target_link_libraries(doomlegacy ${sdl2mixer_LIBRARIES})
 endif()
@@ -370,15 +412,23 @@ if(USE_IMAGE_SUPPORT)
     set(IMAGE_LIBRARIES ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
 endif()
 
+# GLEW library (for OpenGL extension loading)
+if(NOT USE_GLEW)
+    set(GLEW_LIBRARIES "")
+elseif(WIN32)
+    # Force use of static GLEW lib from staging dir (not the DLL import lib from MSYS2)
+    set(GLEW_LIBRARIES /home/geoffrey/mingw-deps/lib/libglew32.a)
+endif()
+
 if(WIN32)
   target_link_libraries(doomlegacy grammars util
   ${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES}
-  ${OPENGL_LIBRARIES} ${IMAGE_LIBRARIES}
-  ws2_32 mswsock winmm)
+  ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${IMAGE_LIBRARIES}
+  ws2_32 mswsock winmm imm32 version setupapi cfgmgr32 shlwapi)
 else()
   target_link_libraries(doomlegacy grammars util
   ${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES}
-  ${OPENGL_LIBRARIES} ${IMAGE_LIBRARIES}
+  ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${IMAGE_LIBRARIES}
   pthread)
 endif()
 

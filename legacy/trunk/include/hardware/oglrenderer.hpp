@@ -72,12 +72,23 @@
 #endif
 #endif
 
+#ifdef SDL2
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_video.h>
+#include <SDL2/SDL_opengl.h>
+#else
+#include <SDL/SDL.h>
+#include <SDL/SDL_video.h>
+#include <SDL/SDL_opengl.h>
+#endif
+
 #include<GL/gl.h>
 #include<GL/glext.h>
 
-// On Windows, <GL/gl.h> only covers OpenGL 1.1.  Declare the 1.4 point
-// parameter functions explicitly — they are exported by opengl32.dll.
-#if defined(_WIN32) && !defined(GL_POINT_PARAMETERS_DECLARED)
+// On Windows without GLEW, <GL/gl.h> only covers OpenGL 1.1. Declare the 1.4
+// point parameter functions explicitly. When GLEW is used, it provides these
+// via function pointer macros so this block must be skipped.
+#if defined(_WIN32) && !defined(GL_POINT_PARAMETERS_DECLARED) && !defined(__GLEW_H__)
 #  define GL_POINT_PARAMETERS_DECLARED 1
 #  ifndef APIENTRY
 #    define APIENTRY __stdcall
@@ -136,7 +147,11 @@ private:
   bool  workinggl;  ///< Do we have a working OpenGL context?
   GLfloat glversion;  ///< Current (runtime) OpenGL version (major.minor).
 
-  SDL_Surface *screen; ///< Main screen turn on.
+#ifdef SDL2
+  SDL_Window *screen; ///< Main screen window (SDL2)
+#else
+  SDL_Surface *screen; ///< Main screen surface (SDL1)
+#endif
   GLint viewportw; ///< Width of current viewport in pixels.
   GLint viewporth; ///< Height of current viewport in pixels.
 
