@@ -31,7 +31,8 @@
 
 // Not needed with little endian, unless the BE_SWAP* get used.
 // __BIG_ENDIAN__ is defined on MAC compilers, not on WIN, nor LINUX
-#ifdef __BIG_ENDIAN__
+// Use both __BIG_ENDIAN__ and PLATFORM_BIG_ENDIAN for broader platform support
+#if defined(__BIG_ENDIAN__) || defined(PLATFORM_BIG_ENDIAN)
 
 #include "m_swap.h"
 

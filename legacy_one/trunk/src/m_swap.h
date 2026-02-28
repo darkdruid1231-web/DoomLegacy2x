@@ -39,6 +39,7 @@
 #define M_SWAP_H
 
 #include <stdint.h>
+#include "doomtype.h"
 
 // WAD files are always little-endian.
 // Other files, such as MIDI files, are always big-endian.
@@ -88,7 +89,8 @@ static inline int32_t SWAP_INT32_FAST( uint32_t x)
 // Use BE_SWAP* to convert to and from external big-endian value.
 //    Midi
 // __BIG_ENDIAN__ is defined on MAC compilers, not on WIN, nor LINUX
-#ifdef __BIG_ENDIAN__
+// Use both __BIG_ENDIAN__ and PLATFORM_BIG_ENDIAN for broader platform support
+#if defined(__BIG_ENDIAN__) || defined(PLATFORM_BIG_ENDIAN)
 
 // [WDJ] swap functions, reduces executable bloat.
 int16_t swap_int16( uint16_t x);
