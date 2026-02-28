@@ -314,6 +314,7 @@ dehacked_t::dehacked_t()
     max_health = 200;
     max_soul_health = 200;
     initial_bullets = 50;
+    monster_backing = 0;
 }
 
 void dehacked_t::error(const char *first, ...)
@@ -1031,8 +1032,8 @@ void dehacked_t::Read_Misc()
             }
             else if (!strcasecmp(word2, "Backing"))
             {
-                // Monsters backing away - not implemented yet
-                error("Monsters Backing not yet implemented\n");
+                // Monsters backing away distance
+                monster_backing = value;
             }
             else
                 error("Monsters : unknown option '%s'\n", word2);
@@ -1192,6 +1193,32 @@ void dehacked_t::Read_STRINGS()
         // FIXME backslash-continued lines...
         char *newtext = p.GetToken("=");
         text[m->num] = Z_StrDup(newtext);
+    }
+}
+
+// Parses the BEX [PARS] section
+void dehacked_t::Read_PARS()
+{
+    while (p.NewLine(false))
+    {
+        p.PassWS();
+        if (!p.LineLen())
+            break; // a whitespace-only line ends the record
+
+        char *word1 = p.GetToken(" \t");
+
+        if (!strcasecmp(word1, "SPRITE"))
+        {
+            char *frame = p.GetToken(" \t");
+            char *lump = p.GetToken(" \t");
+            char *offset_str = p.GetToken(" \t");
+            int offset = offset_str ? atoi(offset_str) : 0;
+            // TODO: Implement sprite mapping
+        }
+        else
+        {
+            error("PARS: unknown command '%s'\n", word1);
+        }
     }
 }
 
@@ -1374,8 +1401,7 @@ bool dehacked_t::LoadDehackedLump(int lump)
                     Read_CODEPTR();
                     break;
                 case DEH_PARS:
-                    // TODO support PARS?
-                    error("BEX [PARS] block currently unsupported.\n");
+                    Read_PARS();
                     break;
                 case DEH_STRINGS:
                     Read_STRINGS();

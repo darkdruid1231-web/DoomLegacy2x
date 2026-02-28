@@ -46,6 +46,7 @@ class dehacked_t
     void Read_Cheat();
     void Read_CODEPTR();
     void Read_STRINGS();
+    void Read_PARS();
 
   public:
     bool loaded;
@@ -64,6 +65,7 @@ class dehacked_t
     int max_soul_health;
 
     int initial_bullets;
+    int monster_backing;
 };
 
 extern dehacked_t DEH;
