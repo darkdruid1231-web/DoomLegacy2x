@@ -204,7 +204,7 @@ void GameInfo::AdvanceIntro()
             {
                 case gm_doom2:
                     pagetic = TICRATE * 11;
-                    pagename = "TITLEPIC";
+                    pagename = "INTERPIC";
                     S_StartMusic(mus_dm2ttl);
                     break;
                 case gm_heretic:

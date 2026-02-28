@@ -396,6 +396,10 @@ jobs:
         & tar xzf SDL2.tar.gz
         # Assume it extracts to SDL2-2.30.10/
 
+    - name: Install build dependencies
+      run: |
+        & 'C:\msys64\usr\bin\bash.exe' -c "pacman -S flex lemon --noconfirm"
+
     - name: Configure and Build
       run: |
         & 'C:\msys64\usr\bin\bash.exe' -c "
