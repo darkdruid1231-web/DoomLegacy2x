@@ -898,7 +898,7 @@ static byte LXD_init_OSS( void )
     {
         // MIX_CHANNELS == 2
         myioctl(oss_audio_fd, SNDCTL_DSP_GETFMTS, &i);
-#ifdef __BIG_ENDIAN__
+#if defined(__BIG_ENDIAN__) || defined(PLATFORM_BIG_ENDIAN)
         if (i &= AFMT_S16_BE)
 #else
         if (i &= AFMT_S16_LE)
@@ -907,7 +907,7 @@ static byte LXD_init_OSS( void )
             msg = "16bit stereo";
             select_audio_mode( AM_stereo16 );
 
-#ifdef __BIG_ENDIAN__
+#if defined(__BIG_ENDIAN__) || defined(PLATFORM_BIG_ENDIAN)
             i = AFMT_S16_BE;
 #else
             i = AFMT_S16_LE;
@@ -960,7 +960,7 @@ report_err:
 
 #ifdef DEV_ESD
 // Enlightened Sound Daemon, Sound device interface
-#ifdef __BIG_ENDIAN__
+#if defined(__BIG_ENDIAN__) || defined(PLATFORM_BIG_ENDIAN)
 #  warning  "ESD is only little-endian"
 #endif
 
@@ -1687,7 +1687,7 @@ const char * alsa_device[] = {
 snd_pcm_format_t  alsa_format_table[] =
 {
   SND_PCM_FORMAT_U8,  // AM_mono8
-#ifdef __BIG_ENDIAN__
+#if defined(__BIG_ENDIAN__) || defined(PLATFORM_BIG_ENDIAN)
   SND_PCM_FORMAT_S16_BE,  // AM_stereo16
 #else
   SND_PCM_FORMAT_S16_LE,  // AM_stereo16
@@ -2416,13 +2416,13 @@ static void LXD_shutdown_PULSE( void )
 byte  pulse_format_table[] =
 {
   PA_SAMPLE_U8,     // AM_mono8
-#ifdef __BIG_ENDIAN__
+#if defined(__BIG_ENDIAN__) || defined(PLATFORM_BIG_ENDIAN)
   PA_SAMPLE_S16BE,  // AM_stereo16
 #else
   PA_SAMPLE_S16LE,  // AM_stereo16
 #endif
 #ifdef QUAD_AUDIO
-#ifdef __BIG_ENDIAN__
+#if defined(__BIG_ENDIAN__) || defined(PLATFORM_BIG_ENDIAN)
   PA_SAMPLE_S16BE,  // AM_stereo16
 #else
   PA_SAMPLE_S16LE,  // AM_stereo16

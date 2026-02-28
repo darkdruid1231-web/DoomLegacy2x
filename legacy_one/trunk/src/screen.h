@@ -185,7 +185,7 @@ typedef struct vmode_s {
 // [WDJ] definitions for 15bpp, 16bpp, 24bpp, 32bpp
 
 typedef struct {
-#ifdef __BIG_ENDIAN__
+#if defined(__BIG_ENDIAN__) || defined(PLATFORM_BIG_ENDIAN)
    byte r, g, b;
 #else
    byte b, g, r;
@@ -193,7 +193,7 @@ typedef struct {
 } pixel24_t;
 
 typedef struct {
-#ifdef __BIG_ENDIAN__
+#if defined(__BIG_ENDIAN__) || defined(PLATFORM_BIG_ENDIAN)
    byte alpha, r, g, b;
 #else
    byte b, g, r, alpha;
@@ -204,7 +204,7 @@ typedef union {
    uint32_t      ui32;
    pixel24_t     pix24;  // for speed, does not line up with pix32
    struct {
-#ifdef __BIG_ENDIAN__
+#if defined(__BIG_ENDIAN__) || defined(PLATFORM_BIG_ENDIAN)
       byte unused;
       pixel24_t  rgb24;
 #else

@@ -1032,6 +1032,10 @@ int  W_ReadLumpHeader ( lumpnum_t     lump,
 
     lif = & wf->lumpinfo[ ln1 ];
 
+    // Validate lump size to prevent exploits
+    if (lif->size > 0x1000000)  // 16MB limit
+        I_Error("W_ReadLumpHeader: Lump size %d too large", lif->size);
+
     // empty resource (usually markers like S_START, F_END ..)
     if (lif->size==0)
         return 0;
@@ -1242,7 +1246,8 @@ void release_patch_array( patch_t ** pp, int count )
 void* W_CachePatchNum_Endian ( lumpnum_t lump, int ztag )
 {
 // __BIG_ENDIAN__ is defined on MAC compilers, not on WIN, nor LINUX
-#ifdef __BIG_ENDIAN__
+// Use both __BIG_ENDIAN__ and PLATFORM_BIG_ENDIAN for broader platform support
+#if defined(__BIG_ENDIAN__) || defined(PLATFORM_BIG_ENDIAN)
     patch_t * patch = W_CacheLumpNum(lump, ztag);
     // [WDJ] If newly read patch then fix endian.
     if( lump_read )
@@ -1434,7 +1439,8 @@ void* W_CacheRawAsPic( lumpnum_t lumpnum, int width, int height, int ztag)
 void* W_CachePicNum( lumpnum_t lumpnum, int ztag )
 {
 // __BIG_ENDIAN__ is defined on MAC compilers, not on WIN, nor LINUX
-#ifdef __BIG_ENDIAN__
+// Use both __BIG_ENDIAN__ and PLATFORM_BIG_ENDIAN for broader platform support
+#if defined(__BIG_ENDIAN__) || defined(PLATFORM_BIG_ENDIAN)
     pic_t * pt = W_CacheLumpNum ( lumpnum, ztag );
     // [WDJ] If newly read pic then fix endian.
     if( lump_read )
