@@ -23,6 +23,9 @@
 /// \brief Network connections
 
 #include "command.h"
+
+#include <algorithm>
+
 #include "cvars.h"
 #include "doomdef.h"
 
@@ -66,6 +69,10 @@ LConnection::LConnection()
     // setIsAdaptive();
     // setTranslatesStrings();
     // setFixedRateParameters(50, 50, 2000, 2000); // packet rates, sizes (send and receive)
+}
+
+LConnection::~LConnection()
+{
 }
 
 // client
@@ -259,11 +266,9 @@ void LConnection::onConnectionEstablished()
         // server side
         n->client_con.push_back(this);
 
-        int k = player.size();
-        for (int i = 0; i < k; i++)
+        for (const auto& p : player)
         {
-            CONS_Printf(
-                "%s entered the game (player %d)\n", player[i]->name.c_str(), player[i]->number);
+            CONS_Printf("%s entered the game (player %d)\n", p->name.c_str(), p->number);
         }
         setScopeObject(game.gtype);
         setGhostFrom(true);
@@ -292,11 +297,10 @@ void LConnection::ConnectionTerminated(bool established)
     {
         if (established)
         {
-            int n = player.size();
-            for (int i = 0; i < n; i++)
+            for (const auto& p : player)
             {
-                CONS_Printf("Player (%d) dropped.\n", player[i]->number);
-                player[i]->playerstate = PST_REMOVE;
+                CONS_Printf("Player (%d) dropped.\n", p->number);
+                p->playerstate = PST_REMOVE;
             }
             resetGhosting();
             ((LNetInterface *)getInterface())->SV_RemoveConnection(this);
@@ -438,11 +442,10 @@ void LNetInterface::Pause(int pnum, bool on)
         // send rpc event to all clients
         if (game.netgame && client_con.size())
         {
-            int n = client_con.size();
             NetEvent *e = TNL_RPC_CONSTRUCT_NETEVENT(client_con[0], rpcPause, (pnum, on));
 
-            for (int i = 0; i < n; i++)
-                client_con[i]->postNetEvent(e);
+            for (const auto& c : client_con)
+                c->postNetEvent(e);
         }
 
         PauseMsg(on, pnum);
@@ -476,10 +479,10 @@ void LConnection::rpcPause(U8 pnum, bool on)
 
 void LConnection::rpcMessage_s2c(S8 pnum, StringPtr msg, S8 priority, S8 type)
 {
-    for (int i = 0; i < NUM_LOCALPLAYERS; i++)
-        if (LocalPlayers[i].info && LocalPlayers[i].info->number == pnum)
+    for (const auto& lp : LocalPlayers)
+        if (lp.info && lp.info->number == pnum)
         {
-            LocalPlayers[i].info->SetMessage(msg.getString(), priority, type);
+            lp.info->SetMessage(msg.getString(), priority, type);
             return;
         }
 
@@ -489,9 +492,8 @@ void LConnection::rpcMessage_s2c(S8 pnum, StringPtr msg, S8 priority, S8 type)
 void LNetInterface::SendNetVar(U16 netid, const char *str)
 {
     // send netvar as an rpc event to all clients
-    int n = client_con.size();
-    for (int i = 0; i < n; i++)
-        client_con[i]->rpcSendNetVar_s2c(netid, str);
+    for (const auto& c : client_con)
+        c->rpcSendNetVar_s2c(netid, str);
 }
 
 void LConnection::rpcSendNetVar_s2c(U16 netid, StringPtr s)
