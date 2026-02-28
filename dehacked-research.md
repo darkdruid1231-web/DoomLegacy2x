@@ -15,17 +15,19 @@ Doom Legacy's DeHackEd/BEX parsing is implemented in `legacy/trunk/util/dehacked
 - **Cheats**: Modification of cheat codes.
 - **BEX [CODEPTR]**: Setting codepointers for frames.
 - **BEX [STRINGS]**: String replacements with mnemonics.
+- **BEX [PARS]**: Basic parsing implemented (placeholder for sprite mapping).
 
 ### Partially Supported
 
 - **Sound**: Deprecated, redirects to SNDINFO.
 - **Pointer**: Codepointer setting (legacy syntax).
+- **Monsters**: Infighting and Backing parsed, but Backing not used.
 
 ### Unsupported/Missing Features
 
 - **ammopershoot for weapons**: Only supported for BFG in Misc section. Other weapons lack ammopershoot setting.
-- **Monsters section**: Marked as TODO in Misc parsing.
-- **BEX [PARS]**: Unsupported, error message says "currently unsupported".
+- **Monsters section**: Partially supported - Infighting and Backing implemented, but Backing not used in game logic.
+- **BEX [PARS]**: Parsing implemented, but sprite mapping not fully integrated (placeholder).
 - **String escaping**: No support for escape sequences like \n in STRINGS.
 - **Backslash line continuation**: FIXME comment mentions backslash-continued lines not handled.
 - **Other BEX sections**: [TABLES], etc., not implemented.
