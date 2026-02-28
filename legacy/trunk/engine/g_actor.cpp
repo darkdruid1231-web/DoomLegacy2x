@@ -50,6 +50,10 @@
 #include "m_random.h"
 #include "tables.h"
 
+#include "net/NetworkManager.h"
+#include "net/ActorNetworkSerializer.h"
+#include "net/BitStreamSerializer.h"
+
 /*!
   \defgroup g_thing The Doom mapthing system
 
@@ -222,33 +226,34 @@ U32 Actor::packUpdate(GhostConnection *c, U32 mask, class BitStream *stream)
         mask = M_EVERYTHING;
     }
 
-    // check which states need to be updated, and write updates
-    if (stream->writeFlag(mask & M_MOVE))
-    {
-        // as often as possible
-        pos.Pack(stream);
-        vel.Pack(stream);
-        stream->writeInt(yaw >> (32 - ACTOR_AR), ACTOR_AR); // we do not need full resolution
-        stream->writeInt(pitch >> (32 - ACTOR_AR), ACTOR_AR);
+    // Initialize network serializers if needed
+    static bool initialized = false;
+    if (!initialized) {
+        DoomLegacy::Network::NetworkManager::Instance().RegisterSerializer<Actor>(std::make_unique<DoomLegacy::Network::ActorNetworkSerializer>());
+        initialized = true;
     }
 
-    // NOTE: here we are in fact transferring presentation_t data.
-    // Decided not to make presentation_t a NetObject of its own, since
-    // it is always associated with an Actor and this is simpler.
+    // Use the new decoupled serializer for data parts
+    auto* netSerializer = DoomLegacy::Network::NetworkManager::Instance().GetSerializer<Actor>();
+    ActorNetworkSerializer* actorSerializer = static_cast<DoomLegacy::Network::ActorNetworkSerializer*>(netSerializer);
+
+    if (stream->writeFlag(mask & M_MOVE))
+    {
+        BitStreamSerializer serializer(stream);
+        if (actorSerializer) actorSerializer->SerializeMove(this, serializer);
+    }
 
     if (stream->writeFlag(mask & M_PRES))
     {
-        // very rarely
-        // send over model/sprite info (mobjinfo/modeltype, color, drawing flags)
-        pres->Pack(*stream);
+        BitStreamSerializer serializer(stream);
+        if (actorSerializer) actorSerializer->SerializePresentation(this, serializer);
         mask &= ~M_ANIM; // it's already included here
     }
 
     if (stream->writeFlag(mask & M_ANIM))
     {
-        // often
-        // send over animation sequence and interpolation / state
-        pres->PackAnim(*stream);
+        BitStreamSerializer serializer(stream);
+        if (actorSerializer) actorSerializer->SerializeAnimation(this, serializer);
     }
 
     if (isInitialUpdate())
@@ -267,29 +272,33 @@ U32 Actor::packUpdate(GhostConnection *c, U32 mask, class BitStream *stream)
 /// the clientside pair of packUpdate
 void Actor::unpackUpdate(GhostConnection *connection, BitStream *stream)
 {
-    // NOTE: the unpackUpdate function must be symmetrical to packUpdate
+    // Initialize network serializers if needed
+    static bool initialized = false;
+    if (!initialized) {
+        DoomLegacy::Network::NetworkManager::Instance().RegisterSerializer<Actor>(std::make_unique<DoomLegacy::Network::ActorNetworkSerializer>());
+        initialized = true;
+    }
+
+    // Use the new decoupled serializer for data parts
+    auto* netSerializer = DoomLegacy::Network::NetworkManager::Instance().GetSerializer<Actor>();
+    ActorNetworkSerializer* actorSerializer = static_cast<DoomLegacy::Network::ActorNetworkSerializer*>(netSerializer);
+
     if (stream->readFlag()) // M_MOVE
     {
-        // movement data
-        apos.Unpack(stream); // NOTE: unpacked to apos, not pos! then we interpolate...
-        avel.Unpack(stream);
-        yaw = stream->readInt(ACTOR_AR); // we do not need full resolution
-        pitch = stream->readInt(ACTOR_AR);
+        BitStreamSerializer serializer(stream);
+        if (actorSerializer) actorSerializer->DeserializeMove(this, serializer);
     }
 
     if (stream->readFlag()) // M_PRES
     {
-        // get model/sprite info (mobjinfo/modeltype, color)
-        // TODO read presentation type, create it
-        if (pres)
-            delete pres;
-        pres = new spritepres_t(*stream);
+        BitStreamSerializer serializer(stream);
+        if (actorSerializer) actorSerializer->DeserializePresentation(this, serializer);
     }
 
     if (stream->readFlag()) // M_ANIM
     {
-        // get animation sequence and interpolation
-        pres->UnpackAnim(*stream);
+        BitStreamSerializer serializer(stream);
+        if (actorSerializer) actorSerializer->DeserializeAnimation(this, serializer);
     }
 
     if (isInitialUpdate())

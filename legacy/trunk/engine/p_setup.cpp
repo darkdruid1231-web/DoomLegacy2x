@@ -32,6 +32,7 @@
 #include "cvars.h"
 #include "doomdata.h"
 #include "doomdef.h"
+#include "hardware/gl_bsp.h"
 
 #include "g_blockmap.h"
 #include "g_decorate.h"
@@ -1611,6 +1612,7 @@ bool Map::Setup(tic_t start, bool spawnthings)
 
     int gllump = fc.FindNumForName(glname.c_str(), false);
     int gl_version = 0;
+    bool build_gl = false;
     if (gllump != -1 && gllump > lumpnum)
     {
         gl_version = LoadGLVertexes(gllump + LUMP_GL_VERTEXES);
@@ -1622,12 +1624,11 @@ bool Map::Setup(tic_t start, bool spawnthings)
     else
     {
         CONS_Printf(" Map has no GL nodes.\n");
-        // OpenGL renderer. TODO more friendly behavior (include glBSP, build nodes on the fly)
         if (rendermode == render_opengl)
         {
-            CONS_Printf("Trying to use OpenGL renderer without GL nodes. Exiting.\n");
-            CONS_Printf("Build GL nodes with glbsp and try again.\n");
-            return false;
+            CONS_Printf("Building GL nodes dynamically.\n");
+            build_gl = true;
+            gl_version = 2; // Assume v2
         }
 
         gllump = -1;
@@ -1655,6 +1656,9 @@ bool Map::Setup(tic_t start, bool spawnthings)
         LoadNodes(lumpnum + LUMP_NODES);         // loads nodes
         LoadSegs(lumpnum + LUMP_SEGS);           // points to v, l, si, se, uses l
     }
+
+    if (build_gl)
+        BuildGLData(this);
 
     LoadSectors2(lumpnum + LUMP_SECTORS); // rest of secs, uses nothing!!!
     rejectmatrix = static_cast<byte *>(fc.CacheLumpNum(lumpnum + LUMP_REJECT, PU_LEVEL));

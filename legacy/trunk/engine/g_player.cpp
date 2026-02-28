@@ -48,6 +48,10 @@
 #include "wi_stuff.h"
 #include "z_zone.h"
 
+#include "net/NetworkManager.h"
+#include "net/PlayerInfoNetworkSerializer.h"
+#include "net/BitStreamSerializer.h"
+
 //============================================================
 //           Global (nonstatic) client data
 //============================================================
@@ -321,6 +325,13 @@ U32 PlayerInfo::packUpdate(GhostConnection *c, U32 mask, class BitStream *stream
     if (isInitialUpdate())
         mask = M_IDENTITY; // everything else is at default value at this point
 
+    // Initialize network serializers if needed
+    static bool initialized = false;
+    if (!initialized) {
+        DoomLegacy::Network::NetworkManager::Instance().RegisterSerializer<PlayerInfo>(std::make_unique<DoomLegacy::Network::PlayerInfoNetworkSerializer>());
+        initialized = true;
+    }
+
     int ret = 0;
     // check which states need to be updated, and write updates
 
@@ -328,9 +339,10 @@ U32 PlayerInfo::packUpdate(GhostConnection *c, U32 mask, class BitStream *stream
     {
         // very rarely
         CONS_Printf("---PI: sent identity\n");
-        stream->writeString(name.c_str());
-        stream->write(number);
-        stream->write(team);
+        BitStreamSerializer serializer(stream);
+        auto* netSerializer = DoomLegacy::Network::NetworkManager::Instance().GetSerializer<PlayerInfo>();
+        PlayerInfoNetworkSerializer* playerSerializer = static_cast<DoomLegacy::Network::PlayerInfoNetworkSerializer*>(netSerializer);
+        if (playerSerializer) playerSerializer->SerializeIdentity(this, serializer);
     }
 
     if (mask & M_PAWN)
@@ -358,8 +370,10 @@ U32 PlayerInfo::packUpdate(GhostConnection *c, U32 mask, class BitStream *stream
     {
         CONS_Printf("---PI: sent score\n");
         // occasionally
-        stream->write(score);
-        // kills, items, secrets?
+        BitStreamSerializer serializer(stream);
+        auto* netSerializer = DoomLegacy::Network::NetworkManager::Instance().GetSerializer<PlayerInfo>();
+        PlayerInfoNetworkSerializer* playerSerializer = static_cast<DoomLegacy::Network::PlayerInfoNetworkSerializer*>(netSerializer);
+        if (playerSerializer) playerSerializer->SerializeScore(this, serializer);
     }
 
     // feedback (goes only to the owner)
@@ -374,20 +388,20 @@ U32 PlayerInfo::packUpdate(GhostConnection *c, U32 mask, class BitStream *stream
     if (stream->writeFlag(mask & M_PALETTE))
     {
         // often
-        stream->write(palette);
-        palette = -1;
+        BitStreamSerializer serializer(stream);
+        auto* netSerializer = DoomLegacy::Network::NetworkManager::Instance().GetSerializer<PlayerInfo>();
+        PlayerInfoNetworkSerializer* playerSerializer = static_cast<DoomLegacy::Network::PlayerInfoNetworkSerializer*>(netSerializer);
+        if (playerSerializer) playerSerializer->SerializePalette(this, serializer);
     }
 
     if (stream->writeFlag(mask & M_HUDFLASH))
     {
         // often
         // palette change overrides flashes
-        if (stream->writeFlag(damagecount))
-            stream->write(damagecount);
-        if (stream->writeFlag(bonuscount))
-            stream->write(bonuscount);
-
-        stream->writeFlag(itemuse);
+        BitStreamSerializer serializer(stream);
+        auto* netSerializer = DoomLegacy::Network::NetworkManager::Instance().GetSerializer<PlayerInfo>();
+        PlayerInfoNetworkSerializer* playerSerializer = static_cast<DoomLegacy::Network::PlayerInfoNetworkSerializer*>(netSerializer);
+        if (playerSerializer) playerSerializer->SerializeHudFlash(this, serializer);
     }
 
     // the return value from packUpdate can set which states still
@@ -398,16 +412,22 @@ U32 PlayerInfo::packUpdate(GhostConnection *c, U32 mask, class BitStream *stream
 ///
 void PlayerInfo::unpackUpdate(GhostConnection *c, BitStream *stream)
 {
-    char temp[256];
+    // Initialize network serializers if needed
+    static bool initialized = false;
+    if (!initialized) {
+        DoomLegacy::Network::NetworkManager::Instance().RegisterSerializer<PlayerInfo>(std::make_unique<DoomLegacy::Network::PlayerInfoNetworkSerializer>());
+        initialized = true;
+    }
+
+    auto* netSerializer = DoomLegacy::Network::NetworkManager::Instance().GetSerializer<PlayerInfo>();
+    PlayerInfoNetworkSerializer* playerSerializer = static_cast<DoomLegacy::Network::PlayerInfoNetworkSerializer*>(netSerializer);
 
     // NOTE: the unpackUpdate function must be symmetrical to packUpdate
     if (stream->readFlag()) // M_IDENTITY
     {
         CONS_Printf("---PI: got identity\n");
-        stream->readString(temp);
-        name = temp;
-        stream->read(&number);
-        stream->read(&team);
+        BitStreamSerializer serializer(stream);
+        if (playerSerializer) playerSerializer->DeserializeIdentity(this, serializer);
     }
 
     if (stream->readFlag()) // M_PAWN
@@ -425,7 +445,8 @@ void PlayerInfo::unpackUpdate(GhostConnection *c, BitStream *stream)
     if (stream->readFlag()) // M_SCORE
     {
         CONS_Printf("---PI: got score\n");
-        stream->read(&score);
+        BitStreamSerializer serializer(stream);
+        if (playerSerializer) playerSerializer->DeserializeScore(this, serializer);
     }
 
     if (!stream->readFlag())
@@ -434,17 +455,15 @@ void PlayerInfo::unpackUpdate(GhostConnection *c, BitStream *stream)
     // feedback
 
     if (stream->readFlag()) // M_PALETTE
-        stream->read(&palette);
+    {
+        BitStreamSerializer serializer(stream);
+        if (playerSerializer) playerSerializer->DeserializePalette(this, serializer);
+    }
 
     if (stream->readFlag()) // M_HUDFLASH
     {
-        // palette change overrides flashes
-        if (stream->readFlag())
-            stream->read(&damagecount);
-        if (stream->readFlag())
-            stream->read(&bonuscount);
-
-        itemuse = stream->readFlag();
+        BitStreamSerializer serializer(stream);
+        if (playerSerializer) playerSerializer->DeserializeHudFlash(this, serializer);
     }
 }
 
