@@ -85,9 +85,10 @@
 #include<GL/gl.h>
 #include<GL/glext.h>
 
-// On Windows, <GL/gl.h> only covers OpenGL 1.1.  Declare the 1.4 point
-// parameter functions explicitly — they are exported by opengl32.dll.
-#if defined(_WIN32) && !defined(GL_POINT_PARAMETERS_DECLARED)
+// On Windows without GLEW, <GL/gl.h> only covers OpenGL 1.1. Declare the 1.4
+// point parameter functions explicitly. When GLEW is used, it provides these
+// via function pointer macros so this block must be skipped.
+#if defined(_WIN32) && !defined(GL_POINT_PARAMETERS_DECLARED) && !defined(__GLEW_H__)
 #  define GL_POINT_PARAMETERS_DECLARED 1
 #  ifndef APIENTRY
 #    define APIENTRY __stdcall

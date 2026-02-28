@@ -22,6 +22,10 @@
 
 #define GL_GLEXT_PROTOTYPES 1
 
+#if defined(_WIN32) || defined(__MINGW32__)
+#define GLEW_STATIC
+#include <GL/glew.h>
+#endif
 #ifdef SDL2
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
@@ -34,6 +38,12 @@
 
 // Compatibility macros for SDL1/SDL2 screen dimension access
 #ifdef SDL2
+// SDL2 uses SDL_GetWindowSize which takes two pointers
+// We need to provide wrapper functions
+inline int SDL_GetWindowWidth_wrapper(SDL_Window *w) { int width, height; SDL_GetWindowSize(w, &width, &height); return width; }
+inline int SDL_GetWindowHeight_wrapper(SDL_Window *w) { int width, height; SDL_GetWindowSize(w, &width, &height); return height; }
+#define SDL_GetWindowWidth SDL_GetWindowWidth_wrapper
+#define SDL_GetWindowHeight SDL_GetWindowHeight_wrapper
 #define SCREEN_W(w) SDL_GetWindowWidth(w)
 #define SCREEN_H(h) SDL_GetWindowHeight(h)
 #else

@@ -22,16 +22,67 @@
 
 #include "SDL.h"
 
+#ifdef SDL2
+#include <SDL2/SDL_video.h>
+#endif
+
 #include "command.h"
 #include "cvars.h"
 #include "hardware/hwr_render.h"
 #include "screen.h"
 #include "v_video.h"
 
+#ifdef SDL2
+static SDL_Window *oglWindow = NULL;
+static SDL_GLContext glContext = NULL;
+#else
 static SDL_Surface *vidSurface = NULL; // use the one from i_video_sdl.c instead?
+#endif
 
 bool OglSdlSurface()
 {
+#ifdef SDL2
+    Uint32 windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
+
+    if (cv_fullscreen.value)
+        windowFlags |= SDL_WINDOW_FULLSCREEN;
+
+    // Clean up old window
+    if (oglWindow)
+    {
+        SDL_DestroyWindow(oglWindow);
+        oglWindow = NULL;
+    }
+    if (glContext)
+    {
+        SDL_GL_DeleteContext(glContext);
+        glContext = NULL;
+    }
+
+    // We want at least 1 bit (???) for R, G, and B, and at least 16 bits for depth buffer.
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 1);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 1);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+
+    oglWindow = SDL_CreateWindow("Doom Legacy",
+        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        vid.width, vid.height, windowFlags);
+
+    if (!oglWindow)
+        return false;
+
+    glContext = SDL_GL_CreateContext(oglWindow);
+    if (!glContext)
+        return false;
+
+    CONS_Printf("HWRend::Startup(): %dx%d OpenGL\n", vid.width, vid.height);
+
+    return true;
+#else
+    // Original SDL1 code
     Uint32 surfaceFlags;
 
     if (NULL != vidSurface)
@@ -64,25 +115,49 @@ bool OglSdlSurface()
     CONS_Printf("HWRend::Startup(): %dx%d %d bits\n", vid.width, vid.height, cbpp);
 
     return true;
+#endif
 }
 
 void OglSdlFinishUpdate(bool vidwait)
 {
+#ifdef SDL2
+    if (oglWindow)
+        SDL_GL_SwapWindow(oglWindow);
+#else
     SDL_GL_SwapBuffers();
+#endif
 }
 
 void OglSdlShutdown()
 {
+#ifdef SDL2
+    if (glContext)
+    {
+        SDL_GL_DeleteContext(glContext);
+        glContext = NULL;
+    }
+    if (oglWindow)
+    {
+        SDL_DestroyWindow(oglWindow);
+        oglWindow = NULL;
+    }
+#else
     if (NULL != vidSurface)
     {
         SDL_FreeSurface(vidSurface);
         vidSurface = NULL;
     }
+#endif
 }
 
 void OglSdlSetGamma(float r, float g, float b)
 {
+#ifdef SDL2
+    // SDL2 removed SDL_SetGamma, need to use OpenGL directly
+    // For now, this is a no-op
+#else
     SDL_SetGamma(r, g, b);
+#endif
 }
 
 /*
@@ -96,7 +171,7 @@ void OglSdlSetPalette(RGBA_t *palette, RGBA_t *gamma)
         myPaletteData[i].s.blue  = MIN((palette[i].s.blue  * gamma->s.blue) /127, 255);
         myPaletteData[i].s.alpha = palette[i].s.alpha;
     }
-    // on a changé de palette, il faut recharger toutes les textures
+    // on a changï¿½ de palette, il faut recharger toutes les textures
     // jaja, und noch viel mehr ;-)
     Flush();
 }
