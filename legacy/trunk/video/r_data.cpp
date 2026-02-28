@@ -25,6 +25,15 @@
 #include <png.h>
 
 #define GL_GLEXT_PROTOTYPES 1
+// Define GLchar before GL headers for MSYS2 MinGW compatibility
+#ifndef GLchar
+typedef char GLchar;
+#endif
+// On Windows, GLEW must be included first to provide extension function pointers
+#if defined(_WIN32) || defined(__MINGW32__)
+#define GLEW_STATIC
+#include <GL/glew.h>
+#endif
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include <GL/glu.h>

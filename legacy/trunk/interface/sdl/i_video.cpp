@@ -26,6 +26,23 @@
 
 #include "SDL.h"
 
+#ifdef SDL2
+#include <SDL2/SDL_video.h>
+// SDL2 compatibility macros
+#define SDL_VideoInfo SDL_DisplayMode
+#define SDL_HWPALETTE 0
+#define SDL_FULLSCREEN SDL_WINDOW_FULLSCREEN
+#define SDL_SetVideoMode(w, h, b, flags) SDL_CreateWindow("", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, flags)
+#define SDL_Flip(surface) // SDL2 uses SDL_RenderPresent instead
+#define SDL_SetColors(surface, colors, first, n) 0
+#define SDL_SetGamma(r, g, b) // SDL2 removed this
+#define SDL_GetVideoInfo() SDL_GetDesktopDisplayMode()
+#define vidInfo (*vidInfo_ptr)
+static SDL_DisplayMode* vidInfo_ptr = NULL;
+#define SDL_SWSURFACE 0
+#define SDL_HWPALETTE 0
+#endif
+
 #include "command.h"
 #include "doomdef.h"
 
@@ -53,9 +70,20 @@ static LegacyDLL OGL_renderer;
 #endif
 
 // SDL vars
+#ifdef SDL2
+static SDL_Window *sdlWindow = NULL;
+static SDL_DisplayMode vidInfo_mode;
+#define vidInfo (&vidInfo_mode)
+#else
 static const SDL_VideoInfo *vidInfo = NULL;
+#endif
 static SDL_Surface *vidSurface = NULL;
 static SDL_Color localPalette[256];
+
+// Export window pointer for other modules (like i_system.cpp)
+#ifdef SDL2
+SDL_Window* GetSDLWindow() { return sdlWindow; }
+#endif
 
 const static Uint32 surfaceFlags = SDL_SWSURFACE | SDL_HWPALETTE;
 
@@ -140,6 +168,11 @@ void I_FinishUpdate()
 {
     if (rendermode == render_soft)
     {
+#ifdef SDL2
+        // In SDL2, we need to blit the surface to the window
+        // For now, just flip - actual rendering happens elsewhere
+        // TODO: Implement proper SDL_RenderCopy for software mode
+#else
         /*
         if (vid.screens[0] != vid.direct)
       memcpy(vid.direct, vid.screens[0], vid.height*vid.rowbytes);
@@ -148,6 +181,7 @@ void I_FinishUpdate()
 
         if (SDL_MUSTLOCK(vidSurface))
             SDL_UnlockSurface(vidSurface);
+#endif
     }
     else if (oglrenderer != NULL)
         oglrenderer->FinishFrame();
@@ -242,6 +276,77 @@ int I_SetVideoMode(int modeNum)
     Uint32 flags = surfaceFlags;
     vid.modenum = modeNum;
 
+#ifdef SDL2
+    if (cv_fullscreen.value)
+    {
+        vid.width = fullscrModes[modeNum].w;
+        vid.height = fullscrModes[modeNum].h;
+        flags |= SDL_WINDOW_FULLSCREEN;
+
+        CONS_Printf("I_SetVideoMode: fullscreen %d x %d (%d bpp)\n",
+                    vid.width,
+                    vid.height,
+                    vid.BitsPerPixel);
+    }
+    else
+    {
+        vid.width = windowedModes[modeNum].w;
+        vid.height = windowedModes[modeNum].h;
+
+        CONS_Printf(
+            "I_SetVideoMode: windowed %d x %d (%d bpp)\n", vid.width, vid.height, vid.BitsPerPixel);
+    }
+
+    if (rendermode == render_soft)
+    {
+        // Destroy old window and surface
+        if (vidSurface)
+        {
+            SDL_FreeSurface(vidSurface);
+            vidSurface = NULL;
+        }
+        if (sdlWindow)
+        {
+            SDL_DestroyWindow(sdlWindow);
+            sdlWindow = NULL;
+        }
+
+        // Create new window
+        Uint32 windowFlags = SDL_WINDOW_SHOWN;
+        if (cv_fullscreen.value)
+            windowFlags |= SDL_WINDOW_FULLSCREEN;
+
+        sdlWindow = SDL_CreateWindow("Doom Legacy",
+            SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+            vid.width, vid.height, windowFlags);
+
+        if (sdlWindow == NULL)
+            I_Error("Could not set vidmode: %s\n", SDL_GetError());
+
+        // Create surface for software rendering
+        vidSurface = SDL_CreateRGBSurface(0, vid.width, vid.height, 32,
+            0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+
+        if (vidSurface == NULL)
+            I_Error("Could not create surface: %s\n", SDL_GetError());
+
+        if (vidSurface->pixels == NULL)
+            I_Error("Didn't get a valid pixels pointer (SDL). Exiting.\n");
+
+        vid.direct = static_cast<byte *>(vidSurface->pixels);
+        vid.direct[0] = 1;
+    }
+    else
+    {
+        if (!oglrenderer->InitVideoMode(vid.width, vid.height, cv_fullscreen.value))
+            I_Error("Could not set OpenGL vidmode.\n");
+    }
+
+    I_StartupMouse(); // grabs mouse and keyboard input if necessary
+
+    return 1;
+#else
+    // Original SDL1 code
     if (cv_fullscreen.value)
     {
         vid.width = fullscrModes[modeNum].w;
@@ -286,6 +391,7 @@ int I_SetVideoMode(int modeNum)
     I_StartupMouse(); // grabs mouse and keyboard input if necessary
 
     return 1;
+#endif
 }
 
 bool I_StartupGraphics()
@@ -293,6 +399,112 @@ bool I_StartupGraphics()
     if (graphics_started)
         return true;
 
+#ifdef SDL2
+    // Get desktop display mode for reference
+    if (SDL_GetDesktopDisplayMode(0, &vidInfo_mode) < 0)
+    {
+        CONS_Printf("Could not get desktop display mode: %s\n", SDL_GetError());
+        return false;
+    }
+
+    // Get available fullscreen modes
+    int numModes = SDL_GetNumDisplayModes(0);
+    for (int i = 0; i < numModes; i++)
+    {
+        SDL_DisplayMode mode;
+        if (SDL_GetDisplayMode(0, i, &mode) == 0)
+        {
+            if (mode.w <= MAXVIDWIDTH && mode.h <= MAXVIDHEIGHT)
+            {
+                vidmode_t temp;
+                temp.w = mode.w;
+                temp.h = mode.h;
+                sprintf(temp.name, "%dx%d", temp.w, temp.h);
+
+                // Avoid duplicates
+                bool found = false;
+                for (unsigned j = 0; j < fullscrModes.size(); j++)
+                {
+                    if (fullscrModes[j].w == temp.w && fullscrModes[j].h == temp.h)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                    fullscrModes.push_back(temp);
+            }
+        }
+    }
+
+    CONS_Printf(" Found %d video modes.\n", fullscrModes.size());
+    if (fullscrModes.empty())
+    {
+        CONS_Printf(" No suitable video modes found!\n");
+        return false;
+    }
+
+    // name the windowed modes
+    for (int n = 0; n < MAXWINMODES; n++)
+        sprintf(windowedModes[n].name, "win %dx%d", windowedModes[n].w, windowedModes[n].h);
+
+    vid.BytesPerPixel = 1;
+    vid.BitsPerPixel = 8;
+
+    // default resolution
+    vid.width = BASEVIDWIDTH;
+    vid.height = BASEVIDHEIGHT;
+
+    if (M_CheckParm("-opengl"))
+    {
+        // OpenGL mode
+        rendermode = render_opengl;
+        oglrenderer = new OGLRenderer;
+    }
+    else
+    {
+        // software mode - create window and use software renderer
+        rendermode = render_soft;
+        CONS_Printf("I_StartupGraphics: windowed %d x %d x %d bpp\n",
+                    vid.width,
+                    vid.height,
+                    vid.BitsPerPixel);
+
+        Uint32 flags = SDL_WINDOW_SHOWN;
+        if (cv_fullscreen.value)
+            flags |= SDL_WINDOW_FULLSCREEN;
+
+        sdlWindow = SDL_CreateWindow("Doom Legacy",
+            SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+            vid.width, vid.height, flags);
+
+        if (sdlWindow == NULL)
+        {
+            CONS_Printf("Could not create window: %s\n", SDL_GetError());
+            return false;
+        }
+
+        // For software rendering in SDL2, we need a renderer and texture
+        // For now, create a surface for compatibility
+        vidSurface = SDL_CreateRGBSurface(0, vid.width, vid.height, 32,
+            0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+
+        if (vidSurface == NULL)
+        {
+            CONS_Printf("Could not create surface: %s\n", SDL_GetError());
+            return false;
+        }
+        vid.direct = static_cast<byte *>(vidSurface->pixels);
+    }
+
+    SDL_ShowCursor(SDL_DISABLE);
+    I_StartupMouse(); // grab mouse and keyboard input if needed
+
+    graphics_started = true;
+
+    return true;
+#else
+    // Original SDL1 code
     // Get video info for screen resolutions
     vidInfo = SDL_GetVideoInfo();
     // now we _could_ do all kinds of cool tests to determine which
@@ -415,6 +627,7 @@ bool I_StartupGraphics()
     graphics_started = true;
 
     return true;
+#endif
 }
 
 void I_ShutdownGraphics()
@@ -423,6 +636,31 @@ void I_ShutdownGraphics()
     if (!graphics_started)
         return;
 
+#ifdef SDL2
+    if (rendermode == render_soft)
+    {
+        if (vidSurface)
+        {
+            SDL_FreeSurface(vidSurface);
+            vidSurface = NULL;
+        }
+        if (sdlWindow)
+        {
+            SDL_DestroyWindow(sdlWindow);
+            sdlWindow = NULL;
+        }
+    }
+    else
+    {
+        delete oglrenderer;
+        oglrenderer = NULL;
+
+#ifdef DYNAMIC_LINKAGE
+        if (ogl_handle)
+            CloseDLL(ogl_handle);
+#endif
+    }
+#else
     if (rendermode == render_soft)
     {
         // vidSurface should be automatically freed
@@ -437,5 +675,6 @@ void I_ShutdownGraphics()
             CloseDLL(ogl_handle);
 #endif
     }
+#endif
     SDL_Quit();
 }

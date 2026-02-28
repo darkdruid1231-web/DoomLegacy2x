@@ -61,14 +61,17 @@
 #define SDLKey SDL_Keycode
 #define SDL_Keysym SDL_Keysym
 #define SDL_WarpMouse(x, y) SDL_WarpMouseInWindow(NULL, x, y)
-#define SDL_WM_GrabInput(x) SDL_SetWindowGrab(NULL, x)
-#define SDL_GRAB_QUERY 0  // SDL2 uses SDL_GetWindowGrab instead
-#define SDL_GRAB_OFF 0
-#define SDL_GRAB_ON 1
 #define SDL_WM_SetCaption(t, i) SDL_SetWindowTitle(NULL, t)
 #define SDL_EnableUNICODE(x) // no-op in SDL2
 // SDL2 removed unicode field in keysym - we use text input events instead
 #define SDL_Keysym_unicode(keysym) 0
+
+// SDL2 mouse grab - use GetSDLWindow from i_video.cpp
+extern SDL_Window* GetSDLWindow();
+#define SDL_WM_GrabInput(mode) SDL_SetWindowGrab(GetSDLWindow(), mode)
+#define SDL_GRAB_QUERY SDL_FALSE
+#define SDL_GRAB_OFF SDL_FALSE
+#define SDL_GRAB_ON SDL_TRUE
 #endif
 
 #include "command.h"
@@ -308,8 +311,14 @@ void I_GrabMouse()
     if (devparm)
         return; // we don't want to hog input when debugging
 
+#ifdef SDL2
+    SDL_Window* win = GetSDLWindow();
+    if (cv_grabinput.value && win && SDL_GetWindowGrab(win) == SDL_FALSE)
+        SDL_SetWindowGrab(win, SDL_TRUE);
+#else
     if (cv_grabinput.value && SDL_WM_GrabInput(SDL_GRAB_QUERY) == SDL_GRAB_OFF)
         SDL_WM_GrabInput(SDL_GRAB_ON);
+#endif
 
     SDL_ShowCursor(SDL_DISABLE);
     warp_mouse = true;
@@ -317,8 +326,14 @@ void I_GrabMouse()
 
 void I_UngrabMouse()
 {
+#ifdef SDL2
+    SDL_Window* win = GetSDLWindow();
+    if (win && SDL_GetWindowGrab(win) == SDL_TRUE)
+        SDL_SetWindowGrab(win, SDL_FALSE);
+#else
     if (SDL_WM_GrabInput(SDL_GRAB_QUERY) == SDL_GRAB_ON)
         SDL_WM_GrabInput(SDL_GRAB_OFF);
+#endif
 
     SDL_ShowCursor(SDL_ENABLE);
     warp_mouse = false;

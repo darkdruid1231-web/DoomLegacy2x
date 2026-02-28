@@ -4,14 +4,14 @@
 set(CMAKE_SYSTEM_NAME Windows)
 set(CMAKE_SYSTEM_PROCESSOR x86_64)
 
-# Cross-compiler paths: use GCC MinGW
+# Cross-compiler paths: use GCC MinGW (posix thread model for C++11 threads)
 set(CMAKE_C_COMPILER   x86_64-w64-mingw32-gcc-posix)
 set(CMAKE_CXX_COMPILER x86_64-w64-mingw32-g++-posix)
 set(CMAKE_RC_COMPILER  x86_64-w64-mingw32-windres)
 
-# Tell CMake's find_* commands to look inside the MinGW sysroot for libraries
-# and headers, and to never search the build-host programs.
-set(CMAKE_FIND_ROOT_PATH /usr/x86_64-w64-mingw32)
+# Tell CMake's find_* commands to look in our deps staging area AND the MinGW sysroot.
+# Deps staging area has SDL2, GLEW, PNG, JPEG, ZLIB, ENet copied from MSYS2.
+set(CMAKE_FIND_ROOT_PATH /home/geoffrey/mingw-deps /usr/x86_64-w64-mingw32)
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
@@ -21,16 +21,17 @@ set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 # <chrono> when they try to pull clock_t / tm from the system time.h.
 # The MinGW cross-compiler already knows its own sysroot path internally.
 
-# Windows-specific link flags: bundle libgcc/libstdc++ statically so the
-# produced .exe doesn't require extra DLLs at runtime.
+# Link flags: bundle libgcc/libstdc++ statically to avoid needing those DLLs.
+# SDL2, SDL2_mixer and other MSYS2 libraries are linked via their DLL import
+# libs (.dll.a) so the corresponding DLLs must be shipped alongside the exe.
 set(CMAKE_C_FLAGS_INIT   "-Wno-missing-attributes -Wno-error")
 set(CMAKE_CXX_FLAGS_INIT "-static-libgcc -static-libstdc++ -Wno-missing-attributes -Wno-error")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 
 # No RPATH on Windows
 set(CMAKE_SKIP_RPATH TRUE)
 
-# pkg-config: point at the MinGW sysroot's .pc files.
+# pkg-config: point at our staging area's .pc files.
 set(PKG_CONFIG_EXECUTABLE    /usr/bin/pkg-config)
-set(PKG_CONFIG_SYSROOT_DIR   /usr/x86_64-w64-mingw32)
-set(PKG_CONFIG_PREFIX        /usr/x86_64-w64-mingw32)
+set(ENV{PKG_CONFIG_PATH}     /home/geoffrey/mingw-deps/lib/pkgconfig)
+set(ENV{PKG_CONFIG_LIBDIR}   /home/geoffrey/mingw-deps/lib/pkgconfig)
+set(ENV{PKG_CONFIG_SYSROOT_DIR} "")

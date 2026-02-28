@@ -495,10 +495,11 @@ bool D_DoomMain()
     {
         // FIXME: these files should be placed in ~/Library/Logs/ as Legacy_%s.log
 #ifndef __APPLE_CC__
-        if (freopen("stdout.txt", "w", stdout) == NULL)
-            CONS_Printf("freopen didnt work\n");
-        if (freopen("stderr.txt", "w", stderr) == NULL)
-            CONS_Printf("freopen didnt work\n");
+        // DEBUG: freopen disabled so output stays on console
+        //if (freopen("stdout.txt", "w", stdout) == NULL)
+        //    CONS_Printf("freopen didnt work\n");
+        //if (freopen("stderr.txt", "w", stderr) == NULL)
+        //    CONS_Printf("freopen didnt work\n");
 #endif
     }
 

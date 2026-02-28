@@ -51,9 +51,7 @@ decorate.parser.h
 # Apply platform definitions needed for legacy code
 target_compile_definitions(grammars PRIVATE
     FN_CDECL=
-    i386
-    linux
-    __GNUC__
     QSORT_CALLBACK=
+    NO_SHADERS
 )
 

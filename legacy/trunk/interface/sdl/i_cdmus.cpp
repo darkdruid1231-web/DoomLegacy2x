@@ -494,4 +494,16 @@ int I_SetVolumeCD(int volume)
     return 0;
 }
 
+#else // SDL2 - stub implementations
+
+#include "command.h"
+
+void I_InitCD() {}
+void I_ShutdownCD() {}
+void I_PlayCD(int track, bool looping) {}
+void I_PauseCD() {}
+void I_ResumeCD() {}
+void I_UpdateCD() {}
+void I_CDVolume(int volume) {}
+
 #endif // SDL2

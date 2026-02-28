@@ -23,8 +23,14 @@
 #ifndef oglshaders_h
 #define oglshaders_h 1
 
+// Define GLchar for MSYS2 MinGW compatibility
+#ifndef GLchar
+typedef char GLchar;
+#endif
+
 #define GL_GLEXT_PROTOTYPES 1
 #include <GL/gl.h>
+#include <GL/glext.h>
 
 #include "z_cache.h"
 
