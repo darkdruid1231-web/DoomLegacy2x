@@ -21,6 +21,7 @@
 /// \brief Handles keyboard/mouse/joystick inputs,
 /// maps inputs to game controls (forward, use, fire...).
 
+#include <algorithm>
 #include <stdlib.h>
 #include <string.h>
 
@@ -80,8 +81,7 @@ bool gamekeydown[NUMINPUTS];
 /// Releases all game keys.
 void G_ReleaseKeys()
 {
-    for (int i = 0; i < NUMINPUTS; i++)
-        gamekeydown[i] = false;
+    std::fill(std::begin(gamekeydown), std::end(gamekeydown), false);
 }
 
 /// Two key (or virtual key) codes per game control
@@ -781,7 +781,7 @@ void G_SavePlayerPrefs(FILE *f)
 {
     for (int i = 0; i < NUM_LOCALHUMANS; i++)
     {
-        LocalPlayerInfo *p = &LocalPlayers[i];
+        const LocalPlayerInfo *p = &LocalPlayers[i];
 
         // TODO skin, weaponpref, originalweaponswitch, chasecam...
         fprintf(f, "player %d name \"%s\"\n", i, p->name.c_str());
@@ -890,10 +890,9 @@ void Command_BindJoyaxis_f()
             return;
         }
         CONS_Printf("Current axis bindings.\n");
-        for (unsigned int i = 0; i < joybindings.size(); i++)
+        for (const auto& jb : joybindings)
         {
-            j = joybindings[i];
-            CONS_Printf("%d %d %d %d %f\n", j.playnum, j.joynum, j.axisnum, (int)j.action, j.scale);
+            CONS_Printf("%d %d %d %d %f\n", jb.playnum, jb.joynum, jb.axisnum, (int)jb.action, jb.scale);
         }
         return;
     }
@@ -977,9 +976,8 @@ void Command_UnbindJoyaxis_f()
     if (na > 1)
         joynum = atoi(COM.Argv(1));
 
-    for (unsigned int i = 0; i < joybindings.size(); i++)
+    for (const auto& j : joybindings)
     {
-        joybinding_t j = joybindings[i];
         if ((joynum == -1 || joynum == j.joynum) && (axisnum == -1 || axisnum == j.axisnum))
             continue; // We have a binding to prune.
         newbind.push_back(j);

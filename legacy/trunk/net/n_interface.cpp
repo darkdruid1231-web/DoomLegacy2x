@@ -24,6 +24,8 @@
 
 #include "tnl/tnlAsymmetricKey.h"
 
+#include <algorithm>
+
 #include "command.h"
 #include "cvars.h"
 #include "doomdef.h"
@@ -58,7 +60,7 @@ serverinfo_t::serverinfo_t(const Address &a)
 }
 
 /// reads server information from a packet
-void serverinfo_t::Read(BitStream &s)
+void serverinfo_t::Read(BitStream& s)
 {
     char temp[256];
 
@@ -92,12 +94,9 @@ void serverinfo_t::Write(BitStream &s)
 
 serverinfo_t *LNetInterface::SL_FindServer(const Address &a)
 {
-    int n = serverlist.size();
-    for (int i = 0; i < n; i++)
-        if (serverlist[i]->addr == a)
-            return serverlist[i];
-
-    return NULL;
+    auto it = std::find_if(serverlist.begin(), serverlist.end(),
+        [&a](const serverinfo_t* s) { return s->addr == a; });
+    return (it != serverlist.end()) ? *it : nullptr;
 }
 
 serverinfo_t *LNetInterface::SL_AddServer(const Address &a)
@@ -112,19 +111,17 @@ serverinfo_t *LNetInterface::SL_AddServer(const Address &a)
 
 void LNetInterface::SL_Clear()
 {
-    int n = serverlist.size();
-    for (int i = 0; i < n; i++)
-        delete serverlist[i];
+    for (const auto& s : serverlist)
+        delete s;
 
     serverlist.clear();
 }
 
 void LNetInterface::SL_Update()
 {
-    int n = serverlist.size();
-    for (int i = 0; i < n; i++)
-        if (serverlist[i]->nextquery <= nowtime)
-            SendQuery(serverlist[i]);
+    for (const auto& s : serverlist)
+        if (s->nextquery <= nowtime)
+            SendQuery(s);
 }
 
 //===================================================================
@@ -465,16 +462,15 @@ class NetFileInfo
 
 void FileCache::WriteNetInfo(BitStream &s)
 {
-    S32 n = vfiles.size();
-    s.write(n); // number of files
+    s.write(static_cast<S32>(vfiles.size())); // number of files
 
-    for (int i = 0; i < n; i++)
+    for (const auto& vf : vfiles)
     {
         S32 size;
         byte md5[16];
 
-        s.write(vfiles[i]->GetNetworkInfo(&size, md5)); // downloadable?
-        s.writeString(FIL_StripPath(vfiles[i]->filename.c_str()));
+        s.write(vf->GetNetworkInfo(&size, md5)); // downloadable?
+        s.writeString(FIL_StripPath(vf->filename.c_str()));
         s.write(size);
         s.write(16, md5);
     }
