@@ -26,7 +26,22 @@
 
 #include "SDL.h"
 
-#ifdef SDL2
+#ifdef SDL3
+#include <SDL3/SDL_video.h>
+// SDL3 compatibility macros (similar to SDL2 but with updated APIs)
+#define SDL_VideoInfo SDL_DisplayMode
+#define SDL_HWPALETTE 0
+#define SDL_FULLSCREEN SDL_WINDOW_FULLSCREEN
+#define SDL_SetVideoMode(w, h, b, flags) SDL_CreateWindow("", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, flags)
+#define SDL_Flip(surface) // SDL3 uses SDL_RenderPresent instead
+#define SDL_SetColors(surface, colors, first, n) 0
+#define SDL_SetGamma(r, g, b) // SDL3 removed this
+#define SDL_GetVideoInfo() SDL_GetDesktopDisplayMode(0, NULL) // Updated for SDL3
+#define vidInfo (*vidInfo_ptr)
+static SDL_DisplayMode* vidInfo_ptr = NULL;
+#define SDL_SWSURFACE 0
+#define SDL_HWPALETTE 0
+#elif defined(SDL2)
 #include <SDL2/SDL_video.h>
 // SDL2 compatibility macros
 #define SDL_VideoInfo SDL_DisplayMode
@@ -36,7 +51,7 @@
 #define SDL_Flip(surface) // SDL2 uses SDL_RenderPresent instead
 #define SDL_SetColors(surface, colors, first, n) 0
 #define SDL_SetGamma(r, g, b) // SDL2 removed this
-#define SDL_GetVideoInfo() SDL_GetDesktopDisplayMode()
+#define SDL_GetVideoInfo() SDL_GetDesktopDisplayMode(0, NULL)
 #define vidInfo (*vidInfo_ptr)
 static SDL_DisplayMode* vidInfo_ptr = NULL;
 #define SDL_SWSURFACE 0

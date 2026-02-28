@@ -6,7 +6,7 @@ project(doomlegacy C CXX)
 # -fpermissive: allow implicit conversions, etc.
 # Fix GCC 13+ / MinGW-w64 intrinsics conflict: define these BEFORE any includes
 # to prevent GCC's xsaveintrin.h from declaring conflicting signed versions
-add_compile_definitions(_XSAVEINTRIN_H_INCLUDED _CPUID_H_INCLUDED _XGETBV_DEFINED SDL SDL2)
+add_compile_definitions(_XSAVEINTRIN_H_INCLUDED _CPUID_H_INCLUDED _XGETBV_DEFINED)
 
 add_compile_options(-w -fpermissive)
 
@@ -53,10 +53,38 @@ else()
 endif()
 
 # External libraries. First SDL.
-# Use pkg-config for SDL2 (more reliable across platforms)
+# Use pkg-config for SDL2/3 (more reliable across platforms)
+option(USE_SDL3 "Enable SDL3 support" OFF)
 option(USE_SDL2 "Enable SDL2 support" ON)
 
-if(USE_SDL2)
+if(USE_SDL3)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(SDL3 REQUIRED sdl3)
+    if(SDL3_LIBRARY_DIRS)
+        link_directories(${SDL3_LIBRARY_DIRS})
+    endif()
+    option(USE_SOUND "Enable sound support" ON)
+    if(USE_SOUND STREQUAL "ON")
+        pkg_check_modules(SDL3MIXER SDL3_mixer)
+        if(SDL3MIXER_LIBRARY_DIRS)
+            link_directories(${SDL3MIXER_LIBRARY_DIRS})
+        endif()
+        if(SDL3MIXER_FOUND)
+            set(HAVE_MIXER 1)
+            list(APPEND SOURCES interface/sdl/i_sound.cpp)
+        else()
+            message(STATUS "SDL3_mixer not found, disabling sound")
+        endif()
+    endif()
+    # Add SDL3 include path
+    if(SDL3_FOUND)
+        include_directories(${SDL3_INCLUDE_DIRS})
+        add_compile_definitions(SDL SDL3)
+    endif()
+    # Set compatibility variables
+    set(SDL2_LIBRARIES ${SDL3_LIBRARIES})
+    set(SDL2MIXER_LIBRARIES ${SDL3MIXER_LIBRARIES})
+elseif(USE_SDL2)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(SDL2 REQUIRED sdl2)
     if(SDL2_LIBRARY_DIRS)
@@ -78,9 +106,10 @@ if(USE_SDL2)
     # Add SDL2 include path - use ONLY SDL2-specific paths to avoid SDL1 header conflicts
     if(SDL2_FOUND)
         include_directories(${SDL2_INCLUDE_DIRS})
+        add_compile_definitions(SDL SDL2)
     endif()
 else()
-    message(STATUS "SDL2 disabled, using SDL1")
+    message(STATUS "SDL2/3 disabled, using SDL1")
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(SDL REQUIRED sdl)
     include_directories(${SDL_INCLUDE_DIRS})
@@ -343,7 +372,7 @@ add_subdirectory(grammars)
 add_executable(d2h ../../common/tools/d2h.cpp)
 add_executable(wadtool ../../common/tools/wadtool.cpp util/md5.cpp)
 
-add_executable(doomlegacy ${LEGACY_SRC} debug_init.cpp)
+add_executable(doomlegacy ${LEGACY_SRC})
 
 # Modern target-based definitions (replacing deprecated add_definitions)
 # NOTE: Do NOT redefine __GNUC__ here — it's a compiler built-in and redefining it
@@ -365,9 +394,11 @@ if(WIN32)
     endif()
 endif()
 
-# SDL define only when SDL2 is actually enabled (otherwise doomtype.h tries to
+# SDL define only when SDL2/3 is actually enabled (otherwise doomtype.h tries to
 # include SDL_types.h which won't be in the include path)
-if(USE_SDL2)
+if(USE_SDL3)
+    target_compile_definitions(doomlegacy PRIVATE SDL SDL3)
+elseif(USE_SDL2)
     target_compile_definitions(doomlegacy PRIVATE SDL SDL2)
 endif()
 
@@ -397,6 +428,10 @@ endif()
 # Conditional definitions
 if(USE_SOUND)
     target_compile_definitions(doomlegacy PRIVATE USE_SOUND)
+endif()
+
+if(NOT HAVE_MIXER)
+    target_compile_definitions(doomlegacy PRIVATE NO_MIXER)
 endif()
 
 if(NOT USE_MODERN_NETWORKING)
