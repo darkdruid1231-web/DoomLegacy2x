@@ -821,8 +821,8 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
-#line 2 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 1 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 2 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 // GNU Flex scanner for various plaintext lumps.
 // Ville Bergholm 2005-2007
 
@@ -1056,7 +1056,7 @@ YY_DECL
 		}
 
 	{
-#line 29 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 29 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 
 
  // C++ -style comments
@@ -1116,19 +1116,19 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 33 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 33 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { BEGIN(comment); }
 	YY_BREAK
 
 case 2:
 YY_RULE_SETUP
-#line 35 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 35 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 
 	YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 36 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 36 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { col = 0; line++;  BEGIN(INITIAL); }
 	YY_BREAK
 
@@ -1138,13 +1138,13 @@ YY_RULE_SETUP
 
 case 4:
 YY_RULE_SETUP
-#line 43 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 43 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { temp.clear(); BEGIN(str); }
 	YY_BREAK
 
 case 5:
 YY_RULE_SETUP
-#line 45 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 45 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { // closing quote
             BEGIN(INITIAL);
 	    // TODO col update
@@ -1153,47 +1153,47 @@ YY_RULE_SETUP
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 50 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 50 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { /* error, unterminated string */ }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 51 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 51 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { /* error, unknown escape seq */ }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 53 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 53 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { temp += '\n'; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 54 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 54 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { temp += '\t'; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 55 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 55 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { temp += '\r'; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 56 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 56 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { temp += '\b'; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 57 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 57 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { temp += '\f'; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 59 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 59 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { temp += yytext[1]; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 61 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 61 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { temp += yytext; }
 	YY_BREAK
 
@@ -1201,72 +1201,72 @@ YY_RULE_SETUP
 
 case 15:
 YY_RULE_SETUP
-#line 66 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 66 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { return MATERIAL; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 67 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 67 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { return SPRITE; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 68 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 68 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { return TEX_UNIT; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 69 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 69 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { return TEXTURE; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 70 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 70 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { return WORLDSIZE; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 71 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 71 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { return SCALE; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 72 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 72 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { return TEXELOFFSETS; } 
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 73 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 73 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { return OFFSET; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 74 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 74 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { return FILTERING; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 75 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 75 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { return MAX_ANISOTROPY; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 77 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 77 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { return SHADER_REF; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 78 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 78 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { return SHADER; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 79 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 79 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { return V_SOURCE; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 80 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 80 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { return F_SOURCE; }
 	YY_BREAK
 
@@ -1275,66 +1275,66 @@ YY_RULE_SETUP
 
 case 29:
 YY_RULE_SETUP
-#line 87 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 87 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { col += strlen(yytext);  yylval.itype = strtol(yytext, NULL, 16); return INT; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 88 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 88 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { col += strlen(yytext);  yylval.itype = strtol(yytext, NULL, 10); return INT; }
 	YY_BREAK
 case 31:
-#line 91 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 91 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 case 32:
-#line 92 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 92 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 case 33:
 YY_RULE_SETUP
-#line 92 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 92 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { col += strlen(yytext);  yylval.ftype = strtod(yytext, NULL); return FLOAT; }
 	YY_BREAK
  // unquoted string TODO should accept more chars
 
 case 34:
 YY_RULE_SETUP
-#line 96 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 96 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { col += strlen(yytext);  yylval.stype = Z_StrDup(yytext); return STR; }
 	YY_BREAK
  // delimiters
 
 case 35:
 YY_RULE_SETUP
-#line 100 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 100 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { col++; return SEMICOLON; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 101 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 101 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { col++; return COLON; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 102 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 102 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { col++; return L_BRACE; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 103 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 103 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { col++; return R_BRACE; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 106 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 106 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { col += strlen(yytext); /* skip whitespace */ }
 	YY_BREAK
 case 40:
 /* rule 40 can match eol */
 YY_RULE_SETUP
-#line 107 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 107 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 { col = 0; line++; }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 109 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 109 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 ECHO;
 	YY_BREAK
 #line 1341 "ntexture.lexer.c"
@@ -2308,7 +2308,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 109 "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex"
+#line 109 "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex"
 
 
 

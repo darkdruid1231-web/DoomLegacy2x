@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/tests/integration/test_serialization.cpp" "CMakeFiles/test_serialization.dir/tests/integration/test_serialization.cpp.o" "gcc" "CMakeFiles/test_serialization.dir/tests/integration/test_serialization.cpp.o.d"
+  "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/tests/integration/test_serialization.cpp" "CMakeFiles/test_serialization.dir/tests/integration/test_serialization.cpp.o" "gcc" "CMakeFiles/test_serialization.dir/tests/integration/test_serialization.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

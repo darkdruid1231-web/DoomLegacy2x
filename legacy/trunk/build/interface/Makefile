@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk
+CMAKE_SOURCE_DIR = /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build
+CMAKE_BINARY_DIR = /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -97,14 +97,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/interface//CMakeFiles/progress.marks
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 interface/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles 0
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/interface//CMakeFiles/progress.marks
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 interface/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 interface/clean
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 interface/clean
 .PHONY : clean
 
 # The main clean target
@@ -113,17 +113,17 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 interface/preinstall
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 interface/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 interface/preinstall
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 interface/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Help Target
@@ -146,6 +146,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

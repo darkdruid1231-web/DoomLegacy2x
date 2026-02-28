@@ -51,10 +51,15 @@ void Material::Draw(float x, float y, int scrn)
     if (rendermode == render_opengl)
     {
         if (oglrenderer && oglrenderer->ReadyToDraw())
+        {
+            // Use GL_LINEAR filtering for menu graphics to reduce pixelation
+            if (this->name[0] == 'M' && this->name[1] == '_')
+                tex[0].mag_filter = GL_LINEAR;
             // Console tries to use some patches before graphics are
             // initialized. If this is the case, then create the missing
             // texture.
             oglrenderer->Draw2DGraphic_Doom(x, y, this, scrn & V_FLAGMASK);
+        }
         return;
     }
 

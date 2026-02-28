@@ -39,6 +39,7 @@
 #include "sounds.h"
 
 #include "a_functions.h" // action function prototypes
+#include "cvars.h"
 #include "w_wad.h"
 #include "z_zone.h"
 
@@ -842,7 +843,7 @@ void dehacked_t::Read_Text(int len1, int len2)
 /*
   Weapon sample:
 Ammo type = 2
-TODO ammopershoot
+Ammo per shot = 1
 Deselect frame = 11
 Select frame = 12
 Bobbing frame = 13
@@ -867,7 +868,18 @@ void dehacked_t::Read_Weapon(int num)
         char *word = p.GetToken(" \t");
 
         if (!strcasecmp(word, "Ammo"))
-            wpnlev1info[num].ammo = ammotype_t(value);
+        {
+            word = p.GetToken(" \t");
+            if (!strcasecmp(word, "type"))
+                wpnlev1info[num].ammo = ammotype_t(value);
+            else if (!strcasecmp(word, "per"))
+            {
+                word = p.GetToken(" \t"); // "shot"
+                wpnlev1info[num].ammopershoot = value;
+            }
+            else
+                error("Weapon %d : unknown ammo subtype '%s'\n", num, word);
+        }
         else
         {
             value = -FindState();
@@ -1010,7 +1022,21 @@ void dehacked_t::Read_Misc()
             wpnlev1info[wp_bfg].ammopershoot = value;
         else if (!strcasecmp(word1, "Monsters"))
         {
-        } // TODO
+            // Monsters section parsing
+            word2 = p.GetToken(" \t");
+            if (!strcasecmp(word2, "Infighting"))
+            {
+                // Set global infighting: 0 = disable, 1 = enable
+                cv_infighting.value = value;
+            }
+            else if (!strcasecmp(word2, "Backing"))
+            {
+                // Monsters backing away - not implemented yet
+                error("Monsters Backing not yet implemented\n");
+            }
+            else
+                error("Monsters : unknown option '%s'\n", word2);
+        }
         else
             error("Misc : unknown command '%s'\n", word1);
     }

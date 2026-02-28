@@ -4,4 +4,9 @@ n_connection.cpp
 sv_main.cpp
 sv_cmds.cpp
 cl_main.cpp
+ENetNetworkTransport.cpp
+NetworkManager.cpp
+ActorNetworkSerializer.cpp
+PlayerInfoNetworkSerializer.cpp
+BitStreamSerializer.cpp
 )

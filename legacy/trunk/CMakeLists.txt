@@ -6,7 +6,7 @@ project(doomlegacy C CXX)
 # -fpermissive: allow implicit conversions, etc.
 # Fix GCC 13+ / MinGW-w64 intrinsics conflict: define these BEFORE any includes
 # to prevent GCC's xsaveintrin.h from declaring conflicting signed versions
-add_compile_definitions(_XSAVEINTRIN_H_INCLUDED _CPUID_H_INCLUDED _XGETBV_DEFINED SDL SDL2)
+add_compile_definitions(_XSAVEINTRIN_H_INCLUDED _CPUID_H_INCLUDED _XGETBV_DEFINED)
 
 add_compile_options(-w -fpermissive)
 
@@ -78,6 +78,7 @@ if(USE_SDL2)
     # Add SDL2 include path - use ONLY SDL2-specific paths to avoid SDL1 header conflicts
     if(SDL2_FOUND)
         include_directories(${SDL2_INCLUDE_DIRS})
+        add_compile_definitions(SDL2)
     endif()
 else()
     message(STATUS "SDL2 disabled, using SDL1")
@@ -143,119 +144,84 @@ include_directories(${CMAKE_SOURCE_DIR}/include_stubs)
 
 # Networking support
 if(USE_NETWORKING)
-    option(USE_MODERN_NETWORKING "Use lnet for modern networking" ON)
+    message(STATUS "Using ENet for networking")
 
-    if(USE_MODERN_NETWORKING)
-        message(STATUS "Using lnet for modern networking")
-        
-        # Try to find ENet using CMake's find_package (works if ENet provides CMake config)
-        # First attempt with QUIET - if found, it sets ENet_FOUND
-        find_package(ENet 1.3 QUIET)
-        
-        if(ENet_FOUND)
-            message(STATUS "Found ENet via CMake: ${ENet_VERSION}")
-            include_directories(${ENET_INCLUDE_DIRS})
-            set(ENET_LIBRARY ${ENET_LIBRARIES})
-        else()
-            # Try pkg-config as fallback (most common way to find ENet)
-            find_package(PkgConfig QUIET)
-            if(PkgConfig_FOUND)
-                pkg_check_modules(PC_ENET QUIET libenet>=1.3)
-                if(PC_ENET_FOUND)
-                    message(STATUS "Found ENet via pkg-config: ${PC_ENET_VERSION}")
-                    include_directories(${PC_ENET_INCLUDE_DIRS})
-                    set(ENET_LIBRARY ${PC_ENET_LIBRARIES})
-                    set(ENET_FOUND TRUE)
-                endif()
+    # Try to find ENet using CMake's find_package (works if ENet provides CMake config)
+    # First attempt with QUIET - if found, it sets ENet_FOUND
+    find_package(ENet 1.3 QUIET)
+
+    if(ENet_FOUND)
+        message(STATUS "Found ENet via CMake: ${ENet_VERSION}")
+        include_directories(${ENET_INCLUDE_DIRS})
+        set(ENET_LIBRARY ${ENET_LIBRARIES})
+    else()
+        # Try pkg-config as fallback (most common way to find ENet)
+        find_package(PkgConfig QUIET)
+        if(PkgConfig_FOUND)
+            pkg_check_modules(PC_ENET QUIET libenet>=1.3)
+            if(PC_ENET_FOUND)
+                message(STATUS "Found ENet via pkg-config: ${PC_ENET_VERSION}")
+                include_directories(${PC_ENET_INCLUDE_DIRS})
+                set(ENET_LIBRARY ${PC_ENET_LIBRARIES})
+                set(ENET_FOUND TRUE)
             endif()
         endif()
-        
-        if(NOT ENET_FOUND)
-            message(STATUS "ENet not found in system paths, checking common locations...")
-            
-            # Try platform-specific default locations
-            if(WIN32)
-                # Common Windows ENet install locations
-                set(ENET_SEARCH_PATHS 
-                    "C:/enet-mingw"
-                    "C:/Program Files/enet"
-                    "${CMAKE_SOURCE_DIR}/../enet-mingw"
-                    "${CMAKE_SOURCE_DIR}/enet-mingw")
-                find_path(ENET_INCLUDE_DIR NAMES enet/enet.h PATHS ${ENET_SEARCH_PATHS} PATH_SUFFIXES include)
-                find_library(ENET_LIBRARY NAMES enet PATHS ${ENET_SEARCH_PATHS} PATH_SUFFIXES lib)
-        else()
-            # Linux/Unix common locations
-            set(ENET_SEARCH_PATHS 
-                "/usr"
-                "/usr/local"
-                "${CMAKE_SOURCE_DIR}/../enet"
-                "${CMAKE_SOURCE_DIR}/enet")
-            find_path(ENET_INCLUDE_DIR NAMES enet.h PATHS ${ENET_SEARCH_PATHS} PATH_SUFFIXES include)
-            find_library(ENET_LIBRARY NAMES enet PATHS ${ENET_SEARCH_PATHS} PATH_SUFFIXES lib)
-        endif()
-        
-        if(ENET_INCLUDE_DIR AND ENET_LIBRARY)
-            message(STATUS "Found ENet at: include=${ENET_INCLUDE_DIR}, library=${ENET_LIBRARY}")
-            include_directories(${ENET_INCLUDE_DIR})
-            set(ENET_FOUND TRUE)
-        endif()
     endif()
-    
+
     if(NOT ENET_FOUND)
-        message(FATAL_ERROR 
-            "ENet 1.3 or later not found.\n"
-            "Please install ENet or set ENET_INCLUDE_DIR and ENET_LIBRARY manually.\n"
-            "On Windows, you can download from: https://github.com/lsalzman/enet/releases\n"
-            "On Linux, install via: sudo apt-get install libenet-dev (Debian) or sudo yum install enet-devel (RHEL)")
-    endif()
-    
-    # Create imported ENet target with proper Windows linking
-    add_library(enet STATIC IMPORTED)
-    set_target_properties(enet PROPERTIES 
-        IMPORTED_LOCATION "${ENET_LIBRARY}"
-        INTERFACE_INCLUDE_DIRECTORIES "${ENET_INCLUDE_DIR}")
-    
-    # ENet on Windows requires ws2_32 (Winsock) and potentially winmm
-    if(WIN32)
-        set_target_properties(enet PROPERTIES 
-            IMPORTED_LINK_DEPENDENT_LIBRARIES "ws2_32;winmm")
-        message(STATUS "ENet Windows dependencies: ws2_32, winmm")
+        message(STATUS "ENet not found in system paths, checking common locations...")
+
+        # Try platform-specific default locations
+        if(WIN32)
+            # Common Windows ENet install locations
+            set(ENET_SEARCH_PATHS
+                "C:/enet-mingw"
+                "C:/Program Files/enet"
+                "${CMAKE_SOURCE_DIR}/../enet-mingw"
+                "${CMAKE_SOURCE_DIR}/enet-mingw")
+            find_path(ENET_INCLUDE_DIR NAMES enet/enet.h PATHS ${ENET_SEARCH_PATHS} PATH_SUFFIXES include)
+            find_library(ENET_LIBRARY NAMES enet PATHS ${ENET_SEARCH_PATHS} PATH_SUFFIXES lib)
+    else()
+        # Linux/Unix common locations
+        set(ENET_SEARCH_PATHS
+            "/usr"
+            "/usr/local"
+            "${CMAKE_SOURCE_DIR}/../enet"
+            "${CMAKE_SOURCE_DIR}/enet")
+        find_path(ENET_INCLUDE_DIR NAMES enet.h PATHS ${ENET_SEARCH_PATHS} PATH_SUFFIXES include)
+        find_library(ENET_LIBRARY NAMES enet PATHS ${ENET_SEARCH_PATHS} PATH_SUFFIXES lib)
     endif()
 
-    # Use TNL stubs for type declarations even with lnet
-    add_definitions(-DTNL_STUB_BUILD)
-else()
-    message(STATUS "Using legacy TNL networking")
-    add_definitions(-DTNL_STUB_BUILD)
-    # TNL (legacy)
-    if(EXISTS "/home/geoffrey/tnl/lib/libtnl.a")
-        set(TNL_LIBRARY "/home/geoffrey/tnl/lib/libtnl.a")
-    else()
-        find_library(TNL_LIBRARY tnl)
+    if(ENET_INCLUDE_DIR AND ENET_LIBRARY)
+        message(STATUS "Found ENet at: include=${ENET_INCLUDE_DIR}, library=${ENET_LIBRARY}")
+        include_directories(${ENET_INCLUDE_DIR})
+        set(ENET_FOUND TRUE)
     endif()
-    if(${TNL_LIBRARY} STREQUAL "TNL_LIBRARY-NOTFOUND")
-        message(STATUS "TNL library not found - using stub implementation.")
-        set(TNL_LIBRARY "")
-    endif()
-    if(EXISTS "/home/geoffrey/tnl/lib/libtomcrypt.a")
-        set(TOMCRYPT_LIBRARY "/home/geoffrey/tnl/lib/libtomcrypt.a")
-    else()
-        find_library(TOMCRYPT_LIBRARY tomcrypt)
-    endif()
-    if(${TOMCRYPT_LIBRARY} STREQUAL "TOMCRYPT_LIBRARY-NOTFOUND")
-        message(STATUS "Tomcrypt library not found - using stub implementation.")
-        set(TOMCRYPT_LIBRARY "")
-    endif()
+endif()
 
-    check_include_file_cxx("tnl/tnl.h" HAS_TNL_HEADER)
-    if(NOT ${HAS_TNL_HEADER})
-        if(EXISTS "/home/geoffrey/tnl/tnl/tnl.h")
-            include_directories(/home/geoffrey/tnl)
-        else()
-            message(FATAL_ERROR "TNL headers not found.")
-        endif()
-    endif()
-endif()  # USE_MODERN_NETWORKING
+if(NOT ENET_FOUND)
+    message(FATAL_ERROR
+        "ENet 1.3 or later not found.\n"
+        "Please install ENet or set ENET_INCLUDE_DIR and ENET_LIBRARY manually.\n"
+        "On Windows, you can download from: https://github.com/lsalzman/enet/releases\n"
+        "On Linux, install via: sudo apt-get install libenet-dev (Debian) or sudo yum install enet-devel (RHEL)")
+endif()
+
+# Create imported ENet target with proper Windows linking
+add_library(enet STATIC IMPORTED)
+set_target_properties(enet PROPERTIES
+    IMPORTED_LOCATION "${ENET_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${ENET_INCLUDE_DIR}")
+
+# ENet on Windows requires ws2_32 (Winsock) and potentially winmm
+if(WIN32)
+    set_target_properties(enet PROPERTIES
+        IMPORTED_LINK_DEPENDENT_LIBRARIES "ws2_32;winmm")
+    message(STATUS "ENet Windows dependencies: ws2_32, winmm")
+endif()
+
+# Use TNL stubs for compatibility during transition
+add_definitions(-DTNL_STUB_BUILD)
 endif()  # USE_NETWORKING
 
 # Graphics - PNG/JPEG support (can be disabled for Windows cross-compilation)
@@ -292,11 +258,6 @@ include_directories(include/core)
 include_directories(tnl)
 # include_directories(lnet)  # disabled: directory not present
 
-if(NOT USE_MODERN_NETWORKING)
-    include_directories(/home/geoffrey/tnl/include)
-    # TNL definitions added via target_compile_definitions below
-endif()
-
 # Platform-specific definitions - now using target_compile_definitions below
 # (removed add_definitions here)
 
@@ -327,13 +288,6 @@ target_compile_definitions(util PRIVATE
     QSORT_CALLBACK=
 )
 
-if(NOT USE_MODERN_NETWORKING)
-    target_compile_definitions(util PRIVATE
-        TNL_LITTLE_ENDIAN
-        _TNL_X86_
-    )
-endif()
-
 process_subdir(net)
 process_subdir(interface)
 
@@ -343,7 +297,7 @@ add_subdirectory(grammars)
 add_executable(d2h ../../common/tools/d2h.cpp)
 add_executable(wadtool ../../common/tools/wadtool.cpp util/md5.cpp)
 
-add_executable(doomlegacy ${LEGACY_SRC} debug_init.cpp)
+add_executable(doomlegacy ${LEGACY_SRC})
 
 # Modern target-based definitions (replacing deprecated add_definitions)
 # NOTE: Do NOT redefine __GNUC__ here — it's a compiler built-in and redefining it
@@ -399,13 +353,6 @@ if(USE_SOUND)
     target_compile_definitions(doomlegacy PRIVATE USE_SOUND)
 endif()
 
-if(NOT USE_MODERN_NETWORKING)
-    target_compile_definitions(doomlegacy PRIVATE
-        TNL_LITTLE_ENDIAN
-        _TNL_X86_
-    )
-endif()
-
 # Build image libraries list conditionally
 set(IMAGE_LIBRARIES "")
 if(USE_IMAGE_SUPPORT)
@@ -432,11 +379,7 @@ else()
   pthread)
 endif()
 
-if(USE_MODERN_NETWORKING)
-    target_link_libraries(doomlegacy lnet)
-else()
-    target_link_libraries(doomlegacy ${TNL_LIBRARY} ${TOMCRYPT_LIBRARY})
-endif()
+target_link_libraries(doomlegacy enet)
 
 #============================================================================
 # Catch2 Test Framework
@@ -497,11 +440,6 @@ add_test(NAME serialization_tests COMMAND test_serialization)
 # target_include_directories(test_mapinfo_constants PRIVATE include)
 # target_link_libraries(test_mapinfo_constants util ${SDL2_LIBRARIES})
 # add_test(NAME mapinfo_constants_tests COMMAND test_mapinfo_constants)
-
-add_executable(test_tnl_packets tests/unit/test_tnl_packets.cpp)
-target_include_directories(test_tnl_packets PRIVATE include include_stubs)
-target_link_libraries(test_tnl_packets util ${SDL2_LIBRARIES})
-add_test(NAME tnl_packet_tests COMMAND test_tnl_packets)
 
 add_executable(test_actor tests/unit/test_actor.cpp)
 target_include_directories(test_actor PRIVATE include include_stubs)

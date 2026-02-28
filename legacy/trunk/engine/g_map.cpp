@@ -614,16 +614,8 @@ int Map::HandlePlayers()
                             // only use intermissions if mapchanges are synchronous
                             if (next && cv_intermission.value)
                             {
-                                if (p->connection)
-                                    // nonlocal players need intermission data
-                                    // TODO need we send Map kills, items or secrets?
-                                    p->s2cStartIntermission(info->mapnumber,
-                                                            next->mapnumber,
-                                                            maptic,
-                                                            kills,
-                                                            items,
-                                                            secrets);
-                                else
+                                // TNL RPC removed
+                                {
                                 {
                                     // for locals, the intermission is started
                                     wi.Start(info, next, maptic, kills, items, secrets);

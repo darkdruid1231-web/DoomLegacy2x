@@ -1,1 +1,1 @@
-/usr/bin/c++ CMakeFiles/wadtool.dir/tools/wadtool.cpp.o CMakeFiles/wadtool.dir/util/md5.cpp.o -o wadtool 
+/usr/bin/c++ CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.o CMakeFiles/wadtool.dir/util/md5.cpp.o -o wadtool 

@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk
+CMAKE_SOURCE_DIR = /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build
+CMAKE_BINARY_DIR = /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/test_network_integration.dir/depend.make
@@ -70,18 +70,18 @@ include CMakeFiles/test_network_integration.dir/progress.make
 include CMakeFiles/test_network_integration.dir/flags.make
 
 CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.o: CMakeFiles/test_network_integration.dir/flags.make
-CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/tests/integration/test_network_integration.cpp
+CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/tests/integration/test_network_integration.cpp
 CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.o: CMakeFiles/test_network_integration.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.o -MF CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.o.d -o CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/tests/integration/test_network_integration.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.o -MF CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.o.d -o CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/tests/integration/test_network_integration.cpp
 
 CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/tests/integration/test_network_integration.cpp > CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/tests/integration/test_network_integration.cpp > CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.i
 
 CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/tests/integration/test_network_integration.cpp -o CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/tests/integration/test_network_integration.cpp -o CMakeFiles/test_network_integration.dir/tests/integration/test_network_integration.cpp.s
 
 # Object files for target test_network_integration
 test_network_integration_OBJECTS = \
@@ -94,7 +94,7 @@ test_network_integration: CMakeFiles/test_network_integration.dir/tests/integrat
 test_network_integration: CMakeFiles/test_network_integration.dir/build.make
 test_network_integration: libutil.a
 test_network_integration: CMakeFiles/test_network_integration.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable test_network_integration"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable test_network_integration"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/test_network_integration.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -106,6 +106,6 @@ CMakeFiles/test_network_integration.dir/clean:
 .PHONY : CMakeFiles/test_network_integration.dir/clean
 
 CMakeFiles/test_network_integration.dir/depend:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles/test_network_integration.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles/test_network_integration.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/test_network_integration.dir/depend
 

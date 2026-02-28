@@ -1,8 +1,8 @@
 _deps/catch2-build/src/CMakeFiles/Catch2.dir/catch2/benchmark/catch_chronometer.cpp.o: \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/_deps/catch2-src/src/catch2/benchmark/catch_chronometer.cpp \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/_deps/catch2-src/src/catch2/benchmark/catch_chronometer.cpp \
  /usr/include/stdc-predef.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/_deps/catch2-src/src/catch2/../catch2/benchmark/catch_chronometer.hpp \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/_deps/catch2-src/src/catch2/../catch2/benchmark/catch_clock.hpp \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/_deps/catch2-src/src/catch2/../catch2/benchmark/catch_chronometer.hpp \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/_deps/catch2-src/src/catch2/../catch2/benchmark/catch_clock.hpp \
  /usr/include/c++/13/chrono /usr/include/c++/13/bits/requires_hosted.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h \
@@ -45,6 +45,6 @@ _deps/catch2-build/src/CMakeFiles/Catch2.dir/catch2/benchmark/catch_chronometer.
  /usr/include/c++/13/ext/numeric_traits.h \
  /usr/include/c++/13/bits/cpp_type_traits.h \
  /usr/include/c++/13/ext/type_traits.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/_deps/catch2-src/src/catch2/../catch2/benchmark/catch_optimizer.hpp \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/_deps/catch2-src/src/catch2/../catch2/internal/catch_move_and_forward.hpp \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/_deps/catch2-src/src/catch2/../catch2/internal/catch_meta.hpp
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/_deps/catch2-src/src/catch2/../catch2/benchmark/catch_optimizer.hpp \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/_deps/catch2-src/src/catch2/../catch2/internal/catch_move_and_forward.hpp \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/_deps/catch2-src/src/catch2/../catch2/internal/catch_meta.hpp

@@ -1,0 +1,11 @@
+filesrch.o: filesrch.cpp ../../include/filesrch.h
+i_main.o: i_main.cpp
+i_net.o: i_net.cpp ../../include/doomdef.h ../../include/core/doomdef.h \
+ ../../include/d_event.h ../../include/game/d_event.h \
+ ../../include/i_system.h ../../include/doomtype.h \
+ ../../include/core/doomtype.h /usr/include/SDL/SDL_types.h \
+ /usr/include/SDL/SDL_stdinc.h /usr/include/SDL/SDL_config.h \
+ /usr/include/SDL/SDL_platform.h /usr/include/SDL/begin_code.h \
+ /usr/include/SDL/close_code.h ../../include/m_argv.h \
+ ../../include/i_net.h ../../include/z_zone.h
+searchp.o: searchp.cpp

@@ -352,14 +352,7 @@ void GameInfo::Ticker()
             if (!m->Activate(p))
                 I_Error("Darn!\n");
 
-            if (conn)
-            {
-                CONS_Printf(" server sending rpc\n");
-                // nonlocal player enters a new map, notify client
-                // send the EnterMap rpc only to the owning connection
-                NetEvent *e = TNL_RPC_CONSTRUCT_NETEVENT(p, s2cEnterMap, (m->mapnumber));
-                conn->postNetEvent(e);
-            }
+            // TNL RPC removed
         }
     }
 }
@@ -380,10 +373,7 @@ void GameInfo::EndIntermission()
         PlayerInfo *p = LocalPlayers[i].info;
         if (p && p->playerstate == PST_INTERMISSION)
         {
-            if (server)
-                p->playerstate = PST_NEEDMAP;
-            else
-                p->c2sIntermissionDone();
+            p->playerstate = PST_NEEDMAP;
         }
     }
 }

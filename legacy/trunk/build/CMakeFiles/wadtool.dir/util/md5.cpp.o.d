@@ -1,5 +1,5 @@
 CMakeFiles/wadtool.dir/util/md5.cpp.o: \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/util/md5.cpp \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/util/md5.cpp \
  /usr/include/stdc-predef.h /usr/include/string.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -37,7 +37,7 @@ CMakeFiles/wadtool.dir/util/md5.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h \
  /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
  /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/md5.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/md5.h \
  /usr/include/stdio.h /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h \
  /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h \

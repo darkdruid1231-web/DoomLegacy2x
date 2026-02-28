@@ -1,4 +1,4 @@
-# Install script for directory: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk
+# Install script for directory: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -44,37 +44,42 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/engine/cmake_install.cmake")
+  include("/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/engine/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/video/cmake_install.cmake")
+  include("/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/audio/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/util/cmake_install.cmake")
+  include("/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/video/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/net/cmake_install.cmake")
+  include("/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/util/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/interface/cmake_install.cmake")
+  include("/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/net/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/cmake_install.cmake")
+  include("/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/interface/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/_deps/catch2-build/cmake_install.cmake")
+  include("/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/_deps/catch2-build/cmake_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -85,5 +90,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

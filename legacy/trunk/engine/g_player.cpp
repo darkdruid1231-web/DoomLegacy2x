@@ -539,19 +539,7 @@ void PlayerInfo::Unserialize(DoomLegacy::ISerializer &s)
     options.Read(s);
 }
 
-// In stub builds, these RPC methods are already defined as inline no-ops via
-// TNL_DECLARE_RPC in the class body.  The real implementations below are only
-// compiled when the actual TNL library is present.
-#ifndef TNL_STUB_BUILD
-
-/// server notifies the client that this player has entered a new map
-PLAYERINFO_RPC_S2C(s2cEnterMap, (U8 mapnum), (mapnum))
-{
-    CONS_Printf("player sent to map %d\n", mapnum);
-
-    MapInfo *m = game.FindMapInfo(mapnum);
-    if (!m)
-        I_Error("Server sent a player to an unknown map %d!", mapnum);
+// TNL RPC methods removed
 
     // requestmap = mapnum;
     /*
@@ -571,31 +559,7 @@ PLAYERINFO_RPC_S2C(s2cEnterMap, (U8 mapnum), (mapnum))
     game.currentcluster = game.FindCluster(m->cluster);
 }
 
-PLAYERINFO_RPC_S2C(s2cStartIntermission,
-                   (U8 finished, U8 next, U32 maptic, U32 kills, U32 items, U32 secrets),
-                   (finished, next, maptic, kills, items, secrets))
-{
-    CONS_Printf("server ordered intermission for player %d\n", number);
-
-    MapInfo *f = game.FindMapInfo(finished);
-    MapInfo *n = game.FindMapInfo(next);
-
-    if (f && n)
-    {
-        wi.Start(f, n, maptic, kills, items, secrets);
-        game.StartIntermission();
-    }
-    else
-        game.EndIntermission();
-}
-
-PLAYERINFO_RPC_C2S(c2sIntermissionDone, (), ())
-{
-    CONS_Printf("client player %d has finished intermission\n", number);
-    playerstate = PST_NEEDMAP;
-}
-
-#endif // TNL_STUB_BUILD
+// TNL RPC methods removed
 
 void PlayerInfo::Ticker()
 {

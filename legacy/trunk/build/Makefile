@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk
+CMAKE_SOURCE_DIR = /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build
+CMAKE_BINARY_DIR = /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -97,9 +97,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -192,19 +192,6 @@ test_fixed_t/fast:
 .PHONY : test_fixed_t/fast
 
 #=============================================================================
-# Target rules for targets named test_fixed_catch2
-
-# Build rule for target.
-test_fixed_catch2: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_fixed_catch2
-.PHONY : test_fixed_catch2
-
-# fast build rule for target.
-test_fixed_catch2/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fixed_catch2.dir/build.make CMakeFiles/test_fixed_catch2.dir/build
-.PHONY : test_fixed_catch2/fast
-
-#=============================================================================
 # Target rules for targets named test_save_load_unit
 
 # Build rule for target.
@@ -229,19 +216,6 @@ test_serialization: cmake_check_build_system
 test_serialization/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_serialization.dir/build.make CMakeFiles/test_serialization.dir/build
 .PHONY : test_serialization/fast
-
-#=============================================================================
-# Target rules for targets named test_tnl_packets
-
-# Build rule for target.
-test_tnl_packets: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_tnl_packets
-.PHONY : test_tnl_packets
-
-# fast build rule for target.
-test_tnl_packets/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tnl_packets.dir/build.make CMakeFiles/test_tnl_packets.dir/build
-.PHONY : test_tnl_packets/fast
 
 #=============================================================================
 # Target rules for targets named test_actor
@@ -372,6 +346,102 @@ Catch2WithMain: cmake_check_build_system
 Catch2WithMain/fast:
 	$(MAKE) $(MAKESILENT) -f _deps/catch2-build/src/CMakeFiles/Catch2WithMain.dir/build.make _deps/catch2-build/src/CMakeFiles/Catch2WithMain.dir/build
 .PHONY : Catch2WithMain/fast
+
+audio/qmus2mid.o: audio/qmus2mid.cpp.o
+.PHONY : audio/qmus2mid.o
+
+# target to build an object file
+audio/qmus2mid.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.o
+.PHONY : audio/qmus2mid.cpp.o
+
+audio/qmus2mid.i: audio/qmus2mid.cpp.i
+.PHONY : audio/qmus2mid.i
+
+# target to preprocess a source file
+audio/qmus2mid.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.i
+.PHONY : audio/qmus2mid.cpp.i
+
+audio/qmus2mid.s: audio/qmus2mid.cpp.s
+.PHONY : audio/qmus2mid.s
+
+# target to generate assembly for a file
+audio/qmus2mid.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.s
+.PHONY : audio/qmus2mid.cpp.s
+
+audio/s_sndseq.o: audio/s_sndseq.cpp.o
+.PHONY : audio/s_sndseq.o
+
+# target to build an object file
+audio/s_sndseq.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.o
+.PHONY : audio/s_sndseq.cpp.o
+
+audio/s_sndseq.i: audio/s_sndseq.cpp.i
+.PHONY : audio/s_sndseq.i
+
+# target to preprocess a source file
+audio/s_sndseq.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.i
+.PHONY : audio/s_sndseq.cpp.i
+
+audio/s_sndseq.s: audio/s_sndseq.cpp.s
+.PHONY : audio/s_sndseq.s
+
+# target to generate assembly for a file
+audio/s_sndseq.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.s
+.PHONY : audio/s_sndseq.cpp.s
+
+audio/s_sound.o: audio/s_sound.cpp.o
+.PHONY : audio/s_sound.o
+
+# target to build an object file
+audio/s_sound.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.o
+.PHONY : audio/s_sound.cpp.o
+
+audio/s_sound.i: audio/s_sound.cpp.i
+.PHONY : audio/s_sound.i
+
+# target to preprocess a source file
+audio/s_sound.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.i
+.PHONY : audio/s_sound.cpp.i
+
+audio/s_sound.s: audio/s_sound.cpp.s
+.PHONY : audio/s_sound.s
+
+# target to generate assembly for a file
+audio/s_sound.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.s
+.PHONY : audio/s_sound.cpp.s
+
+audio/sounds.o: audio/sounds.cpp.o
+.PHONY : audio/sounds.o
+
+# target to build an object file
+audio/sounds.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/sounds.cpp.o
+.PHONY : audio/sounds.cpp.o
+
+audio/sounds.i: audio/sounds.cpp.i
+.PHONY : audio/sounds.i
+
+# target to preprocess a source file
+audio/sounds.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/sounds.cpp.i
+.PHONY : audio/sounds.cpp.i
+
+audio/sounds.s: audio/sounds.cpp.s
+.PHONY : audio/sounds.s
+
+# target to generate assembly for a file
+audio/sounds.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/sounds.cpp.s
+.PHONY : audio/sounds.cpp.s
 
 engine/a_action.o: engine/a_action.cpp.o
 .PHONY : engine/a_action.o
@@ -2053,6 +2123,54 @@ engine/singleplayer_stubs.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.s
 .PHONY : engine/singleplayer_stubs.cpp.s
 
+home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.o: home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.cpp.o
+.PHONY : home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.o
+
+# target to build an object file
+home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/d2h.dir/build.make CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.cpp.o
+.PHONY : home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.cpp.o
+
+home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.i: home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.cpp.i
+.PHONY : home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.i
+
+# target to preprocess a source file
+home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/d2h.dir/build.make CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.cpp.i
+.PHONY : home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.cpp.i
+
+home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.s: home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.cpp.s
+.PHONY : home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.s
+
+# target to generate assembly for a file
+home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/d2h.dir/build.make CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.cpp.s
+.PHONY : home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.cpp.s
+
+home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.o: home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.o
+.PHONY : home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.o
+
+# target to build an object file
+home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/wadtool.dir/build.make CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.o
+.PHONY : home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.o
+
+home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.i: home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.i
+.PHONY : home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.i
+
+# target to preprocess a source file
+home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/wadtool.dir/build.make CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.i
+.PHONY : home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.i
+
+home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.s: home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.s
+.PHONY : home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.s
+
+# target to generate assembly for a file
+home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/wadtool.dir/build.make CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.s
+.PHONY : home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.s
+
 interface/sdl/endtxt.o: interface/sdl/endtxt.cpp.o
 .PHONY : interface/sdl/endtxt.o
 
@@ -2220,6 +2338,126 @@ interface/sdl/i_video.s: interface/sdl/i_video.cpp.s
 interface/sdl/i_video.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.s
 .PHONY : interface/sdl/i_video.cpp.s
+
+net/ActorNetworkSerializer.o: net/ActorNetworkSerializer.cpp.o
+.PHONY : net/ActorNetworkSerializer.o
+
+# target to build an object file
+net/ActorNetworkSerializer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/net/ActorNetworkSerializer.cpp.o
+.PHONY : net/ActorNetworkSerializer.cpp.o
+
+net/ActorNetworkSerializer.i: net/ActorNetworkSerializer.cpp.i
+.PHONY : net/ActorNetworkSerializer.i
+
+# target to preprocess a source file
+net/ActorNetworkSerializer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/net/ActorNetworkSerializer.cpp.i
+.PHONY : net/ActorNetworkSerializer.cpp.i
+
+net/ActorNetworkSerializer.s: net/ActorNetworkSerializer.cpp.s
+.PHONY : net/ActorNetworkSerializer.s
+
+# target to generate assembly for a file
+net/ActorNetworkSerializer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/net/ActorNetworkSerializer.cpp.s
+.PHONY : net/ActorNetworkSerializer.cpp.s
+
+net/BitStreamSerializer.o: net/BitStreamSerializer.cpp.o
+.PHONY : net/BitStreamSerializer.o
+
+# target to build an object file
+net/BitStreamSerializer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/net/BitStreamSerializer.cpp.o
+.PHONY : net/BitStreamSerializer.cpp.o
+
+net/BitStreamSerializer.i: net/BitStreamSerializer.cpp.i
+.PHONY : net/BitStreamSerializer.i
+
+# target to preprocess a source file
+net/BitStreamSerializer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/net/BitStreamSerializer.cpp.i
+.PHONY : net/BitStreamSerializer.cpp.i
+
+net/BitStreamSerializer.s: net/BitStreamSerializer.cpp.s
+.PHONY : net/BitStreamSerializer.s
+
+# target to generate assembly for a file
+net/BitStreamSerializer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/net/BitStreamSerializer.cpp.s
+.PHONY : net/BitStreamSerializer.cpp.s
+
+net/ENetNetworkTransport.o: net/ENetNetworkTransport.cpp.o
+.PHONY : net/ENetNetworkTransport.o
+
+# target to build an object file
+net/ENetNetworkTransport.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/net/ENetNetworkTransport.cpp.o
+.PHONY : net/ENetNetworkTransport.cpp.o
+
+net/ENetNetworkTransport.i: net/ENetNetworkTransport.cpp.i
+.PHONY : net/ENetNetworkTransport.i
+
+# target to preprocess a source file
+net/ENetNetworkTransport.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/net/ENetNetworkTransport.cpp.i
+.PHONY : net/ENetNetworkTransport.cpp.i
+
+net/ENetNetworkTransport.s: net/ENetNetworkTransport.cpp.s
+.PHONY : net/ENetNetworkTransport.s
+
+# target to generate assembly for a file
+net/ENetNetworkTransport.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/net/ENetNetworkTransport.cpp.s
+.PHONY : net/ENetNetworkTransport.cpp.s
+
+net/NetworkManager.o: net/NetworkManager.cpp.o
+.PHONY : net/NetworkManager.o
+
+# target to build an object file
+net/NetworkManager.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/net/NetworkManager.cpp.o
+.PHONY : net/NetworkManager.cpp.o
+
+net/NetworkManager.i: net/NetworkManager.cpp.i
+.PHONY : net/NetworkManager.i
+
+# target to preprocess a source file
+net/NetworkManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/net/NetworkManager.cpp.i
+.PHONY : net/NetworkManager.cpp.i
+
+net/NetworkManager.s: net/NetworkManager.cpp.s
+.PHONY : net/NetworkManager.s
+
+# target to generate assembly for a file
+net/NetworkManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/net/NetworkManager.cpp.s
+.PHONY : net/NetworkManager.cpp.s
+
+net/PlayerInfoNetworkSerializer.o: net/PlayerInfoNetworkSerializer.cpp.o
+.PHONY : net/PlayerInfoNetworkSerializer.o
+
+# target to build an object file
+net/PlayerInfoNetworkSerializer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/net/PlayerInfoNetworkSerializer.cpp.o
+.PHONY : net/PlayerInfoNetworkSerializer.cpp.o
+
+net/PlayerInfoNetworkSerializer.i: net/PlayerInfoNetworkSerializer.cpp.i
+.PHONY : net/PlayerInfoNetworkSerializer.i
+
+# target to preprocess a source file
+net/PlayerInfoNetworkSerializer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/net/PlayerInfoNetworkSerializer.cpp.i
+.PHONY : net/PlayerInfoNetworkSerializer.cpp.i
+
+net/PlayerInfoNetworkSerializer.s: net/PlayerInfoNetworkSerializer.cpp.s
+.PHONY : net/PlayerInfoNetworkSerializer.s
+
+# target to generate assembly for a file
+net/PlayerInfoNetworkSerializer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/net/PlayerInfoNetworkSerializer.cpp.s
+.PHONY : net/PlayerInfoNetworkSerializer.cpp.s
 
 net/cl_main.o: net/cl_main.cpp.o
 .PHONY : net/cl_main.o
@@ -2533,30 +2771,6 @@ tests/unit/test_console.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_console.dir/build.make CMakeFiles/test_console.dir/tests/unit/test_console.cpp.s
 .PHONY : tests/unit/test_console.cpp.s
 
-tests/unit/test_fixed_catch2.o: tests/unit/test_fixed_catch2.cpp.o
-.PHONY : tests/unit/test_fixed_catch2.o
-
-# target to build an object file
-tests/unit/test_fixed_catch2.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fixed_catch2.dir/build.make CMakeFiles/test_fixed_catch2.dir/tests/unit/test_fixed_catch2.cpp.o
-.PHONY : tests/unit/test_fixed_catch2.cpp.o
-
-tests/unit/test_fixed_catch2.i: tests/unit/test_fixed_catch2.cpp.i
-.PHONY : tests/unit/test_fixed_catch2.i
-
-# target to preprocess a source file
-tests/unit/test_fixed_catch2.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fixed_catch2.dir/build.make CMakeFiles/test_fixed_catch2.dir/tests/unit/test_fixed_catch2.cpp.i
-.PHONY : tests/unit/test_fixed_catch2.cpp.i
-
-tests/unit/test_fixed_catch2.s: tests/unit/test_fixed_catch2.cpp.s
-.PHONY : tests/unit/test_fixed_catch2.s
-
-# target to generate assembly for a file
-tests/unit/test_fixed_catch2.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fixed_catch2.dir/build.make CMakeFiles/test_fixed_catch2.dir/tests/unit/test_fixed_catch2.cpp.s
-.PHONY : tests/unit/test_fixed_catch2.cpp.s
-
 tests/unit/test_fixed_t.o: tests/unit/test_fixed_t.cpp.o
 .PHONY : tests/unit/test_fixed_t.o
 
@@ -2581,30 +2795,6 @@ tests/unit/test_fixed_t.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fixed_t.dir/build.make CMakeFiles/test_fixed_t.dir/tests/unit/test_fixed_t.cpp.s
 .PHONY : tests/unit/test_fixed_t.cpp.s
 
-tests/unit/test_tnl_packets.o: tests/unit/test_tnl_packets.cpp.o
-.PHONY : tests/unit/test_tnl_packets.o
-
-# target to build an object file
-tests/unit/test_tnl_packets.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tnl_packets.dir/build.make CMakeFiles/test_tnl_packets.dir/tests/unit/test_tnl_packets.cpp.o
-.PHONY : tests/unit/test_tnl_packets.cpp.o
-
-tests/unit/test_tnl_packets.i: tests/unit/test_tnl_packets.cpp.i
-.PHONY : tests/unit/test_tnl_packets.i
-
-# target to preprocess a source file
-tests/unit/test_tnl_packets.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tnl_packets.dir/build.make CMakeFiles/test_tnl_packets.dir/tests/unit/test_tnl_packets.cpp.i
-.PHONY : tests/unit/test_tnl_packets.cpp.i
-
-tests/unit/test_tnl_packets.s: tests/unit/test_tnl_packets.cpp.s
-.PHONY : tests/unit/test_tnl_packets.s
-
-# target to generate assembly for a file
-tests/unit/test_tnl_packets.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tnl_packets.dir/build.make CMakeFiles/test_tnl_packets.dir/tests/unit/test_tnl_packets.cpp.s
-.PHONY : tests/unit/test_tnl_packets.cpp.s
-
 tests/unit/test_vector.o: tests/unit/test_vector.cpp.o
 .PHONY : tests/unit/test_vector.o
 
@@ -2628,54 +2818,6 @@ tests/unit/test_vector.s: tests/unit/test_vector.cpp.s
 tests/unit/test_vector.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_vector.dir/build.make CMakeFiles/test_vector.dir/tests/unit/test_vector.cpp.s
 .PHONY : tests/unit/test_vector.cpp.s
-
-tools/d2h.o: tools/d2h.cpp.o
-.PHONY : tools/d2h.o
-
-# target to build an object file
-tools/d2h.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/d2h.dir/build.make CMakeFiles/d2h.dir/tools/d2h.cpp.o
-.PHONY : tools/d2h.cpp.o
-
-tools/d2h.i: tools/d2h.cpp.i
-.PHONY : tools/d2h.i
-
-# target to preprocess a source file
-tools/d2h.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/d2h.dir/build.make CMakeFiles/d2h.dir/tools/d2h.cpp.i
-.PHONY : tools/d2h.cpp.i
-
-tools/d2h.s: tools/d2h.cpp.s
-.PHONY : tools/d2h.s
-
-# target to generate assembly for a file
-tools/d2h.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/d2h.dir/build.make CMakeFiles/d2h.dir/tools/d2h.cpp.s
-.PHONY : tools/d2h.cpp.s
-
-tools/wadtool.o: tools/wadtool.cpp.o
-.PHONY : tools/wadtool.o
-
-# target to build an object file
-tools/wadtool.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/wadtool.dir/build.make CMakeFiles/wadtool.dir/tools/wadtool.cpp.o
-.PHONY : tools/wadtool.cpp.o
-
-tools/wadtool.i: tools/wadtool.cpp.i
-.PHONY : tools/wadtool.i
-
-# target to preprocess a source file
-tools/wadtool.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/wadtool.dir/build.make CMakeFiles/wadtool.dir/tools/wadtool.cpp.i
-.PHONY : tools/wadtool.cpp.i
-
-tools/wadtool.s: tools/wadtool.cpp.s
-.PHONY : tools/wadtool.s
-
-# target to generate assembly for a file
-tools/wadtool.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/wadtool.dir/build.make CMakeFiles/wadtool.dir/tools/wadtool.cpp.s
-.PHONY : tools/wadtool.cpp.s
 
 util/command.o: util/command.cpp.o
 .PHONY : util/command.o
@@ -3730,16 +3872,26 @@ help:
 	@echo "... test_components"
 	@echo "... test_console"
 	@echo "... test_demos_integration"
-	@echo "... test_fixed_catch2"
 	@echo "... test_fixed_t"
 	@echo "... test_network_integration"
 	@echo "... test_parity"
 	@echo "... test_save_load_unit"
 	@echo "... test_serialization"
-	@echo "... test_tnl_packets"
 	@echo "... test_vector"
 	@echo "... util"
 	@echo "... wadtool"
+	@echo "... audio/qmus2mid.o"
+	@echo "... audio/qmus2mid.i"
+	@echo "... audio/qmus2mid.s"
+	@echo "... audio/s_sndseq.o"
+	@echo "... audio/s_sndseq.i"
+	@echo "... audio/s_sndseq.s"
+	@echo "... audio/s_sound.o"
+	@echo "... audio/s_sound.i"
+	@echo "... audio/s_sound.s"
+	@echo "... audio/sounds.o"
+	@echo "... audio/sounds.i"
+	@echo "... audio/sounds.s"
 	@echo "... engine/a_action.o"
 	@echo "... engine/a_action.i"
 	@echo "... engine/a_action.s"
@@ -3950,6 +4102,12 @@ help:
 	@echo "... engine/singleplayer_stubs.o"
 	@echo "... engine/singleplayer_stubs.i"
 	@echo "... engine/singleplayer_stubs.s"
+	@echo "... home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.o"
+	@echo "... home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.i"
+	@echo "... home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.s"
+	@echo "... home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.o"
+	@echo "... home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.i"
+	@echo "... home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.s"
 	@echo "... interface/sdl/endtxt.o"
 	@echo "... interface/sdl/endtxt.i"
 	@echo "... interface/sdl/endtxt.s"
@@ -3971,6 +4129,21 @@ help:
 	@echo "... interface/sdl/i_video.o"
 	@echo "... interface/sdl/i_video.i"
 	@echo "... interface/sdl/i_video.s"
+	@echo "... net/ActorNetworkSerializer.o"
+	@echo "... net/ActorNetworkSerializer.i"
+	@echo "... net/ActorNetworkSerializer.s"
+	@echo "... net/BitStreamSerializer.o"
+	@echo "... net/BitStreamSerializer.i"
+	@echo "... net/BitStreamSerializer.s"
+	@echo "... net/ENetNetworkTransport.o"
+	@echo "... net/ENetNetworkTransport.i"
+	@echo "... net/ENetNetworkTransport.s"
+	@echo "... net/NetworkManager.o"
+	@echo "... net/NetworkManager.i"
+	@echo "... net/NetworkManager.s"
+	@echo "... net/PlayerInfoNetworkSerializer.o"
+	@echo "... net/PlayerInfoNetworkSerializer.i"
+	@echo "... net/PlayerInfoNetworkSerializer.s"
 	@echo "... net/cl_main.o"
 	@echo "... net/cl_main.i"
 	@echo "... net/cl_main.s"
@@ -4010,24 +4183,12 @@ help:
 	@echo "... tests/unit/test_console.o"
 	@echo "... tests/unit/test_console.i"
 	@echo "... tests/unit/test_console.s"
-	@echo "... tests/unit/test_fixed_catch2.o"
-	@echo "... tests/unit/test_fixed_catch2.i"
-	@echo "... tests/unit/test_fixed_catch2.s"
 	@echo "... tests/unit/test_fixed_t.o"
 	@echo "... tests/unit/test_fixed_t.i"
 	@echo "... tests/unit/test_fixed_t.s"
-	@echo "... tests/unit/test_tnl_packets.o"
-	@echo "... tests/unit/test_tnl_packets.i"
-	@echo "... tests/unit/test_tnl_packets.s"
 	@echo "... tests/unit/test_vector.o"
 	@echo "... tests/unit/test_vector.i"
 	@echo "... tests/unit/test_vector.s"
-	@echo "... tools/d2h.o"
-	@echo "... tools/d2h.i"
-	@echo "... tools/d2h.s"
-	@echo "... tools/wadtool.o"
-	@echo "... tools/wadtool.i"
-	@echo "... tools/wadtool.s"
 	@echo "... util/command.o"
 	@echo "... util/command.i"
 	@echo "... util/command.s"

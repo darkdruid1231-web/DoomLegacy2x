@@ -1,5 +1,5 @@
 # Hashes of file build rules.
-ccf4db272f8d36d012de6be62da993a8 grammars/decorate.lexer.c
-acee3b9ed039db4febec3e9ccfd799dd grammars/decorate.parser.c
-67921435cec04465dc8c7b6f2e63ae1b grammars/ntexture.lexer.c
-81d1280242c8673b0543d63b64cc1df4 grammars/ntexture.parser.c
+da95247652faf333d32852fcccf9f42b grammars/decorate.lexer.c
+3173eec60a44fc108a89d1466393b356 grammars/decorate.parser.c
+431f59f419fa647b352198d34d6010d7 grammars/ntexture.lexer.c
+b21c82c367e1fd3fcb4cb13d0330693c grammars/ntexture.parser.c

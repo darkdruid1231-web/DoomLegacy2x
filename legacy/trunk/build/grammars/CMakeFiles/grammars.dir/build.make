@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk
+CMAKE_SOURCE_DIR = /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build
+CMAKE_BINARY_DIR = /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build
 
 # Include any dependencies generated for this target.
 include grammars/CMakeFiles/grammars.dir/depend.make
@@ -69,101 +69,101 @@ include grammars/CMakeFiles/grammars.dir/progress.make
 # Include the compile flags for this target's objects.
 include grammars/CMakeFiles/grammars.dir/flags.make
 
-grammars/ntexture.lexer.c: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/grammars/ntexture.lexer.flex
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating ntexture.lexer.c"
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/cmake -E copy /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/grammars/ntexture.lexer.flex /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/flex -PNTEXTURE_ /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.flex
+grammars/ntexture.lexer.c: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/grammars/ntexture.lexer.flex
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating ntexture.lexer.c"
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/cmake -E copy /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/grammars/ntexture.lexer.flex /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/flex -PNTEXTURE_ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.flex
 
-grammars/decorate.lexer.c: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/grammars/decorate.lexer.flex
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Generating decorate.lexer.c"
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/cmake -E copy /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/grammars/decorate.lexer.flex /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/decorate.lexer.flex
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/flex -PDECORATE_ /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/decorate.lexer.flex
+grammars/decorate.lexer.c: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/grammars/decorate.lexer.flex
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Generating decorate.lexer.c"
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/cmake -E copy /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/grammars/decorate.lexer.flex /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/decorate.lexer.flex
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/flex -PDECORATE_ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/decorate.lexer.flex
 
-grammars/ntexture.parser.c: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/grammars/ntexture.parser.y
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Generating ntexture.parser.c, ntexture.parser.h"
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/cmake -E copy /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/grammars/ntexture.parser.y /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.parser.y
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/lemon /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.parser.y
+grammars/ntexture.parser.c: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/grammars/ntexture.parser.y
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Generating ntexture.parser.c, ntexture.parser.h"
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/cmake -E copy /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/grammars/ntexture.parser.y /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.parser.y
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/lemon /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.parser.y
 
 grammars/ntexture.parser.h: grammars/ntexture.parser.c
 	@$(CMAKE_COMMAND) -E touch_nocreate grammars/ntexture.parser.h
 
-grammars/decorate.parser.c: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/grammars/decorate.parser.y
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Generating decorate.parser.c, decorate.parser.h"
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/cmake -E copy /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/grammars/decorate.parser.y /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/decorate.parser.y
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/lemon /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/decorate.parser.y
+grammars/decorate.parser.c: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/grammars/decorate.parser.y
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Generating decorate.parser.c, decorate.parser.h"
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/cmake -E copy /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/grammars/decorate.parser.y /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/decorate.parser.y
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/lemon /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/decorate.parser.y
 
 grammars/decorate.parser.h: grammars/decorate.parser.c
 	@$(CMAKE_COMMAND) -E touch_nocreate grammars/decorate.parser.h
 
 grammars/CMakeFiles/grammars.dir/parser_driver.cpp.o: grammars/CMakeFiles/grammars.dir/flags.make
-grammars/CMakeFiles/grammars.dir/parser_driver.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/grammars/parser_driver.cpp
+grammars/CMakeFiles/grammars.dir/parser_driver.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/grammars/parser_driver.cpp
 grammars/CMakeFiles/grammars.dir/parser_driver.cpp.o: grammars/CMakeFiles/grammars.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object grammars/CMakeFiles/grammars.dir/parser_driver.cpp.o"
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT grammars/CMakeFiles/grammars.dir/parser_driver.cpp.o -MF CMakeFiles/grammars.dir/parser_driver.cpp.o.d -o CMakeFiles/grammars.dir/parser_driver.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/grammars/parser_driver.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object grammars/CMakeFiles/grammars.dir/parser_driver.cpp.o"
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT grammars/CMakeFiles/grammars.dir/parser_driver.cpp.o -MF CMakeFiles/grammars.dir/parser_driver.cpp.o.d -o CMakeFiles/grammars.dir/parser_driver.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/grammars/parser_driver.cpp
 
 grammars/CMakeFiles/grammars.dir/parser_driver.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/grammars.dir/parser_driver.cpp.i"
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/grammars/parser_driver.cpp > CMakeFiles/grammars.dir/parser_driver.cpp.i
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/grammars/parser_driver.cpp > CMakeFiles/grammars.dir/parser_driver.cpp.i
 
 grammars/CMakeFiles/grammars.dir/parser_driver.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/grammars.dir/parser_driver.cpp.s"
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/grammars/parser_driver.cpp -o CMakeFiles/grammars.dir/parser_driver.cpp.s
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/grammars/parser_driver.cpp -o CMakeFiles/grammars.dir/parser_driver.cpp.s
 
 grammars/CMakeFiles/grammars.dir/ntexture.lexer.c.o: grammars/CMakeFiles/grammars.dir/flags.make
 grammars/CMakeFiles/grammars.dir/ntexture.lexer.c.o: grammars/ntexture.lexer.c
 grammars/CMakeFiles/grammars.dir/ntexture.lexer.c.o: grammars/CMakeFiles/grammars.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object grammars/CMakeFiles/grammars.dir/ntexture.lexer.c.o"
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT grammars/CMakeFiles/grammars.dir/ntexture.lexer.c.o -MF CMakeFiles/grammars.dir/ntexture.lexer.c.o.d -o CMakeFiles/grammars.dir/ntexture.lexer.c.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object grammars/CMakeFiles/grammars.dir/ntexture.lexer.c.o"
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT grammars/CMakeFiles/grammars.dir/ntexture.lexer.c.o -MF CMakeFiles/grammars.dir/ntexture.lexer.c.o.d -o CMakeFiles/grammars.dir/ntexture.lexer.c.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.c
 
 grammars/CMakeFiles/grammars.dir/ntexture.lexer.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/grammars.dir/ntexture.lexer.c.i"
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.c > CMakeFiles/grammars.dir/ntexture.lexer.c.i
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.c > CMakeFiles/grammars.dir/ntexture.lexer.c.i
 
 grammars/CMakeFiles/grammars.dir/ntexture.lexer.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/grammars.dir/ntexture.lexer.c.s"
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.lexer.c -o CMakeFiles/grammars.dir/ntexture.lexer.c.s
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.lexer.c -o CMakeFiles/grammars.dir/ntexture.lexer.c.s
 
 grammars/CMakeFiles/grammars.dir/decorate.lexer.c.o: grammars/CMakeFiles/grammars.dir/flags.make
 grammars/CMakeFiles/grammars.dir/decorate.lexer.c.o: grammars/decorate.lexer.c
 grammars/CMakeFiles/grammars.dir/decorate.lexer.c.o: grammars/CMakeFiles/grammars.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object grammars/CMakeFiles/grammars.dir/decorate.lexer.c.o"
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT grammars/CMakeFiles/grammars.dir/decorate.lexer.c.o -MF CMakeFiles/grammars.dir/decorate.lexer.c.o.d -o CMakeFiles/grammars.dir/decorate.lexer.c.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/decorate.lexer.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object grammars/CMakeFiles/grammars.dir/decorate.lexer.c.o"
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT grammars/CMakeFiles/grammars.dir/decorate.lexer.c.o -MF CMakeFiles/grammars.dir/decorate.lexer.c.o.d -o CMakeFiles/grammars.dir/decorate.lexer.c.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/decorate.lexer.c
 
 grammars/CMakeFiles/grammars.dir/decorate.lexer.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/grammars.dir/decorate.lexer.c.i"
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/decorate.lexer.c > CMakeFiles/grammars.dir/decorate.lexer.c.i
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/decorate.lexer.c > CMakeFiles/grammars.dir/decorate.lexer.c.i
 
 grammars/CMakeFiles/grammars.dir/decorate.lexer.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/grammars.dir/decorate.lexer.c.s"
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/decorate.lexer.c -o CMakeFiles/grammars.dir/decorate.lexer.c.s
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/decorate.lexer.c -o CMakeFiles/grammars.dir/decorate.lexer.c.s
 
 grammars/CMakeFiles/grammars.dir/ntexture.parser.c.o: grammars/CMakeFiles/grammars.dir/flags.make
 grammars/CMakeFiles/grammars.dir/ntexture.parser.c.o: grammars/ntexture.parser.c
 grammars/CMakeFiles/grammars.dir/ntexture.parser.c.o: grammars/CMakeFiles/grammars.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object grammars/CMakeFiles/grammars.dir/ntexture.parser.c.o"
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT grammars/CMakeFiles/grammars.dir/ntexture.parser.c.o -MF CMakeFiles/grammars.dir/ntexture.parser.c.o.d -o CMakeFiles/grammars.dir/ntexture.parser.c.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.parser.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object grammars/CMakeFiles/grammars.dir/ntexture.parser.c.o"
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT grammars/CMakeFiles/grammars.dir/ntexture.parser.c.o -MF CMakeFiles/grammars.dir/ntexture.parser.c.o.d -o CMakeFiles/grammars.dir/ntexture.parser.c.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.parser.c
 
 grammars/CMakeFiles/grammars.dir/ntexture.parser.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/grammars.dir/ntexture.parser.c.i"
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.parser.c > CMakeFiles/grammars.dir/ntexture.parser.c.i
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.parser.c > CMakeFiles/grammars.dir/ntexture.parser.c.i
 
 grammars/CMakeFiles/grammars.dir/ntexture.parser.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/grammars.dir/ntexture.parser.c.s"
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/ntexture.parser.c -o CMakeFiles/grammars.dir/ntexture.parser.c.s
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/ntexture.parser.c -o CMakeFiles/grammars.dir/ntexture.parser.c.s
 
 grammars/CMakeFiles/grammars.dir/decorate.parser.c.o: grammars/CMakeFiles/grammars.dir/flags.make
 grammars/CMakeFiles/grammars.dir/decorate.parser.c.o: grammars/decorate.parser.c
 grammars/CMakeFiles/grammars.dir/decorate.parser.c.o: grammars/CMakeFiles/grammars.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object grammars/CMakeFiles/grammars.dir/decorate.parser.c.o"
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT grammars/CMakeFiles/grammars.dir/decorate.parser.c.o -MF CMakeFiles/grammars.dir/decorate.parser.c.o.d -o CMakeFiles/grammars.dir/decorate.parser.c.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/decorate.parser.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object grammars/CMakeFiles/grammars.dir/decorate.parser.c.o"
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT grammars/CMakeFiles/grammars.dir/decorate.parser.c.o -MF CMakeFiles/grammars.dir/decorate.parser.c.o.d -o CMakeFiles/grammars.dir/decorate.parser.c.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/decorate.parser.c
 
 grammars/CMakeFiles/grammars.dir/decorate.parser.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/grammars.dir/decorate.parser.c.i"
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/decorate.parser.c > CMakeFiles/grammars.dir/decorate.parser.c.i
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/decorate.parser.c > CMakeFiles/grammars.dir/decorate.parser.c.i
 
 grammars/CMakeFiles/grammars.dir/decorate.parser.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/grammars.dir/decorate.parser.c.s"
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/decorate.parser.c -o CMakeFiles/grammars.dir/decorate.parser.c.s
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/decorate.parser.c -o CMakeFiles/grammars.dir/decorate.parser.c.s
 
 # Object files for target grammars
 grammars_OBJECTS = \
@@ -183,16 +183,16 @@ grammars/libgrammars.a: grammars/CMakeFiles/grammars.dir/ntexture.parser.c.o
 grammars/libgrammars.a: grammars/CMakeFiles/grammars.dir/decorate.parser.c.o
 grammars/libgrammars.a: grammars/CMakeFiles/grammars.dir/build.make
 grammars/libgrammars.a: grammars/CMakeFiles/grammars.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Linking CXX static library libgrammars.a"
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && $(CMAKE_COMMAND) -P CMakeFiles/grammars.dir/cmake_clean_target.cmake
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/grammars.dir/link.txt --verbose=$(VERBOSE)
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Linking CXX static library libgrammars.a"
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && $(CMAKE_COMMAND) -P CMakeFiles/grammars.dir/cmake_clean_target.cmake
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/grammars.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
 grammars/CMakeFiles/grammars.dir/build: grammars/libgrammars.a
 .PHONY : grammars/CMakeFiles/grammars.dir/build
 
 grammars/CMakeFiles/grammars.dir/clean:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars && $(CMAKE_COMMAND) -P CMakeFiles/grammars.dir/cmake_clean.cmake
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars && $(CMAKE_COMMAND) -P CMakeFiles/grammars.dir/cmake_clean.cmake
 .PHONY : grammars/CMakeFiles/grammars.dir/clean
 
 grammars/CMakeFiles/grammars.dir/depend: grammars/decorate.lexer.c
@@ -201,6 +201,6 @@ grammars/CMakeFiles/grammars.dir/depend: grammars/decorate.parser.h
 grammars/CMakeFiles/grammars.dir/depend: grammars/ntexture.lexer.c
 grammars/CMakeFiles/grammars.dir/depend: grammars/ntexture.parser.c
 grammars/CMakeFiles/grammars.dir/depend: grammars/ntexture.parser.h
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/grammars /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars/CMakeFiles/grammars.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/grammars /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars/CMakeFiles/grammars.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : grammars/CMakeFiles/grammars.dir/depend
 

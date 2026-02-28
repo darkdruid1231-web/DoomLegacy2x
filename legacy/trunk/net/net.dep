@@ -1,0 +1,5 @@
+ENetNetworkTransport.o: ENetNetworkTransport.cpp ENetNetworkTransport.h \
+ ../include/network/INetworkTransport.h ../include/core/ISerializer.h
+NetworkManager.o: NetworkManager.cpp NetworkManager.h \
+ ../include/network/INetworkSerializer.h ../include/core/ISerializer.h \
+ ../include/network/INetworkTransport.h

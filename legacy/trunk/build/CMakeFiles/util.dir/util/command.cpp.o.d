@@ -1,8 +1,9 @@
 CMakeFiles/util.dir/util/command.cpp.o: \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/util/command.cpp \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/util/command.cpp \
  /usr/include/stdc-predef.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include_stubs/tnl/tnlBitStream.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include_stubs/tnl_stub.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include_stubs/tnl_stub.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include_stubs/tnl/tnlNetBase.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include_stubs/tnl/tnlBitStream.h \
  /usr/include/c++/13/cstdint \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h \
@@ -23,30 +24,27 @@ CMakeFiles/util.dir/util/command.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
- /usr/include/c++/13/cstdio /usr/include/stdio.h \
- /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
- /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h \
- /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h \
- /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h \
- /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h \
- /usr/include/x86_64-linux-gnu/bits/types/__FILE.h \
- /usr/include/x86_64-linux-gnu/bits/types/FILE.h \
- /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
- /usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h \
- /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
- /usr/include/x86_64-linux-gnu/bits/floatn.h \
- /usr/include/x86_64-linux-gnu/bits/floatn-common.h \
  /usr/include/c++/13/cstring /usr/include/string.h \
+ /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
  /usr/include/x86_64-linux-gnu/bits/types/locale_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h \
- /usr/include/strings.h /usr/include/c++/13/string \
- /usr/include/c++/13/bits/requires_hosted.h \
+ /usr/include/strings.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include_stubs/tnl/tnlNetInterface.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include_stubs/tnl/tnlBitStream.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include_stubs/tnl/tnlNetBase.h \
+ /usr/include/c++/13/string /usr/include/c++/13/bits/requires_hosted.h \
  /usr/include/c++/13/bits/stringfwd.h \
  /usr/include/c++/13/bits/memoryfwd.h \
  /usr/include/c++/13/bits/char_traits.h \
  /usr/include/c++/13/bits/postypes.h /usr/include/c++/13/cwchar \
- /usr/include/wchar.h /usr/include/x86_64-linux-gnu/bits/types/wint_t.h \
+ /usr/include/wchar.h /usr/include/x86_64-linux-gnu/bits/floatn.h \
+ /usr/include/x86_64-linux-gnu/bits/floatn-common.h \
+ /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h \
+ /usr/include/x86_64-linux-gnu/bits/types/wint_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h \
+ /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h \
+ /usr/include/x86_64-linux-gnu/bits/types/__FILE.h \
+ /usr/include/x86_64-linux-gnu/bits/types/FILE.h \
  /usr/include/c++/13/type_traits /usr/include/c++/13/bits/allocator.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++allocator.h \
  /usr/include/c++/13/bits/new_allocator.h /usr/include/c++/13/new \
@@ -108,23 +106,34 @@ CMakeFiles/util.dir/util/command.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
  /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h /usr/include/alloca.h \
  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
- /usr/include/c++/13/bits/std_abs.h /usr/include/c++/13/cerrno \
- /usr/include/errno.h /usr/include/x86_64-linux-gnu/bits/errno.h \
- /usr/include/linux/errno.h /usr/include/x86_64-linux-gnu/asm/errno.h \
+ /usr/include/c++/13/bits/std_abs.h /usr/include/c++/13/cstdio \
+ /usr/include/stdio.h /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h \
+ /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h \
+ /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
+ /usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h \
+ /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
+ /usr/include/c++/13/cerrno /usr/include/errno.h \
+ /usr/include/x86_64-linux-gnu/bits/errno.h /usr/include/linux/errno.h \
+ /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
  /usr/include/c++/13/bits/charconv.h \
  /usr/include/c++/13/bits/functional_hash.h \
  /usr/include/c++/13/bits/hash_bytes.h \
- /usr/include/c++/13/bits/basic_string.tcc /usr/include/c++/13/vector \
- /usr/include/c++/13/bits/stl_uninitialized.h \
+ /usr/include/c++/13/bits/basic_string.tcc \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include_stubs/tnl/tnlGhostConnection.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include_stubs/tnl/tnlNetInterface.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include_stubs/tnl/tnlNetObject.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include_stubs/tnl/tnlAsymmetricKey.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include_stubs/tnl/tnlAssert.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/command.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/core/ISerializer.h \
+ /usr/include/c++/13/vector /usr/include/c++/13/bits/stl_uninitialized.h \
  /usr/include/c++/13/bits/stl_vector.h \
  /usr/include/c++/13/bits/stl_bvector.h \
  /usr/include/c++/13/bits/vector.tcc \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/command.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/core/ISerializer.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/doomtype.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/core/doomtype.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/doomtype.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/core/doomtype.h \
  /usr/include/values.h /usr/lib/gcc/x86_64-linux-gnu/13/include/limits.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/syslimits.h \
  /usr/include/limits.h /usr/include/x86_64-linux-gnu/bits/posix1_lim.h \
@@ -135,21 +144,21 @@ CMakeFiles/util.dir/util/command.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/xopen_lim.h \
  /usr/include/x86_64-linux-gnu/bits/uio_lim.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/float.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/console.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/console.h \
  /usr/include/c++/13/deque /usr/include/c++/13/bits/stl_deque.h \
  /usr/include/c++/13/bits/deque.tcc \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/keys.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/doomdef.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/core/doomdef.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/z_zone.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/n_interface.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include_stubs/tnl/tnlAssert.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include_stubs/tnl/tnlNetInterface.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/m_fixed.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/core/m_fixed.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/core/ISerializer.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/core/doomtype.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/lnet.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/keys.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/doomdef.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/core/doomdef.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/z_zone.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/n_interface.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include_stubs/tnl/tnlAssert.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include_stubs/tnl/tnlNetInterface.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/m_fixed.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/core/m_fixed.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/core/ISerializer.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/core/doomtype.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/lnet.h \
  /usr/include/c++/13/math.h /usr/include/c++/13/cmath /usr/include/math.h \
  /usr/include/x86_64-linux-gnu/bits/math-vector.h \
  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
@@ -161,20 +170,19 @@ CMakeFiles/util.dir/util/command.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h \
  /usr/include/x86_64-linux-gnu/bits/iscanonical.h \
  /usr/include/c++/13/stdlib.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/m_misc.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/g_game.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/game/g_game.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/m_misc.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/g_game.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/game/g_game.h \
  /usr/include/c++/13/map /usr/include/c++/13/bits/stl_tree.h \
  /usr/include/c++/13/ext/aligned_buffer.h \
  /usr/include/c++/13/bits/stl_map.h /usr/include/c++/13/tuple \
  /usr/include/c++/13/bits/uses_allocator.h \
  /usr/include/c++/13/bits/stl_multimap.h \
  /usr/include/c++/13/bits/erase_if.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/g_player.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/game/g_player.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/d_items.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/data/d_items.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/info.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/d_ticcmd.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include/data/d_ticcmd.h \
- /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/include_stubs/tnl/tnlNetObject.h
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/g_player.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/game/g_player.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/d_items.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/data/d_items.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/info.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/d_ticcmd.h \
+ /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/include/data/d_ticcmd.h

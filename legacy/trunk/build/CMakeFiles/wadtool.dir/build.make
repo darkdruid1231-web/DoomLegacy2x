@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk
+CMAKE_SOURCE_DIR = /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build
+CMAKE_BINARY_DIR = /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/wadtool.dir/depend.make
@@ -69,47 +69,47 @@ include CMakeFiles/wadtool.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/wadtool.dir/flags.make
 
-CMakeFiles/wadtool.dir/tools/wadtool.cpp.o: CMakeFiles/wadtool.dir/flags.make
-CMakeFiles/wadtool.dir/tools/wadtool.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/tools/wadtool.cpp
-CMakeFiles/wadtool.dir/tools/wadtool.cpp.o: CMakeFiles/wadtool.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/wadtool.dir/tools/wadtool.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/wadtool.dir/tools/wadtool.cpp.o -MF CMakeFiles/wadtool.dir/tools/wadtool.cpp.o.d -o CMakeFiles/wadtool.dir/tools/wadtool.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/tools/wadtool.cpp
+CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.o: CMakeFiles/wadtool.dir/flags.make
+CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp
+CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.o: CMakeFiles/wadtool.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.o -MF CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.o.d -o CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp
 
-CMakeFiles/wadtool.dir/tools/wadtool.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/wadtool.dir/tools/wadtool.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/tools/wadtool.cpp > CMakeFiles/wadtool.dir/tools/wadtool.cpp.i
+CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp > CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.i
 
-CMakeFiles/wadtool.dir/tools/wadtool.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/wadtool.dir/tools/wadtool.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/tools/wadtool.cpp -o CMakeFiles/wadtool.dir/tools/wadtool.cpp.s
+CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp -o CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.s
 
 CMakeFiles/wadtool.dir/util/md5.cpp.o: CMakeFiles/wadtool.dir/flags.make
-CMakeFiles/wadtool.dir/util/md5.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/util/md5.cpp
+CMakeFiles/wadtool.dir/util/md5.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/util/md5.cpp
 CMakeFiles/wadtool.dir/util/md5.cpp.o: CMakeFiles/wadtool.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/wadtool.dir/util/md5.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/wadtool.dir/util/md5.cpp.o -MF CMakeFiles/wadtool.dir/util/md5.cpp.o.d -o CMakeFiles/wadtool.dir/util/md5.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/util/md5.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/wadtool.dir/util/md5.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/wadtool.dir/util/md5.cpp.o -MF CMakeFiles/wadtool.dir/util/md5.cpp.o.d -o CMakeFiles/wadtool.dir/util/md5.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/util/md5.cpp
 
 CMakeFiles/wadtool.dir/util/md5.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/wadtool.dir/util/md5.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/util/md5.cpp > CMakeFiles/wadtool.dir/util/md5.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/util/md5.cpp > CMakeFiles/wadtool.dir/util/md5.cpp.i
 
 CMakeFiles/wadtool.dir/util/md5.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/wadtool.dir/util/md5.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/util/md5.cpp -o CMakeFiles/wadtool.dir/util/md5.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/util/md5.cpp -o CMakeFiles/wadtool.dir/util/md5.cpp.s
 
 # Object files for target wadtool
 wadtool_OBJECTS = \
-"CMakeFiles/wadtool.dir/tools/wadtool.cpp.o" \
+"CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.o" \
 "CMakeFiles/wadtool.dir/util/md5.cpp.o"
 
 # External object files for target wadtool
 wadtool_EXTERNAL_OBJECTS =
 
-wadtool: CMakeFiles/wadtool.dir/tools/wadtool.cpp.o
+wadtool: CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/wadtool.cpp.o
 wadtool: CMakeFiles/wadtool.dir/util/md5.cpp.o
 wadtool: CMakeFiles/wadtool.dir/build.make
 wadtool: CMakeFiles/wadtool.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable wadtool"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable wadtool"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/wadtool.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -121,6 +121,6 @@ CMakeFiles/wadtool.dir/clean:
 .PHONY : CMakeFiles/wadtool.dir/clean
 
 CMakeFiles/wadtool.dir/depend:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles/wadtool.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles/wadtool.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/wadtool.dir/depend
 

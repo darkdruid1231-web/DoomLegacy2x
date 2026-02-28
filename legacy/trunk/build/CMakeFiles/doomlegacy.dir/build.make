@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk
+CMAKE_SOURCE_DIR = /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build
+CMAKE_BINARY_DIR = /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/doomlegacy.dir/depend.make
@@ -70,1474 +70,1600 @@ include CMakeFiles/doomlegacy.dir/progress.make
 include CMakeFiles/doomlegacy.dir/flags.make
 
 CMakeFiles/doomlegacy.dir/engine/g_game.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/g_game.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_game.cpp
+CMakeFiles/doomlegacy.dir/engine/g_game.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_game.cpp
 CMakeFiles/doomlegacy.dir/engine/g_game.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_game.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_game.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_game.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_game.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_game.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_game.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_game.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_game.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_game.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_game.cpp
 
 CMakeFiles/doomlegacy.dir/engine/g_game.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/g_game.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_game.cpp > CMakeFiles/doomlegacy.dir/engine/g_game.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_game.cpp > CMakeFiles/doomlegacy.dir/engine/g_game.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/g_game.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/g_game.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_game.cpp -o CMakeFiles/doomlegacy.dir/engine/g_game.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_game.cpp -o CMakeFiles/doomlegacy.dir/engine/g_game.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/g_state.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/g_state.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_state.cpp
+CMakeFiles/doomlegacy.dir/engine/g_state.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_state.cpp
 CMakeFiles/doomlegacy.dir/engine/g_state.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_state.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_state.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_state.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_state.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_state.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_state.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_state.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_state.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_state.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_state.cpp
 
 CMakeFiles/doomlegacy.dir/engine/g_state.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/g_state.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_state.cpp > CMakeFiles/doomlegacy.dir/engine/g_state.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_state.cpp > CMakeFiles/doomlegacy.dir/engine/g_state.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/g_state.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/g_state.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_state.cpp -o CMakeFiles/doomlegacy.dir/engine/g_state.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_state.cpp -o CMakeFiles/doomlegacy.dir/engine/g_state.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/g_demo.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/g_demo.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_demo.cpp
+CMakeFiles/doomlegacy.dir/engine/g_demo.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_demo.cpp
 CMakeFiles/doomlegacy.dir/engine/g_demo.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_demo.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_demo.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_demo.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_demo.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_demo.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_demo.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_demo.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_demo.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_demo.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_demo.cpp
 
 CMakeFiles/doomlegacy.dir/engine/g_demo.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/g_demo.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_demo.cpp > CMakeFiles/doomlegacy.dir/engine/g_demo.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_demo.cpp > CMakeFiles/doomlegacy.dir/engine/g_demo.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/g_demo.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/g_demo.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_demo.cpp -o CMakeFiles/doomlegacy.dir/engine/g_demo.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_demo.cpp -o CMakeFiles/doomlegacy.dir/engine/g_demo.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/g_input.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/g_input.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_input.cpp
+CMakeFiles/doomlegacy.dir/engine/g_input.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_input.cpp
 CMakeFiles/doomlegacy.dir/engine/g_input.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_input.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_input.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_input.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_input.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_input.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_input.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_input.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_input.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_input.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_input.cpp
 
 CMakeFiles/doomlegacy.dir/engine/g_input.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/g_input.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_input.cpp > CMakeFiles/doomlegacy.dir/engine/g_input.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_input.cpp > CMakeFiles/doomlegacy.dir/engine/g_input.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/g_input.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/g_input.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_input.cpp -o CMakeFiles/doomlegacy.dir/engine/g_input.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_input.cpp -o CMakeFiles/doomlegacy.dir/engine/g_input.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/g_type.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/g_type.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_type.cpp
+CMakeFiles/doomlegacy.dir/engine/g_type.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_type.cpp
 CMakeFiles/doomlegacy.dir/engine/g_type.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_type.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_type.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_type.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_type.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_type.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_type.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_type.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_type.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_type.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_type.cpp
 
 CMakeFiles/doomlegacy.dir/engine/g_type.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/g_type.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_type.cpp > CMakeFiles/doomlegacy.dir/engine/g_type.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_type.cpp > CMakeFiles/doomlegacy.dir/engine/g_type.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/g_type.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/g_type.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_type.cpp -o CMakeFiles/doomlegacy.dir/engine/g_type.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_type.cpp -o CMakeFiles/doomlegacy.dir/engine/g_type.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/g_level.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/g_level.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_level.cpp
+CMakeFiles/doomlegacy.dir/engine/g_level.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_level.cpp
 CMakeFiles/doomlegacy.dir/engine/g_level.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_level.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_level.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_level.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_level.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_level.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_level.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_level.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_level.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_level.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_level.cpp
 
 CMakeFiles/doomlegacy.dir/engine/g_level.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/g_level.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_level.cpp > CMakeFiles/doomlegacy.dir/engine/g_level.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_level.cpp > CMakeFiles/doomlegacy.dir/engine/g_level.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/g_level.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/g_level.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_level.cpp -o CMakeFiles/doomlegacy.dir/engine/g_level.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_level.cpp -o CMakeFiles/doomlegacy.dir/engine/g_level.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/g_mapinfo.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/g_mapinfo.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_mapinfo.cpp
+CMakeFiles/doomlegacy.dir/engine/g_mapinfo.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_mapinfo.cpp
 CMakeFiles/doomlegacy.dir/engine/g_mapinfo.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_mapinfo.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_mapinfo.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_mapinfo.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_mapinfo.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_mapinfo.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_mapinfo.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_mapinfo.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_mapinfo.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_mapinfo.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_mapinfo.cpp
 
 CMakeFiles/doomlegacy.dir/engine/g_mapinfo.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/g_mapinfo.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_mapinfo.cpp > CMakeFiles/doomlegacy.dir/engine/g_mapinfo.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_mapinfo.cpp > CMakeFiles/doomlegacy.dir/engine/g_mapinfo.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/g_mapinfo.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/g_mapinfo.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_mapinfo.cpp -o CMakeFiles/doomlegacy.dir/engine/g_mapinfo.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_mapinfo.cpp -o CMakeFiles/doomlegacy.dir/engine/g_mapinfo.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/g_map.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/g_map.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_map.cpp
+CMakeFiles/doomlegacy.dir/engine/g_map.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_map.cpp
 CMakeFiles/doomlegacy.dir/engine/g_map.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_map.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_map.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_map.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_map.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_map.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_map.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_map.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_map.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_map.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_map.cpp
 
 CMakeFiles/doomlegacy.dir/engine/g_map.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/g_map.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_map.cpp > CMakeFiles/doomlegacy.dir/engine/g_map.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_map.cpp > CMakeFiles/doomlegacy.dir/engine/g_map.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/g_map.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/g_map.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_map.cpp -o CMakeFiles/doomlegacy.dir/engine/g_map.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_map.cpp -o CMakeFiles/doomlegacy.dir/engine/g_map.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/g_player.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/g_player.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_player.cpp
+CMakeFiles/doomlegacy.dir/engine/g_player.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_player.cpp
 CMakeFiles/doomlegacy.dir/engine/g_player.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_player.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_player.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_player.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_player.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_player.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_player.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_player.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_player.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_player.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_player.cpp
 
 CMakeFiles/doomlegacy.dir/engine/g_player.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/g_player.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_player.cpp > CMakeFiles/doomlegacy.dir/engine/g_player.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_player.cpp > CMakeFiles/doomlegacy.dir/engine/g_player.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/g_player.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/g_player.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_player.cpp -o CMakeFiles/doomlegacy.dir/engine/g_player.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_player.cpp -o CMakeFiles/doomlegacy.dir/engine/g_player.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/g_team.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/g_team.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_team.cpp
+CMakeFiles/doomlegacy.dir/engine/g_team.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_team.cpp
 CMakeFiles/doomlegacy.dir/engine/g_team.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_team.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_team.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_team.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_team.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_team.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_team.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_team.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_team.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_team.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_team.cpp
 
 CMakeFiles/doomlegacy.dir/engine/g_team.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/g_team.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_team.cpp > CMakeFiles/doomlegacy.dir/engine/g_team.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_team.cpp > CMakeFiles/doomlegacy.dir/engine/g_team.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/g_team.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/g_team.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_team.cpp -o CMakeFiles/doomlegacy.dir/engine/g_team.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_team.cpp -o CMakeFiles/doomlegacy.dir/engine/g_team.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/g_think.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/g_think.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_think.cpp
+CMakeFiles/doomlegacy.dir/engine/g_think.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_think.cpp
 CMakeFiles/doomlegacy.dir/engine/g_think.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_think.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_think.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_think.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_think.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_think.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_think.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_think.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_think.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_think.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_think.cpp
 
 CMakeFiles/doomlegacy.dir/engine/g_think.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/g_think.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_think.cpp > CMakeFiles/doomlegacy.dir/engine/g_think.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_think.cpp > CMakeFiles/doomlegacy.dir/engine/g_think.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/g_think.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/g_think.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_think.cpp -o CMakeFiles/doomlegacy.dir/engine/g_think.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_think.cpp -o CMakeFiles/doomlegacy.dir/engine/g_think.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/singleplayer_stubs.cpp
+CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/singleplayer_stubs.cpp
 CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/singleplayer_stubs.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/singleplayer_stubs.cpp
 
 CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/singleplayer_stubs.cpp > CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/singleplayer_stubs.cpp > CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/singleplayer_stubs.cpp -o CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/singleplayer_stubs.cpp -o CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/g_actor.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/g_actor.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_actor.cpp
+CMakeFiles/doomlegacy.dir/engine/g_actor.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_actor.cpp
 CMakeFiles/doomlegacy.dir/engine/g_actor.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_actor.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_actor.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_actor.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_actor.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_actor.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_actor.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_actor.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_actor.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_actor.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_actor.cpp
 
 CMakeFiles/doomlegacy.dir/engine/g_actor.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/g_actor.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_actor.cpp > CMakeFiles/doomlegacy.dir/engine/g_actor.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_actor.cpp > CMakeFiles/doomlegacy.dir/engine/g_actor.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/g_actor.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/g_actor.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_actor.cpp -o CMakeFiles/doomlegacy.dir/engine/g_actor.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_actor.cpp -o CMakeFiles/doomlegacy.dir/engine/g_actor.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/g_pawn.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/g_pawn.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_pawn.cpp
+CMakeFiles/doomlegacy.dir/engine/g_pawn.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_pawn.cpp
 CMakeFiles/doomlegacy.dir/engine/g_pawn.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_pawn.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_pawn.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_pawn.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_pawn.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_pawn.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_pawn.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_pawn.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_pawn.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_pawn.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_pawn.cpp
 
 CMakeFiles/doomlegacy.dir/engine/g_pawn.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/g_pawn.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_pawn.cpp > CMakeFiles/doomlegacy.dir/engine/g_pawn.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_pawn.cpp > CMakeFiles/doomlegacy.dir/engine/g_pawn.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/g_pawn.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/g_pawn.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_pawn.cpp -o CMakeFiles/doomlegacy.dir/engine/g_pawn.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_pawn.cpp -o CMakeFiles/doomlegacy.dir/engine/g_pawn.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/g_decorate.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/g_decorate.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_decorate.cpp
+CMakeFiles/doomlegacy.dir/engine/g_decorate.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_decorate.cpp
 CMakeFiles/doomlegacy.dir/engine/g_decorate.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_decorate.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_decorate.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_decorate.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_decorate.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_decorate.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/doomlegacy.dir/engine/g_decorate.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/g_decorate.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/g_decorate.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/g_decorate.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_decorate.cpp
 
 CMakeFiles/doomlegacy.dir/engine/g_decorate.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/g_decorate.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_decorate.cpp > CMakeFiles/doomlegacy.dir/engine/g_decorate.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_decorate.cpp > CMakeFiles/doomlegacy.dir/engine/g_decorate.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/g_decorate.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/g_decorate.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/g_decorate.cpp -o CMakeFiles/doomlegacy.dir/engine/g_decorate.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/g_decorate.cpp -o CMakeFiles/doomlegacy.dir/engine/g_decorate.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_tick.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_tick.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_tick.cpp
+CMakeFiles/doomlegacy.dir/engine/p_tick.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_tick.cpp
 CMakeFiles/doomlegacy.dir/engine/p_tick.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_tick.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_tick.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_tick.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_tick.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_tick.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_tick.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_tick.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_tick.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_tick.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_tick.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_tick.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_tick.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_tick.cpp > CMakeFiles/doomlegacy.dir/engine/p_tick.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_tick.cpp > CMakeFiles/doomlegacy.dir/engine/p_tick.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_tick.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_tick.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_tick.cpp -o CMakeFiles/doomlegacy.dir/engine/p_tick.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_tick.cpp -o CMakeFiles/doomlegacy.dir/engine/p_tick.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_setup.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_setup.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_setup.cpp
+CMakeFiles/doomlegacy.dir/engine/p_setup.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_setup.cpp
 CMakeFiles/doomlegacy.dir/engine/p_setup.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_setup.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_setup.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_setup.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_setup.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_setup.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_setup.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_setup.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_setup.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_setup.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_setup.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_setup.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_setup.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_setup.cpp > CMakeFiles/doomlegacy.dir/engine/p_setup.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_setup.cpp > CMakeFiles/doomlegacy.dir/engine/p_setup.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_setup.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_setup.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_setup.cpp -o CMakeFiles/doomlegacy.dir/engine/p_setup.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_setup.cpp -o CMakeFiles/doomlegacy.dir/engine/p_setup.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_saveg.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_saveg.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_saveg.cpp
+CMakeFiles/doomlegacy.dir/engine/p_saveg.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_saveg.cpp
 CMakeFiles/doomlegacy.dir/engine/p_saveg.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_saveg.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_saveg.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_saveg.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_saveg.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_saveg.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_saveg.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_saveg.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_saveg.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_saveg.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_saveg.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_saveg.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_saveg.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_saveg.cpp > CMakeFiles/doomlegacy.dir/engine/p_saveg.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_saveg.cpp > CMakeFiles/doomlegacy.dir/engine/p_saveg.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_saveg.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_saveg.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_saveg.cpp -o CMakeFiles/doomlegacy.dir/engine/p_saveg.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_saveg.cpp -o CMakeFiles/doomlegacy.dir/engine/p_saveg.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_effects.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_effects.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_effects.cpp
+CMakeFiles/doomlegacy.dir/engine/p_effects.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_effects.cpp
 CMakeFiles/doomlegacy.dir/engine/p_effects.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_effects.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_effects.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_effects.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_effects.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_effects.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_effects.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_effects.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_effects.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_effects.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_effects.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_effects.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_effects.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_effects.cpp > CMakeFiles/doomlegacy.dir/engine/p_effects.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_effects.cpp > CMakeFiles/doomlegacy.dir/engine/p_effects.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_effects.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_effects.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_effects.cpp -o CMakeFiles/doomlegacy.dir/engine/p_effects.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_effects.cpp -o CMakeFiles/doomlegacy.dir/engine/p_effects.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_spec.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_spec.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_spec.cpp
+CMakeFiles/doomlegacy.dir/engine/p_spec.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_spec.cpp
 CMakeFiles/doomlegacy.dir/engine/p_spec.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_spec.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_spec.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_spec.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_spec.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_spec.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_spec.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_spec.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_spec.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_spec.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_spec.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_spec.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_spec.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_spec.cpp > CMakeFiles/doomlegacy.dir/engine/p_spec.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_spec.cpp > CMakeFiles/doomlegacy.dir/engine/p_spec.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_spec.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_spec.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_spec.cpp -o CMakeFiles/doomlegacy.dir/engine/p_spec.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_spec.cpp -o CMakeFiles/doomlegacy.dir/engine/p_spec.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_events.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_events.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_events.cpp
+CMakeFiles/doomlegacy.dir/engine/p_events.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_events.cpp
 CMakeFiles/doomlegacy.dir/engine/p_events.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_events.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_events.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_events.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_events.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_events.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_events.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_events.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_events.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_events.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_events.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_events.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_events.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_events.cpp > CMakeFiles/doomlegacy.dir/engine/p_events.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_events.cpp > CMakeFiles/doomlegacy.dir/engine/p_events.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_events.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_events.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_events.cpp -o CMakeFiles/doomlegacy.dir/engine/p_events.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_events.cpp -o CMakeFiles/doomlegacy.dir/engine/p_events.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_floor.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_floor.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_floor.cpp
+CMakeFiles/doomlegacy.dir/engine/p_floor.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_floor.cpp
 CMakeFiles/doomlegacy.dir/engine/p_floor.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_floor.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_floor.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_floor.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_floor.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_floor.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_floor.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_floor.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_floor.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_floor.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_floor.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_floor.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_floor.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_floor.cpp > CMakeFiles/doomlegacy.dir/engine/p_floor.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_floor.cpp > CMakeFiles/doomlegacy.dir/engine/p_floor.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_floor.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_floor.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_floor.cpp -o CMakeFiles/doomlegacy.dir/engine/p_floor.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_floor.cpp -o CMakeFiles/doomlegacy.dir/engine/p_floor.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_plats.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_plats.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_plats.cpp
+CMakeFiles/doomlegacy.dir/engine/p_plats.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_plats.cpp
 CMakeFiles/doomlegacy.dir/engine/p_plats.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_plats.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_plats.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_plats.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_plats.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_plats.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_plats.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_plats.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_plats.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_plats.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_plats.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_plats.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_plats.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_plats.cpp > CMakeFiles/doomlegacy.dir/engine/p_plats.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_plats.cpp > CMakeFiles/doomlegacy.dir/engine/p_plats.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_plats.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_plats.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_plats.cpp -o CMakeFiles/doomlegacy.dir/engine/p_plats.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_plats.cpp -o CMakeFiles/doomlegacy.dir/engine/p_plats.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_ceilng.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_ceilng.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_ceilng.cpp
+CMakeFiles/doomlegacy.dir/engine/p_ceilng.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_ceilng.cpp
 CMakeFiles/doomlegacy.dir/engine/p_ceilng.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_ceilng.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_ceilng.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_ceilng.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_ceilng.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_ceilng.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_ceilng.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_ceilng.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_ceilng.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_ceilng.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_ceilng.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_ceilng.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_ceilng.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_ceilng.cpp > CMakeFiles/doomlegacy.dir/engine/p_ceilng.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_ceilng.cpp > CMakeFiles/doomlegacy.dir/engine/p_ceilng.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_ceilng.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_ceilng.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_ceilng.cpp -o CMakeFiles/doomlegacy.dir/engine/p_ceilng.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_ceilng.cpp -o CMakeFiles/doomlegacy.dir/engine/p_ceilng.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_doors.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_doors.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_doors.cpp
+CMakeFiles/doomlegacy.dir/engine/p_doors.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_doors.cpp
 CMakeFiles/doomlegacy.dir/engine/p_doors.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_doors.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_doors.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_doors.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_doors.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_doors.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_doors.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_doors.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_doors.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_doors.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_doors.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_doors.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_doors.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_doors.cpp > CMakeFiles/doomlegacy.dir/engine/p_doors.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_doors.cpp > CMakeFiles/doomlegacy.dir/engine/p_doors.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_doors.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_doors.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_doors.cpp -o CMakeFiles/doomlegacy.dir/engine/p_doors.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_doors.cpp -o CMakeFiles/doomlegacy.dir/engine/p_doors.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_genlin.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_genlin.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_genlin.cpp
+CMakeFiles/doomlegacy.dir/engine/p_genlin.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_genlin.cpp
 CMakeFiles/doomlegacy.dir/engine/p_genlin.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_genlin.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_genlin.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_genlin.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_genlin.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_genlin.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_genlin.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_genlin.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_genlin.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_genlin.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_genlin.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_genlin.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_genlin.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_genlin.cpp > CMakeFiles/doomlegacy.dir/engine/p_genlin.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_genlin.cpp > CMakeFiles/doomlegacy.dir/engine/p_genlin.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_genlin.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_genlin.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_genlin.cpp -o CMakeFiles/doomlegacy.dir/engine/p_genlin.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_genlin.cpp -o CMakeFiles/doomlegacy.dir/engine/p_genlin.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_things.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_things.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_things.cpp
+CMakeFiles/doomlegacy.dir/engine/p_things.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_things.cpp
 CMakeFiles/doomlegacy.dir/engine/p_things.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_things.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_things.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_things.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_things.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_things.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_things.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_things.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_things.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_things.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_things.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_things.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_things.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_things.cpp > CMakeFiles/doomlegacy.dir/engine/p_things.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_things.cpp > CMakeFiles/doomlegacy.dir/engine/p_things.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_things.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_things.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_things.cpp -o CMakeFiles/doomlegacy.dir/engine/p_things.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_things.cpp -o CMakeFiles/doomlegacy.dir/engine/p_things.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_lights.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_lights.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_lights.cpp
+CMakeFiles/doomlegacy.dir/engine/p_lights.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_lights.cpp
 CMakeFiles/doomlegacy.dir/engine/p_lights.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_lights.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_lights.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_lights.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_lights.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_lights.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_lights.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_lights.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_lights.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_lights.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_lights.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_lights.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_lights.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_lights.cpp > CMakeFiles/doomlegacy.dir/engine/p_lights.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_lights.cpp > CMakeFiles/doomlegacy.dir/engine/p_lights.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_lights.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_lights.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_lights.cpp -o CMakeFiles/doomlegacy.dir/engine/p_lights.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_lights.cpp -o CMakeFiles/doomlegacy.dir/engine/p_lights.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_switch.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_switch.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_switch.cpp
+CMakeFiles/doomlegacy.dir/engine/p_switch.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_switch.cpp
 CMakeFiles/doomlegacy.dir/engine/p_switch.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_switch.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_switch.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_switch.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_switch.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_switch.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_switch.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_switch.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_switch.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_switch.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_switch.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_switch.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_switch.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_switch.cpp > CMakeFiles/doomlegacy.dir/engine/p_switch.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_switch.cpp > CMakeFiles/doomlegacy.dir/engine/p_switch.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_switch.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_switch.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_switch.cpp -o CMakeFiles/doomlegacy.dir/engine/p_switch.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_switch.cpp -o CMakeFiles/doomlegacy.dir/engine/p_switch.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_polyobj.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_polyobj.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_polyobj.cpp
+CMakeFiles/doomlegacy.dir/engine/p_polyobj.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_polyobj.cpp
 CMakeFiles/doomlegacy.dir/engine/p_polyobj.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_polyobj.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_polyobj.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_polyobj.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_polyobj.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_polyobj.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_polyobj.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_polyobj.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_polyobj.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_polyobj.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_polyobj.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_polyobj.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_polyobj.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_polyobj.cpp > CMakeFiles/doomlegacy.dir/engine/p_polyobj.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_polyobj.cpp > CMakeFiles/doomlegacy.dir/engine/p_polyobj.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_polyobj.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_polyobj.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_polyobj.cpp -o CMakeFiles/doomlegacy.dir/engine/p_polyobj.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_polyobj.cpp -o CMakeFiles/doomlegacy.dir/engine/p_polyobj.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/a_action.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/a_action.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/a_action.cpp
+CMakeFiles/doomlegacy.dir/engine/a_action.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/a_action.cpp
 CMakeFiles/doomlegacy.dir/engine/a_action.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_31) "Building CXX object CMakeFiles/doomlegacy.dir/engine/a_action.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/a_action.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/a_action.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/a_action.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/a_action.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_31) "Building CXX object CMakeFiles/doomlegacy.dir/engine/a_action.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/a_action.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/a_action.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/a_action.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/a_action.cpp
 
 CMakeFiles/doomlegacy.dir/engine/a_action.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/a_action.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/a_action.cpp > CMakeFiles/doomlegacy.dir/engine/a_action.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/a_action.cpp > CMakeFiles/doomlegacy.dir/engine/a_action.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/a_action.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/a_action.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/a_action.cpp -o CMakeFiles/doomlegacy.dir/engine/a_action.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/a_action.cpp -o CMakeFiles/doomlegacy.dir/engine/a_action.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_pspr.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_pspr.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_pspr.cpp
+CMakeFiles/doomlegacy.dir/engine/p_pspr.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_pspr.cpp
 CMakeFiles/doomlegacy.dir/engine/p_pspr.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_32) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_pspr.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_pspr.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_pspr.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_pspr.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_pspr.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_32) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_pspr.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_pspr.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_pspr.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_pspr.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_pspr.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_pspr.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_pspr.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_pspr.cpp > CMakeFiles/doomlegacy.dir/engine/p_pspr.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_pspr.cpp > CMakeFiles/doomlegacy.dir/engine/p_pspr.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_pspr.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_pspr.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_pspr.cpp -o CMakeFiles/doomlegacy.dir/engine/p_pspr.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_pspr.cpp -o CMakeFiles/doomlegacy.dir/engine/p_pspr.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_hpspr.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_hpspr.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_hpspr.cpp
+CMakeFiles/doomlegacy.dir/engine/p_hpspr.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_hpspr.cpp
 CMakeFiles/doomlegacy.dir/engine/p_hpspr.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_33) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_hpspr.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_hpspr.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_hpspr.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_hpspr.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_hpspr.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_33) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_hpspr.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_hpspr.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_hpspr.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_hpspr.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_hpspr.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_hpspr.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_hpspr.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_hpspr.cpp > CMakeFiles/doomlegacy.dir/engine/p_hpspr.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_hpspr.cpp > CMakeFiles/doomlegacy.dir/engine/p_hpspr.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_hpspr.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_hpspr.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_hpspr.cpp -o CMakeFiles/doomlegacy.dir/engine/p_hpspr.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_hpspr.cpp -o CMakeFiles/doomlegacy.dir/engine/p_hpspr.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_xpspr.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_xpspr.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_xpspr.cpp
+CMakeFiles/doomlegacy.dir/engine/p_xpspr.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_xpspr.cpp
 CMakeFiles/doomlegacy.dir/engine/p_xpspr.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_34) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_xpspr.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_xpspr.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_xpspr.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_xpspr.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_xpspr.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_34) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_xpspr.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_xpspr.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_xpspr.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_xpspr.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_xpspr.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_xpspr.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_xpspr.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_xpspr.cpp > CMakeFiles/doomlegacy.dir/engine/p_xpspr.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_xpspr.cpp > CMakeFiles/doomlegacy.dir/engine/p_xpspr.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_xpspr.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_xpspr.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_xpspr.cpp -o CMakeFiles/doomlegacy.dir/engine/p_xpspr.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_xpspr.cpp -o CMakeFiles/doomlegacy.dir/engine/p_xpspr.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_enemy.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_enemy.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_enemy.cpp
+CMakeFiles/doomlegacy.dir/engine/p_enemy.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_enemy.cpp
 CMakeFiles/doomlegacy.dir/engine/p_enemy.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_35) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_enemy.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_enemy.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_enemy.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_enemy.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_enemy.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_35) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_enemy.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_enemy.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_enemy.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_enemy.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_enemy.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_enemy.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_enemy.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_enemy.cpp > CMakeFiles/doomlegacy.dir/engine/p_enemy.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_enemy.cpp > CMakeFiles/doomlegacy.dir/engine/p_enemy.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_enemy.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_enemy.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_enemy.cpp -o CMakeFiles/doomlegacy.dir/engine/p_enemy.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_enemy.cpp -o CMakeFiles/doomlegacy.dir/engine/p_enemy.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_henemy.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_henemy.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_henemy.cpp
+CMakeFiles/doomlegacy.dir/engine/p_henemy.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_henemy.cpp
 CMakeFiles/doomlegacy.dir/engine/p_henemy.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_36) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_henemy.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_henemy.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_henemy.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_henemy.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_henemy.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_36) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_henemy.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_henemy.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_henemy.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_henemy.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_henemy.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_henemy.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_henemy.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_henemy.cpp > CMakeFiles/doomlegacy.dir/engine/p_henemy.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_henemy.cpp > CMakeFiles/doomlegacy.dir/engine/p_henemy.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_henemy.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_henemy.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_henemy.cpp -o CMakeFiles/doomlegacy.dir/engine/p_henemy.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_henemy.cpp -o CMakeFiles/doomlegacy.dir/engine/p_henemy.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_xenemy.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_xenemy.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_xenemy.cpp
+CMakeFiles/doomlegacy.dir/engine/p_xenemy.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_xenemy.cpp
 CMakeFiles/doomlegacy.dir/engine/p_xenemy.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_37) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_xenemy.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_xenemy.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_xenemy.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_xenemy.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_xenemy.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_37) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_xenemy.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_xenemy.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_xenemy.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_xenemy.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_xenemy.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_xenemy.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_xenemy.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_xenemy.cpp > CMakeFiles/doomlegacy.dir/engine/p_xenemy.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_xenemy.cpp > CMakeFiles/doomlegacy.dir/engine/p_xenemy.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_xenemy.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_xenemy.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_xenemy.cpp -o CMakeFiles/doomlegacy.dir/engine/p_xenemy.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_xenemy.cpp -o CMakeFiles/doomlegacy.dir/engine/p_xenemy.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/ai_mobjinfo.cpp
+CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/ai_mobjinfo.cpp
 CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_38) "Building CXX object CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/ai_mobjinfo.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_38) "Building CXX object CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/ai_mobjinfo.cpp
 
 CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/ai_mobjinfo.cpp > CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/ai_mobjinfo.cpp > CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/ai_mobjinfo.cpp -o CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/ai_mobjinfo.cpp -o CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/ai_states.cpp
+CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/ai_states.cpp
 CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_39) "Building CXX object CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/ai_states.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_39) "Building CXX object CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/ai_states.cpp
 
 CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/ai_states.cpp > CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/ai_states.cpp > CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/ai_states.cpp -o CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/ai_states.cpp -o CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_map.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_map.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_map.cpp
+CMakeFiles/doomlegacy.dir/engine/p_map.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_map.cpp
 CMakeFiles/doomlegacy.dir/engine/p_map.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_40) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_map.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_map.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_map.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_map.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_map.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_40) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_map.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_map.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_map.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_map.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_map.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_map.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_map.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_map.cpp > CMakeFiles/doomlegacy.dir/engine/p_map.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_map.cpp > CMakeFiles/doomlegacy.dir/engine/p_map.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_map.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_map.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_map.cpp -o CMakeFiles/doomlegacy.dir/engine/p_map.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_map.cpp -o CMakeFiles/doomlegacy.dir/engine/p_map.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_maputl.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_maputl.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_maputl.cpp
+CMakeFiles/doomlegacy.dir/engine/p_maputl.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_maputl.cpp
 CMakeFiles/doomlegacy.dir/engine/p_maputl.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_41) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_maputl.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_maputl.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_maputl.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_maputl.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_maputl.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_41) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_maputl.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_maputl.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_maputl.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_maputl.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_maputl.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_maputl.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_maputl.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_maputl.cpp > CMakeFiles/doomlegacy.dir/engine/p_maputl.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_maputl.cpp > CMakeFiles/doomlegacy.dir/engine/p_maputl.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_maputl.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_maputl.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_maputl.cpp -o CMakeFiles/doomlegacy.dir/engine/p_maputl.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_maputl.cpp -o CMakeFiles/doomlegacy.dir/engine/p_maputl.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_sight.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_sight.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_sight.cpp
+CMakeFiles/doomlegacy.dir/engine/p_sight.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_sight.cpp
 CMakeFiles/doomlegacy.dir/engine/p_sight.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_42) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_sight.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_sight.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_sight.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_sight.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_sight.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_42) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_sight.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_sight.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_sight.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_sight.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_sight.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_sight.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_sight.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_sight.cpp > CMakeFiles/doomlegacy.dir/engine/p_sight.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_sight.cpp > CMakeFiles/doomlegacy.dir/engine/p_sight.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_sight.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_sight.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_sight.cpp -o CMakeFiles/doomlegacy.dir/engine/p_sight.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_sight.cpp -o CMakeFiles/doomlegacy.dir/engine/p_sight.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_telept.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_telept.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_telept.cpp
+CMakeFiles/doomlegacy.dir/engine/p_telept.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_telept.cpp
 CMakeFiles/doomlegacy.dir/engine/p_telept.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_43) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_telept.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_telept.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_telept.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_telept.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_telept.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_43) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_telept.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_telept.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_telept.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_telept.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_telept.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_telept.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_telept.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_telept.cpp > CMakeFiles/doomlegacy.dir/engine/p_telept.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_telept.cpp > CMakeFiles/doomlegacy.dir/engine/p_telept.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_telept.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_telept.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_telept.cpp -o CMakeFiles/doomlegacy.dir/engine/p_telept.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_telept.cpp -o CMakeFiles/doomlegacy.dir/engine/p_telept.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_camera.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_camera.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_camera.cpp
+CMakeFiles/doomlegacy.dir/engine/p_camera.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_camera.cpp
 CMakeFiles/doomlegacy.dir/engine/p_camera.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_44) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_camera.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_camera.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_camera.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_camera.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_camera.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_44) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_camera.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_camera.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_camera.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_camera.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_camera.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_camera.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_camera.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_camera.cpp > CMakeFiles/doomlegacy.dir/engine/p_camera.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_camera.cpp > CMakeFiles/doomlegacy.dir/engine/p_camera.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_camera.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_camera.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_camera.cpp -o CMakeFiles/doomlegacy.dir/engine/p_camera.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_camera.cpp -o CMakeFiles/doomlegacy.dir/engine/p_camera.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_user.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_user.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_user.cpp
+CMakeFiles/doomlegacy.dir/engine/p_user.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_user.cpp
 CMakeFiles/doomlegacy.dir/engine/p_user.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_45) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_user.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_user.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_user.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_user.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_user.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_45) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_user.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_user.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_user.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_user.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_user.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_user.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_user.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_user.cpp > CMakeFiles/doomlegacy.dir/engine/p_user.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_user.cpp > CMakeFiles/doomlegacy.dir/engine/p_user.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_user.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_user.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_user.cpp -o CMakeFiles/doomlegacy.dir/engine/p_user.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_user.cpp -o CMakeFiles/doomlegacy.dir/engine/p_user.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_inter.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_inter.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_inter.cpp
+CMakeFiles/doomlegacy.dir/engine/p_inter.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_inter.cpp
 CMakeFiles/doomlegacy.dir/engine/p_inter.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_46) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_inter.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_inter.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_inter.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_inter.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_inter.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_46) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_inter.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_inter.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_inter.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_inter.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_inter.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_inter.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_inter.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_inter.cpp > CMakeFiles/doomlegacy.dir/engine/p_inter.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_inter.cpp > CMakeFiles/doomlegacy.dir/engine/p_inter.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_inter.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_inter.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_inter.cpp -o CMakeFiles/doomlegacy.dir/engine/p_inter.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_inter.cpp -o CMakeFiles/doomlegacy.dir/engine/p_inter.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/m_cheat.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/m_cheat.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/m_cheat.cpp
+CMakeFiles/doomlegacy.dir/engine/m_cheat.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/m_cheat.cpp
 CMakeFiles/doomlegacy.dir/engine/m_cheat.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_47) "Building CXX object CMakeFiles/doomlegacy.dir/engine/m_cheat.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/m_cheat.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/m_cheat.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/m_cheat.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/m_cheat.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_47) "Building CXX object CMakeFiles/doomlegacy.dir/engine/m_cheat.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/m_cheat.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/m_cheat.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/m_cheat.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/m_cheat.cpp
 
 CMakeFiles/doomlegacy.dir/engine/m_cheat.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/m_cheat.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/m_cheat.cpp > CMakeFiles/doomlegacy.dir/engine/m_cheat.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/m_cheat.cpp > CMakeFiles/doomlegacy.dir/engine/m_cheat.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/m_cheat.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/m_cheat.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/m_cheat.cpp -o CMakeFiles/doomlegacy.dir/engine/m_cheat.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/m_cheat.cpp -o CMakeFiles/doomlegacy.dir/engine/m_cheat.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_fab.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_fab.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_fab.cpp
+CMakeFiles/doomlegacy.dir/engine/p_fab.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_fab.cpp
 CMakeFiles/doomlegacy.dir/engine/p_fab.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_48) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_fab.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_fab.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_fab.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_fab.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_fab.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_48) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_fab.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_fab.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_fab.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_fab.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_fab.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_fab.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_fab.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_fab.cpp > CMakeFiles/doomlegacy.dir/engine/p_fab.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_fab.cpp > CMakeFiles/doomlegacy.dir/engine/p_fab.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_fab.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_fab.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_fab.cpp -o CMakeFiles/doomlegacy.dir/engine/p_fab.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_fab.cpp -o CMakeFiles/doomlegacy.dir/engine/p_fab.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/p_hacks.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/p_hacks.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_hacks.cpp
+CMakeFiles/doomlegacy.dir/engine/p_hacks.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_hacks.cpp
 CMakeFiles/doomlegacy.dir/engine/p_hacks.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_49) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_hacks.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_hacks.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_hacks.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_hacks.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_hacks.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_49) "Building CXX object CMakeFiles/doomlegacy.dir/engine/p_hacks.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/p_hacks.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/p_hacks.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/p_hacks.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_hacks.cpp
 
 CMakeFiles/doomlegacy.dir/engine/p_hacks.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/p_hacks.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_hacks.cpp > CMakeFiles/doomlegacy.dir/engine/p_hacks.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_hacks.cpp > CMakeFiles/doomlegacy.dir/engine/p_hacks.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/p_hacks.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/p_hacks.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/p_hacks.cpp -o CMakeFiles/doomlegacy.dir/engine/p_hacks.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/p_hacks.cpp -o CMakeFiles/doomlegacy.dir/engine/p_hacks.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/d_items.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/d_items.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/d_items.cpp
+CMakeFiles/doomlegacy.dir/engine/d_items.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/d_items.cpp
 CMakeFiles/doomlegacy.dir/engine/d_items.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_50) "Building CXX object CMakeFiles/doomlegacy.dir/engine/d_items.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/d_items.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/d_items.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/d_items.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/d_items.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_50) "Building CXX object CMakeFiles/doomlegacy.dir/engine/d_items.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/d_items.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/d_items.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/d_items.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/d_items.cpp
 
 CMakeFiles/doomlegacy.dir/engine/d_items.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/d_items.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/d_items.cpp > CMakeFiles/doomlegacy.dir/engine/d_items.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/d_items.cpp > CMakeFiles/doomlegacy.dir/engine/d_items.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/d_items.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/d_items.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/d_items.cpp -o CMakeFiles/doomlegacy.dir/engine/d_items.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/d_items.cpp -o CMakeFiles/doomlegacy.dir/engine/d_items.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/d_main.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/d_main.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/d_main.cpp
+CMakeFiles/doomlegacy.dir/engine/d_main.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/d_main.cpp
 CMakeFiles/doomlegacy.dir/engine/d_main.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_51) "Building CXX object CMakeFiles/doomlegacy.dir/engine/d_main.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/d_main.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/d_main.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/d_main.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/d_main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_51) "Building CXX object CMakeFiles/doomlegacy.dir/engine/d_main.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/d_main.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/d_main.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/d_main.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/d_main.cpp
 
 CMakeFiles/doomlegacy.dir/engine/d_main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/d_main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/d_main.cpp > CMakeFiles/doomlegacy.dir/engine/d_main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/d_main.cpp > CMakeFiles/doomlegacy.dir/engine/d_main.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/d_main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/d_main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/d_main.cpp -o CMakeFiles/doomlegacy.dir/engine/d_main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/d_main.cpp -o CMakeFiles/doomlegacy.dir/engine/d_main.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/dstrings.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/dstrings.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/dstrings.cpp
+CMakeFiles/doomlegacy.dir/engine/dstrings.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/dstrings.cpp
 CMakeFiles/doomlegacy.dir/engine/dstrings.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_52) "Building CXX object CMakeFiles/doomlegacy.dir/engine/dstrings.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/dstrings.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/dstrings.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/dstrings.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/dstrings.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_52) "Building CXX object CMakeFiles/doomlegacy.dir/engine/dstrings.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/dstrings.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/dstrings.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/dstrings.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/dstrings.cpp
 
 CMakeFiles/doomlegacy.dir/engine/dstrings.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/dstrings.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/dstrings.cpp > CMakeFiles/doomlegacy.dir/engine/dstrings.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/dstrings.cpp > CMakeFiles/doomlegacy.dir/engine/dstrings.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/dstrings.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/dstrings.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/dstrings.cpp -o CMakeFiles/doomlegacy.dir/engine/dstrings.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/dstrings.cpp -o CMakeFiles/doomlegacy.dir/engine/dstrings.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/bots/acbot.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/bots/acbot.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/bots/acbot.cpp
+CMakeFiles/doomlegacy.dir/engine/bots/acbot.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/bots/acbot.cpp
 CMakeFiles/doomlegacy.dir/engine/bots/acbot.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_53) "Building CXX object CMakeFiles/doomlegacy.dir/engine/bots/acbot.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/bots/acbot.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/bots/acbot.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/bots/acbot.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/bots/acbot.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_53) "Building CXX object CMakeFiles/doomlegacy.dir/engine/bots/acbot.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/bots/acbot.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/bots/acbot.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/bots/acbot.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/bots/acbot.cpp
 
 CMakeFiles/doomlegacy.dir/engine/bots/acbot.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/bots/acbot.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/bots/acbot.cpp > CMakeFiles/doomlegacy.dir/engine/bots/acbot.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/bots/acbot.cpp > CMakeFiles/doomlegacy.dir/engine/bots/acbot.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/bots/acbot.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/bots/acbot.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/bots/acbot.cpp -o CMakeFiles/doomlegacy.dir/engine/bots/acbot.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/bots/acbot.cpp -o CMakeFiles/doomlegacy.dir/engine/bots/acbot.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/bots/b_bot.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/bots/b_bot.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/bots/b_bot.cpp
+CMakeFiles/doomlegacy.dir/engine/bots/b_bot.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/bots/b_bot.cpp
 CMakeFiles/doomlegacy.dir/engine/bots/b_bot.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_54) "Building CXX object CMakeFiles/doomlegacy.dir/engine/bots/b_bot.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/bots/b_bot.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/bots/b_bot.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/bots/b_bot.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/bots/b_bot.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_54) "Building CXX object CMakeFiles/doomlegacy.dir/engine/bots/b_bot.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/bots/b_bot.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/bots/b_bot.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/bots/b_bot.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/bots/b_bot.cpp
 
 CMakeFiles/doomlegacy.dir/engine/bots/b_bot.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/bots/b_bot.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/bots/b_bot.cpp > CMakeFiles/doomlegacy.dir/engine/bots/b_bot.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/bots/b_bot.cpp > CMakeFiles/doomlegacy.dir/engine/bots/b_bot.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/bots/b_bot.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/bots/b_bot.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/bots/b_bot.cpp -o CMakeFiles/doomlegacy.dir/engine/bots/b_bot.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/bots/b_bot.cpp -o CMakeFiles/doomlegacy.dir/engine/bots/b_bot.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/bots/b_path.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/bots/b_path.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/bots/b_path.cpp
+CMakeFiles/doomlegacy.dir/engine/bots/b_path.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/bots/b_path.cpp
 CMakeFiles/doomlegacy.dir/engine/bots/b_path.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_55) "Building CXX object CMakeFiles/doomlegacy.dir/engine/bots/b_path.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/bots/b_path.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/bots/b_path.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/bots/b_path.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/bots/b_path.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_55) "Building CXX object CMakeFiles/doomlegacy.dir/engine/bots/b_path.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/bots/b_path.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/bots/b_path.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/bots/b_path.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/bots/b_path.cpp
 
 CMakeFiles/doomlegacy.dir/engine/bots/b_path.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/bots/b_path.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/bots/b_path.cpp > CMakeFiles/doomlegacy.dir/engine/bots/b_path.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/bots/b_path.cpp > CMakeFiles/doomlegacy.dir/engine/bots/b_path.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/bots/b_path.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/bots/b_path.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/bots/b_path.cpp -o CMakeFiles/doomlegacy.dir/engine/bots/b_path.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/bots/b_path.cpp -o CMakeFiles/doomlegacy.dir/engine/bots/b_path.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/scripting/acs.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/scripting/acs.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/acs.cpp
+CMakeFiles/doomlegacy.dir/engine/scripting/acs.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/acs.cpp
 CMakeFiles/doomlegacy.dir/engine/scripting/acs.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_56) "Building CXX object CMakeFiles/doomlegacy.dir/engine/scripting/acs.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/scripting/acs.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/scripting/acs.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/scripting/acs.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/acs.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_56) "Building CXX object CMakeFiles/doomlegacy.dir/engine/scripting/acs.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/scripting/acs.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/scripting/acs.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/scripting/acs.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/acs.cpp
 
 CMakeFiles/doomlegacy.dir/engine/scripting/acs.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/scripting/acs.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/acs.cpp > CMakeFiles/doomlegacy.dir/engine/scripting/acs.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/acs.cpp > CMakeFiles/doomlegacy.dir/engine/scripting/acs.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/scripting/acs.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/scripting/acs.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/acs.cpp -o CMakeFiles/doomlegacy.dir/engine/scripting/acs.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/acs.cpp -o CMakeFiles/doomlegacy.dir/engine/scripting/acs.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_oper.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/scripting/t_oper.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_oper.cpp
+CMakeFiles/doomlegacy.dir/engine/scripting/t_oper.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_oper.cpp
 CMakeFiles/doomlegacy.dir/engine/scripting/t_oper.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_57) "Building CXX object CMakeFiles/doomlegacy.dir/engine/scripting/t_oper.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/scripting/t_oper.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/scripting/t_oper.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/scripting/t_oper.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_oper.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_57) "Building CXX object CMakeFiles/doomlegacy.dir/engine/scripting/t_oper.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/scripting/t_oper.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/scripting/t_oper.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/scripting/t_oper.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_oper.cpp
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_oper.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/scripting/t_oper.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_oper.cpp > CMakeFiles/doomlegacy.dir/engine/scripting/t_oper.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_oper.cpp > CMakeFiles/doomlegacy.dir/engine/scripting/t_oper.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_oper.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/scripting/t_oper.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_oper.cpp -o CMakeFiles/doomlegacy.dir/engine/scripting/t_oper.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_oper.cpp -o CMakeFiles/doomlegacy.dir/engine/scripting/t_oper.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_parse.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/scripting/t_parse.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_parse.cpp
+CMakeFiles/doomlegacy.dir/engine/scripting/t_parse.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_parse.cpp
 CMakeFiles/doomlegacy.dir/engine/scripting/t_parse.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_58) "Building CXX object CMakeFiles/doomlegacy.dir/engine/scripting/t_parse.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/scripting/t_parse.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/scripting/t_parse.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/scripting/t_parse.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_parse.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_58) "Building CXX object CMakeFiles/doomlegacy.dir/engine/scripting/t_parse.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/scripting/t_parse.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/scripting/t_parse.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/scripting/t_parse.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_parse.cpp
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_parse.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/scripting/t_parse.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_parse.cpp > CMakeFiles/doomlegacy.dir/engine/scripting/t_parse.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_parse.cpp > CMakeFiles/doomlegacy.dir/engine/scripting/t_parse.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_parse.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/scripting/t_parse.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_parse.cpp -o CMakeFiles/doomlegacy.dir/engine/scripting/t_parse.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_parse.cpp -o CMakeFiles/doomlegacy.dir/engine/scripting/t_parse.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_prepro.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/scripting/t_prepro.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_prepro.cpp
+CMakeFiles/doomlegacy.dir/engine/scripting/t_prepro.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_prepro.cpp
 CMakeFiles/doomlegacy.dir/engine/scripting/t_prepro.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_59) "Building CXX object CMakeFiles/doomlegacy.dir/engine/scripting/t_prepro.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/scripting/t_prepro.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/scripting/t_prepro.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/scripting/t_prepro.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_prepro.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_59) "Building CXX object CMakeFiles/doomlegacy.dir/engine/scripting/t_prepro.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/scripting/t_prepro.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/scripting/t_prepro.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/scripting/t_prepro.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_prepro.cpp
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_prepro.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/scripting/t_prepro.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_prepro.cpp > CMakeFiles/doomlegacy.dir/engine/scripting/t_prepro.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_prepro.cpp > CMakeFiles/doomlegacy.dir/engine/scripting/t_prepro.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_prepro.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/scripting/t_prepro.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_prepro.cpp -o CMakeFiles/doomlegacy.dir/engine/scripting/t_prepro.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_prepro.cpp -o CMakeFiles/doomlegacy.dir/engine/scripting/t_prepro.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_spec.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/scripting/t_spec.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_spec.cpp
+CMakeFiles/doomlegacy.dir/engine/scripting/t_spec.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_spec.cpp
 CMakeFiles/doomlegacy.dir/engine/scripting/t_spec.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_60) "Building CXX object CMakeFiles/doomlegacy.dir/engine/scripting/t_spec.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/scripting/t_spec.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/scripting/t_spec.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/scripting/t_spec.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_spec.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_60) "Building CXX object CMakeFiles/doomlegacy.dir/engine/scripting/t_spec.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/scripting/t_spec.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/scripting/t_spec.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/scripting/t_spec.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_spec.cpp
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_spec.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/scripting/t_spec.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_spec.cpp > CMakeFiles/doomlegacy.dir/engine/scripting/t_spec.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_spec.cpp > CMakeFiles/doomlegacy.dir/engine/scripting/t_spec.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_spec.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/scripting/t_spec.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_spec.cpp -o CMakeFiles/doomlegacy.dir/engine/scripting/t_spec.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_spec.cpp -o CMakeFiles/doomlegacy.dir/engine/scripting/t_spec.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_vari.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/scripting/t_vari.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_vari.cpp
+CMakeFiles/doomlegacy.dir/engine/scripting/t_vari.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_vari.cpp
 CMakeFiles/doomlegacy.dir/engine/scripting/t_vari.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_61) "Building CXX object CMakeFiles/doomlegacy.dir/engine/scripting/t_vari.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/scripting/t_vari.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/scripting/t_vari.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/scripting/t_vari.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_vari.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_61) "Building CXX object CMakeFiles/doomlegacy.dir/engine/scripting/t_vari.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/scripting/t_vari.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/scripting/t_vari.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/scripting/t_vari.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_vari.cpp
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_vari.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/scripting/t_vari.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_vari.cpp > CMakeFiles/doomlegacy.dir/engine/scripting/t_vari.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_vari.cpp > CMakeFiles/doomlegacy.dir/engine/scripting/t_vari.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_vari.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/scripting/t_vari.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_vari.cpp -o CMakeFiles/doomlegacy.dir/engine/scripting/t_vari.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_vari.cpp -o CMakeFiles/doomlegacy.dir/engine/scripting/t_vari.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_script.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/scripting/t_script.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_script.cpp
+CMakeFiles/doomlegacy.dir/engine/scripting/t_script.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_script.cpp
 CMakeFiles/doomlegacy.dir/engine/scripting/t_script.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_62) "Building CXX object CMakeFiles/doomlegacy.dir/engine/scripting/t_script.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/scripting/t_script.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/scripting/t_script.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/scripting/t_script.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_script.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_62) "Building CXX object CMakeFiles/doomlegacy.dir/engine/scripting/t_script.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/scripting/t_script.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/scripting/t_script.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/scripting/t_script.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_script.cpp
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_script.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/scripting/t_script.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_script.cpp > CMakeFiles/doomlegacy.dir/engine/scripting/t_script.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_script.cpp > CMakeFiles/doomlegacy.dir/engine/scripting/t_script.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_script.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/scripting/t_script.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_script.cpp -o CMakeFiles/doomlegacy.dir/engine/scripting/t_script.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_script.cpp -o CMakeFiles/doomlegacy.dir/engine/scripting/t_script.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_func.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/scripting/t_func.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_func.cpp
+CMakeFiles/doomlegacy.dir/engine/scripting/t_func.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_func.cpp
 CMakeFiles/doomlegacy.dir/engine/scripting/t_func.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_63) "Building CXX object CMakeFiles/doomlegacy.dir/engine/scripting/t_func.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/scripting/t_func.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/scripting/t_func.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/scripting/t_func.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_func.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_63) "Building CXX object CMakeFiles/doomlegacy.dir/engine/scripting/t_func.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/scripting/t_func.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/scripting/t_func.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/scripting/t_func.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_func.cpp
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_func.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/scripting/t_func.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_func.cpp > CMakeFiles/doomlegacy.dir/engine/scripting/t_func.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_func.cpp > CMakeFiles/doomlegacy.dir/engine/scripting/t_func.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/scripting/t_func.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/scripting/t_func.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/scripting/t_func.cpp -o CMakeFiles/doomlegacy.dir/engine/scripting/t_func.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/scripting/t_func.cpp -o CMakeFiles/doomlegacy.dir/engine/scripting/t_func.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/automap/am_map.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/automap/am_map.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/automap/am_map.cpp
+CMakeFiles/doomlegacy.dir/engine/automap/am_map.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/automap/am_map.cpp
 CMakeFiles/doomlegacy.dir/engine/automap/am_map.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_64) "Building CXX object CMakeFiles/doomlegacy.dir/engine/automap/am_map.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/automap/am_map.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/automap/am_map.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/automap/am_map.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/automap/am_map.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_64) "Building CXX object CMakeFiles/doomlegacy.dir/engine/automap/am_map.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/automap/am_map.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/automap/am_map.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/automap/am_map.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/automap/am_map.cpp
 
 CMakeFiles/doomlegacy.dir/engine/automap/am_map.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/automap/am_map.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/automap/am_map.cpp > CMakeFiles/doomlegacy.dir/engine/automap/am_map.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/automap/am_map.cpp > CMakeFiles/doomlegacy.dir/engine/automap/am_map.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/automap/am_map.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/automap/am_map.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/automap/am_map.cpp -o CMakeFiles/doomlegacy.dir/engine/automap/am_map.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/automap/am_map.cpp -o CMakeFiles/doomlegacy.dir/engine/automap/am_map.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/menu/menu.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/menu/menu.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/menu/menu.cpp
+CMakeFiles/doomlegacy.dir/engine/menu/menu.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/menu/menu.cpp
 CMakeFiles/doomlegacy.dir/engine/menu/menu.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_65) "Building CXX object CMakeFiles/doomlegacy.dir/engine/menu/menu.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/menu/menu.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/menu/menu.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/menu/menu.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/menu/menu.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_65) "Building CXX object CMakeFiles/doomlegacy.dir/engine/menu/menu.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/menu/menu.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/menu/menu.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/menu/menu.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/menu/menu.cpp
 
 CMakeFiles/doomlegacy.dir/engine/menu/menu.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/menu/menu.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/menu/menu.cpp > CMakeFiles/doomlegacy.dir/engine/menu/menu.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/menu/menu.cpp > CMakeFiles/doomlegacy.dir/engine/menu/menu.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/menu/menu.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/menu/menu.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/menu/menu.cpp -o CMakeFiles/doomlegacy.dir/engine/menu/menu.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/menu/menu.cpp -o CMakeFiles/doomlegacy.dir/engine/menu/menu.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/finale/f_finale.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/finale/f_finale.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/finale/f_finale.cpp
+CMakeFiles/doomlegacy.dir/engine/finale/f_finale.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/finale/f_finale.cpp
 CMakeFiles/doomlegacy.dir/engine/finale/f_finale.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_66) "Building CXX object CMakeFiles/doomlegacy.dir/engine/finale/f_finale.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/finale/f_finale.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/finale/f_finale.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/finale/f_finale.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/finale/f_finale.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_66) "Building CXX object CMakeFiles/doomlegacy.dir/engine/finale/f_finale.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/finale/f_finale.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/finale/f_finale.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/finale/f_finale.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/finale/f_finale.cpp
 
 CMakeFiles/doomlegacy.dir/engine/finale/f_finale.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/finale/f_finale.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/finale/f_finale.cpp > CMakeFiles/doomlegacy.dir/engine/finale/f_finale.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/finale/f_finale.cpp > CMakeFiles/doomlegacy.dir/engine/finale/f_finale.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/finale/f_finale.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/finale/f_finale.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/finale/f_finale.cpp -o CMakeFiles/doomlegacy.dir/engine/finale/f_finale.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/finale/f_finale.cpp -o CMakeFiles/doomlegacy.dir/engine/finale/f_finale.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/finale/wi_stuff.cpp
+CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/finale/wi_stuff.cpp
 CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_67) "Building CXX object CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/finale/wi_stuff.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_67) "Building CXX object CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/finale/wi_stuff.cpp
 
 CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/finale/wi_stuff.cpp > CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/finale/wi_stuff.cpp > CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/finale/wi_stuff.cpp -o CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/finale/wi_stuff.cpp -o CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/hud/st_lib.cpp
+CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/hud/st_lib.cpp
 CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_68) "Building CXX object CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/hud/st_lib.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_68) "Building CXX object CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/hud/st_lib.cpp
 
 CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/hud/st_lib.cpp > CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/hud/st_lib.cpp > CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/hud/st_lib.cpp -o CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/hud/st_lib.cpp -o CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/hud/st_stuff.cpp
+CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/hud/st_stuff.cpp
 CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_69) "Building CXX object CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/hud/st_stuff.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_69) "Building CXX object CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/hud/st_stuff.cpp
 
 CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/hud/st_stuff.cpp > CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/hud/st_stuff.cpp > CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/hud/st_stuff.cpp -o CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/hud/st_stuff.cpp -o CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.s
 
 CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/hud/hu_stuff.cpp
+CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/hud/hu_stuff.cpp
 CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_70) "Building CXX object CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/hud/hu_stuff.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_70) "Building CXX object CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.o -MF CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.o.d -o CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/hud/hu_stuff.cpp
 
 CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/hud/hu_stuff.cpp > CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/hud/hu_stuff.cpp > CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.i
 
 CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/hud/hu_stuff.cpp -o CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/engine/hud/hu_stuff.cpp -o CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.s
+
+CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
+CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/audio/qmus2mid.cpp
+CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_71) "Building CXX object CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.o -MF CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.o.d -o CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/audio/qmus2mid.cpp
+
+CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/audio/qmus2mid.cpp > CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.i
+
+CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/audio/qmus2mid.cpp -o CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.s
+
+CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
+CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/audio/s_sndseq.cpp
+CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_72) "Building CXX object CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.o -MF CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.o.d -o CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/audio/s_sndseq.cpp
+
+CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/audio/s_sndseq.cpp > CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.i
+
+CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/audio/s_sndseq.cpp -o CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.s
+
+CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
+CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/audio/s_sound.cpp
+CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_73) "Building CXX object CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.o -MF CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.o.d -o CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/audio/s_sound.cpp
+
+CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/audio/s_sound.cpp > CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.i
+
+CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/audio/s_sound.cpp -o CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.s
+
+CMakeFiles/doomlegacy.dir/audio/sounds.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
+CMakeFiles/doomlegacy.dir/audio/sounds.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/audio/sounds.cpp
+CMakeFiles/doomlegacy.dir/audio/sounds.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_74) "Building CXX object CMakeFiles/doomlegacy.dir/audio/sounds.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/audio/sounds.cpp.o -MF CMakeFiles/doomlegacy.dir/audio/sounds.cpp.o.d -o CMakeFiles/doomlegacy.dir/audio/sounds.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/audio/sounds.cpp
+
+CMakeFiles/doomlegacy.dir/audio/sounds.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/audio/sounds.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/audio/sounds.cpp > CMakeFiles/doomlegacy.dir/audio/sounds.cpp.i
+
+CMakeFiles/doomlegacy.dir/audio/sounds.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/audio/sounds.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/audio/sounds.cpp -o CMakeFiles/doomlegacy.dir/audio/sounds.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/png.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/png.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/png.cpp
+CMakeFiles/doomlegacy.dir/video/png.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/png.cpp
 CMakeFiles/doomlegacy.dir/video/png.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_71) "Building CXX object CMakeFiles/doomlegacy.dir/video/png.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/png.cpp.o -MF CMakeFiles/doomlegacy.dir/video/png.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/png.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/png.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_75) "Building CXX object CMakeFiles/doomlegacy.dir/video/png.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/png.cpp.o -MF CMakeFiles/doomlegacy.dir/video/png.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/png.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/png.cpp
 
 CMakeFiles/doomlegacy.dir/video/png.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/png.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/png.cpp > CMakeFiles/doomlegacy.dir/video/png.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/png.cpp > CMakeFiles/doomlegacy.dir/video/png.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/png.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/png.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/png.cpp -o CMakeFiles/doomlegacy.dir/video/png.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/png.cpp -o CMakeFiles/doomlegacy.dir/video/png.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/jpeg.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/jpeg.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/jpeg.cpp
+CMakeFiles/doomlegacy.dir/video/jpeg.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/jpeg.cpp
 CMakeFiles/doomlegacy.dir/video/jpeg.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_72) "Building CXX object CMakeFiles/doomlegacy.dir/video/jpeg.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/jpeg.cpp.o -MF CMakeFiles/doomlegacy.dir/video/jpeg.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/jpeg.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/jpeg.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_76) "Building CXX object CMakeFiles/doomlegacy.dir/video/jpeg.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/jpeg.cpp.o -MF CMakeFiles/doomlegacy.dir/video/jpeg.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/jpeg.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/jpeg.cpp
 
 CMakeFiles/doomlegacy.dir/video/jpeg.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/jpeg.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/jpeg.cpp > CMakeFiles/doomlegacy.dir/video/jpeg.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/jpeg.cpp > CMakeFiles/doomlegacy.dir/video/jpeg.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/jpeg.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/jpeg.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/jpeg.cpp -o CMakeFiles/doomlegacy.dir/video/jpeg.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/jpeg.cpp -o CMakeFiles/doomlegacy.dir/video/jpeg.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/screen.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/screen.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/screen.cpp
+CMakeFiles/doomlegacy.dir/video/screen.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/screen.cpp
 CMakeFiles/doomlegacy.dir/video/screen.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_73) "Building CXX object CMakeFiles/doomlegacy.dir/video/screen.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/screen.cpp.o -MF CMakeFiles/doomlegacy.dir/video/screen.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/screen.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/screen.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_77) "Building CXX object CMakeFiles/doomlegacy.dir/video/screen.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/screen.cpp.o -MF CMakeFiles/doomlegacy.dir/video/screen.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/screen.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/screen.cpp
 
 CMakeFiles/doomlegacy.dir/video/screen.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/screen.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/screen.cpp > CMakeFiles/doomlegacy.dir/video/screen.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/screen.cpp > CMakeFiles/doomlegacy.dir/video/screen.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/screen.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/screen.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/screen.cpp -o CMakeFiles/doomlegacy.dir/video/screen.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/screen.cpp -o CMakeFiles/doomlegacy.dir/video/screen.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/v_video.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/v_video.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/v_video.cpp
+CMakeFiles/doomlegacy.dir/video/v_video.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/v_video.cpp
 CMakeFiles/doomlegacy.dir/video/v_video.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_74) "Building CXX object CMakeFiles/doomlegacy.dir/video/v_video.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/v_video.cpp.o -MF CMakeFiles/doomlegacy.dir/video/v_video.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/v_video.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/v_video.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_78) "Building CXX object CMakeFiles/doomlegacy.dir/video/v_video.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/v_video.cpp.o -MF CMakeFiles/doomlegacy.dir/video/v_video.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/v_video.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/v_video.cpp
 
 CMakeFiles/doomlegacy.dir/video/v_video.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/v_video.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/v_video.cpp > CMakeFiles/doomlegacy.dir/video/v_video.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/v_video.cpp > CMakeFiles/doomlegacy.dir/video/v_video.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/v_video.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/v_video.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/v_video.cpp -o CMakeFiles/doomlegacy.dir/video/v_video.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/v_video.cpp -o CMakeFiles/doomlegacy.dir/video/v_video.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/r_font.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/r_font.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_font.cpp
+CMakeFiles/doomlegacy.dir/video/r_font.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_font.cpp
 CMakeFiles/doomlegacy.dir/video/r_font.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_75) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_font.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_font.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_font.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_font.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_font.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_79) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_font.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_font.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_font.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_font.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_font.cpp
 
 CMakeFiles/doomlegacy.dir/video/r_font.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/r_font.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_font.cpp > CMakeFiles/doomlegacy.dir/video/r_font.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_font.cpp > CMakeFiles/doomlegacy.dir/video/r_font.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/r_font.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/r_font.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_font.cpp -o CMakeFiles/doomlegacy.dir/video/r_font.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_font.cpp -o CMakeFiles/doomlegacy.dir/video/r_font.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/r_render.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/r_render.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_render.cpp
+CMakeFiles/doomlegacy.dir/video/r_render.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_render.cpp
 CMakeFiles/doomlegacy.dir/video/r_render.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_76) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_render.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_render.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_render.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_render.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_render.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_80) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_render.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_render.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_render.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_render.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_render.cpp
 
 CMakeFiles/doomlegacy.dir/video/r_render.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/r_render.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_render.cpp > CMakeFiles/doomlegacy.dir/video/r_render.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_render.cpp > CMakeFiles/doomlegacy.dir/video/r_render.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/r_render.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/r_render.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_render.cpp -o CMakeFiles/doomlegacy.dir/video/r_render.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_render.cpp -o CMakeFiles/doomlegacy.dir/video/r_render.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/r_bsp.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/r_bsp.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_bsp.cpp
+CMakeFiles/doomlegacy.dir/video/r_bsp.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_bsp.cpp
 CMakeFiles/doomlegacy.dir/video/r_bsp.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_77) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_bsp.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_bsp.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_bsp.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_bsp.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_bsp.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_81) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_bsp.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_bsp.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_bsp.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_bsp.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_bsp.cpp
 
 CMakeFiles/doomlegacy.dir/video/r_bsp.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/r_bsp.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_bsp.cpp > CMakeFiles/doomlegacy.dir/video/r_bsp.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_bsp.cpp > CMakeFiles/doomlegacy.dir/video/r_bsp.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/r_bsp.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/r_bsp.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_bsp.cpp -o CMakeFiles/doomlegacy.dir/video/r_bsp.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_bsp.cpp -o CMakeFiles/doomlegacy.dir/video/r_bsp.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/r_data.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/r_data.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_data.cpp
+CMakeFiles/doomlegacy.dir/video/r_data.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_data.cpp
 CMakeFiles/doomlegacy.dir/video/r_data.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_78) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_data.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_data.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_data.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_data.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_data.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_82) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_data.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_data.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_data.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_data.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_data.cpp
 
 CMakeFiles/doomlegacy.dir/video/r_data.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/r_data.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_data.cpp > CMakeFiles/doomlegacy.dir/video/r_data.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_data.cpp > CMakeFiles/doomlegacy.dir/video/r_data.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/r_data.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/r_data.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_data.cpp -o CMakeFiles/doomlegacy.dir/video/r_data.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_data.cpp -o CMakeFiles/doomlegacy.dir/video/r_data.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/r_draw.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/r_draw.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_draw.cpp
+CMakeFiles/doomlegacy.dir/video/r_draw.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_draw.cpp
 CMakeFiles/doomlegacy.dir/video/r_draw.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_79) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_draw.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_draw.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_draw.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_draw.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_draw.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_83) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_draw.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_draw.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_draw.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_draw.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_draw.cpp
 
 CMakeFiles/doomlegacy.dir/video/r_draw.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/r_draw.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_draw.cpp > CMakeFiles/doomlegacy.dir/video/r_draw.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_draw.cpp > CMakeFiles/doomlegacy.dir/video/r_draw.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/r_draw.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/r_draw.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_draw.cpp -o CMakeFiles/doomlegacy.dir/video/r_draw.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_draw.cpp -o CMakeFiles/doomlegacy.dir/video/r_draw.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/r_draw8.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/r_draw8.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_draw8.cpp
+CMakeFiles/doomlegacy.dir/video/r_draw8.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_draw8.cpp
 CMakeFiles/doomlegacy.dir/video/r_draw8.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_80) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_draw8.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_draw8.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_draw8.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_draw8.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_draw8.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_84) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_draw8.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_draw8.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_draw8.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_draw8.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_draw8.cpp
 
 CMakeFiles/doomlegacy.dir/video/r_draw8.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/r_draw8.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_draw8.cpp > CMakeFiles/doomlegacy.dir/video/r_draw8.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_draw8.cpp > CMakeFiles/doomlegacy.dir/video/r_draw8.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/r_draw8.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/r_draw8.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_draw8.cpp -o CMakeFiles/doomlegacy.dir/video/r_draw8.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_draw8.cpp -o CMakeFiles/doomlegacy.dir/video/r_draw8.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/r_draw16.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/r_draw16.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_draw16.cpp
+CMakeFiles/doomlegacy.dir/video/r_draw16.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_draw16.cpp
 CMakeFiles/doomlegacy.dir/video/r_draw16.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_81) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_draw16.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_draw16.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_draw16.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_draw16.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_draw16.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_85) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_draw16.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_draw16.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_draw16.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_draw16.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_draw16.cpp
 
 CMakeFiles/doomlegacy.dir/video/r_draw16.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/r_draw16.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_draw16.cpp > CMakeFiles/doomlegacy.dir/video/r_draw16.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_draw16.cpp > CMakeFiles/doomlegacy.dir/video/r_draw16.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/r_draw16.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/r_draw16.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_draw16.cpp -o CMakeFiles/doomlegacy.dir/video/r_draw16.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_draw16.cpp -o CMakeFiles/doomlegacy.dir/video/r_draw16.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/r_main.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/r_main.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_main.cpp
+CMakeFiles/doomlegacy.dir/video/r_main.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_main.cpp
 CMakeFiles/doomlegacy.dir/video/r_main.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_82) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_main.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_main.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_main.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_main.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_86) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_main.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_main.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_main.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_main.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_main.cpp
 
 CMakeFiles/doomlegacy.dir/video/r_main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/r_main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_main.cpp > CMakeFiles/doomlegacy.dir/video/r_main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_main.cpp > CMakeFiles/doomlegacy.dir/video/r_main.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/r_main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/r_main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_main.cpp -o CMakeFiles/doomlegacy.dir/video/r_main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_main.cpp -o CMakeFiles/doomlegacy.dir/video/r_main.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/r_plane.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/r_plane.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_plane.cpp
+CMakeFiles/doomlegacy.dir/video/r_plane.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_plane.cpp
 CMakeFiles/doomlegacy.dir/video/r_plane.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_83) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_plane.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_plane.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_plane.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_plane.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_plane.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_87) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_plane.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_plane.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_plane.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_plane.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_plane.cpp
 
 CMakeFiles/doomlegacy.dir/video/r_plane.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/r_plane.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_plane.cpp > CMakeFiles/doomlegacy.dir/video/r_plane.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_plane.cpp > CMakeFiles/doomlegacy.dir/video/r_plane.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/r_plane.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/r_plane.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_plane.cpp -o CMakeFiles/doomlegacy.dir/video/r_plane.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_plane.cpp -o CMakeFiles/doomlegacy.dir/video/r_plane.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/r_segs.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/r_segs.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_segs.cpp
+CMakeFiles/doomlegacy.dir/video/r_segs.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_segs.cpp
 CMakeFiles/doomlegacy.dir/video/r_segs.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_84) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_segs.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_segs.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_segs.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_segs.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_segs.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_88) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_segs.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_segs.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_segs.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_segs.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_segs.cpp
 
 CMakeFiles/doomlegacy.dir/video/r_segs.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/r_segs.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_segs.cpp > CMakeFiles/doomlegacy.dir/video/r_segs.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_segs.cpp > CMakeFiles/doomlegacy.dir/video/r_segs.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/r_segs.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/r_segs.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_segs.cpp -o CMakeFiles/doomlegacy.dir/video/r_segs.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_segs.cpp -o CMakeFiles/doomlegacy.dir/video/r_segs.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/r_sky.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/r_sky.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_sky.cpp
+CMakeFiles/doomlegacy.dir/video/r_sky.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_sky.cpp
 CMakeFiles/doomlegacy.dir/video/r_sky.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_85) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_sky.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_sky.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_sky.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_sky.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_sky.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_89) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_sky.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_sky.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_sky.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_sky.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_sky.cpp
 
 CMakeFiles/doomlegacy.dir/video/r_sky.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/r_sky.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_sky.cpp > CMakeFiles/doomlegacy.dir/video/r_sky.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_sky.cpp > CMakeFiles/doomlegacy.dir/video/r_sky.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/r_sky.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/r_sky.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_sky.cpp -o CMakeFiles/doomlegacy.dir/video/r_sky.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_sky.cpp -o CMakeFiles/doomlegacy.dir/video/r_sky.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/r_splats.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/r_splats.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_splats.cpp
+CMakeFiles/doomlegacy.dir/video/r_splats.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_splats.cpp
 CMakeFiles/doomlegacy.dir/video/r_splats.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_86) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_splats.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_splats.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_splats.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_splats.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_splats.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_90) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_splats.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_splats.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_splats.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_splats.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_splats.cpp
 
 CMakeFiles/doomlegacy.dir/video/r_splats.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/r_splats.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_splats.cpp > CMakeFiles/doomlegacy.dir/video/r_splats.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_splats.cpp > CMakeFiles/doomlegacy.dir/video/r_splats.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/r_splats.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/r_splats.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_splats.cpp -o CMakeFiles/doomlegacy.dir/video/r_splats.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_splats.cpp -o CMakeFiles/doomlegacy.dir/video/r_splats.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/r_sprite.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/r_sprite.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_sprite.cpp
+CMakeFiles/doomlegacy.dir/video/r_sprite.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_sprite.cpp
 CMakeFiles/doomlegacy.dir/video/r_sprite.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_87) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_sprite.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_sprite.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_sprite.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_sprite.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_sprite.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_91) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_sprite.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_sprite.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_sprite.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_sprite.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_sprite.cpp
 
 CMakeFiles/doomlegacy.dir/video/r_sprite.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/r_sprite.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_sprite.cpp > CMakeFiles/doomlegacy.dir/video/r_sprite.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_sprite.cpp > CMakeFiles/doomlegacy.dir/video/r_sprite.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/r_sprite.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/r_sprite.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_sprite.cpp -o CMakeFiles/doomlegacy.dir/video/r_sprite.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_sprite.cpp -o CMakeFiles/doomlegacy.dir/video/r_sprite.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/r_things.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/r_things.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_things.cpp
+CMakeFiles/doomlegacy.dir/video/r_things.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_things.cpp
 CMakeFiles/doomlegacy.dir/video/r_things.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_88) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_things.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_things.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_things.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_things.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_things.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_92) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_things.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_things.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_things.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_things.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_things.cpp
 
 CMakeFiles/doomlegacy.dir/video/r_things.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/r_things.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_things.cpp > CMakeFiles/doomlegacy.dir/video/r_things.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_things.cpp > CMakeFiles/doomlegacy.dir/video/r_things.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/r_things.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/r_things.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_things.cpp -o CMakeFiles/doomlegacy.dir/video/r_things.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_things.cpp -o CMakeFiles/doomlegacy.dir/video/r_things.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/r_anim.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/r_anim.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_anim.cpp
+CMakeFiles/doomlegacy.dir/video/r_anim.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_anim.cpp
 CMakeFiles/doomlegacy.dir/video/r_anim.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_89) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_anim.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_anim.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_anim.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_anim.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_anim.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_93) "Building CXX object CMakeFiles/doomlegacy.dir/video/r_anim.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/r_anim.cpp.o -MF CMakeFiles/doomlegacy.dir/video/r_anim.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/r_anim.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_anim.cpp
 
 CMakeFiles/doomlegacy.dir/video/r_anim.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/r_anim.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_anim.cpp > CMakeFiles/doomlegacy.dir/video/r_anim.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_anim.cpp > CMakeFiles/doomlegacy.dir/video/r_anim.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/r_anim.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/r_anim.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/r_anim.cpp -o CMakeFiles/doomlegacy.dir/video/r_anim.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/r_anim.cpp -o CMakeFiles/doomlegacy.dir/video/r_anim.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/hardware/oglrenderer.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/hardware/oglrenderer.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/hardware/oglrenderer.cpp
+CMakeFiles/doomlegacy.dir/video/hardware/oglrenderer.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/hardware/oglrenderer.cpp
 CMakeFiles/doomlegacy.dir/video/hardware/oglrenderer.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_90) "Building CXX object CMakeFiles/doomlegacy.dir/video/hardware/oglrenderer.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/hardware/oglrenderer.cpp.o -MF CMakeFiles/doomlegacy.dir/video/hardware/oglrenderer.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/hardware/oglrenderer.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/hardware/oglrenderer.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_94) "Building CXX object CMakeFiles/doomlegacy.dir/video/hardware/oglrenderer.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/hardware/oglrenderer.cpp.o -MF CMakeFiles/doomlegacy.dir/video/hardware/oglrenderer.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/hardware/oglrenderer.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/hardware/oglrenderer.cpp
 
 CMakeFiles/doomlegacy.dir/video/hardware/oglrenderer.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/hardware/oglrenderer.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/hardware/oglrenderer.cpp > CMakeFiles/doomlegacy.dir/video/hardware/oglrenderer.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/hardware/oglrenderer.cpp > CMakeFiles/doomlegacy.dir/video/hardware/oglrenderer.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/hardware/oglrenderer.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/hardware/oglrenderer.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/hardware/oglrenderer.cpp -o CMakeFiles/doomlegacy.dir/video/hardware/oglrenderer.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/hardware/oglrenderer.cpp -o CMakeFiles/doomlegacy.dir/video/hardware/oglrenderer.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/hardware/md3.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/hardware/md3.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/hardware/md3.cpp
+CMakeFiles/doomlegacy.dir/video/hardware/md3.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/hardware/md3.cpp
 CMakeFiles/doomlegacy.dir/video/hardware/md3.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_91) "Building CXX object CMakeFiles/doomlegacy.dir/video/hardware/md3.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/hardware/md3.cpp.o -MF CMakeFiles/doomlegacy.dir/video/hardware/md3.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/hardware/md3.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/hardware/md3.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_95) "Building CXX object CMakeFiles/doomlegacy.dir/video/hardware/md3.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/hardware/md3.cpp.o -MF CMakeFiles/doomlegacy.dir/video/hardware/md3.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/hardware/md3.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/hardware/md3.cpp
 
 CMakeFiles/doomlegacy.dir/video/hardware/md3.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/hardware/md3.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/hardware/md3.cpp > CMakeFiles/doomlegacy.dir/video/hardware/md3.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/hardware/md3.cpp > CMakeFiles/doomlegacy.dir/video/hardware/md3.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/hardware/md3.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/hardware/md3.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/hardware/md3.cpp -o CMakeFiles/doomlegacy.dir/video/hardware/md3.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/hardware/md3.cpp -o CMakeFiles/doomlegacy.dir/video/hardware/md3.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/hardware/oglshaders.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/hardware/oglshaders.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/hardware/oglshaders.cpp
+CMakeFiles/doomlegacy.dir/video/hardware/oglshaders.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/hardware/oglshaders.cpp
 CMakeFiles/doomlegacy.dir/video/hardware/oglshaders.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_92) "Building CXX object CMakeFiles/doomlegacy.dir/video/hardware/oglshaders.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/hardware/oglshaders.cpp.o -MF CMakeFiles/doomlegacy.dir/video/hardware/oglshaders.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/hardware/oglshaders.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/hardware/oglshaders.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_96) "Building CXX object CMakeFiles/doomlegacy.dir/video/hardware/oglshaders.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/hardware/oglshaders.cpp.o -MF CMakeFiles/doomlegacy.dir/video/hardware/oglshaders.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/hardware/oglshaders.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/hardware/oglshaders.cpp
 
 CMakeFiles/doomlegacy.dir/video/hardware/oglshaders.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/hardware/oglshaders.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/hardware/oglshaders.cpp > CMakeFiles/doomlegacy.dir/video/hardware/oglshaders.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/hardware/oglshaders.cpp > CMakeFiles/doomlegacy.dir/video/hardware/oglshaders.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/hardware/oglshaders.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/hardware/oglshaders.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/hardware/oglshaders.cpp -o CMakeFiles/doomlegacy.dir/video/hardware/oglshaders.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/hardware/oglshaders.cpp -o CMakeFiles/doomlegacy.dir/video/hardware/oglshaders.cpp.s
 
 CMakeFiles/doomlegacy.dir/video/hardware/oglhelpers.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/video/hardware/oglhelpers.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/hardware/oglhelpers.cpp
+CMakeFiles/doomlegacy.dir/video/hardware/oglhelpers.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/hardware/oglhelpers.cpp
 CMakeFiles/doomlegacy.dir/video/hardware/oglhelpers.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_93) "Building CXX object CMakeFiles/doomlegacy.dir/video/hardware/oglhelpers.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/hardware/oglhelpers.cpp.o -MF CMakeFiles/doomlegacy.dir/video/hardware/oglhelpers.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/hardware/oglhelpers.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/hardware/oglhelpers.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_97) "Building CXX object CMakeFiles/doomlegacy.dir/video/hardware/oglhelpers.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/video/hardware/oglhelpers.cpp.o -MF CMakeFiles/doomlegacy.dir/video/hardware/oglhelpers.cpp.o.d -o CMakeFiles/doomlegacy.dir/video/hardware/oglhelpers.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/hardware/oglhelpers.cpp
 
 CMakeFiles/doomlegacy.dir/video/hardware/oglhelpers.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/video/hardware/oglhelpers.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/hardware/oglhelpers.cpp > CMakeFiles/doomlegacy.dir/video/hardware/oglhelpers.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/hardware/oglhelpers.cpp > CMakeFiles/doomlegacy.dir/video/hardware/oglhelpers.cpp.i
 
 CMakeFiles/doomlegacy.dir/video/hardware/oglhelpers.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/video/hardware/oglhelpers.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/video/hardware/oglhelpers.cpp -o CMakeFiles/doomlegacy.dir/video/hardware/oglhelpers.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/video/hardware/oglhelpers.cpp -o CMakeFiles/doomlegacy.dir/video/hardware/oglhelpers.cpp.s
 
 CMakeFiles/doomlegacy.dir/net/n_interface.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/net/n_interface.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/net/n_interface.cpp
+CMakeFiles/doomlegacy.dir/net/n_interface.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/n_interface.cpp
 CMakeFiles/doomlegacy.dir/net/n_interface.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_94) "Building CXX object CMakeFiles/doomlegacy.dir/net/n_interface.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/net/n_interface.cpp.o -MF CMakeFiles/doomlegacy.dir/net/n_interface.cpp.o.d -o CMakeFiles/doomlegacy.dir/net/n_interface.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/net/n_interface.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_98) "Building CXX object CMakeFiles/doomlegacy.dir/net/n_interface.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/net/n_interface.cpp.o -MF CMakeFiles/doomlegacy.dir/net/n_interface.cpp.o.d -o CMakeFiles/doomlegacy.dir/net/n_interface.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/n_interface.cpp
 
 CMakeFiles/doomlegacy.dir/net/n_interface.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/net/n_interface.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/net/n_interface.cpp > CMakeFiles/doomlegacy.dir/net/n_interface.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/n_interface.cpp > CMakeFiles/doomlegacy.dir/net/n_interface.cpp.i
 
 CMakeFiles/doomlegacy.dir/net/n_interface.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/net/n_interface.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/net/n_interface.cpp -o CMakeFiles/doomlegacy.dir/net/n_interface.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/n_interface.cpp -o CMakeFiles/doomlegacy.dir/net/n_interface.cpp.s
 
 CMakeFiles/doomlegacy.dir/net/n_connection.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/net/n_connection.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/net/n_connection.cpp
+CMakeFiles/doomlegacy.dir/net/n_connection.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/n_connection.cpp
 CMakeFiles/doomlegacy.dir/net/n_connection.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_95) "Building CXX object CMakeFiles/doomlegacy.dir/net/n_connection.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/net/n_connection.cpp.o -MF CMakeFiles/doomlegacy.dir/net/n_connection.cpp.o.d -o CMakeFiles/doomlegacy.dir/net/n_connection.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/net/n_connection.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_99) "Building CXX object CMakeFiles/doomlegacy.dir/net/n_connection.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/net/n_connection.cpp.o -MF CMakeFiles/doomlegacy.dir/net/n_connection.cpp.o.d -o CMakeFiles/doomlegacy.dir/net/n_connection.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/n_connection.cpp
 
 CMakeFiles/doomlegacy.dir/net/n_connection.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/net/n_connection.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/net/n_connection.cpp > CMakeFiles/doomlegacy.dir/net/n_connection.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/n_connection.cpp > CMakeFiles/doomlegacy.dir/net/n_connection.cpp.i
 
 CMakeFiles/doomlegacy.dir/net/n_connection.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/net/n_connection.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/net/n_connection.cpp -o CMakeFiles/doomlegacy.dir/net/n_connection.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/n_connection.cpp -o CMakeFiles/doomlegacy.dir/net/n_connection.cpp.s
 
 CMakeFiles/doomlegacy.dir/net/sv_main.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/net/sv_main.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/net/sv_main.cpp
+CMakeFiles/doomlegacy.dir/net/sv_main.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/sv_main.cpp
 CMakeFiles/doomlegacy.dir/net/sv_main.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_96) "Building CXX object CMakeFiles/doomlegacy.dir/net/sv_main.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/net/sv_main.cpp.o -MF CMakeFiles/doomlegacy.dir/net/sv_main.cpp.o.d -o CMakeFiles/doomlegacy.dir/net/sv_main.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/net/sv_main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_100) "Building CXX object CMakeFiles/doomlegacy.dir/net/sv_main.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/net/sv_main.cpp.o -MF CMakeFiles/doomlegacy.dir/net/sv_main.cpp.o.d -o CMakeFiles/doomlegacy.dir/net/sv_main.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/sv_main.cpp
 
 CMakeFiles/doomlegacy.dir/net/sv_main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/net/sv_main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/net/sv_main.cpp > CMakeFiles/doomlegacy.dir/net/sv_main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/sv_main.cpp > CMakeFiles/doomlegacy.dir/net/sv_main.cpp.i
 
 CMakeFiles/doomlegacy.dir/net/sv_main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/net/sv_main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/net/sv_main.cpp -o CMakeFiles/doomlegacy.dir/net/sv_main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/sv_main.cpp -o CMakeFiles/doomlegacy.dir/net/sv_main.cpp.s
 
 CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/net/sv_cmds.cpp
+CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/sv_cmds.cpp
 CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_97) "Building CXX object CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.o -MF CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.o.d -o CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/net/sv_cmds.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_101) "Building CXX object CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.o -MF CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.o.d -o CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/sv_cmds.cpp
 
 CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/net/sv_cmds.cpp > CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/sv_cmds.cpp > CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.i
 
 CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/net/sv_cmds.cpp -o CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/sv_cmds.cpp -o CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.s
 
 CMakeFiles/doomlegacy.dir/net/cl_main.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/net/cl_main.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/net/cl_main.cpp
+CMakeFiles/doomlegacy.dir/net/cl_main.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/cl_main.cpp
 CMakeFiles/doomlegacy.dir/net/cl_main.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_98) "Building CXX object CMakeFiles/doomlegacy.dir/net/cl_main.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/net/cl_main.cpp.o -MF CMakeFiles/doomlegacy.dir/net/cl_main.cpp.o.d -o CMakeFiles/doomlegacy.dir/net/cl_main.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/net/cl_main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_102) "Building CXX object CMakeFiles/doomlegacy.dir/net/cl_main.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/net/cl_main.cpp.o -MF CMakeFiles/doomlegacy.dir/net/cl_main.cpp.o.d -o CMakeFiles/doomlegacy.dir/net/cl_main.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/cl_main.cpp
 
 CMakeFiles/doomlegacy.dir/net/cl_main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/net/cl_main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/net/cl_main.cpp > CMakeFiles/doomlegacy.dir/net/cl_main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/cl_main.cpp > CMakeFiles/doomlegacy.dir/net/cl_main.cpp.i
 
 CMakeFiles/doomlegacy.dir/net/cl_main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/net/cl_main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/net/cl_main.cpp -o CMakeFiles/doomlegacy.dir/net/cl_main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/cl_main.cpp -o CMakeFiles/doomlegacy.dir/net/cl_main.cpp.s
+
+CMakeFiles/doomlegacy.dir/net/ENetNetworkTransport.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
+CMakeFiles/doomlegacy.dir/net/ENetNetworkTransport.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/ENetNetworkTransport.cpp
+CMakeFiles/doomlegacy.dir/net/ENetNetworkTransport.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_103) "Building CXX object CMakeFiles/doomlegacy.dir/net/ENetNetworkTransport.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/net/ENetNetworkTransport.cpp.o -MF CMakeFiles/doomlegacy.dir/net/ENetNetworkTransport.cpp.o.d -o CMakeFiles/doomlegacy.dir/net/ENetNetworkTransport.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/ENetNetworkTransport.cpp
+
+CMakeFiles/doomlegacy.dir/net/ENetNetworkTransport.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/net/ENetNetworkTransport.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/ENetNetworkTransport.cpp > CMakeFiles/doomlegacy.dir/net/ENetNetworkTransport.cpp.i
+
+CMakeFiles/doomlegacy.dir/net/ENetNetworkTransport.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/net/ENetNetworkTransport.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/ENetNetworkTransport.cpp -o CMakeFiles/doomlegacy.dir/net/ENetNetworkTransport.cpp.s
+
+CMakeFiles/doomlegacy.dir/net/NetworkManager.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
+CMakeFiles/doomlegacy.dir/net/NetworkManager.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/NetworkManager.cpp
+CMakeFiles/doomlegacy.dir/net/NetworkManager.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_104) "Building CXX object CMakeFiles/doomlegacy.dir/net/NetworkManager.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/net/NetworkManager.cpp.o -MF CMakeFiles/doomlegacy.dir/net/NetworkManager.cpp.o.d -o CMakeFiles/doomlegacy.dir/net/NetworkManager.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/NetworkManager.cpp
+
+CMakeFiles/doomlegacy.dir/net/NetworkManager.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/net/NetworkManager.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/NetworkManager.cpp > CMakeFiles/doomlegacy.dir/net/NetworkManager.cpp.i
+
+CMakeFiles/doomlegacy.dir/net/NetworkManager.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/net/NetworkManager.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/NetworkManager.cpp -o CMakeFiles/doomlegacy.dir/net/NetworkManager.cpp.s
+
+CMakeFiles/doomlegacy.dir/net/ActorNetworkSerializer.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
+CMakeFiles/doomlegacy.dir/net/ActorNetworkSerializer.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/ActorNetworkSerializer.cpp
+CMakeFiles/doomlegacy.dir/net/ActorNetworkSerializer.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_105) "Building CXX object CMakeFiles/doomlegacy.dir/net/ActorNetworkSerializer.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/net/ActorNetworkSerializer.cpp.o -MF CMakeFiles/doomlegacy.dir/net/ActorNetworkSerializer.cpp.o.d -o CMakeFiles/doomlegacy.dir/net/ActorNetworkSerializer.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/ActorNetworkSerializer.cpp
+
+CMakeFiles/doomlegacy.dir/net/ActorNetworkSerializer.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/net/ActorNetworkSerializer.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/ActorNetworkSerializer.cpp > CMakeFiles/doomlegacy.dir/net/ActorNetworkSerializer.cpp.i
+
+CMakeFiles/doomlegacy.dir/net/ActorNetworkSerializer.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/net/ActorNetworkSerializer.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/ActorNetworkSerializer.cpp -o CMakeFiles/doomlegacy.dir/net/ActorNetworkSerializer.cpp.s
+
+CMakeFiles/doomlegacy.dir/net/PlayerInfoNetworkSerializer.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
+CMakeFiles/doomlegacy.dir/net/PlayerInfoNetworkSerializer.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/PlayerInfoNetworkSerializer.cpp
+CMakeFiles/doomlegacy.dir/net/PlayerInfoNetworkSerializer.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_106) "Building CXX object CMakeFiles/doomlegacy.dir/net/PlayerInfoNetworkSerializer.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/net/PlayerInfoNetworkSerializer.cpp.o -MF CMakeFiles/doomlegacy.dir/net/PlayerInfoNetworkSerializer.cpp.o.d -o CMakeFiles/doomlegacy.dir/net/PlayerInfoNetworkSerializer.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/PlayerInfoNetworkSerializer.cpp
+
+CMakeFiles/doomlegacy.dir/net/PlayerInfoNetworkSerializer.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/net/PlayerInfoNetworkSerializer.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/PlayerInfoNetworkSerializer.cpp > CMakeFiles/doomlegacy.dir/net/PlayerInfoNetworkSerializer.cpp.i
+
+CMakeFiles/doomlegacy.dir/net/PlayerInfoNetworkSerializer.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/net/PlayerInfoNetworkSerializer.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/PlayerInfoNetworkSerializer.cpp -o CMakeFiles/doomlegacy.dir/net/PlayerInfoNetworkSerializer.cpp.s
+
+CMakeFiles/doomlegacy.dir/net/BitStreamSerializer.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
+CMakeFiles/doomlegacy.dir/net/BitStreamSerializer.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/BitStreamSerializer.cpp
+CMakeFiles/doomlegacy.dir/net/BitStreamSerializer.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_107) "Building CXX object CMakeFiles/doomlegacy.dir/net/BitStreamSerializer.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/net/BitStreamSerializer.cpp.o -MF CMakeFiles/doomlegacy.dir/net/BitStreamSerializer.cpp.o.d -o CMakeFiles/doomlegacy.dir/net/BitStreamSerializer.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/BitStreamSerializer.cpp
+
+CMakeFiles/doomlegacy.dir/net/BitStreamSerializer.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/net/BitStreamSerializer.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/BitStreamSerializer.cpp > CMakeFiles/doomlegacy.dir/net/BitStreamSerializer.cpp.i
+
+CMakeFiles/doomlegacy.dir/net/BitStreamSerializer.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/net/BitStreamSerializer.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/net/BitStreamSerializer.cpp -o CMakeFiles/doomlegacy.dir/net/BitStreamSerializer.cpp.s
 
 CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/endtxt.cpp
+CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/endtxt.cpp
 CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_99) "Building CXX object CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.o -MF CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.o.d -o CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/endtxt.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_108) "Building CXX object CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.o -MF CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.o.d -o CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/endtxt.cpp
 
 CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/endtxt.cpp > CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/endtxt.cpp > CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.i
 
 CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/endtxt.cpp -o CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/endtxt.cpp -o CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.s
 
 CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_cdmus.cpp
+CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_cdmus.cpp
 CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_100) "Building CXX object CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.o -MF CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.o.d -o CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_cdmus.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_109) "Building CXX object CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.o -MF CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.o.d -o CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_cdmus.cpp
 
 CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_cdmus.cpp > CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_cdmus.cpp > CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.i
 
 CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_cdmus.cpp -o CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_cdmus.cpp -o CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.s
 
 CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_main.cpp
+CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_main.cpp
 CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_101) "Building CXX object CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.o -MF CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.o.d -o CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_110) "Building CXX object CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.o -MF CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.o.d -o CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_main.cpp
 
 CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_main.cpp > CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_main.cpp > CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.i
 
 CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_main.cpp -o CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_main.cpp -o CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.s
 
 CMakeFiles/doomlegacy.dir/interface/sdl/i_net.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/interface/sdl/i_net.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_net.cpp
+CMakeFiles/doomlegacy.dir/interface/sdl/i_net.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_net.cpp
 CMakeFiles/doomlegacy.dir/interface/sdl/i_net.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_102) "Building CXX object CMakeFiles/doomlegacy.dir/interface/sdl/i_net.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/interface/sdl/i_net.cpp.o -MF CMakeFiles/doomlegacy.dir/interface/sdl/i_net.cpp.o.d -o CMakeFiles/doomlegacy.dir/interface/sdl/i_net.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_net.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_111) "Building CXX object CMakeFiles/doomlegacy.dir/interface/sdl/i_net.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/interface/sdl/i_net.cpp.o -MF CMakeFiles/doomlegacy.dir/interface/sdl/i_net.cpp.o.d -o CMakeFiles/doomlegacy.dir/interface/sdl/i_net.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_net.cpp
 
 CMakeFiles/doomlegacy.dir/interface/sdl/i_net.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/interface/sdl/i_net.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_net.cpp > CMakeFiles/doomlegacy.dir/interface/sdl/i_net.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_net.cpp > CMakeFiles/doomlegacy.dir/interface/sdl/i_net.cpp.i
 
 CMakeFiles/doomlegacy.dir/interface/sdl/i_net.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/interface/sdl/i_net.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_net.cpp -o CMakeFiles/doomlegacy.dir/interface/sdl/i_net.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_net.cpp -o CMakeFiles/doomlegacy.dir/interface/sdl/i_net.cpp.s
 
 CMakeFiles/doomlegacy.dir/interface/sdl/i_sound.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/interface/sdl/i_sound.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_sound.cpp
+CMakeFiles/doomlegacy.dir/interface/sdl/i_sound.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_sound.cpp
 CMakeFiles/doomlegacy.dir/interface/sdl/i_sound.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_103) "Building CXX object CMakeFiles/doomlegacy.dir/interface/sdl/i_sound.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/interface/sdl/i_sound.cpp.o -MF CMakeFiles/doomlegacy.dir/interface/sdl/i_sound.cpp.o.d -o CMakeFiles/doomlegacy.dir/interface/sdl/i_sound.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_sound.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_112) "Building CXX object CMakeFiles/doomlegacy.dir/interface/sdl/i_sound.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/interface/sdl/i_sound.cpp.o -MF CMakeFiles/doomlegacy.dir/interface/sdl/i_sound.cpp.o.d -o CMakeFiles/doomlegacy.dir/interface/sdl/i_sound.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_sound.cpp
 
 CMakeFiles/doomlegacy.dir/interface/sdl/i_sound.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/interface/sdl/i_sound.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_sound.cpp > CMakeFiles/doomlegacy.dir/interface/sdl/i_sound.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_sound.cpp > CMakeFiles/doomlegacy.dir/interface/sdl/i_sound.cpp.i
 
 CMakeFiles/doomlegacy.dir/interface/sdl/i_sound.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/interface/sdl/i_sound.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_sound.cpp -o CMakeFiles/doomlegacy.dir/interface/sdl/i_sound.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_sound.cpp -o CMakeFiles/doomlegacy.dir/interface/sdl/i_sound.cpp.s
 
 CMakeFiles/doomlegacy.dir/interface/sdl/i_system.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/interface/sdl/i_system.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_system.cpp
+CMakeFiles/doomlegacy.dir/interface/sdl/i_system.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_system.cpp
 CMakeFiles/doomlegacy.dir/interface/sdl/i_system.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_104) "Building CXX object CMakeFiles/doomlegacy.dir/interface/sdl/i_system.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/interface/sdl/i_system.cpp.o -MF CMakeFiles/doomlegacy.dir/interface/sdl/i_system.cpp.o.d -o CMakeFiles/doomlegacy.dir/interface/sdl/i_system.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_system.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_113) "Building CXX object CMakeFiles/doomlegacy.dir/interface/sdl/i_system.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/interface/sdl/i_system.cpp.o -MF CMakeFiles/doomlegacy.dir/interface/sdl/i_system.cpp.o.d -o CMakeFiles/doomlegacy.dir/interface/sdl/i_system.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_system.cpp
 
 CMakeFiles/doomlegacy.dir/interface/sdl/i_system.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/interface/sdl/i_system.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_system.cpp > CMakeFiles/doomlegacy.dir/interface/sdl/i_system.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_system.cpp > CMakeFiles/doomlegacy.dir/interface/sdl/i_system.cpp.i
 
 CMakeFiles/doomlegacy.dir/interface/sdl/i_system.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/interface/sdl/i_system.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_system.cpp -o CMakeFiles/doomlegacy.dir/interface/sdl/i_system.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_system.cpp -o CMakeFiles/doomlegacy.dir/interface/sdl/i_system.cpp.s
 
 CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.o: CMakeFiles/doomlegacy.dir/flags.make
-CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_video.cpp
+CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.o: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_video.cpp
 CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.o: CMakeFiles/doomlegacy.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_105) "Building CXX object CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.o -MF CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.o.d -o CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_video.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_114) "Building CXX object CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.o -MF CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.o.d -o CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.o -c /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_video.cpp
 
 CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_video.cpp > CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_video.cpp > CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.i
 
 CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/interface/sdl/i_video.cpp -o CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/interface/sdl/i_video.cpp -o CMakeFiles/doomlegacy.dir/interface/sdl/i_video.cpp.s
 
 # Object files for target doomlegacy
 doomlegacy_OBJECTS = \
@@ -1611,6 +1737,10 @@ doomlegacy_OBJECTS = \
 "CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.o" \
 "CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.o" \
 "CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.o" \
+"CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.o" \
+"CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.o" \
+"CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.o" \
+"CMakeFiles/doomlegacy.dir/audio/sounds.cpp.o" \
 "CMakeFiles/doomlegacy.dir/video/png.cpp.o" \
 "CMakeFiles/doomlegacy.dir/video/jpeg.cpp.o" \
 "CMakeFiles/doomlegacy.dir/video/screen.cpp.o" \
@@ -1639,6 +1769,11 @@ doomlegacy_OBJECTS = \
 "CMakeFiles/doomlegacy.dir/net/sv_main.cpp.o" \
 "CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.o" \
 "CMakeFiles/doomlegacy.dir/net/cl_main.cpp.o" \
+"CMakeFiles/doomlegacy.dir/net/ENetNetworkTransport.cpp.o" \
+"CMakeFiles/doomlegacy.dir/net/NetworkManager.cpp.o" \
+"CMakeFiles/doomlegacy.dir/net/ActorNetworkSerializer.cpp.o" \
+"CMakeFiles/doomlegacy.dir/net/PlayerInfoNetworkSerializer.cpp.o" \
+"CMakeFiles/doomlegacy.dir/net/BitStreamSerializer.cpp.o" \
 "CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.o" \
 "CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.o" \
 "CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.o" \
@@ -1720,6 +1855,10 @@ doomlegacy: CMakeFiles/doomlegacy.dir/engine/finale/wi_stuff.cpp.o
 doomlegacy: CMakeFiles/doomlegacy.dir/engine/hud/st_lib.cpp.o
 doomlegacy: CMakeFiles/doomlegacy.dir/engine/hud/st_stuff.cpp.o
 doomlegacy: CMakeFiles/doomlegacy.dir/engine/hud/hu_stuff.cpp.o
+doomlegacy: CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.o
+doomlegacy: CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.o
+doomlegacy: CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.o
+doomlegacy: CMakeFiles/doomlegacy.dir/audio/sounds.cpp.o
 doomlegacy: CMakeFiles/doomlegacy.dir/video/png.cpp.o
 doomlegacy: CMakeFiles/doomlegacy.dir/video/jpeg.cpp.o
 doomlegacy: CMakeFiles/doomlegacy.dir/video/screen.cpp.o
@@ -1748,6 +1887,11 @@ doomlegacy: CMakeFiles/doomlegacy.dir/net/n_connection.cpp.o
 doomlegacy: CMakeFiles/doomlegacy.dir/net/sv_main.cpp.o
 doomlegacy: CMakeFiles/doomlegacy.dir/net/sv_cmds.cpp.o
 doomlegacy: CMakeFiles/doomlegacy.dir/net/cl_main.cpp.o
+doomlegacy: CMakeFiles/doomlegacy.dir/net/ENetNetworkTransport.cpp.o
+doomlegacy: CMakeFiles/doomlegacy.dir/net/NetworkManager.cpp.o
+doomlegacy: CMakeFiles/doomlegacy.dir/net/ActorNetworkSerializer.cpp.o
+doomlegacy: CMakeFiles/doomlegacy.dir/net/PlayerInfoNetworkSerializer.cpp.o
+doomlegacy: CMakeFiles/doomlegacy.dir/net/BitStreamSerializer.cpp.o
 doomlegacy: CMakeFiles/doomlegacy.dir/interface/sdl/endtxt.cpp.o
 doomlegacy: CMakeFiles/doomlegacy.dir/interface/sdl/i_cdmus.cpp.o
 doomlegacy: CMakeFiles/doomlegacy.dir/interface/sdl/i_main.cpp.o
@@ -1764,8 +1908,9 @@ doomlegacy: /usr/lib/x86_64-linux-gnu/libGLU.so
 doomlegacy: /usr/lib/x86_64-linux-gnu/libjpeg.so
 doomlegacy: /usr/lib/x86_64-linux-gnu/libpng.so
 doomlegacy: /usr/lib/x86_64-linux-gnu/libz.so
+doomlegacy: enet
 doomlegacy: CMakeFiles/doomlegacy.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_106) "Linking CXX executable doomlegacy"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_115) "Linking CXX executable doomlegacy"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/doomlegacy.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -1777,6 +1922,6 @@ CMakeFiles/doomlegacy.dir/clean:
 .PHONY : CMakeFiles/doomlegacy.dir/clean
 
 CMakeFiles/doomlegacy.dir/depend:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles/doomlegacy.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles/doomlegacy.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/doomlegacy.dir/depend
 

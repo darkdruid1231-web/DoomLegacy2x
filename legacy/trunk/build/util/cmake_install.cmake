@@ -1,4 +1,4 @@
-# Install script for directory: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/util
+# Install script for directory: /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/util
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

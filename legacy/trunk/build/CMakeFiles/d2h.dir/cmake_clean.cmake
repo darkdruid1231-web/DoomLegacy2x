@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/d2h.dir/tools/d2h.cpp.o"
-  "CMakeFiles/d2h.dir/tools/d2h.cpp.o.d"
+  "CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.cpp.o"
+  "CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/DoomLegacy/common/tools/d2h.cpp.o.d"
   "d2h"
   "d2h.pdb"
 )

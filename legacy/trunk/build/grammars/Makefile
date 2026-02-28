@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk
+CMAKE_SOURCE_DIR = /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build
+CMAKE_BINARY_DIR = /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -97,14 +97,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/grammars//CMakeFiles/progress.marks
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 grammars/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles 0
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/grammars//CMakeFiles/progress.marks
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 grammars/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 grammars/clean
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 grammars/clean
 .PHONY : clean
 
 # The main clean target
@@ -113,22 +113,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 grammars/preinstall
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 grammars/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 grammars/preinstall
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 grammars/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 grammars/CMakeFiles/grammars.dir/rule:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 grammars/CMakeFiles/grammars.dir/rule
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 grammars/CMakeFiles/grammars.dir/rule
 .PHONY : grammars/CMakeFiles/grammars.dir/rule
 
 # Convenience name for target.
@@ -137,7 +137,7 @@ grammars: grammars/CMakeFiles/grammars.dir/rule
 
 # fast build rule for target.
 grammars/fast:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/build
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/build
 .PHONY : grammars/fast
 
 decorate.lexer.o: decorate.lexer.c.o
@@ -145,7 +145,7 @@ decorate.lexer.o: decorate.lexer.c.o
 
 # target to build an object file
 decorate.lexer.c.o:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/decorate.lexer.c.o
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/decorate.lexer.c.o
 .PHONY : decorate.lexer.c.o
 
 decorate.lexer.i: decorate.lexer.c.i
@@ -153,7 +153,7 @@ decorate.lexer.i: decorate.lexer.c.i
 
 # target to preprocess a source file
 decorate.lexer.c.i:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/decorate.lexer.c.i
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/decorate.lexer.c.i
 .PHONY : decorate.lexer.c.i
 
 decorate.lexer.s: decorate.lexer.c.s
@@ -161,7 +161,7 @@ decorate.lexer.s: decorate.lexer.c.s
 
 # target to generate assembly for a file
 decorate.lexer.c.s:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/decorate.lexer.c.s
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/decorate.lexer.c.s
 .PHONY : decorate.lexer.c.s
 
 decorate.parser.o: decorate.parser.c.o
@@ -169,7 +169,7 @@ decorate.parser.o: decorate.parser.c.o
 
 # target to build an object file
 decorate.parser.c.o:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/decorate.parser.c.o
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/decorate.parser.c.o
 .PHONY : decorate.parser.c.o
 
 decorate.parser.i: decorate.parser.c.i
@@ -177,7 +177,7 @@ decorate.parser.i: decorate.parser.c.i
 
 # target to preprocess a source file
 decorate.parser.c.i:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/decorate.parser.c.i
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/decorate.parser.c.i
 .PHONY : decorate.parser.c.i
 
 decorate.parser.s: decorate.parser.c.s
@@ -185,7 +185,7 @@ decorate.parser.s: decorate.parser.c.s
 
 # target to generate assembly for a file
 decorate.parser.c.s:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/decorate.parser.c.s
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/decorate.parser.c.s
 .PHONY : decorate.parser.c.s
 
 ntexture.lexer.o: ntexture.lexer.c.o
@@ -193,7 +193,7 @@ ntexture.lexer.o: ntexture.lexer.c.o
 
 # target to build an object file
 ntexture.lexer.c.o:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/ntexture.lexer.c.o
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/ntexture.lexer.c.o
 .PHONY : ntexture.lexer.c.o
 
 ntexture.lexer.i: ntexture.lexer.c.i
@@ -201,7 +201,7 @@ ntexture.lexer.i: ntexture.lexer.c.i
 
 # target to preprocess a source file
 ntexture.lexer.c.i:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/ntexture.lexer.c.i
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/ntexture.lexer.c.i
 .PHONY : ntexture.lexer.c.i
 
 ntexture.lexer.s: ntexture.lexer.c.s
@@ -209,7 +209,7 @@ ntexture.lexer.s: ntexture.lexer.c.s
 
 # target to generate assembly for a file
 ntexture.lexer.c.s:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/ntexture.lexer.c.s
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/ntexture.lexer.c.s
 .PHONY : ntexture.lexer.c.s
 
 ntexture.parser.o: ntexture.parser.c.o
@@ -217,7 +217,7 @@ ntexture.parser.o: ntexture.parser.c.o
 
 # target to build an object file
 ntexture.parser.c.o:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/ntexture.parser.c.o
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/ntexture.parser.c.o
 .PHONY : ntexture.parser.c.o
 
 ntexture.parser.i: ntexture.parser.c.i
@@ -225,7 +225,7 @@ ntexture.parser.i: ntexture.parser.c.i
 
 # target to preprocess a source file
 ntexture.parser.c.i:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/ntexture.parser.c.i
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/ntexture.parser.c.i
 .PHONY : ntexture.parser.c.i
 
 ntexture.parser.s: ntexture.parser.c.s
@@ -233,7 +233,7 @@ ntexture.parser.s: ntexture.parser.c.s
 
 # target to generate assembly for a file
 ntexture.parser.c.s:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/ntexture.parser.c.s
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/ntexture.parser.c.s
 .PHONY : ntexture.parser.c.s
 
 parser_driver.o: parser_driver.cpp.o
@@ -241,7 +241,7 @@ parser_driver.o: parser_driver.cpp.o
 
 # target to build an object file
 parser_driver.cpp.o:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/parser_driver.cpp.o
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/parser_driver.cpp.o
 .PHONY : parser_driver.cpp.o
 
 parser_driver.i: parser_driver.cpp.i
@@ -249,7 +249,7 @@ parser_driver.i: parser_driver.cpp.i
 
 # target to preprocess a source file
 parser_driver.cpp.i:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/parser_driver.cpp.i
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/parser_driver.cpp.i
 .PHONY : parser_driver.cpp.i
 
 parser_driver.s: parser_driver.cpp.s
@@ -257,7 +257,7 @@ parser_driver.s: parser_driver.cpp.s
 
 # target to generate assembly for a file
 parser_driver.cpp.s:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/parser_driver.cpp.s
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/parser_driver.cpp.s
 .PHONY : parser_driver.cpp.s
 
 # Help Target
@@ -296,6 +296,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/geoffrey/openclaw/workspace/DoomLegacy/legacy/trunk/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 
