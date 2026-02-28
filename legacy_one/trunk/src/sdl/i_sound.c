@@ -110,7 +110,7 @@
 
 
 // MIDI music buffer
-#define MIDI_BUFFER_SIZE   (128*1024)
+#define MIDI_BUFFER_SIZE   (512*1024)
 
 #define MUSIC_FADE_TIME 400 // ms
 
@@ -532,7 +532,7 @@ void I_UpdateSound(void)
 
     /*
        Pour une raison que j'ignore, la version SDL n'appelle jamais
-       ce truc directement. Fonction vide pour garder une compatibilité
+       ce truc directement. Fonction vide pour garder une compatibilitï¿½
        avec le point de vue de legacy...
      */
 
@@ -565,8 +565,8 @@ static void I_UpdateSound_sdl(void *unused, Uint8 *stream, int len)
     while (rightout < buffer_end)
     {
         // take the current audio output (incl. music) and mix (add) in our sfx
-        register int dl = *leftout;
-        register int dr = *rightout;
+        register Sint32 dl = *leftout;
+        register Sint32 dr = *rightout;
 
         // Love thy L2 chache - made this a loop.
         // Now more channels could be set at compile time
@@ -732,9 +732,9 @@ static void free_music_rwop( void )
       // Prboom and crispy do not use rwops.
       // The sample programs playmus, and playmidi, do free the rwops.
 # ifdef MUSIC_MP3
-      // Will double free fault if mixer 1.2.12 was playing MP3.
+      // Will double free fault if mixer 1.2.12 was playing MP3 or MIDI.
       // Due to autofree of rwops by something else?
-      if( rwop_music_type < MUSTYPE_MP3 )
+      if( rwop_music_type != MUSTYPE_MP3 && rwop_music_type != MUSTYPE_MIDI )
 # endif
       {
 # ifdef MIX_INIT_PRESENT

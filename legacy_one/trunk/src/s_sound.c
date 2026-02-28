@@ -77,7 +77,7 @@
 //
 // Revision 1.8  2000/04/22 16:16:50  emanne
 // Correction de l'interface.
-// Une erreur s'y était glissé, d'où un segfault si on compilait sans SDL.
+// Une erreur s'y ï¿½tait glissï¿½, d'oï¿½ un segfault si on compilait sans SDL.
 //
 // Revision 1.7  2000/04/21 08:23:47  emanne
 // To have SDL working.
@@ -440,6 +440,8 @@ static void SetChannelsNum(void)
     // Allocating the internal channels for mixing
     // (the maximum number of sounds rendered
     // simultaneously) within zone memory.
+    if (cv_numChannels.value > 16)
+        cv_numChannels.value = 16;
     if (channels)
         Z_Free(channels);
 
