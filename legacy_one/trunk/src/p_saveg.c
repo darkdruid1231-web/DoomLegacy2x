@@ -3883,7 +3883,8 @@ const short netgame_idname_length = 16;  // !!<name> length
 #define sg_head_END "::END\n"
 
 // __BIG_ENDIAN__ is defined on MAC compilers, not on WIN, nor LINUX
-#ifdef __BIG_ENDIAN__
+// Use both __BIG_ENDIAN__ and PLATFORM_BIG_ENDIAN for broader platform support
+#if defined(__BIG_ENDIAN__) || defined(PLATFORM_BIG_ENDIAN)
 const byte sg_big_endian = 1;
 #else
 const byte sg_big_endian = 0;

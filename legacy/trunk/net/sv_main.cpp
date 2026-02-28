@@ -93,6 +93,8 @@ Have polymorphed class GameType which creates these into GameInfo containers
 
 #include <vector>
 
+#include <algorithm>
+
 #include "command.h"
 #include "console.h"
 #include "cvars.h"
@@ -313,8 +315,8 @@ void GameInfo::TryRunTics(tic_t elapsed)
         con.Ticker();
 
         // translate inputs (keyboard/mouse/joystick) into a ticcmd
-        for (int i = 0; i < NUM_LOCALPLAYERS; i++)
-            LocalPlayers[i].GetInput(elapsed);
+        for (auto& lp : LocalPlayers)
+            lp.GetInput(elapsed);
     }
 
     D_ProcessEvents(); // read control events, feed them to responders
@@ -401,7 +403,7 @@ void GameInfo::ReadResourceLumps()
     if (!nosound)
     {
         S_ClearSounds();
-        int n = fc.Size();
+        const int n = fc.Size();
         for (int i = 0; i < n; i++)
         {
             // cumulative reading

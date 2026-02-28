@@ -202,7 +202,7 @@ void FIL_DefaultExtension (char *path, const char *extension)
   // search for '.' from end to begin, add .EXT only when not found
     src = path + plen - 1;
 
-    while (*src != '/' && src != path)
+    while (*src != PATH_SEPARATOR_CHAR && src != path)
     {
         if (*src == '.')
             return;                 // it has an extension
@@ -1119,9 +1119,9 @@ void cat_filename( char * dest, const char * dn, const char * fn )
     int dnlen = strlen( dn );
     if( dnlen )
     {
-        // if directory does not have '/' then include one in format
+        // if directory does not have separator then include one in format
         char ch = dn[ dnlen-1 ]; // last char
-        if( ! ( ch == '/' || ch == '\\' ))   format = "%s/%s";
+        if( ! ( ch == '/' || ch == '\\' ))   format = "%s" PATH_SEPARATOR_STR "%s";
     }
     snprintf(dest, MAX_WADPATH-1, format, dn, fn);
     dest[MAX_WADPATH-1] = '\0';
