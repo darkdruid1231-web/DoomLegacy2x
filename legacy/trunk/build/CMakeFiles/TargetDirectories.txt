@@ -19,6 +19,9 @@
 /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/engine/CMakeFiles/test.dir
 /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/engine/CMakeFiles/edit_cache.dir
 /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/engine/CMakeFiles/rebuild_cache.dir
+/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/audio/CMakeFiles/test.dir
+/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/audio/CMakeFiles/edit_cache.dir
+/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/audio/CMakeFiles/rebuild_cache.dir
 /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/video/CMakeFiles/test.dir
 /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/video/CMakeFiles/edit_cache.dir
 /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/video/CMakeFiles/rebuild_cache.dir

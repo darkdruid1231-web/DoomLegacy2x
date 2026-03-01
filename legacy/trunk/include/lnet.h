@@ -136,6 +136,26 @@ class BitStream
         return v;
     }
 
+    // Missing methods for compatibility
+    template<typename T>
+    void read(T *data)
+    {
+        readBits(data, sizeof(T) * 8);
+    }
+
+    bool readFlag()
+    {
+        uint8_t v = 0;
+        readBits(&v, 1);
+        return v != 0;
+    }
+
+    bool writeFlag(bool flag)
+    {
+        writeBits(&flag, 1);
+        return flag;
+    }
+
     void writeString(const char *str)
     {
         if (str)

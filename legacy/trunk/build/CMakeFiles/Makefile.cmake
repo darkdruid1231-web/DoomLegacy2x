@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_GENERATOR "Unix Makefiles")
 set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
   "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/CMakeLists.txt"
+  "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/audio/CMakeLists.txt"
   "CMakeFiles/3.28.3/CMakeCCompiler.cmake"
   "CMakeFiles/3.28.3/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.28.3/CMakeSystem.cmake"
@@ -160,6 +161,7 @@ set(CMAKE_MAKEFILE_PRODUCTS
   "_deps/catch2-subbuild/CMakeLists.txt"
   "CMakeFiles/CMakeDirectoryInformation.cmake"
   "engine/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "audio/CMakeFiles/CMakeDirectoryInformation.cmake"
   "video/CMakeFiles/CMakeDirectoryInformation.cmake"
   "util/CMakeFiles/CMakeDirectoryInformation.cmake"
   "net/CMakeFiles/CMakeDirectoryInformation.cmake"

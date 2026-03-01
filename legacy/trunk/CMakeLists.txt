@@ -353,6 +353,7 @@ add_executable(doomlegacy ${LEGACY_SRC} debug_init.cpp)
 target_compile_definitions(doomlegacy PRIVATE
     FN_CDECL=
     QSORT_CALLBACK=
+    TNL_STUB_BUILD
 )
 
 # _USE_MATH_DEFINES: required on Windows (MSVC / MinGW / MSYS2) to expose M_PI

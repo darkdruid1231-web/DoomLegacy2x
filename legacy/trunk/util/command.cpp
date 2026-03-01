@@ -862,8 +862,34 @@ void consvar_t::GotNetVar(unsigned short id, const char *str)
     cvar->Setvalue(str);
 }
 
-// TNL networking disabled - BitStream version not available
+// Stub BitStream version for networking (uses lnet::BitStream)
+// This is needed when USE_NETWORKING is enabled
+void consvar_t::SaveNetVars(BitStream &s)
+{
+    for (consvar_t *cvar = cvar_list; cvar; cvar = cvar->next)
+        if (cvar->flags & CV_NETVAR)
+        {
+            s.write(cvar->netid);
+            s.writeString(cvar->str);
+        }
+}
+
+void consvar_t::LoadNetVars(BitStream &s)
+{
+    for (consvar_t *cvar = cvar_list; cvar; cvar = cvar->next)
+        if (cvar->flags & CV_NETVAR)
+        {
+            // the for loop is just used for count
+            unsigned short id;
+            s.read(&id);
+            char temp[256];
+            s.readString(temp);
+            GotNetVar(id, temp);
+        }
+}
+
 /*
+// TNL networking disabled - BitStream version not available
 void consvar_t::SaveNetVars(BitStream &s)
 {
     for (consvar_t *cvar = cvar_list; cvar; cvar = cvar->next)

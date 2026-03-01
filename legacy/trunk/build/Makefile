@@ -360,6 +360,102 @@ Catch2WithMain/fast:
 	$(MAKE) $(MAKESILENT) -f _deps/catch2-build/src/CMakeFiles/Catch2WithMain.dir/build.make _deps/catch2-build/src/CMakeFiles/Catch2WithMain.dir/build
 .PHONY : Catch2WithMain/fast
 
+audio/qmus2mid.o: audio/qmus2mid.cpp.o
+.PHONY : audio/qmus2mid.o
+
+# target to build an object file
+audio/qmus2mid.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.o
+.PHONY : audio/qmus2mid.cpp.o
+
+audio/qmus2mid.i: audio/qmus2mid.cpp.i
+.PHONY : audio/qmus2mid.i
+
+# target to preprocess a source file
+audio/qmus2mid.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.i
+.PHONY : audio/qmus2mid.cpp.i
+
+audio/qmus2mid.s: audio/qmus2mid.cpp.s
+.PHONY : audio/qmus2mid.s
+
+# target to generate assembly for a file
+audio/qmus2mid.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.s
+.PHONY : audio/qmus2mid.cpp.s
+
+audio/s_sndseq.o: audio/s_sndseq.cpp.o
+.PHONY : audio/s_sndseq.o
+
+# target to build an object file
+audio/s_sndseq.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.o
+.PHONY : audio/s_sndseq.cpp.o
+
+audio/s_sndseq.i: audio/s_sndseq.cpp.i
+.PHONY : audio/s_sndseq.i
+
+# target to preprocess a source file
+audio/s_sndseq.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.i
+.PHONY : audio/s_sndseq.cpp.i
+
+audio/s_sndseq.s: audio/s_sndseq.cpp.s
+.PHONY : audio/s_sndseq.s
+
+# target to generate assembly for a file
+audio/s_sndseq.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.s
+.PHONY : audio/s_sndseq.cpp.s
+
+audio/s_sound.o: audio/s_sound.cpp.o
+.PHONY : audio/s_sound.o
+
+# target to build an object file
+audio/s_sound.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.o
+.PHONY : audio/s_sound.cpp.o
+
+audio/s_sound.i: audio/s_sound.cpp.i
+.PHONY : audio/s_sound.i
+
+# target to preprocess a source file
+audio/s_sound.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.i
+.PHONY : audio/s_sound.cpp.i
+
+audio/s_sound.s: audio/s_sound.cpp.s
+.PHONY : audio/s_sound.s
+
+# target to generate assembly for a file
+audio/s_sound.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.s
+.PHONY : audio/s_sound.cpp.s
+
+audio/sounds.o: audio/sounds.cpp.o
+.PHONY : audio/sounds.o
+
+# target to build an object file
+audio/sounds.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/sounds.cpp.o
+.PHONY : audio/sounds.cpp.o
+
+audio/sounds.i: audio/sounds.cpp.i
+.PHONY : audio/sounds.i
+
+# target to preprocess a source file
+audio/sounds.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/sounds.cpp.i
+.PHONY : audio/sounds.cpp.i
+
+audio/sounds.s: audio/sounds.cpp.s
+.PHONY : audio/sounds.s
+
+# target to generate assembly for a file
+audio/sounds.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/audio/sounds.cpp.s
+.PHONY : audio/sounds.cpp.s
+
 debug_init.o: debug_init.cpp.o
 .PHONY : debug_init.o
 
@@ -3726,6 +3822,18 @@ help:
 	@echo "... test_vector"
 	@echo "... util"
 	@echo "... wadtool"
+	@echo "... audio/qmus2mid.o"
+	@echo "... audio/qmus2mid.i"
+	@echo "... audio/qmus2mid.s"
+	@echo "... audio/s_sndseq.o"
+	@echo "... audio/s_sndseq.i"
+	@echo "... audio/s_sndseq.s"
+	@echo "... audio/s_sound.o"
+	@echo "... audio/s_sound.i"
+	@echo "... audio/s_sound.s"
+	@echo "... audio/sounds.o"
+	@echo "... audio/sounds.i"
+	@echo "... audio/sounds.s"
 	@echo "... debug_init.o"
 	@echo "... debug_init.i"
 	@echo "... debug_init.s"

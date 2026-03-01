@@ -8,6 +8,10 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/audio/qmus2mid.cpp" "CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.o" "gcc" "CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.o.d"
+  "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/audio/s_sndseq.cpp" "CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.o" "gcc" "CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.o.d"
+  "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/audio/s_sound.cpp" "CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.o" "gcc" "CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.o.d"
+  "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/audio/sounds.cpp" "CMakeFiles/doomlegacy.dir/audio/sounds.cpp.o" "gcc" "CMakeFiles/doomlegacy.dir/audio/sounds.cpp.o.d"
   "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/debug_init.cpp" "CMakeFiles/doomlegacy.dir/debug_init.cpp.o" "gcc" "CMakeFiles/doomlegacy.dir/debug_init.cpp.o.d"
   "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/a_action.cpp" "CMakeFiles/doomlegacy.dir/engine/a_action.cpp.o" "gcc" "CMakeFiles/doomlegacy.dir/engine/a_action.cpp.o.d"
   "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/ai_mobjinfo.cpp" "CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.o" "gcc" "CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.o.d"

@@ -1,4 +1,12 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.o"
+  "CMakeFiles/doomlegacy.dir/audio/qmus2mid.cpp.o.d"
+  "CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.o"
+  "CMakeFiles/doomlegacy.dir/audio/s_sndseq.cpp.o.d"
+  "CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.o"
+  "CMakeFiles/doomlegacy.dir/audio/s_sound.cpp.o.d"
+  "CMakeFiles/doomlegacy.dir/audio/sounds.cpp.o"
+  "CMakeFiles/doomlegacy.dir/audio/sounds.cpp.o.d"
   "CMakeFiles/doomlegacy.dir/debug_init.cpp.o"
   "CMakeFiles/doomlegacy.dir/debug_init.cpp.o.d"
   "CMakeFiles/doomlegacy.dir/engine/a_action.cpp.o"

@@ -64,7 +64,9 @@ typedef BitStream* ByteBufferPtr;
 #define TNL_IMPLEMENT_CLASS(cls)
 #define TNL_IMPLEMENT_NETOBJECT(cls)
 #define TNL_IMPLEMENT_NETCONNECTION(cls, group, flag)
-#define TNL_IMPLEMENT_NETOBJECT_RPC(cls, method, args, ...) void cls::method args {}
+// Stub RPC implementations - expands to nothing (the { causes issues)
+#define TNL_IMPLEMENT_NETOBJECT_RPC(cls, method, args, ...)
+#define TNL_IMPLEMENT_NETOBJECT_RPC_NG(cls, method, args, ...)
 #define TNL_RPC_CONSTRUCT_NETEVENT(player, rpc, args) nullptr
 
 // Enums

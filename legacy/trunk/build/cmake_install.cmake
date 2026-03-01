@@ -49,6 +49,11 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
+  include("/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/audio/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
   include("/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/video/cmake_install.cmake")
 endif()
 
