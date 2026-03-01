@@ -57,7 +57,7 @@ void R_InitSprites()
     for (int i = 0; i < MAXVIDWIDTH; i++)
         negonearray[i] = -1;
 
-    sprites.SetDefaultItem("SMOK");
+    // sprites.SetDefaultItem("SMOK");
 #ifdef TEST_MD3
     models.SetDefaultItem("models/players/imp/");
 #endif
