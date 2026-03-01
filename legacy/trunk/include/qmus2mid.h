@@ -25,8 +25,6 @@
 #if !defined(QMUS2MID_H)
 #define QMUS2MID_H
 
-#include <memory>
-
 #define NOTMUSFILE 1 /* Not a MUS file */
 #define COMUSFILE 2  /* Can't open MUS file */
 #define COTMPFILE 3  /* Can't open TMP file */
@@ -61,14 +59,13 @@ struct MUSheader
     Uint16 instruments[0];
 };
 
-/// \brief Track structure using smart pointer for automatic memory management (RAII)
 struct Track
 {
     unsigned long current;
     char vel;
     long DeltaTime;
     unsigned char LastEvent;
-    std::unique_ptr<char[]> data; /* Primary data - auto-managed via RAII */
+    char *data; /* Primary data */
 };
 
 int qmus2mid(byte *mus,

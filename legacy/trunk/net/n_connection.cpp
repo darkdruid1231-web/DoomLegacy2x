@@ -23,9 +23,6 @@
 /// \brief Network connections
 
 #include "command.h"
-
-#include <algorithm>
-
 #include "cvars.h"
 #include "doomdef.h"
 
@@ -69,10 +66,6 @@ LConnection::LConnection()
     // setIsAdaptive();
     // setTranslatesStrings();
     // setFixedRateParameters(50, 50, 2000, 2000); // packet rates, sizes (send and receive)
-}
-
-LConnection::~LConnection()
-{
 }
 
 // client
@@ -266,9 +259,11 @@ void LConnection::onConnectionEstablished()
         // server side
         n->client_con.push_back(this);
 
-        for (const auto& p : player)
+        int k = player.size();
+        for (int i = 0; i < k; i++)
         {
-            CONS_Printf("%s entered the game (player %d)\n", p->name.c_str(), p->number);
+            CONS_Printf(
+                "%s entered the game (player %d)\n", player[i]->name.c_str(), player[i]->number);
         }
         setScopeObject(game.gtype);
         setGhostFrom(true);
@@ -297,10 +292,11 @@ void LConnection::ConnectionTerminated(bool established)
     {
         if (established)
         {
-            for (const auto& p : player)
+            int n = player.size();
+            for (int i = 0; i < n; i++)
             {
-                CONS_Printf("Player (%d) dropped.\n", p->number);
-                p->playerstate = PST_REMOVE;
+                CONS_Printf("Player (%d) dropped.\n", player[i]->number);
+                player[i]->playerstate = PST_REMOVE;
             }
             resetGhosting();
             ((LNetInterface *)getInterface())->SV_RemoveConnection(this);
@@ -344,277 +340,279 @@ Shooting and artifact use should be guaranteed...
   XD_USEARTEFACT,
 */
 
-void LConnection::rpcTest(U8 num)
-{
-    CONS_Printf("client sent this: %d\n", num);
-}
-
-// the chat message "router"
-void LNetInterface::SendChat(int from, int to, const char *msg)
-{
-    if (!game.netgame)
-        return;
-
-    PlayerInfo *sender = game.FindPlayer(from);
-    if (!sender)
-        return;
-
-    if (game.server)
-    {
-        int n = client_con.size();
-        for (int i = 0; i < n; i++)
-        {
-            LConnection *c = client_con[i];
-            int np = c->player.size();
-            for (int j = 0; j < np; j++)
-            {
-                PlayerInfo *p = c->player[j];
-                if (to == 0 || p->number == to || p->team == -to)
-                {
-                    // We could also use PlayerInfo::SetMessage to trasmit chat messages from server
-                    // to client, but it is mainly for messages which can easily use
-                    // TNL::StringTableEntry.
-                    c->rpcChat(from, to, msg);
-                    if (p->number == to)
-                        return; // nobody else should get it
-
-                    break; // one rpc per connection
-                }
-            }
-        }
-
-        // TODO how to handle messages for local (server) players?
-        CONS_Printf("\a%s: %s\n", sender->name.c_str(), msg);
-    }
-    else if (server_con)
-        server_con->rpcChat(from, to, msg);
-}
-
-// to: 0 means everyone, positive numbers are players, negative numbers are teams
-void LConnection::rpcChat(S8 from, S8 to, StringPtr msg)
-{
-    PlayerInfo *p = game.FindPlayer(from);
-
-    if (isConnectionToServer())
-    {
-        // client
-        if (p)
-            CONS_Printf("%s: %s\n", p->name.c_str(), msg.getString());
-        else
-            CONS_Printf("Unknown player %d: %s\n", from, msg.getString());
-    }
-    else
-    {
-        if (!p || p->connection != this)
-        {
-            CONS_Printf("counterfeit message!\n"); // false sender
-            return;
-        }
-
-        static_cast<LNetInterface *>(getInterface())->SendChat(from, to, msg.getString());
-    }
-}
-
-static void PauseMsg(bool on, int pnum)
-{
-    const char *guilty = "server";
-    if (pnum > 0)
-    {
-        PlayerInfo *p = game.FindPlayer(pnum);
-        if (p)
-            guilty = p->name.c_str();
-    }
-
-    if (on)
-        CONS_Printf("Game paused by %s.\n", guilty);
-    else
-        CONS_Printf("Game unpaused by %s.\n", guilty);
-}
-
-/// pauses or unpauses the game
-void LNetInterface::Pause(int pnum, bool on)
-{
-    if (game.server)
-    {
-        // server can pause the game anytime
-        game.Pause(on);
-
-        // send rpc event to all clients
-        if (game.netgame && client_con.size())
-        {
-            NetEvent *e = TNL_RPC_CONSTRUCT_NETEVENT(client_con[0], rpcPause, (pnum, on));
-
-            for (const auto& c : client_con)
-                c->postNetEvent(e);
-        }
-
-        PauseMsg(on, pnum);
-    }
-    else if (server_con)
-    {
-        // client must request a pause from the server
-        server_con->rpcPause(0, on);
-
-        if (on)
-            CONS_Printf("Pause request sent.\n");
-        else
-            CONS_Printf("Unpause request sent.\n");
-    }
-}
-
-void LConnection::rpcPause(U8 pnum, bool on)
-{
-    if (isConnectionToServer())
-    {
-        // server orders a pause
-        game.Pause(on);
-        PauseMsg(on, pnum);
-    }
-    else if (cv_allowpause.value)
-    {
-        // got a pause request from a client
-        static_cast<LNetInterface *>(getInterface())->Pause(player[0]->number, on);
-    }
-}
-
-void LConnection::rpcMessage_s2c(S8 pnum, StringPtr msg, S8 priority, S8 type)
-{
-    for (const auto& lp : LocalPlayers)
-        if (lp.info && lp.info->number == pnum)
-        {
-            lp.info->SetMessage(msg.getString(), priority, type);
-            return;
-        }
-
-    CONS_Printf("Received someone else's message!\n");
-}
-
-void LNetInterface::SendNetVar(U16 netid, const char *str)
-{
-    // send netvar as an rpc event to all clients
-    for (const auto& c : client_con)
-        c->rpcSendNetVar_s2c(netid, str);
-}
-
-void LConnection::rpcSendNetVar_s2c(U16 netid, StringPtr s)
-{
-    consvar_t::GotNetVar(netid, s.getString());
-}
-
-/// only called on a server
-void LNetInterface::Kick(PlayerInfo *p)
-{
-    LConnection *c = p->connection;
-    if (c)
-    {
-        c->rpcKick_s2c(p->number, "Get lost!");
-
-        if (c->player.size() == 1)
-        {
-            disconnect(c, NetConnection::ReasonSelfDisconnect, "You were kicked by the server.\n");
-        }
-        else
-        {
-            // just kick the one
-        }
-    }
-
-    CONS_Printf("\2%s kicked from the game.\n", p->name.c_str());
-}
-
-void LConnection::rpcKick_s2c(U8 pnum, StringPtr str)
-{
-    // TODO
-    const char *s = str.getString();
-    CONS_Printf("\2You were kicked from the game: %s.\n", s);
-    /*
-      if(pnum == consoleplayer->number - 1)
-        {
-          CL_Reset();
-          game.StartIntro();
-          M_StartMessage("You have been kicked by the server\n\nPress ESC\n",NULL,MM_NOTHING);
-        }
-      else
-        CL_RemovePlayer(pnum);
-    */
-}
-
-void LNetInterface::SendPlayerOptions(int pnum, LocalPlayerInfo &p)
-{
-    if (!server_con)
-        return;
-
-    BitStream s;
-    p.Write(&s);
-    server_con->rpcSendOptions_c2s(pnum, &s);
-}
-
-void LConnection::rpcSendOptions_c2s(U8 pnum, ByteBufferPtr buf)
-{
-    PlayerInfo *p = game.FindPlayer(pnum);
-
-    if (!p || p->connection != this || buf->getBufferSize() > 100)
-    {
-        // since we receive a variable-length bytebuffer, we better be careful...
-        CONS_Printf("Bogus PlayerOptions RPC!\n");
-        return;
-    }
-
-    BitStream s(buf->getBuffer(), buf->getBufferSize());
-    p->options.Read(&s);
-
-    // put a limit on the name length
-    if (p->options.name.size() > MAXPLAYERNAME)
-        p->options.name.resize(MAXPLAYERNAME);
-
-    p->name = p->options.name;
-}
-
-void LNetInterface::RequestSuicide(int pnum)
-{
-    if (server_con)
-        server_con->rpcSuicide_c2s(pnum);
-}
-
-void LConnection::rpcSuicide_c2s(U8 pnum)
-{
-    void Kill_pawn(Actor * v, Actor * k);
-
-    PlayerInfo *p = game.FindPlayer(pnum);
-    if (p->connection == this)
-        Kill_pawn(p->pawn, p->pawn);
-}
-
-void LConnection::rpcRequestPOVchange_c2s(S32 pnum)
-{
-    // spy mode
-    if (game.state == GameInfo::GS_LEVEL && !cv_hiddenplayers.value)
-    {
-        PlayerInfo *p = NULL;
-
-        /* FIXME NOW
-        if (pnum <= 0)
-      {
-        // simply "next available POV"
-        player_iter_t i = Players.upper_bound(player[0]->povnum + 1);
-        if (i == Players.end())
-          i = Players.begin();
-
-        p = i->second;
-      }
-        else
-      p = game.FindPlayer(pnum);
-        */
-
-        if (p)
-            player[0]->pov = p->pawn;
-        else
-            player[0]->pov = player[0]->pawn;
-
-        // tell who's the view
-        player[0]->SetMessage(va("Viewpoint: %s\n", p->name.c_str()));
-        player[0]->setMaskBits(PlayerInfo::M_PAWN); // notify network system
-    }
-
-    // TODO client should start HUD on the new pov...
-}
+//////void LConnection::rpcTest(U8 num)
+//////{
+//////    CONS_Printf("client sent this: %d\n", num);
+//////}
+//////
+//////// the chat message "router"
+////void LNetInterface::SendChat(int from, int to, const char *msg)
+//{
+//    if (!game.netgame)
+//        return;
+//
+//    PlayerInfo *sender = game.FindPlayer(from);
+//    if (!sender)
+//        return;
+//
+//    if (game.server)
+//    {
+//        int n = client_con.size();
+//        for (int i = 0; i < n; i++)
+//        {
+//            LConnection *c = client_con[i];
+//            int np = c->player.size();
+//            for (int j = 0; j < np; j++)
+//            {
+//                PlayerInfo *p = c->player[j];
+//                if (to == 0 || p->number == to || p->team == -to)
+//                {
+//                    // We could also use PlayerInfo::SetMessage to trasmit chat messages from server
+//                    // to client, but it is mainly for messages which can easily use
+//                    // TNL::StringTableEntry.
+//                    c->rpcChat(from, to, msg);
+//                    if (p->number == to)
+//                        return; // nobody else should get it
+//
+//                    break; // one rpc per connection
+//                }
+//            }
+//        }
+//
+//        // TODO how to handle messages for local (server) players?
+//        CONS_Printf("\a%s: %s\n", sender->name.c_str(), msg);
+//    }
+//    else if (server_con)
+//        server_con->rpcChat(from, to, msg);
+//}
+//
+//// to: 0 means everyone, positive numbers are players, negative numbers are teams
+//void LConnection::rpcChat(S8 from, S8 to, StringPtr msg)
+//{
+//    PlayerInfo *p = game.FindPlayer(from);
+//
+//    if (isConnectionToServer())
+//    {
+//        // client
+//        if (p)
+//            CONS_Printf("%s: %s\n", p->name.c_str(), msg.getString());
+//        else
+//            CONS_Printf("Unknown player %d: %s\n", from, msg.getString());
+//    }
+//    else
+//    {
+//        if (!p || p->connection != this)
+//        {
+//            CONS_Printf("counterfeit message!\n"); // false sender
+//            return;
+//        }
+//
+//        static_cast<LNetInterface *>(getInterface())->SendChat(from, to, msg.getString());
+//    }
+//}
+//
+//static void PauseMsg(bool on, int pnum)
+//{
+//    const char *guilty = "server";
+//    if (pnum > 0)
+//    {
+//        PlayerInfo *p = game.FindPlayer(pnum);
+//        if (p)
+//            guilty = p->name.c_str();
+//    }
+//
+//    if (on)
+//        CONS_Printf("Game paused by %s.\n", guilty);
+//    else
+//        CONS_Printf("Game unpaused by %s.\n", guilty);
+//}
+//
+///// pauses or unpauses the game
+//void LNetInterface::Pause(int pnum, bool on)
+//{
+//    if (game.server)
+//    {
+//        // server can pause the game anytime
+//        game.Pause(on);
+//
+//        // send rpc event to all clients
+//        if (game.netgame && client_con.size())
+//        {
+//            int n = client_con.size();
+//            NetEvent *e = TNL_RPC_CONSTRUCT_NETEVENT(client_con[0], rpcPause, (pnum, on));
+//
+//            for (int i = 0; i < n; i++)
+//                client_con[i]->postNetEvent(e);
+//        }
+//
+//        PauseMsg(on, pnum);
+//    }
+//    else if (server_con)
+//    {
+//        // client must request a pause from the server
+//        server_con->rpcPause(0, on);
+//
+//        if (on)
+//            CONS_Printf("Pause request sent.\n");
+//        else
+//            CONS_Printf("Unpause request sent.\n");
+//    }
+//}
+//
+//void LConnection::rpcPause(U8 pnum, bool on)
+//{
+//    if (isConnectionToServer())
+//    {
+//        // server orders a pause
+//        game.Pause(on);
+//        PauseMsg(on, pnum);
+//    }
+//    else if (cv_allowpause.value)
+//    {
+//        // got a pause request from a client
+//        static_cast<LNetInterface *>(getInterface())->Pause(player[0]->number, on);
+//    }
+//}
+//
+//void LConnection::rpcMessage_s2c(S8 pnum, StringPtr msg, S8 priority, S8 type)
+//{
+//    for (int i = 0; i < NUM_LOCALPLAYERS; i++)
+//        if (LocalPlayers[i].info && LocalPlayers[i].info->number == pnum)
+//        {
+//            LocalPlayers[i].info->SetMessage(msg.getString(), priority, type);
+//            return;
+//        }
+//
+//    CONS_Printf("Received someone else's message!\n");
+//}
+//
+//void LNetInterface::SendNetVar(U16 netid, const char *str)
+//{
+//    // send netvar as an rpc event to all clients
+//    int n = client_con.size();
+//    for (int i = 0; i < n; i++)
+//        client_con[i]->rpcSendNetVar_s2c(netid, str);
+//}
+//
+//void LConnection::rpcSendNetVar_s2c(U16 netid, StringPtr s)
+//{
+//    consvar_t::GotNetVar(netid, s.getString());
+//}
+//
+///// only called on a server
+//void LNetInterface::Kick(PlayerInfo *p)
+//{
+//    LConnection *c = p->connection;
+//    if (c)
+//    {
+//        c->rpcKick_s2c(p->number, "Get lost!");
+//
+//        if (c->player.size() == 1)
+//        {
+//            disconnect(c, NetConnection::ReasonSelfDisconnect, "You were kicked by the server.\n");
+//        }
+//        else
+//        {
+//            // just kick the one
+//        }
+//    }
+//
+//    CONS_Printf("\2%s kicked from the game.\n", p->name.c_str());
+//}
+//
+//void LConnection::rpcKick_s2c(U8 pnum, StringPtr str)
+//{
+//    // TODO
+//    const char *s = str.getString();
+//    CONS_Printf("\2You were kicked from the game: %s.\n", s);
+//    /*
+//      if(pnum == consoleplayer->number - 1)
+//        {
+//          CL_Reset();
+//          game.StartIntro();
+//          M_StartMessage("You have been kicked by the server\n\nPress ESC\n",NULL,MM_NOTHING);
+//        }
+//      else
+//        CL_RemovePlayer(pnum);
+//    */
+//}
+//
+//void LNetInterface::SendPlayerOptions(int pnum, LocalPlayerInfo &p)
+//{
+//    if (!server_con)
+//        return;
+//
+//    BitStream s;
+//    p.Write(&s);
+//    server_con->rpcSendOptions_c2s(pnum, &s);
+//}
+//
+//void LConnection::rpcSendOptions_c2s(U8 pnum, ByteBufferPtr buf)
+//{
+//    PlayerInfo *p = game.FindPlayer(pnum);
+//
+//    if (!p || p->connection != this || buf->getBufferSize() > 100)
+//    {
+//        // since we receive a variable-length bytebuffer, we better be careful...
+//        CONS_Printf("Bogus PlayerOptions RPC!\n");
+//        return;
+//    }
+//
+//    BitStream s(buf->getBuffer(), buf->getBufferSize());
+//    p->options.Read(&s);
+//
+//    // put a limit on the name length
+//    if (p->options.name.size() > MAXPLAYERNAME)
+//        p->options.name.resize(MAXPLAYERNAME);
+//
+//    p->name = p->options.name;
+//}
+//
+//void LNetInterface::RequestSuicide(int pnum)
+//{
+//    if (server_con)
+//        server_con->rpcSuicide_c2s(pnum);
+//}
+//
+//void LConnection::rpcSuicide_c2s(U8 pnum)
+//{
+//    void Kill_pawn(Actor * v, Actor * k);
+//
+//    PlayerInfo *p = game.FindPlayer(pnum);
+//    if (p->connection == this)
+//        Kill_pawn(p->pawn, p->pawn);
+//}
+//
+//void LConnection::rpcRequestPOVchange_c2s(S32 pnum)
+//{
+//    // spy mode
+//    if (game.state == GameInfo::GS_LEVEL && !cv_hiddenplayers.value)
+//    {
+//        PlayerInfo *p = NULL;
+//
+//        /* FIXME NOW
+//        if (pnum <= 0)
+//      {
+//        // simply "next available POV"
+//        player_iter_t i = Players.upper_bound(player[0]->povnum + 1);
+//        if (i == Players.end())
+//          i = Players.begin();
+//
+//        p = i->second;
+//      }
+//        else
+//      p = game.FindPlayer(pnum);
+//        */
+//
+//        if (p)
+//            player[0]->pov = p->pawn;
+//        else
+//            player[0]->pov = player[0]->pawn;
+//
+//        // tell who's the view
+//        player[0]->SetMessage(va("Viewpoint: %s\n", p->name.c_str()));
+//        player[0]->setMaskBits(PlayerInfo::M_PAWN); // notify network system
+//    }
+//
+//    // TODO client should start HUD on the new pov...
+//}

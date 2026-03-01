@@ -6,8 +6,10 @@
 #define TNL_STUB_H
 
 #include <cstdint>
+#include <cstring>
 #include <string>
 #include <vector>
+#include "lnet.h"
 #ifdef SDL2
 #include <SDL2/SDL.h>
 #ifdef HAVE_SDL2_MIXER

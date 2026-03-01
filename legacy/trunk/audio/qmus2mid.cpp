@@ -22,7 +22,6 @@
 /// \brief Converts Doom MUS data to MIDI music data
 
 #include <ctype.h>
-#include <memory>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -84,16 +83,11 @@ inline void fwritelong(Uint32 x, byte **f)
 
 static void FreeTracks(void)
 {
-    // No need to manually free - smart pointers handle cleanup automatically
-    // Just reset all tracks to initial state
-    for (int i = 0; i < 16; i++)
-    {
-        track[i].current = 0;
-        track[i].vel = 64;
-        track[i].DeltaTime = 0;
-        track[i].LastEvent = 0;
-        track[i].data.reset();  // Release the smart pointer
-    }
+    int i;
+
+    for (i = 0; i < 16; i++)
+        if (track[i].data)
+            free(track[i].data);
 }
 
 static void TWriteByte(byte MIDItrack, char bbyte)
@@ -262,7 +256,7 @@ int qmus2mid(byte *mus,
         track[i].vel = 64;
         track[i].DeltaTime = 0;
         track[i].LastEvent = 0;
-        track[i].data = nullptr;
+        track[i].data = NULL;
     }
 
     if (BufferSize)
@@ -281,9 +275,7 @@ int qmus2mid(byte *mus,
                 // if percussion use channel 9
                 (MUSchannel == 15 ? 9 : FirstChannelAvailable(MUS2MIDchannel));
             MIDItrack = MIDIchan2track[MIDIchannel] = (byte)TrackCnt++;
-            // Use smart pointer for automatic memory management
-            track[MIDItrack].data.reset(new (std::nothrow) char[TRACKBUFFERSIZE]);
-            if (!track[MIDItrack].data)
+            if (!(track[MIDItrack].data = (char *)malloc(TRACKBUFFERSIZE)))
             {
                 FreeTracks();
                 return MEMALLOC;

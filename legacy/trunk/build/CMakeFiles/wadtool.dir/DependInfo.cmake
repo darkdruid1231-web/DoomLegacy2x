@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/tools/wadtool.cpp" "CMakeFiles/wadtool.dir/tools/wadtool.cpp.o" "gcc" "CMakeFiles/wadtool.dir/tools/wadtool.cpp.o.d"
+  "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.cpp" "CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.cpp.o" "gcc" "CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.cpp.o.d"
   "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/util/md5.cpp" "CMakeFiles/wadtool.dir/util/md5.cpp.o" "gcc" "CMakeFiles/wadtool.dir/util/md5.cpp.o.d"
   )
 

@@ -25,8 +25,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <algorithm>
-
 #include "command.h"
 #include "console.h"
 
@@ -216,17 +214,18 @@ void D_DoomLoop()
 // D_AddFile
 //
 static char *startupwadfiles[MAX_WADFILES];
-static int num_startup_wads = 0;
 
 static void D_AddFile(const char *file)
 {
-    if (num_startup_wads >= MAX_WADFILES)
+    static int i = 0;
+
+    if (i >= MAX_WADFILES)
         return;
 
     char *newfile = (char *)malloc(strlen(file) + 1);
-    memcpy(newfile, file, strlen(file) + 1);
+    strcpy(newfile, file);
 
-    startupwadfiles[num_startup_wads++] = newfile;
+    startupwadfiles[i++] = newfile;
 }
 
 // ==========================================================================
@@ -294,13 +293,13 @@ static void D_IdentifyVersion()
         s = FIL_StripPath(s);
 
         // try to find implied gamemode
-        auto it = std::find_if(iwads, iwads + NUM_IWADS,
-            [s](const auto& iwad) { return !strcasecmp(s, iwad.wadname); });
-        if (it != iwads + NUM_IWADS)
-        {
-            game.mode = it->mode;
-            mission = it->mission;
-        }
+        for (int i = 0; i < NUM_IWADS; i++)
+            if (!strcasecmp(s, iwads[i].wadname))
+            {
+                game.mode = iwads[i].mode;
+                mission = iwads[i].mission;
+                break;
+            }
 
         // Ultimate doom or not?
         if (mission == gmi_doom1)
@@ -442,8 +441,7 @@ void D_SetPaths()
     // check for a custom config file
     if (M_CheckParm("-config") && M_IsNextParm())
     {
-        strncpy(configfile, M_GetNextParm(), sizeof(configfile)-1);
-        configfile[sizeof(configfile)-1] = '\0';
+        strcpy(configfile, M_GetNextParm());
         CONS_Printf("Using config file '%s'\n", configfile);
     }
     else
@@ -563,10 +561,6 @@ bool D_DoomMain()
     if (!fc.InitMultipleFiles(startupwadfiles))
         I_Error("A WAD file was not found\n");
 
-    // free the temporary strings
-    for(int j = 0; j < num_startup_wads; j++)
-        free(startupwadfiles[j]);
-
     // see that legacy.wad version matches program version
     if (!M_CheckParm("-noversioncheck"))
         D_CheckWadVersion();
@@ -604,7 +598,7 @@ bool D_DoomMain()
 
     // ------------- starting the game ----------------
 
-    const char *m = "MI_DOOM1";
+    const char *m;
 
     if (fc.FindNumForName("MAPINFO") >= 0)
         m = "MAPINFO";

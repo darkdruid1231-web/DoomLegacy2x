@@ -862,7 +862,8 @@ void consvar_t::GotNetVar(unsigned short id, const char *str)
     cvar->Setvalue(str);
 }
 
-// write the netvars into a packet
+// TNL networking disabled - BitStream version not available
+/*
 void consvar_t::SaveNetVars(BitStream &s)
 {
     for (consvar_t *cvar = cvar_list; cvar; cvar = cvar->next)
@@ -873,7 +874,6 @@ void consvar_t::SaveNetVars(BitStream &s)
         }
 }
 
-// read the netvars from a packet
 void consvar_t::LoadNetVars(BitStream &s)
 {
     for (consvar_t *cvar = cvar_list; cvar; cvar = cvar->next)
@@ -887,6 +887,7 @@ void consvar_t::LoadNetVars(BitStream &s)
             GotNetVar(id, temp);
         }
 }
+*/
 
 // write the netvars into a buffer using ISerializer abstraction
 void consvar_t::SaveNetVars(DoomLegacy::ISerializer &s)

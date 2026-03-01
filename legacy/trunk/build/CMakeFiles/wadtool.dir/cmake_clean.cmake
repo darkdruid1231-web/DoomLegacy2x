@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/wadtool.dir/tools/wadtool.cpp.o"
-  "CMakeFiles/wadtool.dir/tools/wadtool.cpp.o.d"
+  "CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.cpp.o"
+  "CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.cpp.o.d"
   "CMakeFiles/wadtool.dir/util/md5.cpp.o"
   "CMakeFiles/wadtool.dir/util/md5.cpp.o.d"
   "wadtool"

@@ -153,17 +153,4 @@ union RGBA_t
 #define MINLONG ((long)0x80000000)
 #endif
 
-// C++11 constexpr versions for modern code
-namespace DoomLegacy
-{
-constexpr int MAXINT_CXX = 0x7fffffff;
-constexpr int MININT_CXX = 0x80000000;
-constexpr int MAXSHORT_CXX = 0x7fff;
-// MINSHORT is -32768 when interpreted as signed short (0x8000 in two's complement)
-constexpr int MINSHORT_CXX = -32768;
-constexpr int MAXCHAR_CXX = 0x7f;
-// MINCHAR is -128 when interpreted as signed char
-constexpr int MINCHAR_CXX = -128;
-} // namespace DoomLegacy
-
 #endif

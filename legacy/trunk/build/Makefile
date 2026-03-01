@@ -192,19 +192,6 @@ test_fixed_t/fast:
 .PHONY : test_fixed_t/fast
 
 #=============================================================================
-# Target rules for targets named test_fixed_catch2
-
-# Build rule for target.
-test_fixed_catch2: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_fixed_catch2
-.PHONY : test_fixed_catch2
-
-# fast build rule for target.
-test_fixed_catch2/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fixed_catch2.dir/build.make CMakeFiles/test_fixed_catch2.dir/build
-.PHONY : test_fixed_catch2/fast
-
-#=============================================================================
 # Target rules for targets named test_save_load_unit
 
 # Build rule for target.
@@ -372,6 +359,30 @@ Catch2WithMain: cmake_check_build_system
 Catch2WithMain/fast:
 	$(MAKE) $(MAKESILENT) -f _deps/catch2-build/src/CMakeFiles/Catch2WithMain.dir/build.make _deps/catch2-build/src/CMakeFiles/Catch2WithMain.dir/build
 .PHONY : Catch2WithMain/fast
+
+debug_init.o: debug_init.cpp.o
+.PHONY : debug_init.o
+
+# target to build an object file
+debug_init.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/debug_init.cpp.o
+.PHONY : debug_init.cpp.o
+
+debug_init.i: debug_init.cpp.i
+.PHONY : debug_init.i
+
+# target to preprocess a source file
+debug_init.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/debug_init.cpp.i
+.PHONY : debug_init.cpp.i
+
+debug_init.s: debug_init.cpp.s
+.PHONY : debug_init.s
+
+# target to generate assembly for a file
+debug_init.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/debug_init.cpp.s
+.PHONY : debug_init.cpp.s
 
 engine/a_action.o: engine/a_action.cpp.o
 .PHONY : engine/a_action.o
@@ -2053,6 +2064,54 @@ engine/singleplayer_stubs.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/engine/singleplayer_stubs.cpp.s
 .PHONY : engine/singleplayer_stubs.cpp.s
 
+home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.o: home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.o
+.PHONY : home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.o
+
+# target to build an object file
+home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/d2h.dir/build.make CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.o
+.PHONY : home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.o
+
+home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.i: home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.i
+.PHONY : home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.i
+
+# target to preprocess a source file
+home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/d2h.dir/build.make CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.i
+.PHONY : home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.i
+
+home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.s: home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.s
+.PHONY : home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.s
+
+# target to generate assembly for a file
+home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/d2h.dir/build.make CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.s
+.PHONY : home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.s
+
+home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.o: home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.cpp.o
+.PHONY : home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.o
+
+# target to build an object file
+home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/wadtool.dir/build.make CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.cpp.o
+.PHONY : home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.cpp.o
+
+home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.i: home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.cpp.i
+.PHONY : home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.i
+
+# target to preprocess a source file
+home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/wadtool.dir/build.make CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.cpp.i
+.PHONY : home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.cpp.i
+
+home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.s: home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.cpp.s
+.PHONY : home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.s
+
+# target to generate assembly for a file
+home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/wadtool.dir/build.make CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.cpp.s
+.PHONY : home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.cpp.s
+
 interface/sdl/endtxt.o: interface/sdl/endtxt.cpp.o
 .PHONY : interface/sdl/endtxt.o
 
@@ -2533,30 +2592,6 @@ tests/unit/test_console.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_console.dir/build.make CMakeFiles/test_console.dir/tests/unit/test_console.cpp.s
 .PHONY : tests/unit/test_console.cpp.s
 
-tests/unit/test_fixed_catch2.o: tests/unit/test_fixed_catch2.cpp.o
-.PHONY : tests/unit/test_fixed_catch2.o
-
-# target to build an object file
-tests/unit/test_fixed_catch2.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fixed_catch2.dir/build.make CMakeFiles/test_fixed_catch2.dir/tests/unit/test_fixed_catch2.cpp.o
-.PHONY : tests/unit/test_fixed_catch2.cpp.o
-
-tests/unit/test_fixed_catch2.i: tests/unit/test_fixed_catch2.cpp.i
-.PHONY : tests/unit/test_fixed_catch2.i
-
-# target to preprocess a source file
-tests/unit/test_fixed_catch2.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fixed_catch2.dir/build.make CMakeFiles/test_fixed_catch2.dir/tests/unit/test_fixed_catch2.cpp.i
-.PHONY : tests/unit/test_fixed_catch2.cpp.i
-
-tests/unit/test_fixed_catch2.s: tests/unit/test_fixed_catch2.cpp.s
-.PHONY : tests/unit/test_fixed_catch2.s
-
-# target to generate assembly for a file
-tests/unit/test_fixed_catch2.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fixed_catch2.dir/build.make CMakeFiles/test_fixed_catch2.dir/tests/unit/test_fixed_catch2.cpp.s
-.PHONY : tests/unit/test_fixed_catch2.cpp.s
-
 tests/unit/test_fixed_t.o: tests/unit/test_fixed_t.cpp.o
 .PHONY : tests/unit/test_fixed_t.o
 
@@ -2628,54 +2663,6 @@ tests/unit/test_vector.s: tests/unit/test_vector.cpp.s
 tests/unit/test_vector.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_vector.dir/build.make CMakeFiles/test_vector.dir/tests/unit/test_vector.cpp.s
 .PHONY : tests/unit/test_vector.cpp.s
-
-tools/d2h.o: tools/d2h.cpp.o
-.PHONY : tools/d2h.o
-
-# target to build an object file
-tools/d2h.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/d2h.dir/build.make CMakeFiles/d2h.dir/tools/d2h.cpp.o
-.PHONY : tools/d2h.cpp.o
-
-tools/d2h.i: tools/d2h.cpp.i
-.PHONY : tools/d2h.i
-
-# target to preprocess a source file
-tools/d2h.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/d2h.dir/build.make CMakeFiles/d2h.dir/tools/d2h.cpp.i
-.PHONY : tools/d2h.cpp.i
-
-tools/d2h.s: tools/d2h.cpp.s
-.PHONY : tools/d2h.s
-
-# target to generate assembly for a file
-tools/d2h.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/d2h.dir/build.make CMakeFiles/d2h.dir/tools/d2h.cpp.s
-.PHONY : tools/d2h.cpp.s
-
-tools/wadtool.o: tools/wadtool.cpp.o
-.PHONY : tools/wadtool.o
-
-# target to build an object file
-tools/wadtool.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/wadtool.dir/build.make CMakeFiles/wadtool.dir/tools/wadtool.cpp.o
-.PHONY : tools/wadtool.cpp.o
-
-tools/wadtool.i: tools/wadtool.cpp.i
-.PHONY : tools/wadtool.i
-
-# target to preprocess a source file
-tools/wadtool.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/wadtool.dir/build.make CMakeFiles/wadtool.dir/tools/wadtool.cpp.i
-.PHONY : tools/wadtool.cpp.i
-
-tools/wadtool.s: tools/wadtool.cpp.s
-.PHONY : tools/wadtool.s
-
-# target to generate assembly for a file
-tools/wadtool.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/wadtool.dir/build.make CMakeFiles/wadtool.dir/tools/wadtool.cpp.s
-.PHONY : tools/wadtool.cpp.s
 
 util/command.o: util/command.cpp.o
 .PHONY : util/command.o
@@ -3730,7 +3717,6 @@ help:
 	@echo "... test_components"
 	@echo "... test_console"
 	@echo "... test_demos_integration"
-	@echo "... test_fixed_catch2"
 	@echo "... test_fixed_t"
 	@echo "... test_network_integration"
 	@echo "... test_parity"
@@ -3740,6 +3726,9 @@ help:
 	@echo "... test_vector"
 	@echo "... util"
 	@echo "... wadtool"
+	@echo "... debug_init.o"
+	@echo "... debug_init.i"
+	@echo "... debug_init.s"
 	@echo "... engine/a_action.o"
 	@echo "... engine/a_action.i"
 	@echo "... engine/a_action.s"
@@ -3950,6 +3939,12 @@ help:
 	@echo "... engine/singleplayer_stubs.o"
 	@echo "... engine/singleplayer_stubs.i"
 	@echo "... engine/singleplayer_stubs.s"
+	@echo "... home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.o"
+	@echo "... home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.i"
+	@echo "... home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.s"
+	@echo "... home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.o"
+	@echo "... home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.i"
+	@echo "... home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.s"
 	@echo "... interface/sdl/endtxt.o"
 	@echo "... interface/sdl/endtxt.i"
 	@echo "... interface/sdl/endtxt.s"
@@ -4010,9 +4005,6 @@ help:
 	@echo "... tests/unit/test_console.o"
 	@echo "... tests/unit/test_console.i"
 	@echo "... tests/unit/test_console.s"
-	@echo "... tests/unit/test_fixed_catch2.o"
-	@echo "... tests/unit/test_fixed_catch2.i"
-	@echo "... tests/unit/test_fixed_catch2.s"
 	@echo "... tests/unit/test_fixed_t.o"
 	@echo "... tests/unit/test_fixed_t.i"
 	@echo "... tests/unit/test_fixed_t.s"
@@ -4022,12 +4014,6 @@ help:
 	@echo "... tests/unit/test_vector.o"
 	@echo "... tests/unit/test_vector.i"
 	@echo "... tests/unit/test_vector.s"
-	@echo "... tools/d2h.o"
-	@echo "... tools/d2h.i"
-	@echo "... tools/d2h.s"
-	@echo "... tools/wadtool.o"
-	@echo "... tools/wadtool.i"
-	@echo "... tools/wadtool.s"
 	@echo "... util/command.o"
 	@echo "... util/command.i"
 	@echo "... util/command.s"

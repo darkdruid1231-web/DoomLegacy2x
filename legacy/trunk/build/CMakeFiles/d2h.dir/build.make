@@ -69,28 +69,28 @@ include CMakeFiles/d2h.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/d2h.dir/flags.make
 
-CMakeFiles/d2h.dir/tools/d2h.cpp.o: CMakeFiles/d2h.dir/flags.make
-CMakeFiles/d2h.dir/tools/d2h.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/tools/d2h.cpp
-CMakeFiles/d2h.dir/tools/d2h.cpp.o: CMakeFiles/d2h.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/d2h.dir/tools/d2h.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/d2h.dir/tools/d2h.cpp.o -MF CMakeFiles/d2h.dir/tools/d2h.cpp.o.d -o CMakeFiles/d2h.dir/tools/d2h.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/tools/d2h.cpp
+CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.o: CMakeFiles/d2h.dir/flags.make
+CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.o: /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp
+CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.o: CMakeFiles/d2h.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.o -MF CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.o.d -o CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.o -c /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp
 
-CMakeFiles/d2h.dir/tools/d2h.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/d2h.dir/tools/d2h.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/tools/d2h.cpp > CMakeFiles/d2h.dir/tools/d2h.cpp.i
+CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp > CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.i
 
-CMakeFiles/d2h.dir/tools/d2h.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/d2h.dir/tools/d2h.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/tools/d2h.cpp -o CMakeFiles/d2h.dir/tools/d2h.cpp.s
+CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp -o CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.s
 
 # Object files for target d2h
 d2h_OBJECTS = \
-"CMakeFiles/d2h.dir/tools/d2h.cpp.o"
+"CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.o"
 
 # External object files for target d2h
 d2h_EXTERNAL_OBJECTS =
 
-d2h: CMakeFiles/d2h.dir/tools/d2h.cpp.o
+d2h: CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.o
 d2h: CMakeFiles/d2h.dir/build.make
 d2h: CMakeFiles/d2h.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable d2h"

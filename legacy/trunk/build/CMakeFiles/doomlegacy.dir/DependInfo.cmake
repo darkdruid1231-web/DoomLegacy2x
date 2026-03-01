@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/debug_init.cpp" "CMakeFiles/doomlegacy.dir/debug_init.cpp.o" "gcc" "CMakeFiles/doomlegacy.dir/debug_init.cpp.o.d"
   "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/a_action.cpp" "CMakeFiles/doomlegacy.dir/engine/a_action.cpp.o" "gcc" "CMakeFiles/doomlegacy.dir/engine/a_action.cpp.o.d"
   "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/ai_mobjinfo.cpp" "CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.o" "gcc" "CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.o.d"
   "/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/engine/ai_states.cpp" "CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.o" "gcc" "CMakeFiles/doomlegacy.dir/engine/ai_states.cpp.o.d"

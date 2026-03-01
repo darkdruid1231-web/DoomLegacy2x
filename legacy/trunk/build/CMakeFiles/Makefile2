@@ -68,7 +68,6 @@ all: CMakeFiles/d2h.dir/all
 all: CMakeFiles/wadtool.dir/all
 all: CMakeFiles/doomlegacy.dir/all
 all: CMakeFiles/test_fixed_t.dir/all
-all: CMakeFiles/test_fixed_catch2.dir/all
 all: CMakeFiles/test_save_load_unit.dir/all
 all: CMakeFiles/test_serialization.dir/all
 all: CMakeFiles/test_tnl_packets.dir/all
@@ -104,7 +103,6 @@ clean: CMakeFiles/d2h.dir/clean
 clean: CMakeFiles/wadtool.dir/clean
 clean: CMakeFiles/doomlegacy.dir/clean
 clean: CMakeFiles/test_fixed_t.dir/clean
-clean: CMakeFiles/test_fixed_catch2.dir/clean
 clean: CMakeFiles/test_save_load_unit.dir/clean
 clean: CMakeFiles/test_serialization.dir/clean
 clean: CMakeFiles/test_tnl_packets.dir/clean
@@ -328,16 +326,16 @@ CMakeFiles/wadtool.dir/clean:
 # Target rules for target CMakeFiles/doomlegacy.dir
 
 # All Build rule for target.
-CMakeFiles/doomlegacy.dir/all: CMakeFiles/util.dir/all
 CMakeFiles/doomlegacy.dir/all: grammars/CMakeFiles/grammars.dir/all
+CMakeFiles/doomlegacy.dir/all: CMakeFiles/util.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/doomlegacy.dir/build.make CMakeFiles/doomlegacy.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78 "Built target doomlegacy"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79 "Built target doomlegacy"
 .PHONY : CMakeFiles/doomlegacy.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/doomlegacy.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles 49
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles 50
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/doomlegacy.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles 0
 .PHONY : CMakeFiles/doomlegacy.dir/rule
@@ -376,33 +374,6 @@ test_fixed_t: CMakeFiles/test_fixed_t.dir/rule
 CMakeFiles/test_fixed_t.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fixed_t.dir/build.make CMakeFiles/test_fixed_t.dir/clean
 .PHONY : CMakeFiles/test_fixed_t.dir/clean
-
-#=============================================================================
-# Target rules for target CMakeFiles/test_fixed_catch2.dir
-
-# All Build rule for target.
-CMakeFiles/test_fixed_catch2.dir/all: _deps/catch2-build/src/CMakeFiles/Catch2.dir/all
-CMakeFiles/test_fixed_catch2.dir/all: _deps/catch2-build/src/CMakeFiles/Catch2WithMain.dir/all
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fixed_catch2.dir/build.make CMakeFiles/test_fixed_catch2.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fixed_catch2.dir/build.make CMakeFiles/test_fixed_catch2.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=86 "Built target test_fixed_catch2"
-.PHONY : CMakeFiles/test_fixed_catch2.dir/all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/test_fixed_catch2.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles 40
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_fixed_catch2.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles 0
-.PHONY : CMakeFiles/test_fixed_catch2.dir/rule
-
-# Convenience name for target.
-test_fixed_catch2: CMakeFiles/test_fixed_catch2.dir/rule
-.PHONY : test_fixed_catch2
-
-# clean rule for target.
-CMakeFiles/test_fixed_catch2.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fixed_catch2.dir/build.make CMakeFiles/test_fixed_catch2.dir/clean
-.PHONY : CMakeFiles/test_fixed_catch2.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/test_save_load_unit.dir
@@ -489,12 +460,12 @@ CMakeFiles/test_tnl_packets.dir/clean:
 CMakeFiles/test_actor.dir/all: CMakeFiles/util.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_actor.dir/build.make CMakeFiles/test_actor.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_actor.dir/build.make CMakeFiles/test_actor.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=83 "Built target test_actor"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num= "Built target test_actor"
 .PHONY : CMakeFiles/test_actor.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/test_actor.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles 8
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles 7
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_actor.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles 0
 .PHONY : CMakeFiles/test_actor.dir/rule
@@ -516,12 +487,12 @@ CMakeFiles/test_components.dir/all: _deps/catch2-build/src/CMakeFiles/Catch2.dir
 CMakeFiles/test_components.dir/all: _deps/catch2-build/src/CMakeFiles/Catch2WithMain.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_components.dir/build.make CMakeFiles/test_components.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_components.dir/build.make CMakeFiles/test_components.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num= "Built target test_components"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=84 "Built target test_components"
 .PHONY : CMakeFiles/test_components.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/test_components.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles 39
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles 40
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_components.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles 0
 .PHONY : CMakeFiles/test_components.dir/rule
@@ -542,7 +513,7 @@ CMakeFiles/test_components.dir/clean:
 CMakeFiles/test_console.dir/all: CMakeFiles/util.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_console.dir/build.make CMakeFiles/test_console.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_console.dir/build.make CMakeFiles/test_console.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=84 "Built target test_console"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=85 "Built target test_console"
 .PHONY : CMakeFiles/test_console.dir/all
 
 # Build rule for subdir invocation for target.
@@ -594,7 +565,7 @@ CMakeFiles/test_vector.dir/clean:
 CMakeFiles/test_demos_integration.dir/all: CMakeFiles/util.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_demos_integration.dir/build.make CMakeFiles/test_demos_integration.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_demos_integration.dir/build.make CMakeFiles/test_demos_integration.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=85 "Built target test_demos_integration"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=86 "Built target test_demos_integration"
 .PHONY : CMakeFiles/test_demos_integration.dir/all
 
 # Build rule for subdir invocation for target.
@@ -672,7 +643,7 @@ CMakeFiles/test_parity.dir/clean:
 grammars/CMakeFiles/grammars.dir/all:
 	$(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/depend
 	$(MAKE) $(MAKESILENT) -f grammars/CMakeFiles/grammars.dir/build.make grammars/CMakeFiles/grammars.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=79,80,81,82 "Built target grammars"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/legacy/trunk/build/CMakeFiles --progress-num=80,81,82,83 "Built target grammars"
 .PHONY : grammars/CMakeFiles/grammars.dir/all
 
 # Build rule for subdir invocation for target.

@@ -58,13 +58,6 @@ class fixed_t
         FMASK = (UNIT - 1)             ///< mask for the fractional part
     };
 
-    // C++11 constexpr constants (preferred over enum)
-    static constexpr value_t FRACBITS = 16;       ///< bits in the fractional part
-    static constexpr value_t FRACUNIT = 1 << FRACBITS;  ///< unity
-    static constexpr value_t FRACMIN = -(1 << (FRACBITS - 1));    ///< min representable
-    static constexpr value_t FRACMAX = (1 << (FRACBITS - 1)) - 1; ///< max representable
-    static constexpr value_t FRACMASK = FRACUNIT - 1;  ///< mask for fractional part
-
     /// Constructors.
     /// Explicit constructors are only used when the call exactly matches them, i.e.
     /// the compliler never adds an implicit cast for the input arguments.

@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/doomlegacy.dir/debug_init.cpp.o"
+  "CMakeFiles/doomlegacy.dir/debug_init.cpp.o.d"
   "CMakeFiles/doomlegacy.dir/engine/a_action.cpp.o"
   "CMakeFiles/doomlegacy.dir/engine/a_action.cpp.o.d"
   "CMakeFiles/doomlegacy.dir/engine/ai_mobjinfo.cpp.o"
