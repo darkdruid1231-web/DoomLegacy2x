@@ -1,12 +1,188 @@
-build/_deps/catch2-build/src/CMakeFiles/Catch2.dir/catch2/catch_config.cpp.obj
+# Build artifacts
+*.o
 *.obj
-*.exe
 *.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+*.pdb
+*.ilk
+*.suo
+*.user
+*.aps
+*.pch
+*.vspscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.tmp
+*.tmp_proj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.log
+*.svclog
+*.scc
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+
+# Build directories
 /build/
-legacy/trunk/build/
-/logs/
-*/CMakeFiles/
-*build-new
-CMakeFiles
-legacy/trunk/build/grammars/ntexture.lexer.c
-build-mingw*
+/build-debug/
+/build-release/
+/build-relwithdebinfo/
+/build-minsizerel/
+/build-new/
+/build-win32/
+/build-win64/
+/build-linux/
+/build-macos/
+/legacy/trunk/build/
+/legacy_one/trunk/build/
+
+# Visual Studio
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.suo
+*.user
+*.aps
+*.pch
+*.vspscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.tmp
+*.tmp_proj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.log
+*.svclog
+*.scc
+*.vssscc
+*.vspscc
+
+# Xcode
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xcuserstate
+project.xcworkspace/
+xcuserdata/
+
+# Qt Creator
+*.pro.user
+*.pro.user.*
+
+# Eclipse
+.project
+.cproject
+.autotools
+.factorypath
+.settings/
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Testing artifacts
+test/screenshots/*.png
+!test/baselines/*.png
+performance_trends.json
+test_report.json
+test_report.html
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Game assets (optional - uncomment if you want to ignore large WAD files)
+# *.wad
+# *.pk3
+# *.pk7
+
+# Development notes
+TODO.md
+notes.txt
