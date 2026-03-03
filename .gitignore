@@ -1,0 +1,12 @@
+build/_deps/catch2-build/src/CMakeFiles/Catch2.dir/catch2/catch_config.cpp.obj
+*.obj
+*.exe
+*.a
+/build/
+legacy/trunk/build/
+/logs/
+*/CMakeFiles/
+*build-new
+CMakeFiles
+legacy/trunk/build/grammars/ntexture.lexer.c
+build-mingw*

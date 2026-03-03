@@ -1,3 +1,0 @@
-/usr/bin/cmake -E rm -f CMakeFiles/d2h.dir/objects.a
-/usr/bin/x86_64-w64-mingw32-ar qc CMakeFiles/d2h.dir/objects.a @CMakeFiles/d2h.dir/objects1.rsp
-/usr/bin/x86_64-w64-mingw32-g++-posix -static-libgcc -static-libstdc++ -Wno-missing-attributes -Wno-error -O3 -DNDEBUG  -static -Wl,--whole-archive CMakeFiles/d2h.dir/objects.a -Wl,--no-whole-archive -o d2h.exe -Wl,--out-implib,libd2h.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/d2h.dir/linkLibs.rsp
