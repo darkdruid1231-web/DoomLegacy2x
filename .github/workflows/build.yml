@@ -7,415 +7,65 @@ on:
     branches: [main]
 
 jobs:
-  # Linux build with tests
+  # Linux build with container for consistency
   linux-build:
-    runs-on: ["self-hosted", "linux"]
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      with:
-        path: linux-build
-        submodules: false
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-            cmake \
-            g++ \
-            libsdl1.2-dev \
-            libsdl-mixer1.2-dev \
-            libpng-dev \
-            libjpeg-dev \
-            libenet-dev \
-            libglu1-mesa-dev \
-            flex \
-            lemon \
-            cppcheck
-        # Create SDL symlink if missing (code uses SDL/SDL.h)
-        sudo ln -sf /usr/include/SDL /usr/include/SDL || true
-
-    - name: Configure and Build
-      run: |
-        cd linux-build/legacy/trunk
-        rm -rf build
-        mkdir -p build
-        cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_MODERN_NETWORKING=OFF -DUSE_CDROM=OFF -DUSE_SOUND=ON -DUSE_SDL2=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=ON  # Disable CDROM for SDL2 compatibility
-        # Build main executable, tools, and tests
-        cmake --build . --target doomlegacy d2h wadtool test_fixed_t test_vector test_console test_actor test_save_load_unit --parallel 4 2>&1 | tee build.log
-        if [ ${PIPESTATUS[0]} -eq 0 ]; then
-          echo "Build succeeded"
-        else
-          echo "Build failed - see summary below"
-          echo "Looking for error summarizer script..."
-          find ../../ -name "build_error_summarizer.py" 2>/dev/null || echo "Script not found"
-          python3 ../../build_error_summarizer.py < build.log || echo "Error summarizer failed"
-          exit 1
-        fi
-
-    # Code formatting check removed - clang-format not installed
-
-    # Clang-tidy check removed - not installed in CI
-
-    - name: Run Tests
-      run: |
-        cd linux-build/legacy/trunk/build
-        ctest --output-on-failure -R "fixed_t|vector|console|save_load" || true
+    - name: Build Linux binaries
+      run: make ci-linux
 
     - name: Upload Linux executables and tools
       uses: actions/upload-artifact@v4
       with:
         name: doomlegacy-linux-executables
         path: |
-          linux-build/legacy/trunk/build/doomlegacy
-          linux-build/legacy/trunk/build/d2h
-          linux-build/legacy/trunk/build/wadtool
+          legacy/trunk/build-linux/doomlegacy
+          legacy/trunk/build-linux/d2h
+          legacy/trunk/build-linux/wadtool
         retention-days: 30
         if-no-files-found: warn
 
-    # cppcheck disabled - takes too long
-    # - name: cppcheck static analysis
-    #   run: |
-    #     cppcheck \
-    #       --enable=warning,style,performance,portability \
-    #       --suppress=missingIncludeSystem \
-    #       --suppress=unmatchedSuppression \
-    #       --std=c++11 \
-    #       --platform=win64 \
-    #       -I legacy/trunk/include \
-    #       -I legacy/trunk/include/core \
-    #       -I legacy/trunk/include/game \
-    #       -I legacy/trunk/include_stubs \
-    #       --error-exitcode=0 \
-    #       --output-file=cppcheck-report.txt \
-    #       legacy/trunk/engine legacy/trunk/util legacy/trunk/video \
-    #       2>&1 | tail -20 || true
-    #     echo "=== cppcheck summary ==="
-    #     grep -c "error\|warning" cppcheck-report.txt 2>/dev/null && \
-    #       echo "Full report: cppcheck-report.txt" || echo "No issues found"
-    #
-    # - name: Upload cppcheck report
-    #   uses: actions/upload-artifact@v4
-    #   if: always()
-    #   with:
-    #     name: cppcheck-report
-    #     path: cppcheck-report.txt
-    #     retention-days: 14
-    #     if-no-files-found: ignore
-
-  # Windows cross-compilation with GCC + MinGW (disabled)
-  windows-gcc-build:
-    if: false
+  # Windows cross-compilation using container
+  windows-build:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Install MinGW cross-compiler and tools
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-            mingw-w64 \
-            g++-mingw-w64-x86-64 \
-            gcc-mingw-w64-x86-64 \
-            cmake \
-            libsdl1.2-dev \
-            wget \
-            unzip \
-            lemon
-
-    - name: Download SDL2 for Windows
-      run: |
-        mkdir -p /tmp/sdl2
-        cd /tmp/sdl2
-
-        # SDL2 - download development libraries for MinGW (includes headers)
-        wget -q https://github.com/libsdl-org/SDL/releases/download/release-2.30.10/SDL2-devel-2.30.10-mingw.tar.gz
-        tar -xzf SDL2-devel-2.30.10-mingw.tar.gz
-
-        # SDL2_mixer - download development libraries for MinGW
-        wget -q https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.8.0/SDL2_mixer-devel-2.8.0-mingw.tar.gz
-        tar -xzf SDL2_mixer-devel-2.8.0-mingw.tar.gz
-
-        # Create Windows sysroot
-        sudo mkdir -p /usr/x86_64-w64-mingw32
-        sudo cp -r /tmp/sdl2/SDL2-2.30.10/x86_64-w64-mingw32/* /usr/x86_64-w64-mingw32/
-        sudo cp -r /tmp/sdl2/SDL2_mixer-2.8.0/x86_64-w64-mingw32/* /usr/x86_64-w64-mingw32/
-
-        # Copy DLLs to expected location
-        sudo mkdir -p /usr/x86_64-w64-mingw32/bin
-        sudo cp /tmp/sdl2/SDL2-2.30.10/x86_64-w64-mingw32/bin/SDL2.dll /usr/x86_64-w64-mingw32/bin/
-        sudo cp /tmp/sdl2/SDL2_mixer-2.8.0/x86_64-w64-mingw32/bin/SDL2_mixer.dll /usr/x86_64-w64-mingw32/bin/
-
-    - name: Create SDL2 config for LLVM MinGW
-      run: |
-        # Create a fake pkg-config for SDL2 targeting Windows
-        sudo mkdir -p /usr/x86_64-w64-mingw32/lib/pkgconfig
-        cat << 'EOF' | sudo tee /usr/x86_64-w64-mingw32/lib/pkgconfig/sdl2.pc
-        prefix=/usr/x86_64-w64-mingw32
-        exec_prefix=${prefix}
-        libdir=${exec_prefix}/lib
-        includedir=${prefix}/include
-
-        Name: SDL2
-        Description: Simple DirectMedia Layer
-        Version: 2.30.10
-        Libs: -L${libdir} -lSDL2
-        Cflags: -I${includedir}/SDL2
-        EOF
-        cat << 'EOF' | sudo tee /usr/x86_64-w64-mingw32/lib/pkgconfig/SDL2_mixer.pc
-        Name: SDL2_mixer
-        Description: Simple DirectMedia Layer Mixer
-        Version: 2.8.0
-        Libs: -L/usr/x86_64-w64-mingw32/lib -lSDL2_mixer
-        Cflags: -I/usr/x86_64-w64-mingw32/include/SDL2
-        EOF
-
-    - name: Build and install zlib for MinGW
-      run: |
-        cd /tmp
-        wget -q https://github.com/madler/zlib/archive/refs/tags/v1.2.11.tar.gz -O zlib-src.tar.gz
-        tar -xzf zlib-src.tar.gz
-        cd zlib-1.2.11
-        # Use --static to avoid building shared library which requires -lc (not available for MinGW)
-        CC=x86_64-w64-mingw32-gcc-posix ./configure --prefix=/usr/x86_64-w64-mingw32 --static
-        make -j4
-        sudo cp zlib.h zconf.h /usr/x86_64-w64-mingw32/include/
-        sudo cp libz.a /usr/x86_64-w64-mingw32/lib/
-
-    - name: Build ENet for MinGW
-      run: |
-        cd /tmp
-        # Download ENet source
-        wget -q https://github.com/lsalzman/enet/archive/refs/tags/v1.3.17.tar.gz -O enet.tar.gz
-        tar -xzf enet.tar.gz
-        cd enet-1.3.17
-        # Compile each source file individually
-        mkdir -p lib
-        for f in callbacks compress host list packet peer protocol win32; do
-          x86_64-w64-mingw32-gcc-posix -c -O2 -Iinclude ${f}.c -o lib/${f}.o
-        done
-        x86_64-w64-mingw32-ar rcs lib/libenet.a lib/*.o
-        # Install into include/enet/ subdir so enet/time.h does NOT shadow the
-        # real Windows time.h in the root include dir (which breaks <ctime>).
-        sudo mkdir -p /usr/x86_64-w64-mingw32/include/enet
-        sudo cp include/enet/*.h /usr/x86_64-w64-mingw32/include/enet/
-        sudo cp lib/libenet.a /usr/x86_64-w64-mingw32/lib/
-
-    - name: Configure CMake for MinGW
-      env:
-        PKG_CONFIG_PATH: /usr/lib/x86_64-linux-gnu/pkgconfig:/usr/x86_64-w64-mingw32/lib/pkgconfig
-      run: |
-        cd legacy/trunk
-        rm -rf build-win
-        mkdir -p build-win
-        cd build-win
-
-        # Unset conflicting include paths to prevent Linux header leakage
-        unset C_INCLUDE_PATH
-        unset CPLUS_INCLUDE_PATH
-        unset INCLUDE
-        unset CPATH
-        # Debug: Show what paths are active
-        echo "C_INCLUDE_PATH after unset: '$C_INCLUDE_PATH'"
-        echo "CPLUS_INCLUDE_PATH after unset: '$CPLUS_INCLUDE_PATH'"
-        echo "CPATH after unset: '$CPATH'"
-        echo "INCLUDE after unset: '$INCLUDE'"
-
-        # Set pkg-config libdir for MinGW
-        export PKG_CONFIG_LIBDIR=/usr/x86_64-w64-mingw32/lib/pkgconfig
-
-        # Debug: Check SDL2_mixer setup
-        echo "PKG_CONFIG_LIBDIR: $PKG_CONFIG_LIBDIR"
-        ls -la /usr/x86_64-w64-mingw32/lib/pkgconfig/
-        cat /usr/x86_64-w64-mingw32/lib/pkgconfig/SDL2_mixer.pc || echo "SDL2_mixer.pc not found"
-        ls -la /usr/x86_64-w64-mingw32/lib/ | grep SDL
-        pkg-config --exists SDL2_mixer && echo "SDL2_mixer found" || echo "SDL2_mixer not found"
-
-        # Cross-compile with MinGW.
-        cmake .. \
-          -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw-w64-x86_64.cmake \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_C_FLAGS="-isysroot /usr/x86_64-w64-mingw32" \
-          -DCMAKE_CXX_FLAGS="-Wno-inline -Wno-missing-attributes -isysroot /usr/x86_64-w64-mingw32" \
-          -DUSE_SDL2=ON \
-          -DUSE_SOUND=ON \
-          -DUSE_IMAGE_SUPPORT=OFF \
-          -DUSE_NETWORKING=ON \
-          -DCMAKE_PREFIX_PATH=/usr/x86_64-w64-mingw32 \
-          -DENET_INCLUDE_DIR=/usr/x86_64-w64-mingw32/include \
-          -DENET_LIBRARY=/usr/x86_64-w64-mingw32/lib/libenet.a
-
-    - name: Build Windows executables (cross-compile)
-      run: |
-        cd legacy/trunk/build-win
-        # Build main executable and tools
-        cmake --build . --target doomlegacy d2h wadtool --parallel 4
+    - name: Build Windows binaries
+      run: make ci-windows
 
     - name: Upload Windows executables and tools
       uses: actions/upload-artifact@v4
       with:
         name: doomlegacy-windows-executables
         path: |
-          legacy/trunk/build-win/doomlegacy.exe
-          legacy/trunk/build-win/d2h.exe
-          legacy/trunk/build-win/wadtool.exe
+          legacy/trunk/build-windows/doomlegacy.exe
+          legacy/trunk/build-windows/d2h.exe
+          legacy/trunk/build-windows/wadtool.exe
         retention-days: 30
+        if-no-files-found: warn
 
-  # Windows cross-compilation with Docker + LLVM MinGW (disabled)
-  windows-cross-build:
-    if: false
+  # Clang build for additional compiler validation
+  clang-build:
     runs-on: ubuntu-latest
-    container:
-      image: mstorsjo/llvm-mingw:latest
-      volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      with:
-        path: windows-build
 
-    - name: Install dependencies
-      run: |
-        apt-get update
-        apt-get install -y cmake libenet-dev libglu1-mesa-dev libpng-dev libjpeg-dev flex lemon
+    - name: Build with Clang
+      run: make ci-clang
 
-    - name: Download and setup SDL2 and SDL2_mixer for MinGW
-      run: |
-        # SDL2
-        wget -q https://www.libsdl.org/release/SDL2-devel-2.30.10-mingw.tar.gz
-        tar xzf SDL2-devel-2.30.10-mingw.tar.gz
-        # SDL2_mixer
-        wget -q https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.8.0-mingw.tar.gz
-        tar xzf SDL2_mixer-devel-2.8.0-mingw.tar.gz
-        mkdir -p /mingw64
-        cp -r SDL2-2.30.10/x86_64-w64-mingw32/* /mingw64/
-        cp -r SDL2_mixer-2.8.0/x86_64-w64-mingw32/* /mingw64/
-        mkdir -p /mingw64/lib/pkgconfig
-        cat << 'EOF' | tee /mingw64/lib/pkgconfig/sdl2.pc
-        prefix=/mingw64
-        exec_prefix=${prefix}
-        libdir=${exec_prefix}/lib
-        includedir=${prefix}/include
-
-        Name: sdl2
-        Description: Simple DirectMedia Layer
-        Version: 2.30.10
-        Libs: -L${libdir} -lSDL2
-        Cflags: -I${includedir}/SDL2
-        EOF
-        cat << 'EOF' | tee /mingw64/lib/pkgconfig/SDL2_mixer.pc
-        prefix=/mingw64
-        exec_prefix=${prefix}
-        libdir=${exec_prefix}/lib
-        includedir=${prefix}/include
-
-        Name: SDL2_mixer
-        Description: mixer library for Simple DirectMedia Layer
-        Version: 2.8.0
-        Requires: sdl2
-        Libs: -L${libdir} -lSDL2_mixer
-        Cflags: -I${includedir}/SDL2
-        EOF
-
-    - name: Configure and Build Windows Executables
-      run: |
-        cd windows-build/legacy/trunk
-        mkdir -p build-win
-        cd build-win
-
-        # Set pkg-config for MinGW and Linux
-        export PKG_CONFIG_LIBDIR=/usr/x86_64-w64-mingw32/lib/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig
-
-        # Use container's MinGW tools - no toolchain file needed
-        cmake .. \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DUSE_SDL2=ON \
-          -DUSE_IMAGE_SUPPORT=OFF \
-          -DUSE_NETWORKING=ON \
-          -DCMAKE_C_FLAGS="-I /usr/include -I /usr/include/x86_64-linux-gnu --sysroot=/opt/llvm-mingw/x86_64-w64-mingw32 -isystem /opt/llvm-mingw/x86_64-w64-mingw32/include" \
-          -DCMAKE_CXX_FLAGS="-DSDL2 -I /usr/include -I /usr/include/x86_64-linux-gnu --sysroot=/opt/llvm-mingw/x86_64-w64-mingw32 -isystem /opt/llvm-mingw/x86_64-w64-mingw32/include/c++/v1 -isystem /opt/llvm-mingw/x86_64-w64-mingw32/include" \
-          -DCMAKE_SYSTEM_NAME=Windows \
-          -DCMAKE_SYSTEM_PROCESSOR=x86_64 \
-          -DCMAKE_C_COMPILER=clang \
-          -DCMAKE_CXX_COMPILER=clang++ \
-          -DCMAKE_C_COMPILER_TARGET=x86_64-w64-mingw32 \
-          -DCMAKE_CXX_COMPILER_TARGET=x86_64-w64-mingw32 \
-          -DCMAKE_C_COMPILER_EXTERNAL_TOOLCHAIN=/opt/llvm-mingw \
-          -DCMAKE_CXX_COMPILER_EXTERNAL_TOOLCHAIN=/opt/llvm-mingw \
-          -DCMAKE_SYSROOT=/opt/llvm-mingw/x86_64-w64-mingw32 \
-          -DCMAKE_FIND_ROOT_PATH=/opt/llvm-mingw/x86_64-w64-mingw32 \
-          -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER \
-          -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
-          -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
-          -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=ONLY
-
-        # Build main executable and tools
-        cmake --build . --target doomlegacy d2h wadtool --parallel 4
-
-    - name: Upload Windows executables and tools
+    - name: Upload Clang executables and tools
       uses: actions/upload-artifact@v4
       with:
-        name: doomlegacy-windows-executables
+        name: doomlegacy-clang-executables
         path: |
-          windows-build/legacy/trunk/build-win/doomlegacy.exe
-          windows-build/legacy/trunk/build-win/d2h.exe
-          windows-build/legacy/trunk/build-win/wadtool.exe
+          legacy/trunk/build-clang/doomlegacy
+          legacy/trunk/build-clang/d2h
+          legacy/trunk/build-clang/wadtool
         retention-days: 30
         if-no-files-found: warn
-
-  # Windows native build (MSVC)
-  windows-native-build:
-    runs-on: ["self-hosted", "windows"]
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        path: windows-native
-        submodules: true
-
-    - name: Install dependencies
-      run: |
-        # Install CMake if not present
-        if (!(Get-Command cmake -ErrorAction SilentlyContinue)) {
-          Invoke-WebRequest -Uri "https://github.com/Kitware/CMake/releases/download/v3.28.0/cmake-3.28.0-windows-x86_64.zip" -OutFile "cmake.zip"
-          Remove-Item -Recurse -Force cmake-3.28.0-windows-x86_64 -ErrorAction SilentlyContinue
-          Expand-Archive -Path "cmake.zip" -DestinationPath "."
-          $env:PATH = "$PWD/cmake-3.28.0-windows-x86_64/bin;$env:PATH"
-          echo "$PWD/cmake-3.28.0-windows-x86_64/bin" | Out-File -FilePath $env:GITHUB_PATH -Append
-        }
-
-    - name: Download SDL2 for Windows
-      run: |
-        # Download SDL2 development libraries for MinGW
-        Invoke-WebRequest -Uri "https://www.libsdl.org/release/SDL2-devel-2.30.10-mingw.tar.gz" -OutFile "SDL2.tar.gz"
-        Remove-Item -Recurse -Force SDL2-2.30.10 -ErrorAction SilentlyContinue
-        & tar xzf SDL2.tar.gz
-        # Assume it extracts to SDL2-2.30.10/
-
-    - name: Configure and Build
-      run: |
-        & 'C:\msys64\usr\bin\bash.exe' -c "
-          cd /c/actions-runner/_work/DoomLegacy/DoomLegacy/windows-native/legacy/trunk
-          /bin/rm -rf build
-          /bin/mkdir build
-          cd build
-          export PATH=/c/actions-runner/_work/DoomLegacy/DoomLegacy/cmake-3.28.0-windows-x86_64/bin:`$PATH
-          cmake .. -G 'MinGW Makefiles' -DCMAKE_BUILD_TYPE=Release -DUSE_SDL2=ON -DUSE_IMAGE_SUPPORT=OFF -DUSE_NETWORKING=ON -DCMAKE_MAKE_PROGRAM=/mingw64/bin/mingw32-make.exe -DCMAKE_C_COMPILER=/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=/mingw64/bin/g++.exe
-          cmake --build . --target doomlegacy d2h wadtool --parallel 4
-        "
-
-    - name: Upload Windows native executables
-      uses: actions/upload-artifact@v4
-      with:
-        name: doomlegacy-windows-native-executables
-        path: |
-          windows-native/legacy/trunk/build/doomlegacy.exe
-          windows-native/legacy/trunk/build/d2h.exe
-          windows-native/legacy/trunk/build/wadtool.exe
-        retention-days: 30
-        if-no-files-found: warn
-

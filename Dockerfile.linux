@@ -1,0 +1,29 @@
+# Dockerfile for Doom Legacy Linux CI builds
+FROM ubuntu:22.04
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    cmake \
+    g++ \
+    clang \
+    clang-tidy \
+    clang-format \
+    libsdl1.2-dev \
+    libsdl-mixer1.2-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libenet-dev \
+    libglu1-mesa-dev \
+    flex \
+    lemon \
+    cppcheck \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create symlink for SDL headers (legacy compatibility)
+RUN ln -sf /usr/include/SDL /usr/include/SDL || true
+
+# Set working directory
+WORKDIR /workspace
+
+# Default command
+CMD ["/bin/bash"]

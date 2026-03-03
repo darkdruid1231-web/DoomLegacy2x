@@ -1,0 +1,35 @@
+# Doom Legacy Dependencies
+# Single source of truth for build dependencies
+# Used by Dockerfiles, CI scripts, and documentation
+
+# Core build tools
+cmake
+make
+
+# Compilers
+gcc
+g++
+clang
+clang-tidy
+clang-format
+
+# SDL (graphics/sound/input)
+libsdl1.2-dev
+libsdl-mixer1.2-dev
+
+# Image libraries
+libpng-dev
+libjpeg-dev
+
+# Networking
+libenet-dev
+
+# OpenGL
+libglu1-mesa-dev
+
+# Build tools
+flex
+lemon
+
+# Static analysis
+cppcheck
