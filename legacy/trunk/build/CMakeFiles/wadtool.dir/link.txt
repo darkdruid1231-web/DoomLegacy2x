@@ -1,1 +1,0 @@
-/usr/bin/c++ -O3 -DNDEBUG "CMakeFiles/wadtool.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/wadtool.cpp.o" CMakeFiles/wadtool.dir/util/md5.cpp.o -o wadtool 

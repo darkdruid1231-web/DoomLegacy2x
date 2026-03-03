@@ -1,1 +1,0 @@
-/usr/bin/c++ -O3 -DNDEBUG "CMakeFiles/d2h.dir/home/geoffrey/openclaw/workspace/doomlegacy-legacy2/common/tools/d2h.cpp.o" -o d2h 

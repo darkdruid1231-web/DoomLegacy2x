@@ -1,2 +1,0 @@
-/usr/bin/ar qc libgrammars.a CMakeFiles/grammars.dir/parser_driver.cpp.o CMakeFiles/grammars.dir/ntexture.lexer.c.o CMakeFiles/grammars.dir/decorate.lexer.c.o CMakeFiles/grammars.dir/ntexture.parser.c.o CMakeFiles/grammars.dir/decorate.parser.c.o
-/usr/bin/ranlib libgrammars.a

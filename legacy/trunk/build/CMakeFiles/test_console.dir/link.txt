@@ -1,1 +1,0 @@
-/usr/bin/c++ -O3 -DNDEBUG CMakeFiles/test_console.dir/tests/unit/test_console.cpp.o -o test_console  libutil.a -lSDL2 

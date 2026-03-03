@@ -1,1 +1,0 @@
-/usr/bin/c++ -O3 -DNDEBUG CMakeFiles/test_tnl_packets.dir/tests/unit/test_tnl_packets.cpp.o -o test_tnl_packets  libutil.a -lSDL2 
