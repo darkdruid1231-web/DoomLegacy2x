@@ -15,9 +15,7 @@
 #include "z_zone.h"
 #include "r_defs.h"
 
-// GL data pointers (allocated in function)
-extern int numglnodes;
-extern node_t *glnodes;
+// All GL data is now handled through the Map object - no globals needed
 
 // Function to build GL vertices
 void BuildGLVertexes(Map *map)

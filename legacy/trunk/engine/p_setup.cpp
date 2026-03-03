@@ -32,7 +32,9 @@
 #include "cvars.h"
 #include "doomdata.h"
 #include "doomdef.h"
+#include "i_system.h"
 
+#include "g_actor.h"
 #include "g_blockmap.h"
 #include "g_decorate.h"
 #include "g_game.h"
@@ -51,6 +53,7 @@
 #include "p_setup.h"
 #include "p_spec.h"
 #include "tables.h"
+#include "gl_bsp.h"
 
 #include "i_sound.h" //for I_PlayCD()..
 
@@ -1270,6 +1273,10 @@ int Map::LoadGLVertexes(const int lump)
         out->y.setvalue(LONG(in->y));
     }
 
+    // Set Map object members for object-oriented access
+    this->numglvertexes = numglvertexes;
+    this->glvertexes = glvertexes;
+
     Z_Free(data);
 
     return glversion;
@@ -1399,6 +1406,10 @@ void Map::LoadGLSegs(const int lump, const int glversion)
         seg->length = SegLength(dx, dy);
     }
 
+    // Set Map object GL members for object-oriented access
+    this->numglsegs = numsegs;
+    this->glsegs = segs;
+
     Z_Free(data);
 }
 
@@ -1440,6 +1451,10 @@ void Map::LoadGLSubsectors(const int lump, const int glversion)
             ss->sector = NULL;
         }
     }
+
+    // Set Map object GL members for object-oriented access
+    this->numglsubsectors = numsubsectors;
+    this->glsubsectors = subsectors;
 
     Z_Free(data);
 }
@@ -1496,6 +1511,10 @@ void Map::LoadGLNodes(const int lump, const int glversion)
         }
     }
 
+    // Set Map object GL members for object-oriented access
+    this->numglnodes = numnodes;
+    this->glnodes = nodes;
+
     Z_Free(data);
 }
 
@@ -1518,6 +1537,9 @@ void Map::LoadGLVis(const int lump)
         glvis = static_cast<byte *>(fc.CacheLumpNum(lump, PU_STATIC));
         CONS_Printf(" Loaded %d bytes of glVIS data.\n", vissize);
     }
+
+    // Set Map object GL member for object-oriented access
+    this->glvis = glvis;
 
     if (!glvis && rendermode == render_opengl)
         CONS_Printf(" Automap will not work until you run glvis on this file.\n");
@@ -1622,14 +1644,11 @@ bool Map::Setup(tic_t start, bool spawnthings)
     else
     {
         CONS_Printf(" Map has no GL nodes.\n");
-        // OpenGL renderer. TODO more friendly behavior (include glBSP, build nodes on the fly)
-        if (rendermode == render_opengl)
-        {
-            CONS_Printf("Trying to use OpenGL renderer without GL nodes. Exiting.\n");
-            CONS_Printf("Build GL nodes with glbsp and try again.\n");
-            return false;
-        }
-
+        // Build GL nodes dynamically
+        if (!testmode)
+            BuildGLData(this);
+        gl_version = 5; // Use v5 format
+        // GL data is now set directly in BuildGLData functions
         gllump = -1;
     }
 
@@ -1691,6 +1710,24 @@ bool Map::Setup(tic_t start, bool spawnthings)
     RemoveAllActivePlats();    // TODO unnecessary?
     InitTagLists();            // Create hash tables for tags and lineid's
     SpawnLineSpecials(); // spawn Thinkers created by linedefs, confer properties given by linedefs
+
+    if (testmode)
+    {
+        // Count monsters for testing
+        int monster_count = 0;
+        for (Thinker *th = thinkercap.next; th != &thinkercap; th = th->next)
+        {
+            if (th->Inherits<Actor>())
+            {
+                Actor *a = static_cast<Actor *>(th);
+                if (a->flags & MF_MONSTER)
+                    monster_count++;
+            }
+        }
+        CONS_Printf("Test mode: %d monsters spawned on map %s\n", monster_count, lumpname.c_str());
+        CONS_Printf(" %d vertices, %d subsectors, %d segs\n", numvertexes, numsubsectors, numsegs);
+        I_Quit();
+    }
 
     if (game.server)
     {
