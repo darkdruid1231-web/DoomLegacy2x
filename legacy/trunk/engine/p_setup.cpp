@@ -78,6 +78,8 @@ static Material *skyflat_mat;
 extern vector<mapthing_t *> polyspawn;  // for spawning polyobjects
 extern vector<mapthing_t *> polyanchor; // for spawning polyobjects
 
+static bool testmode = false; // temp until properly implemented
+
 /// Editor numbers for certain special mapthings
 enum
 {
@@ -1641,18 +1643,16 @@ bool Map::Setup(tic_t start, bool spawnthings)
         if (gl_version < 0)
             I_Error("Can not handle GL nodes that are not v2 or v5.");
     }
-    else
+    // Load vertexes first - needed for both regular rendering and GL node building
+    LoadVertexes(lumpnum + LUMP_VERTEXES); // These are always needed.
+
+    if (gllump == -1)
     {
         CONS_Printf(" Map has no GL nodes.\n");
-        // Build GL nodes dynamically
-        if (!testmode)
-            BuildGLData(this);
+        // Will build GL nodes dynamically after regular data is loaded
         gl_version = 5; // Use v5 format
-        // GL data is now set directly in BuildGLData functions
-        gllump = -1;
     }
 
-    LoadVertexes(lumpnum + LUMP_VERTEXES); // These are always needed.
     LoadSectors1(lumpnum + LUMP_SECTORS);  // allocates sectors
     LoadSideDefs(lumpnum + LUMP_SIDEDEFS); // allocates sidedefs
     LoadLineDefs(lumpnum + LUMP_LINEDEFS); // points to v, si(and back)
@@ -1661,7 +1661,63 @@ bool Map::Setup(tic_t start, bool spawnthings)
     LoadSideDefs2(lumpnum + LUMP_SIDEDEFS); // points to se, uses l, processes some linedef specials
     LoadLineDefs2();                        // uses si, points to se
 
-    if (gllump != -1)
+    if (gllump == -1)
+    {
+        // Load regular data first, then build GL data
+        LoadSubsectors(lumpnum + LUMP_SSECTORS); // just loads them
+        LoadNodes(lumpnum + LUMP_NODES);         // loads nodes
+        LoadSegs(lumpnum + LUMP_SEGS);           // points to v, l, si, se, uses l
+
+        // Now build GL nodes dynamically (requires segs/nodes/subsectors to be loaded first)
+        if (!testmode)
+        {
+            CONS_Printf(" Building GL nodes dynamically...\n");
+            BuildGLData(this);
+            CONS_Printf(" Finished building GL nodes.\n");
+        }
+
+        // Copy GL data to main fields for renderer
+        if (glvertexes)
+        {
+            // Update linedef vertex pointers to point to new glvertexes
+            // before freeing the old vertexes
+            for (int i = 0; i < numlines; i++)
+            {
+                if (lines[i].v1)
+                    lines[i].v1 = &glvertexes[lines[i].v1 - vertexes];
+                if (lines[i].v2)
+                    lines[i].v2 = &glvertexes[lines[i].v2 - vertexes];
+            }
+
+            if (vertexes)
+                Z_Free(vertexes);
+            vertexes = glvertexes;
+            numvertexes = numglvertexes;
+        }
+        if (glsegs)
+        {
+            if (segs)
+                Z_Free(segs);
+            segs = glsegs;
+            numsegs = numglsegs;
+        }
+        if (glsubsectors)
+        {
+            if (subsectors)
+                Z_Free(subsectors);
+            subsectors = glsubsectors;
+            numsubsectors = numglsubsectors;
+        }
+        if (glnodes)
+        {
+            if (nodes)
+                Z_Free(nodes);
+            nodes = glnodes;
+            numnodes = numglnodes;
+        }
+        CONS_Printf(" Using dynamically built GL nodes.\n");
+    }
+    else if (gllump != -1)
     {
         LoadGLSubsectors(gllump + LUMP_GL_SSECT, gl_version);
         LoadGLNodes(gllump + LUMP_GL_NODES, gl_version);
@@ -1678,6 +1734,16 @@ bool Map::Setup(tic_t start, bool spawnthings)
     LoadSectors2(lumpnum + LUMP_SECTORS); // rest of secs, uses nothing!!!
     rejectmatrix = static_cast<byte *>(fc.CacheLumpNum(lumpnum + LUMP_REJECT, PU_LEVEL));
     GroupLines();
+
+    // Debug: verify sectors are assigned
+    int nullCount = 0;
+    for (int i = 0; i < numsubsectors; i++)
+    {
+        if (subsectors[i].sector == NULL)
+            nullCount++;
+    }
+    if (nullCount > 0)
+        CONS_Printf(" WARNING: %d subsectors have NULL sector!\n", nullCount);
 
     // lights, scrollers, sectordamage...
     for (int i = 0; i < numsectors; i++)

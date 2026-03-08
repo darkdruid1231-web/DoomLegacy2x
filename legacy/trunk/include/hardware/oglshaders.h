@@ -28,9 +28,15 @@
 typedef char GLchar;
 #endif
 
+// GLEW provides GLSL function prototypes on Windows/MinGW
+#if defined(_WIN32) || defined(__MINGW32__)
+#define GLEW_STATIC
+#include <GL/glew.h>
+#else
 #define GL_GLEXT_PROTOTYPES 1
 #include <GL/gl.h>
 #include <GL/glext.h>
+#endif
 
 #include "z_cache.h"
 

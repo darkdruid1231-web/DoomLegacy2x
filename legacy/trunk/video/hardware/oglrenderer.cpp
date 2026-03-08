@@ -340,6 +340,13 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const bool fullscreen)
     workinggl = false;
 
 #ifdef SDL2
+    // Clean up old window and context if they exist
+    if (screen)
+    {
+        SDL_DestroyWindow(screen);
+        screen = NULL;
+    }
+
     surfaceflags = SDL_WINDOW_OPENGL;
     if (fullscreen)
         surfaceflags |= SDL_WINDOW_FULLSCREEN;
@@ -365,6 +372,14 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const bool fullscreen)
         return false;
     }
 
+    // Initialize GLEW
+    GLenum glewErr = glewInit();
+    if (glewErr != GLEW_OK)
+    {
+        CONS_Printf(" GLEW initialization failed: %s\n", glewGetErrorString(glewErr));
+        return false;
+    }
+
     int cbpp = 24; // Assume 24-bit for SDL2
 #else
     surfaceflags = SDL_OPENGL;
@@ -386,6 +401,16 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const bool fullscreen)
     if (!screen)
     {
         CONS_Printf(" Could not obtain requested resolution.\n");
+        return false;
+    }
+#endif
+
+    // Initialize GLEW (if not already initialized in SDL2 path)
+#ifndef SDL2
+    GLenum glewErr = glewInit();
+    if (glewErr != GLEW_OK)
+    {
+        CONS_Printf(" GLEW initialization failed: %s\n", glewGetErrorString(glewErr));
         return false;
     }
 #endif
@@ -850,7 +875,7 @@ void OGLRenderer::Render3DView(Actor *pov)
 
     // Build frustum and we are ready to render.
     CalculateFrustum();
-    RenderBSPNode(mp->numnodes - 1);
+    RenderBSPNode(mp->numglnodes - 1);
 }
 
 void OGLRenderer::DrawPSprites(PlayerPawn *p)
@@ -967,7 +992,7 @@ void OGLRenderer::RenderBSPNode(int nodenum)
     }
 
     // otherwise keep traversing the tree
-    node_t *node = &mp->nodes[nodenum];
+    node_t *node = &mp->glnodes[nodenum];
 
     // Decide which side the view point is on.
     int side = node->PointOnSide(x, y);
@@ -1011,7 +1036,7 @@ void OGLRenderer::RenderGlSsecPolygon(
     glBegin(GL_POLYGON);
     for (int curseg = loopstart; curseg != loopend; curseg += loopinc)
     {
-        seg_t *seg = &mp->segs[curseg];
+        seg_t *seg = &mp->glsegs[curseg];
         GLfloat x, y, tx, ty;
         vertex_t *v;
 
@@ -1071,10 +1096,11 @@ void OGLRenderer::RenderGLSubsector(int num)
 
     ffloor_t *ff;
     Material *fmat;
-    if (num < 0 || num > mp->numsubsectors)
+    if (num < 0 || num > mp->numglsubsectors)
         return;
 
-    subsector_t *ss = &mp->subsectors[num];
+    // Use GL subsectors with GL segs for proper vertex coordinates
+    subsector_t *ss = &mp->glsubsectors[num];
     int firstseg = ss->first_seg;
     int segcount = ss->num_segs;
     sector_t *s = ss->sector;
@@ -1147,7 +1173,7 @@ void OGLRenderer::RenderGLSubsector(int num)
         {
 
             fixed_t nx, ny;
-            seg_t *s = &(mp->segs[curseg]);
+            seg_t *s = &(mp->glsegs[curseg]);
             texright = texleft + s->length;
             vertex_t *v1 = s->v1;
             vertex_t *v2 = s->v2;
@@ -1218,10 +1244,10 @@ void OGLRenderer::GetSegQuads(int num, quad &u, quad &m, quad &l) const
 
     u.m = m.m = l.m = NULL;
 
-    if (num < 0 || num > mp->numsegs)
+    if (num < 0 || num > mp->numglsegs)
         return;
 
-    seg_t *s = &(mp->segs[num]);
+    seg_t *s = &(mp->glsegs[num]);
     line_t *ld = s->linedef;
 
     // Minisegs don't have wall textures so no point in drawing them.

@@ -72,6 +72,8 @@ static LegacyDLL OGL_renderer;
 // SDL vars
 #ifdef SDL2
 static SDL_Window *sdlWindow = NULL;
+static SDL_Renderer *sdlRenderer = NULL;
+static SDL_Texture *sdlTexture = NULL;
 static SDL_DisplayMode vidInfo_mode;
 #define vidInfo (&vidInfo_mode)
 #else
@@ -169,9 +171,14 @@ void I_FinishUpdate()
     if (rendermode == render_soft)
     {
 #ifdef SDL2
-        // In SDL2, we need to blit the surface to the window
-        // For now, just flip - actual rendering happens elsewhere
-        // TODO: Implement proper SDL_RenderCopy for software mode
+        // In SDL2 software mode, copy the surface to the texture and render
+        if (vidSurface && sdlRenderer && sdlTexture)
+        {
+            SDL_UpdateTexture(sdlTexture, NULL, vidSurface->pixels, vidSurface->pitch);
+            SDL_RenderClear(sdlRenderer);
+            SDL_RenderCopy(sdlRenderer, sdlTexture, NULL, NULL);
+            SDL_RenderPresent(sdlRenderer);
+        }
 #else
         /*
         if (vid.screens[0] != vid.direct)
@@ -199,6 +206,7 @@ void I_SetPalette(RGB_t *palette)
         localPalette[i].r = palette[i].r;
         localPalette[i].g = palette[i].g;
         localPalette[i].b = palette[i].b;
+        localPalette[i].a = 255; // Fully opaque
     }
 
     SDL_SetColors(vidSurface, localPalette, 0, 256);
@@ -299,11 +307,21 @@ int I_SetVideoMode(int modeNum)
 
     if (rendermode == render_soft)
     {
-        // Destroy old window and surface
+        // Destroy old window, renderer, texture and surface
         if (vidSurface)
         {
             SDL_FreeSurface(vidSurface);
             vidSurface = NULL;
+        }
+        if (sdlTexture)
+        {
+            SDL_DestroyTexture(sdlTexture);
+            sdlTexture = NULL;
+        }
+        if (sdlRenderer)
+        {
+            SDL_DestroyRenderer(sdlRenderer);
+            sdlRenderer = NULL;
         }
         if (sdlWindow)
         {
@@ -323,9 +341,24 @@ int I_SetVideoMode(int modeNum)
         if (sdlWindow == NULL)
             I_Error("Could not set vidmode: %s\n", SDL_GetError());
 
-        // Create surface for software rendering
-        vidSurface = SDL_CreateRGBSurface(0, vid.width, vid.height, 32,
-            0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+        // Create renderer for software rendering
+        sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
+        if (sdlRenderer == NULL)
+            I_Error("Could not create renderer: %s\n", SDL_GetError());
+
+        // Create texture for rendering
+        sdlTexture = SDL_CreateTexture(sdlRenderer,
+            SDL_PIXELFORMAT_ARGB8888,
+            SDL_TEXTUREACCESS_STREAMING,
+            vid.width, vid.height);
+        if (sdlTexture == NULL)
+            I_Error("Could not create texture: %s\n", SDL_GetError());
+
+        // Create surface for software rendering (for direct pixel access)
+        // Use 8-bit indexed format for DOOM's paletted graphics
+        // Note: SDL2 renderer doesn't directly support 8-bit, so we convert in I_FinishUpdate
+        vidSurface = SDL_CreateRGBSurfaceWithFormat(0, vid.width, vid.height, 8,
+            SDL_PIXELFORMAT_INDEX8);
 
         if (vidSurface == NULL)
             I_Error("Could not create surface: %s\n", SDL_GetError());
@@ -484,10 +517,29 @@ bool I_StartupGraphics()
             return false;
         }
 
-        // For software rendering in SDL2, we need a renderer and texture
-        // For now, create a surface for compatibility
-        vidSurface = SDL_CreateRGBSurface(0, vid.width, vid.height, 32,
-            0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+        // Create renderer for software rendering
+        sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
+        if (sdlRenderer == NULL)
+        {
+            CONS_Printf("Could not create renderer: %s\n", SDL_GetError());
+            return false;
+        }
+
+        // Create texture for rendering
+        sdlTexture = SDL_CreateTexture(sdlRenderer,
+            SDL_PIXELFORMAT_ARGB8888,
+            SDL_TEXTUREACCESS_STREAMING,
+            vid.width, vid.height);
+        if (sdlTexture == NULL)
+        {
+            CONS_Printf("Could not create texture: %s\n", SDL_GetError());
+            return false;
+        }
+
+        // Create surface for software rendering (for direct pixel access)
+        // Use 8-bit indexed format for DOOM's paletted graphics
+        vidSurface = SDL_CreateRGBSurfaceWithFormat(0, vid.width, vid.height, 8,
+            SDL_PIXELFORMAT_INDEX8);
 
         if (vidSurface == NULL)
         {
@@ -643,6 +695,16 @@ void I_ShutdownGraphics()
         {
             SDL_FreeSurface(vidSurface);
             vidSurface = NULL;
+        }
+        if (sdlTexture)
+        {
+            SDL_DestroyTexture(sdlTexture);
+            sdlTexture = NULL;
+        }
+        if (sdlRenderer)
+        {
+            SDL_DestroyRenderer(sdlRenderer);
+            sdlRenderer = NULL;
         }
         if (sdlWindow)
         {

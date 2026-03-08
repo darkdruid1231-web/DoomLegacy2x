@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------------
 
 #include <string.h>
+#include <math.h>
 #include "doomdata.h"
 #include "g_map.h"
 #include "doomdef.h"
@@ -24,8 +25,9 @@ void BuildGLVertexes(Map *map)
     vertex_t *glvertexes = (vertex_t *)Z_Malloc(numglvertexes * sizeof(vertex_t), PU_LEVEL, 0);
     for (int i = 0; i < map->numvertexes; i++)
     {
-        glvertexes[i].x = map->vertexes[i].x << 16; // Convert to fixed point
-        glvertexes[i].y = map->vertexes[i].y << 16;
+        // Copy vertex coordinates - they're already in fixed-point format
+        glvertexes[i].x = map->vertexes[i].x;
+        glvertexes[i].y = map->vertexes[i].y;
     }
     map->numglvertexes = numglvertexes;
     map->glvertexes = glvertexes;
@@ -69,6 +71,16 @@ void BuildGLSegs(Map *map)
         glseg->side = seg->side;
         glseg->frontsector = seg->frontsector;
         glseg->backsector = seg->backsector;
+
+        // Recalculate seg length based on new vertex positions
+        float dx = (glseg->v2->x - glseg->v1->x).Float();
+        float dy = (glseg->v2->y - glseg->v1->y).Float();
+        glseg->length = sqrt(dx * dx + dy * dy);
+
+        // Copy light list fields (numlights and rlights are already 0/NULL from Z_Malloc)
+        glseg->numlights = 0;
+        glseg->rlights = NULL;
+
         // partner is not in seg_t, so maybe not needed
     }
     map->numglsegs = numglsegs;

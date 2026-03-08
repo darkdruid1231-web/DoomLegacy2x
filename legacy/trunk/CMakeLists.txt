@@ -1,14 +1,36 @@
 cmake_minimum_required(VERSION 3.16)
+
 project(doomlegacy C CXX)
 
-# Global compile options
-# -w: suppress all warnings (including GCC 15 / MinGW intrinsics redefinition)
-# -fpermissive: allow implicit conversions, etc.
-# Fix GCC 13+ / MinGW-w64 intrinsics conflict: define these BEFORE any includes
-# to prevent GCC's xsaveintrin.h from declaring conflicting signed versions
-add_compile_definitions(_XSAVEINTRIN_H_INCLUDED _CPUID_H_INCLUDED _XGETBV_DEFINED SDL SDL2)
+# Disable tests for now to avoid Catch2 issues
+option(BUILD_TESTING "Build tests" OFF)
 
-add_compile_options(-w -fpermissive)
+# Global include directories
+include_directories(
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include_stubs
+    ${CMAKE_SOURCE_DIR}/tnl
+)
+
+# Global compile options
+# Workaround for GCC 13+ / MinGW intrinsics conflicts
+add_compile_definitions(_XSAVEINTRIN_H_INCLUDED _CPUID_H_INCLUDED _XGETBV_DEFINED WIN32_LEAN_AND_MEAN NOMINMAX)
+# SDL2 only
+add_compile_definitions(SDL SDL2)
+# Use TNL stub (no actual TNL library)
+add_compile_definitions(TNL_STUB_BUILD)
+# Math constants (M_PI not in C++11 by default)
+add_compile_definitions(_USE_MATH_DEFINES)
+
+# Set C++ standard
+# Use C++11 to avoid std::byte (introduced in C++17)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Suppress warnings for legacy code
+add_compile_options(-fpermissive)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
@@ -23,37 +45,9 @@ endif()
 set(DL_VERSION_MAJOR "1")
 set(DL_VERSION_MINOR "9")
 set(DL_VERSION_PATCH "9")
-
-set(DL_VERSION "${CF_VERSION_MAJOR}.${CF_VERSION_MINOR}.${CF_VERSION_PATCH}")
-
-# All CMake include stuffs.
-INCLUDE(CheckCXXCompilerFlag)
-INCLUDE(CheckIncludeFileCXX)
-
-# Modern compiler detection - CMAKE_COMPILER_IS_GNUCXX was removed in CMake 3.6+
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    # Check for C++11 support
-    CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-    if(NOT COMPILER_SUPPORTS_CXX11)
-        message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER_ID} has no C++11 support. Please use a newer GCC version.")
-    endif()
-    set(CMAKE_CXX_STANDARD 11)
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-    set(CMAKE_CXX_EXTENSIONS OFF)
-    # Keep -fpermissive and -w for backward compatibility with legacy code
-    add_compile_options(-fpermissive -w)
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    set(CMAKE_CXX_STANDARD 11)
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-    set(CMAKE_CXX_EXTENSIONS OFF)
-    # Clang compatibility
-    add_compile_options(-w)
-else()
-    message(FATAL_ERROR "Only GNU C++ and Clang are supported at the moment.")
-endif()
+set(DL_VERSION "${DL_VERSION_MAJOR}.${DL_VERSION_MINOR}.${DL_VERSION_PATCH}")
 
 # External libraries. First SDL.
-# Use pkg-config for SDL2 (more reliable across platforms)
 option(USE_SDL2 "Enable SDL2 support" ON)
 
 if(USE_SDL2)
@@ -75,7 +69,6 @@ if(USE_SDL2)
             message(STATUS "SDL2_mixer not found, disabling sound")
         endif()
     endif()
-    # Add SDL2 include path - use ONLY SDL2-specific paths to avoid SDL1 header conflicts
     if(SDL2_FOUND)
         include_directories(${SDL2_INCLUDE_DIRS})
     endif()
@@ -85,468 +78,99 @@ else()
     pkg_check_modules(SDL REQUIRED sdl)
     include_directories(${SDL_INCLUDE_DIRS})
     add_compile_definitions(SDL)
-    # Set SDL2 variables to SDL for compatibility
     set(SDL2_LIBRARIES ${SDL_LIBRARIES})
-    option(USE_SOUND "Enable sound support" ON)
-    if(USE_SOUND)
-        pkg_check_modules(SDL_MIXER SDL_mixer)
-        if(SDL_MIXER_FOUND)
-            set(HAVE_MIXER 1)
-            list(APPEND SOURCES interface/sdl/i_sound.cpp)
-            set(SDL2MIXER_LIBRARIES ${SDL_MIXER_LIBRARIES})
-            include_directories(${SDL_MIXER_INCLUDE_DIRS})
-        else()
-            message(STATUS "SDL_mixer not found, disabling sound")
-        endif()
-    endif()
-endif()
-# SDL definition added via target_compile_definitions below
-
-# Zlib for compression (used by m_archive.cpp)
-find_package(ZLIB)
-if(ZLIB_FOUND)
-    include_directories(${ZLIB_INCLUDE_DIRS})
-    set(EXTRA_LIBS ${EXTRA_LIBS} ${ZLIB_LIBRARIES})
-else()
-    message(STATUS "ZLIB not found, m_archive.cpp compression may fail")
+    set(SDL2_INCLUDE_DIRS ${SDL_INCLUDE_DIRS})
 endif()
 
 # OpenGL
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
-# GLEW for OpenGL extension loading (required on Windows)
-find_package(GLEW QUIET)
-if(GLEW_FOUND)
-    message(STATUS "Found GLEW: ${GLEW_LIBRARIES}")
-    set(USE_GLEW TRUE)
-else()
-    message(STATUS "GLEW not found, trying pkg-config...")
-    pkg_check_modules(GLEW QUIET glew)
-    if(GLEW_FOUND)
-        message(STATUS "Found GLEW via pkg-config: ${GLEW_LIBRARIES}")
-        set(USE_GLEW TRUE)
-    else()
-        message(STATUS "GLEW not found - OpenGL extensions may not work")
-        set(USE_GLEW FALSE)
-    endif()
+# GLEW - use shared library version for MinGW compatibility
+set(USE_GLEW ON)
+find_path(GLEW_INCLUDE_DIR GL/glew.h)
+# Use shared GLEW library (dll.a) instead of static - works better with MinGW
+set(GLEW_LIBRARY "C:/msys64/mingw64/lib/libglew32.dll.a" CACHE FILEPATH "GLEW library")
+set(GLEW_DLL "C:/msys64/mingw64/bin/libglew32.dll" CACHE FILEPATH "GLEW DLL")
+if(NOT GLEW_INCLUDE_DIR OR NOT GLEW_LIBRARY)
+    message(FATAL_ERROR "GLEW not found!")
 endif()
+include_directories(${GLEW_INCLUDE_DIR})
+link_directories(${GLEW_LIBRARY_DIR})
 
-# Option to disable networking entirely (for platforms without networking support)
-option(USE_NETWORKING "Enable networking support" ON)
-
-# Option to disable image support (for Windows cross-compilation without image libs)
-option(USE_IMAGE_SUPPORT "Enable image (PNG/JPEG) support" ON)
-
-# Include TNL stub headers for type declarations
-include_directories(${CMAKE_SOURCE_DIR}/include_stubs)
-
-# Networking support
-if(USE_NETWORKING)
-    option(USE_MODERN_NETWORKING "Use lnet for modern networking" ON)
-
-    if(USE_MODERN_NETWORKING)
-        message(STATUS "Using lnet for modern networking")
-        
-        # Try to find ENet using CMake's find_package (works if ENet provides CMake config)
-        # First attempt with QUIET - if found, it sets ENet_FOUND
-        find_package(ENet 1.3 QUIET)
-        
-        if(ENet_FOUND)
-            message(STATUS "Found ENet via CMake: ${ENet_VERSION}")
-            include_directories(${ENET_INCLUDE_DIRS})
-            set(ENET_LIBRARY ${ENET_LIBRARIES})
-        else()
-            # Try pkg-config as fallback (most common way to find ENet)
-            find_package(PkgConfig QUIET)
-            if(PkgConfig_FOUND)
-                pkg_check_modules(PC_ENET QUIET libenet>=1.3)
-                if(PC_ENET_FOUND)
-                    message(STATUS "Found ENet via pkg-config: ${PC_ENET_VERSION}")
-                    include_directories(${PC_ENET_INCLUDE_DIRS})
-                    set(ENET_LIBRARY ${PC_ENET_LIBRARIES})
-                    set(ENET_FOUND TRUE)
-                endif()
-            endif()
-        endif()
-        
-        if(NOT ENET_FOUND)
-            message(STATUS "ENet not found in system paths, checking common locations...")
-            
-            # Try platform-specific default locations
-            if(WIN32)
-                # Common Windows ENet install locations
-                set(ENET_SEARCH_PATHS 
-                    "C:/enet-mingw"
-                    "C:/Program Files/enet"
-                    "${CMAKE_SOURCE_DIR}/../enet-mingw"
-                    "${CMAKE_SOURCE_DIR}/enet-mingw")
-                find_path(ENET_INCLUDE_DIR NAMES enet/enet.h PATHS ${ENET_SEARCH_PATHS} PATH_SUFFIXES include)
-                find_library(ENET_LIBRARY NAMES enet PATHS ${ENET_SEARCH_PATHS} PATH_SUFFIXES lib)
-        else()
-            # Linux/Unix common locations
-            set(ENET_SEARCH_PATHS 
-                "/usr"
-                "/usr/local"
-                "${CMAKE_SOURCE_DIR}/../enet"
-                "${CMAKE_SOURCE_DIR}/enet")
-            find_path(ENET_INCLUDE_DIR NAMES enet.h PATHS ${ENET_SEARCH_PATHS} PATH_SUFFIXES include)
-            find_library(ENET_LIBRARY NAMES enet PATHS ${ENET_SEARCH_PATHS} PATH_SUFFIXES lib)
-        endif()
-        
-        if(ENET_INCLUDE_DIR AND ENET_LIBRARY)
-            message(STATUS "Found ENet at: include=${ENET_INCLUDE_DIR}, library=${ENET_LIBRARY}")
-            include_directories(${ENET_INCLUDE_DIR})
-            set(ENET_FOUND TRUE)
-        endif()
-    endif()
-    
-    if(NOT ENET_FOUND)
-        message(FATAL_ERROR 
-            "ENet 1.3 or later not found.\n"
-            "Please install ENet or set ENET_INCLUDE_DIR and ENET_LIBRARY manually.\n"
-            "On Windows, you can download from: https://github.com/lsalzman/enet/releases\n"
-            "On Linux, install via: sudo apt-get install libenet-dev (Debian) or sudo yum install enet-devel (RHEL)")
-    endif()
-    
-    # Create imported ENet target with proper Windows linking
-    add_library(enet STATIC IMPORTED)
-    set_target_properties(enet PROPERTIES 
-        IMPORTED_LOCATION "${ENET_LIBRARY}"
-        INTERFACE_INCLUDE_DIRECTORIES "${ENET_INCLUDE_DIR}")
-    
-    # ENet on Windows requires ws2_32 (Winsock) and potentially winmm
-    if(WIN32)
-        set_target_properties(enet PROPERTIES 
-            IMPORTED_LINK_DEPENDENT_LIBRARIES "ws2_32;winmm")
-        message(STATUS "ENet Windows dependencies: ws2_32, winmm")
-    endif()
-
-    # Use TNL stubs for type declarations even with lnet
-    add_definitions(-DTNL_STUB_BUILD)
-else()
-    message(STATUS "Using legacy TNL networking")
-    add_definitions(-DTNL_STUB_BUILD)
-    # TNL (legacy)
-    if(EXISTS "/home/geoffrey/tnl/lib/libtnl.a")
-        set(TNL_LIBRARY "/home/geoffrey/tnl/lib/libtnl.a")
-    else()
-        find_library(TNL_LIBRARY tnl)
-    endif()
-    if(${TNL_LIBRARY} STREQUAL "TNL_LIBRARY-NOTFOUND")
-        message(STATUS "TNL library not found - using stub implementation.")
-        set(TNL_LIBRARY "")
-    endif()
-    if(EXISTS "/home/geoffrey/tnl/lib/libtomcrypt.a")
-        set(TOMCRYPT_LIBRARY "/home/geoffrey/tnl/lib/libtomcrypt.a")
-    else()
-        find_library(TOMCRYPT_LIBRARY tomcrypt)
-    endif()
-    if(${TOMCRYPT_LIBRARY} STREQUAL "TOMCRYPT_LIBRARY-NOTFOUND")
-        message(STATUS "Tomcrypt library not found - using stub implementation.")
-        set(TOMCRYPT_LIBRARY "")
-    endif()
-
-    check_include_file_cxx("tnl/tnl.h" HAS_TNL_HEADER)
-    if(NOT ${HAS_TNL_HEADER})
-        if(EXISTS "/home/geoffrey/tnl/tnl/tnl.h")
-            include_directories(/home/geoffrey/tnl)
-        else()
-            message(FATAL_ERROR "TNL headers not found.")
-        endif()
-    endif()
-endif()  # USE_MODERN_NETWORKING
-endif()  # USE_NETWORKING
-
-# Graphics - PNG/JPEG support (can be disabled for Windows cross-compilation)
-if(USE_IMAGE_SUPPORT)
+# ZLIB
+find_package(ZLIB REQUIRED)
+# PNG
 find_package(PNG REQUIRED)
+# JPEG
 find_package(JPEG REQUIRED)
-include_directories(${PNG_INCLUDE_DIR} ${JPEG_INCLUDE_DIR})
+# ENet
+pkg_check_modules(ENET libenet)
+if(ENET_LIBRARY_DIRS)
+    link_directories(${ENET_LIBRARY_DIRS})
+endif()
+if(ENET_FOUND)
+    include_directories(${ENET_INCLUDE_DIRS})
 else()
-message(STATUS "Image support disabled (USE_IMAGE_SUPPORT=OFF)")
+    message(FATAL_ERROR "ENet not found!")
 endif()
+# Flex/Bison needed for grammars
+# Set paths directly - skip CMake's find_package as it has issues with MSYS2 tools
+set(FLEX_EXECUTABLE "C:/msys64/mingw64/bin/flex.exe" CACHE FILEPATH "Flex executable")
+set(BISON_EXECUTABLE "C:/msys64/usr/bin/bison.exe" CACHE FILEPATH "Bison executable")
+set(LEMON_EXECUTABLE "C:/msys64/mingw64/bin/lemon.exe" CACHE FILEPATH "Lemon executable")
 
-# Flex and lemon
-find_package(FLEX REQUIRED)
-find_program(LEMON_EXECUTABLE lemon)
-if(${LEMON_EXECUTABLE} STREQUAL "LEMON_EXECUTABLE-NOTFOUND")
-    message(FATAL_ERROR "Lemon parser generator not found.")
-endif()
-
-# Collate all source files from subdirectories.
-macro(append_subdir_files src_var tgt_var dirname)
-    get_directory_property(holder DIRECTORY ${dirname} DEFINITION ${src_var})
-    foreach(depfile ${holder})
-       list(APPEND ${tgt_var} "${dirname}/${depfile}")
-    endforeach()
-endmacro()
-
-macro(process_subdir dirname)
-    add_subdirectory(${dirname})
-    append_subdir_files(SRC_FILES LEGACY_SRC ${dirname})
-endmacro()
-
-include_directories(include)
-include_directories(include/core)
-include_directories(tnl)
-# include_directories(lnet)  # disabled: directory not present
-
-if(NOT USE_MODERN_NETWORKING)
-    include_directories(/home/geoffrey/tnl/include)
-    # TNL definitions added via target_compile_definitions below
-endif()
-
-# Platform-specific definitions - now using target_compile_definitions below
-# (removed add_definitions here)
-
-process_subdir(engine)
-if(USE_SOUND)
-    process_subdir(audio)
-endif()
-process_subdir(video)
-add_subdirectory(util)  # Add util first to get its SRC_FILES
-# add_subdirectory(lnet)  # Add lnet for modern networking - disabled: directory not present
-
-# Build util as a static library
-get_directory_property(UTIL_SRC_FILES DIRECTORY util DEFINITION SRC_FILES)
-# Prepend util/ to source file names
-set(UTIL_SRCS "")
-foreach(src ${UTIL_SRC_FILES})
-    list(APPEND UTIL_SRCS "util/${src}")
-endforeach()
-add_library(util STATIC ${UTIL_SRCS})
-target_include_directories(util PUBLIC ${CMAKE_SOURCE_DIR}/include)
-
-# Apply platform-specific definitions to util (required for TNL headers)
-target_compile_definitions(util PRIVATE
-    FN_CDECL=
-    i386
-    linux
-    __GNUC__
-    QSORT_CALLBACK=
-)
-
-if(NOT USE_MODERN_NETWORKING)
-    target_compile_definitions(util PRIVATE
-        TNL_LITTLE_ENDIAN
-        _TNL_X86_
-    )
-endif()
-
-process_subdir(net)
-process_subdir(interface)
-
-# grammars is a special directory.
+add_subdirectory(audio)
+add_subdirectory(video)
+add_subdirectory(util)
+add_subdirectory(net)
+add_subdirectory(engine)
 add_subdirectory(grammars)
+add_subdirectory(interface)
 
-add_executable(d2h ../../common/tools/d2h.cpp)
-add_executable(wadtool ../../common/tools/wadtool.cpp util/md5.cpp)
-
-add_executable(doomlegacy ${LEGACY_SRC} debug_init.cpp)
-
-# Modern target-based definitions (replacing deprecated add_definitions)
-# NOTE: Do NOT redefine __GNUC__ here — it's a compiler built-in and redefining it
-# to a different value (e.g., 1) breaks version checks like:
-#   #if __GNUC__ >= 4  →  #if 1 >= 4  (false)
-# which then uses broken legacy code paths.
-target_compile_definitions(doomlegacy PRIVATE
-    FN_CDECL=
-    QSORT_CALLBACK=
-    TNL_STUB_BUILD
+# Main executable - interface provides main()
+# Get interface sources for the executable
+set(INTERFACE_SOURCES
+    interface/sdl/endtxt.cpp
+    interface/sdl/i_cdmus.cpp
+    interface/sdl/i_main.cpp
+    interface/sdl/i_net.cpp
+    interface/sdl/i_sound.cpp
+    interface/sdl/i_system.cpp
+    interface/sdl/i_video.cpp
 )
 
-# _USE_MATH_DEFINES: required on Windows (MSVC / MinGW / MSYS2) to expose M_PI
-# and other POSIX math constants from <math.h>/<cmath>.  Must be defined before
-# those headers are included — passing it as a compile definition guarantees that.
-if(WIN32)
-    target_compile_definitions(doomlegacy PRIVATE _USE_MATH_DEFINES)
-    if(USE_GLEW)
-        target_compile_definitions(doomlegacy PRIVATE GLEW_STATIC)
-    endif()
-endif()
+add_executable(doomlegacy WIN32 ${INTERFACE_SOURCES})
+# Important: link order matters!
+# - video must come before grammars (grammars uses Shader/ShaderProg from video)
+# - Use linker groups (-Wl,--start-group ... -Wl,--end-group) to handle circular dependencies
+#   between video library and OpenGL/GLEW
+# Link order with groups to handle circular dependencies between libraries
+# video and grammars need each other (video defines Shader classes used by grammars)
+# Link order: main libraries first, then a group for interdependent libraries
+# doomengine must come before video (video uses engine symbols)
+# video must come before grammars (grammars uses Shader from video)
+# Use linker group to handle circular dependencies between all libraries
+# util must be in the group (video/grammars need cacheitem_t from util)
+target_link_libraries(doomlegacy PRIVATE
+    audio
+    "-Wl,--start-group"
+    util
+    doomengine
+    video
+    grammars
+    net
+    ${GLEW_LIBRARY}
+    ${OPENGL_LIBRARIES}
+    "-Wl,--end-group"
+    ${SDL2_LIBRARIES}
+    ${SDL2MIXER_LIBRARIES}
+    ${ZLIB_LIBRARIES}
+    ${PNG_LIBRARY}
+    ${JPEG_LIBRARY}
+    ${ENET_LIBRARIES}
+)
 
-# SDL define only when SDL2 is actually enabled (otherwise doomtype.h tries to
-# include SDL_types.h which won't be in the include path)
-if(USE_SDL2)
-    target_compile_definitions(doomlegacy PRIVATE SDL SDL2)
-endif()
-
-# Disable shaders on Windows MSYS2 MinGW because OpenGL extension loading
-# is complex and requires more work
-target_compile_definitions(doomlegacy PRIVATE NO_SHADERS)
-
-# Link libraries after target is defined
-target_link_libraries(doomlegacy ${SDL2_LIBRARIES})
-# On Windows, SDL2 requires SDL2main (WinMain shim) and mingw32, plus -mwindows subsystem flag
-if(WIN32)
-    # SDL_MAIN_HANDLED in i_main.cpp means we don't need SDL2main
-    target_link_libraries(doomlegacy -lmingw32)
-    target_link_options(doomlegacy PRIVATE -mconsole)
-endif()
-if(HAVE_MIXER)
-    target_link_libraries(doomlegacy ${sdl2mixer_LIBRARIES})
-endif()
-
-# Platform-specific defines: only set linux/i386 on actual Linux builds
-# These must NOT be set on Windows (MSYS2 / MinGW cross-compile) because they
-# cause doomtype.h and platform detection code to assume a Linux environment
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_compile_definitions(doomlegacy PRIVATE linux i386)
-endif()
-
-# Conditional definitions
-if(USE_SOUND)
-    target_compile_definitions(doomlegacy PRIVATE USE_SOUND)
-endif()
-
-if(NOT USE_MODERN_NETWORKING)
-    target_compile_definitions(doomlegacy PRIVATE
-        TNL_LITTLE_ENDIAN
-        _TNL_X86_
-    )
-endif()
-
-# Build image libraries list conditionally
-set(IMAGE_LIBRARIES "")
-if(USE_IMAGE_SUPPORT)
-    set(IMAGE_LIBRARIES ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
-endif()
-
-# GLEW library (for OpenGL extension loading)
-if(NOT USE_GLEW)
-    set(GLEW_LIBRARIES "")
-elseif(WIN32)
-    # Force use of static GLEW lib from staging dir (not the DLL import lib from MSYS2)
-    set(GLEW_LIBRARIES /home/geoffrey/mingw-deps/lib/libglew32.a)
-endif()
-
-if(WIN32)
-  target_link_libraries(doomlegacy grammars util
-  ${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES}
-  ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${IMAGE_LIBRARIES}
-  ws2_32 mswsock winmm imm32 version setupapi cfgmgr32 shlwapi)
-else()
-  target_link_libraries(doomlegacy grammars util
-  ${SDL2_LIBRARIES} ${SDL2MIXER_LIBRARIES}
-  ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${IMAGE_LIBRARIES}
-  pthread)
-endif()
-
-if(USE_MODERN_NETWORKING)
-    target_link_libraries(doomlegacy lnet)
-else()
-    target_link_libraries(doomlegacy ${TNL_LIBRARY} ${TOMCRYPT_LIBRARY})
-endif()
-
-#============================================================================
-# Catch2 Test Framework
-#============================================================================
-
-# Try to find system Catch2 first
-find_package(Catch2 QUIET)
-
-if(NOT Catch2_FOUND)
-    # Fetch Catch2 from GitHub if not found
-    include(FetchContent)
-    FetchContent_Declare(
-        catch2
-        GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-        GIT_TAG v3.7.1
-    )
-    # FetchContent_MakeAvailable sets up the target
-    FetchContent_MakeAvailable(catch2)
-    message(STATUS "Catch2 fetched via FetchContent")
-else()
-    message(STATUS "Catch2 found: ${Catch2_VERSION}")
-endif()
-
-#============================================================================
-# Test Suite Configuration
-#============================================================================
-
-enable_testing()
-
-# Individual fixed_t test (legacy framework)
-add_executable(test_fixed_t tests/unit/test_fixed_t.cpp)
-target_include_directories(test_fixed_t PRIVATE include include_stubs)
-if(USE_SDL2)
-    target_link_libraries(test_fixed_t ${SDL2_LIBRARIES})
-endif()
-add_test(NAME fixed_t_tests COMMAND test_fixed_t)
-
-# Individual fixed_t test using Catch2 (Phase 1 - new framework)
-# Removed test_fixed_catch2 - Catch2 dependency removed for faster builds
-
-# Note: The run_tests target was removed because each unit test file has its own main()
-# Individual unit tests are covered by their own executables below
-
-# Save/Load Integration Tests
-add_executable(test_save_load_unit tests/integration/test_save_load.cpp)
-target_include_directories(test_save_load_unit PRIVATE include)
-target_link_libraries(test_save_load_unit util ${SDL2_LIBRARIES})
-add_test(NAME save_load_unit_tests COMMAND test_save_load_unit)
-
-# Basic data serialization tests
-add_executable(test_serialization tests/integration/test_serialization.cpp)
-target_include_directories(test_serialization PRIVATE include)
-target_link_libraries(test_serialization ${SDL2_LIBRARIES})
-add_test(NAME serialization_tests COMMAND test_serialization)
-
-# MapInfo Unit Tests - source file not present
-# add_executable(test_mapinfo_constants tests/unit/test_mapinfo_constants.cpp)
-# target_include_directories(test_mapinfo_constants PRIVATE include)
-# target_link_libraries(test_mapinfo_constants util ${SDL2_LIBRARIES})
-# add_test(NAME mapinfo_constants_tests COMMAND test_mapinfo_constants)
-
-add_executable(test_tnl_packets tests/unit/test_tnl_packets.cpp)
-target_include_directories(test_tnl_packets PRIVATE include include_stubs)
-target_link_libraries(test_tnl_packets util ${SDL2_LIBRARIES})
-add_test(NAME tnl_packet_tests COMMAND test_tnl_packets)
-
-add_executable(test_actor tests/unit/test_actor.cpp)
-target_include_directories(test_actor PRIVATE include include_stubs)
-target_link_libraries(test_actor util ${SDL2_LIBRARIES})
-add_test(NAME actor_tests COMMAND test_actor)
-
-# Component pattern tests using Catch2 (dependency injection, thinkable components)
-add_executable(test_components tests/unit/test_components.cpp)
-target_include_directories(test_components PRIVATE include include_stubs)
-target_link_libraries(test_components PRIVATE Catch2::Catch2WithMain)
-add_test(NAME component_tests COMMAND test_components)
-
-add_executable(test_console tests/unit/test_console.cpp)
-target_include_directories(test_console PRIVATE include include_stubs)
-target_link_libraries(test_console util ${SDL2_LIBRARIES})
-add_test(NAME console_tests COMMAND test_console)
-
-add_executable(test_vector tests/unit/test_vector.cpp)
-target_include_directories(test_vector PRIVATE include include_stubs)
-target_link_libraries(test_vector util ${SDL2_LIBRARIES})
-add_test(NAME vector_tests COMMAND test_vector)
-
-# Demo Integration Tests
-add_executable(test_demos_integration tests/integration/test_demos.cpp)
-target_include_directories(test_demos_integration PRIVATE include)
-target_link_libraries(test_demos_integration util ${SDL2_LIBRARIES})
-add_test(NAME demos_integration_tests COMMAND test_demos_integration)
-
-# Network Integration Tests
-add_executable(test_network_integration tests/integration/test_network_integration.cpp)
-target_include_directories(test_network_integration PRIVATE include)
-target_link_libraries(test_network_integration util ${SDL2_LIBRARIES})
-add_test(NAME network_integration_tests COMMAND test_network_integration)
-
-# Parity Tests (C++ vs C feature parity)
-add_executable(test_parity tests/integration/test_parity.cpp)
-target_include_directories(test_parity PRIVATE include /home/geoffrey/tnl/include)
-target_link_libraries(test_parity util ${SDL2_LIBRARIES})
-add_test(NAME parity_tests COMMAND test_parity)
-
-# Console Colors Unit Tests - source file not present
-# add_executable(test_console_colors tests/unit/test_console_colors.cpp)
-# target_include_directories(test_console_colors PRIVATE include)
-# target_link_libraries(test_console_colors util ${SDL2_LIBRARIES})
-# add_test(NAME console_colors_tests COMMAND test_console_colors)
-
-# Save/Load Unit Tests (renamed to avoid conflict)
+# Workaround for multiple definition errors with dummy Shader classes
+# The Shader/ShaderProg classes are compiled in both video and grammars with NO_SHADERS
+target_link_options(doomlegacy PRIVATE "-Wl,--allow-multiple-definition")

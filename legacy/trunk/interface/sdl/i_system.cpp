@@ -154,7 +154,86 @@ static char qwerty_shiftmap[128] = {
 //
 static int xlatekey(SDLKey sym)
 {
-    // leave ASCII codes unchanged, as well as most other SDL keys
+    // leave ASCII codes unchanged
+    if (sym >= ' ' && sym <= '~')
+        return sym;
+
+    // Handle SDL2 key codes that changed from SDL1
+    // SDL2 uses different values for special keys
+    switch (sym)
+    {
+        // Arrow keys (SDL2 values: 26-29)
+        case SDLK_UP:    return KEY_UPARROW;
+        case SDLK_DOWN:  return KEY_DOWNARROW;
+        case SDLK_RIGHT: return KEY_RIGHTARROW;
+        case SDLK_LEFT:  return KEY_LEFTARROW;
+
+        // Navigation keys
+        case SDLK_INSERT:   return KEY_INS;
+        case SDLK_HOME:     return KEY_HOME;
+        case SDLK_END:      return KEY_END;
+        case SDLK_PAGEUP:   return KEY_PGUP;
+        case SDLK_PAGEDOWN: return KEY_PGDN;
+
+        // Function keys (SDL2: 258-269)
+        case SDLK_F1:  return KEY_F1;
+        case SDLK_F2:  return KEY_F2;
+        case SDLK_F3:  return KEY_F3;
+        case SDLK_F4:  return KEY_F4;
+        case SDLK_F5:  return KEY_F5;
+        case SDLK_F6:  return KEY_F6;
+        case SDLK_F7:  return KEY_F7;
+        case SDLK_F8:  return KEY_F8;
+        case SDLK_F9:  return KEY_F9;
+        case SDLK_F10: return KEY_F10;
+        case SDLK_F11: return KEY_F11;
+        case SDLK_F12: return KEY_F12;
+
+        // Keypad keys (SDL2: 256-271)
+        case SDLK_KP_0:       return KEY_KEYPAD0;
+        case SDLK_KP_1:       return KEY_KEYPAD1;
+        case SDLK_KP_2:       return KEY_KEYPAD2;
+        case SDLK_KP_3:       return KEY_KEYPAD3;
+        case SDLK_KP_4:       return KEY_KEYPAD4;
+        case SDLK_KP_5:       return KEY_KEYPAD5;
+        case SDLK_KP_6:       return KEY_KEYPAD6;
+        case SDLK_KP_7:       return KEY_KEYPAD7;
+        case SDLK_KP_8:       return KEY_KEYPAD8;
+        case SDLK_KP_9:       return KEY_KEYPAD9;
+        case SDLK_KP_PERIOD:  return KEY_KPADPERIOD;
+        case SDLK_KP_DIVIDE:  return KEY_KPADSLASH;
+        case SDLK_KP_MULTIPLY: return KEY_KPADMULT;
+        case SDLK_KP_MINUS:   return KEY_MINUSPAD;
+        case SDLK_KP_PLUS:    return KEY_PLUSPAD;
+        case SDLK_KP_ENTER:   return KEY_KPADENTER;
+        case SDLK_KP_EQUALS: return KEY_KPADEQUALS;
+
+        // Other special keys
+        case SDLK_BACKSPACE: return KEY_BACKSPACE;
+        case SDLK_TAB:       return KEY_TAB;
+        case SDLK_RETURN:
+        case SDLK_RETURN2:   return KEY_ENTER;
+        case SDLK_ESCAPE:    return KEY_ESCAPE;
+        case SDLK_PAUSE:     return KEY_PAUSE;
+        case SDLK_DELETE:    return KEY_DELETE;
+        case SDLK_LSHIFT:
+        case SDLK_RSHIFT:    return KEY_RSHIFT;
+        case SDLK_LCTRL:
+        case SDLK_RCTRL:     return KEY_RCTRL;
+        case SDLK_LALT:
+        case SDLK_RALT:      return KEY_RALT;
+        case SDLK_LGUI:      return KEY_LWIN;
+        case SDLK_RGUI:      return KEY_RWIN;
+        case SDLK_CAPSLOCK:  return KEY_CAPSLOCK;
+        case SDLK_SCROLLLOCK: return KEY_SCROLLLOCK;
+        case SDLK_NUMLOCKCLEAR: return KEY_NUMLOCK;
+        case SDLK_PRINTSCREEN: return KEY_PRINT;
+
+        default: break;
+    }
+
+    // Also handle older SDL key codes that may still work
+    // (range check as fallback for unmodified SDL1 codes)
     if (sym >= SDLK_BACKSPACE && sym <= SDLK_MENU)
         return sym;
 

@@ -99,6 +99,14 @@ class Map
 
     byte *glvis; ///<  Subsector visibility data from glVIS.
 
+    // GL nodes (for OpenGL rendering)
+    int numglsegs;
+    struct seg_t *glsegs; ///< GL-optimized segs
+    int numglsubsectors;
+    struct subsector_t *glsubsectors; ///< GL-optimized subsectors
+    int numglnodes;
+    struct node_t *glnodes; ///< GL nodes
+
     bbox_t root_bbox;    ///< bounding box for all the vertices in the map
     line_t **linebuffer; ///< combining sectors and lines
     //@}
