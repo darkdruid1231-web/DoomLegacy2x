@@ -7,3 +7,9 @@ sdl/i_sound.cpp
 sdl/i_system.cpp
 sdl/i_video.cpp
 )
+
+add_library(interface OBJECT ${SRC_FILES})
+
+target_include_directories(interface PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+)

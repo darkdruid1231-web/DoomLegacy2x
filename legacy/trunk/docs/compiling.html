@@ -14,16 +14,17 @@
 <!-- $Id: compiling.html 1108 2014-05-17 16:57:46Z smite-meister $ -->
 <body>
 
-<h1>How to compile Doom Legacy 2.0 (SDL version)</h1>
+<h1>How to compile Doom Legacy (SDL2 version)</h1>
 
-<p>In order to compile Doom Legacy 2.0 SDL you'll need to have several
+<p>In order to compile Doom Legacy with SDL2 you'll need to have several
 libraries installed on your system.<br/>
 Make sure you install the <b>developer</b> packages of the
 libraries, which include both the runtime libraries (DLLs) and
 the stuff required during compilation (header files and import libraries).</p>
 <p>
 NOTE: Most Linux distributions offer these libraries in the form of
-precompiled packages, with the exception of OpenTNL.
+precompiled packages. On Ubuntu/Debian, you can install most dependencies with:
+<div class="code">sudo apt install cmake g++ libsdl2-dev libsdl2-mixer-dev libglew-dev libpng-dev zlib1g-dev libjpeg-dev</div>
 </p>
 
 <table>
@@ -31,15 +32,15 @@ precompiled packages, with the exception of OpenTNL.
   <th>Library</th><th>Version</th><th>Ubuntu/Debian package</th><th>Description</th>
 </tr>
 <tr>
-  <td><a href="http://www.libsdl.org/download-1.2.php">SDL</a></td> <td>1.2.10+</td>
-  <td><a href="http://packages.ubuntu.com/libsdl1.2-dev">libsdl1.2-dev</a></td>
+  <td><a href="https://www.libsdl.org/download-2.0.php">SDL2</a></td> <td>2.0.10+</td>
+  <td>libsdl2-dev</td>
   <td>Simple DirectMedia Layer. A multiplatform multimedia library.</td>
 </tr>
 <tr>
-  <td><a href="http://www.libsdl.org/projects/SDL_mixer/">SDL_mixer</a></td>
-  <td>1.2.7+</td>
-  <td><a href="http://packages.ubuntu.com/libsdl-mixer1.2-dev">libsdl-mixer1.2-dev</a></td>
-  <td>A multichannel mixer library based on SDL.</td>
+  <td><a href="https://github.com/libsdl-org/SDL_mixer/releases">SDL2_mixer</a></td>
+  <td>2.0.4+</td>
+  <td>libsdl2-mixer-dev</td>
+  <td>A multichannel mixer library based on SDL2.</td>
 </tr>
 <tr>
   <td>OpenGL</td> <td>1.3+</td> <td>(several)</td>
@@ -59,14 +60,13 @@ precompiled packages, with the exception of OpenTNL.
 </tr>
 <tr>
   <td><a href="http://www.ijg.org/">libjpeg</a></td> <td>6b</td>
-  <td><a href="http://packages.ubuntu.com/libjpeg62-dev">libjpeg62-dev</a></td>
+  <td>libjpeg-dev</td>
   <td>The unofficial JPEG reference library.</td>
 </tr>
 <tr>
-  <td><a href="http://sourceforge.net/projects/opentnl/">OpenTNL</a></td> <td>HEAD revision</td> <td>-</td>
-  <td>A free game networking library based on the Torque Network Library.<br/>
-    The OpenTNL distribution contains <b>libtomcrypt</b>, which
-    provides strong encryption.</td>
+  <td><a href="https://glew.sourceforge.io/">GLEW</a></td> <td>2.1+</td>
+  <td>libglew-dev</td>
+  <td>OpenGL Extension Wrangler Library.</td>
 </tr>
 </table>
 
@@ -75,12 +75,11 @@ You will require the following programs during the build process:
 </p>
 
 <ul>
-<li><a href="http://gcc.gnu.org/">GCC</a> 4, the Gnu Compiler Collection which, among other things, is
+<li><a href="http://gcc.gnu.org/">GCC</a> 4+, the Gnu Compiler Collection which, among other things, is
 a free C/C++ compiler.<br/>
 Linux systems most likely already have it installed.<br/>
-Windows users should install <a href="http://www.mingw.org/">MinGW</a>, a
-GCC port, and <a href="http://www.mingw.org/node/18">MSYS</a>, a
-collection of POSIX utilities for Win32.</li>
+Windows users should install <a href="https://www.msys2.org/">MSYS2</a>, which
+includes MinGW-w64 GCC toolchain.</li>
 
 <li><a href="http://flex.sourceforge.net/">GNU flex</a>, a scanner
   generator. (Ubuntu package <a href="http://packages.ubuntu.com/flex">flex</a>)</li>
@@ -100,51 +99,104 @@ snapshot, checkout the <b>legacy/trunk/</b> directory from the
 From now on, your local copy of this directory will be referred to as <b>TRUNK</b>.
 
 
-<h3>Compiling OpenTNL</h3>
+<h3>Compiling with CMake on Linux</h3>
 
-<ol>
-<li>Download the latest OpenTNL source from the CVS:
-<div class="code">cvs -z3 -d:pserver:anonymous@opentnl.cvs.sourceforge.net:/cvsroot/opentnl co -P tnl</div>
-</li>
-<li>Go to the <b>TRUNK</b>, say '<b>make tnl TNL=/absolute/path/to/tnl_source</b>' to build
-libtomcrypt.a and libtnl.a.</li>
-</ol>
+<p>CMake is the primary build system for Doom Legacy. The build uses a TNL stub
+by default, so network multiplayer requires additional setup.</p>
 
-<h3>Compiling Legacy</h3>
-
-<ol>
-<li>Open a shell window. Go to the <b>TRUNK</b>.</li>
-<li>Say '<b>make depend</b>' to create the dependency files.</li>
-<li>Say '<b>make OPT=1</b>' or just '<b>make</b>' to build the executable.<br/>
- Omitting the 'OPT=1' parameter adds debugging symbols to the
- executable.</li>
-<li>Get the file <b>legacy.wad</b> (or <b>legacy.dat</b>) from Doom Legacy version 1.40 (or later).<br/>
-Say '<b>make wad WAD=/absolute/path/to/old/legacy.wad</b>' to generate an
-updated legacy.wad.<br/>
-</li>
-<li>Say '<b>make docs</b>' to generate the Doxygen documentation.</li>
-</ol>
-
-<h3>Compiling with CMake (experimental)</h3>
-
-<p>There is a new CMake-based build system. It is only recommended for the adventurous.</p>
-
-<p>You should always keep separate source directories for the regular and CMake builds.
-Trying to use both in the same directory <b>will break stuff</b> eventually.</p>
-
-<p>You'll get <a href="http://www.cmake.org">CMake</a> from your Linux distribution.</p>
+<p>You'll get <a href="https://www.cmake.org">CMake</a> from your Linux distribution.</p>
 
 <p>The build steps are roughly as follows.</p>
 
 <ol>
-<li>Go to your source root.</li>
-<li><b>mkdir builddir; cd builddir</b></li>
-<li>Find out where your TNL headers and libraries are.</li>
-<li><b>CXXFLAGS=-I/path/to/tnl/headers LDFLAGS=-L/path/to/libtnl cmake -DCMAKE_BUILD_TYPE=debug ..</b></li>
-<li>If it doesn't find libtnl or tomcrypt, you can set the paths manually with <b>ccmake</b> or <b>cmake-gui</b>
-once you activate advanced mode.</li>
-<li>Then just type <b>make</b>.</li>
+<li>Go to your source root (legacy/trunk/).</li>
+<li><b>mkdir build &amp;&amp; cd build</b></li>
+<li><b>cmake -DCMAKE_BUILD_TYPE=Release ..</b></li>
+<li><b>cmake --build . --config Release</b></li>
 </ol>
+
+<h3>Compiling on Windows with MSYS2/MinGW</h3>
+
+<p>Doom Legacy can be built on Windows using MSYS2 with MinGW-w64. This is the
+recommended approach for Windows builds.</p>
+
+<h4>Prerequisites</h4>
+
+<ul>
+<li><a href="https://www.msys2.org/">MSYS2</a> - Install MSYS2 and ensure you have the MinGW-w64 toolchain</li>
+<li>Install the required development packages:
+<div class="code">pacman -S mingw-w64-x86_64-cmake mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_mixer mingw-w64-x86_64-glew mingw-w64-x86_64-libpng mingw-w64-x86_64-zlib</div>
+</li>
+<li>Ensure your Doom WAD file (doom.wad) is available</li>
+</ul>
+
+<h4>Build Steps</h4>
+
+<ol>
+<li>Open MSYS2 MinGW 64-bit terminal (not the MSYS terminal, use the MinGW one)</li>
+<li>Navigate to the source directory:
+<div class="code">cd /c/Users/Geoffrey/Desktop/Doom/doomlegacy/doomlegacy-svn/legacy/trunk</div>
+</li>
+<li>Create and enter the build directory:
+<div class="code">mkdir -p build &amp;&amp; cd build</div>
+</li>
+<li>Configure with CMake:
+<div class="code">cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release ..</div>
+</li>
+<li>Build the project:
+<div class="code">cmake --build . --config Release</div>
+</li>
+</ol>
+
+<p><b>Alternative: Using msys2_shell.cmd directly</b></p>
+
+<p>You can also build from a regular Windows command prompt or CI script using:</p>
+
+<div class="code">MSYS_NO_PATHCONV=1 C:/msys64/msys2_shell.cmd -defterm -here -no-start -mingw64 -c "cd C:/Users/Geoffrey/Desktop/Doom/doomlegacy/doomlegacy-svn/legacy/trunk/build && cmake --build . --config Release"</div>
+
+<p>Environment variables:</p>
+<ul>
+<li><b>MSYS_NO_PATHCONV=1</b> - Prevents MSYS from converting paths</li>
+<li><b>-defterm -here -no-start -mingw64</b> - Runs in MinGW 64-bit environment without starting a new window</li>
+</ul>
+
+<h4>Running the Game</h4>
+
+<p>After building, the executable will be in the build directory. Run with:</p>
+
+<div class="code">./doomlegacy.exe -iwad path/to/doom.wad</div>
+
+<h3>Compiling on Windows with Visual Studio</h3>
+
+<p>Doom Legacy can also be built on Windows using Visual Studio 2022.</p>
+
+<h4>Prerequisites</h4>
+
+<ul>
+<li><a href="https://visualstudio.microsoft.com/downloads/">Visual Studio 2022</a> with C++ workload</li>
+<li><a href="https://cmake.org/download/">CMake</a> 3.16 or later</li>
+<li><a href="https://www.libsdl.org/download-2.0.php">SDL2</a> development libraries</li>
+<li><a href="https://github.com/libsdl-org/SDL_mixer/releases">SDL2_mixer</a> development libraries</li>
+</ul>
+
+<h4>Build Steps</h4>
+
+<ol>
+<li>Open "Developer Command Prompt for VS2022" or "x64 Native Tools Command Prompt"</li>
+<li>Navigate to the source directory and create build directory:
+<div class="code">cd legacy\trunk
+mkdir build
+cd build</div>
+</li>
+<li>Configure with CMake:
+<div class="code">cmake -G "Visual Studio 17 2022" -A x64 ..</div>
+</li>
+<li>Build the project:
+<div class="code">cmake --build . --config Release</div>
+</li>
+</ol>
+
+<p>The executable will be at <b>build\Release\doomlegacy.exe</b></p>
 
 </body>
 </html>

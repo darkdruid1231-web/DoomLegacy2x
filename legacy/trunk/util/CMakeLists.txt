@@ -20,3 +20,9 @@ w_wad.cpp
 z_cache.cpp
 z_zone.cpp
 )
+
+add_library(util STATIC ${SRC_FILES})
+
+target_include_directories(util PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+)

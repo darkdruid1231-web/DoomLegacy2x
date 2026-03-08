@@ -17,9 +17,19 @@ r_sky.cpp
 r_splats.cpp
 r_sprite.cpp
 r_things.cpp
-r_anim.cpp 
+r_anim.cpp
 hardware/oglrenderer.cpp
 hardware/md3.cpp
 hardware/oglshaders.cpp
 hardware/oglhelpers.cpp
+)
+
+add_library(video STATIC ${SRC_FILES})
+
+target_link_libraries(video PUBLIC ${GLEW_LIBRARY} ${OPENGL_LIBRARIES} stdc++)
+
+target_include_directories(video PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${GLEW_INCLUDE_DIR}
 )

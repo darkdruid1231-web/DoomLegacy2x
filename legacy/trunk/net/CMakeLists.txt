@@ -5,3 +5,9 @@ sv_main.cpp
 sv_cmds.cpp
 cl_main.cpp
 )
+
+add_library(net STATIC ${SRC_FILES})
+
+target_include_directories(net PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+)

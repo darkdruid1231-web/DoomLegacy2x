@@ -1,4 +1,5 @@
 set(SRC_FILES
+gl_bsp.cpp
 g_game.cpp
 g_state.cpp
 g_demo.cpp
@@ -70,3 +71,5 @@ hud/st_lib.cpp
 hud/st_stuff.cpp
 hud/hu_stuff.cpp
 )
+
+add_library(doomengine STATIC ${SRC_FILES})

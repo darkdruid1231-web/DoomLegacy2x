@@ -95,6 +95,13 @@ typedef uint16_t Uint16;
 typedef uint32_t Uint32;
 #endif
 
+// GCC 15 workaround: undef std::byte if it was defined
+// This happens when headers like <string> pull in <cstddef> which defines std::byte
+#ifdef __GNUC__
+namespace std { }
+#undef byte
+#endif
+
 typedef Uint8 byte;
 typedef Uint32 tic_t;
 typedef Uint32 angle_t;

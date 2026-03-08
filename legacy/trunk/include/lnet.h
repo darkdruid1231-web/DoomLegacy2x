@@ -143,6 +143,32 @@ class BitStream
         readBits(data, sizeof(T) * 8);
     }
 
+    template<typename T>
+    void read(T *data, size_t bits)
+    {
+        readBits(data, bits);
+    }
+
+    void readString(char *str, size_t maxLen)
+    {
+        size_t i = 0;
+        uint8_t c = 0;
+        while (i < maxLen - 1)
+        {
+            read(&c);
+            if (c == 0)
+                break;
+            str[i++] = c;
+        }
+        str[i] = 0;
+    }
+
+    // Overload for single argument
+    void readString(char *str)
+    {
+        readString(str, 256);
+    }
+
     bool readFlag()
     {
         uint8_t v = 0;

@@ -5,6 +5,9 @@
 #ifndef TNL_STUB_H
 #define TNL_STUB_H
 
+// GCC 15 compatibility: define byte before any includes
+typedef unsigned char byte;
+
 #include <cstdint>
 #include <cstring>
 #include <string>
@@ -35,7 +38,7 @@ typedef int64_t S64;
 typedef float F32;
 typedef double F64;
 typedef uint32_t IPAddress;
-typedef unsigned char byte;
+
 
 // Forward declarations
 #ifdef TNL_STUB_BUILD
@@ -56,6 +59,7 @@ typedef BitStream* ByteBufferPtr;
 
 // Macros
 #define BIT(x) (1 << (x))
+#define TNL_DECLARE_CLASS(cls)
 #ifdef TNL_STUB_BUILD
 #define TNL_DECLARE_RPC(func, params) void func params {}
 #else
