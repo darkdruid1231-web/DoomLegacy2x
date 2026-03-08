@@ -81,6 +81,9 @@ extern trace_t trace;
 
 void MD3_InitNormLookup();
 
+// Debug: wireframe mode for diagnosing floor/ceiling issues
+static bool r_wireframe = false;
+
 /*!
   \defgroup g_opengl OpenGL renderer
 
@@ -875,7 +878,7 @@ void OGLRenderer::Render3DView(Actor *pov)
 
     // Build frustum and we are ready to render.
     CalculateFrustum();
-    RenderBSPNode(mp->numglnodes - 1);
+    RenderBSPNode(mp->numnodes - 1);
 }
 
 void OGLRenderer::DrawPSprites(PlayerPawn *p)
@@ -992,7 +995,8 @@ void OGLRenderer::RenderBSPNode(int nodenum)
     }
 
     // otherwise keep traversing the tree
-    node_t *node = &mp->glnodes[nodenum];
+    // Use original nodes - they work fine for BSP traversal
+    node_t *node = &mp->nodes[nodenum];
 
     // Decide which side the view point is on.
     int side = node->PointOnSide(x, y);
@@ -1033,29 +1037,71 @@ void OGLRenderer::RenderGlSsecPolygon(
 
     glNormal3f(0.0, 0.0, -loopinc);
     mat->GLUse();
-    glBegin(GL_POLYGON);
+
+    // Collect vertices first to build a triangle fan
+    // For a convex subsector, this should work better than GL_POLYGON
+    GLfloat vertices[512 * 3]; // Max 512 vertices
+    GLfloat texcoords[512 * 2];
+    int numverts = 0;
+
+    // Collect vertices - always use v1 for all segs (like GZDoom does)
+    // Using v1 for floor caused issues - always use consistent vertex
     for (int curseg = loopstart; curseg != loopend; curseg += loopinc)
     {
+        // Use glsegs since we're rendering glsubsectors
         seg_t *seg = &mp->glsegs[curseg];
         GLfloat x, y, tx, ty;
-        vertex_t *v;
-
-        if (isFloor)
-            v = seg->v2;
-        else
-            v = seg->v1;
+        vertex_t *v = seg->v1;  // Always use v1 for consistency
         x = v->x.Float();
         y = v->y.Float();
 
         tx = (x + xoff) / mat->worldwidth;
         ty = 1.0 - (y - yoff) / mat->worldheight;
 
-        glTexCoord2f(tx, ty);
-        glVertex3f(x, y, height);
+        vertices[numverts * 3 + 0] = x;
+        vertices[numverts * 3 + 1] = y;
+        vertices[numverts * 3 + 2] = height;
+        texcoords[numverts * 2 + 0] = tx;
+        texcoords[numverts * 2 + 1] = ty;
+        numverts++;
 
         //    printf("(%.2f, %.2f)\n", x, y);
     }
-    glEnd();
+
+    // Draw as triangle fan or wireframe for debugging
+    if (r_wireframe)
+    {
+        glDisable(GL_TEXTURE_2D);
+        glColor4f(1.0f, 1.0f, 0.0f, 1.0f); // Yellow wireframe
+        glBegin(GL_LINES);
+        // Draw lines from center to each vertex
+        for (int i = 0; i < numverts; i++)
+        {
+            // Line from center (first vertex) to this vertex
+            glVertex3f(vertices[0], vertices[1], vertices[2]);
+            glVertex3f(vertices[i * 3 + 0], vertices[i * 3 + 1], vertices[i * 3 + 2]);
+            // Line to next vertex
+            if (i < numverts - 1)
+            {
+                glVertex3f(vertices[i * 3 + 0], vertices[i * 3 + 1], vertices[i * 3 + 2]);
+                glVertex3f(vertices[(i + 1) * 3 + 0], vertices[(i + 1) * 3 + 1], vertices[(i + 1) * 3 + 2]);
+            }
+        }
+        glEnd();
+        glEnable(GL_TEXTURE_2D);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+    else
+    {
+        // Use GL_POLYGON - OpenGL handles triangulation internally
+        glBegin(GL_POLYGON);
+        for (int i = 0; i < numverts; i++)
+        {
+            glTexCoord2f(texcoords[i * 2 + 0], texcoords[i * 2 + 1]);
+            glVertex3f(vertices[i * 3 + 0], vertices[i * 3 + 1], vertices[i * 3 + 2]);
+        }
+        glEnd();
+    }
 
 #if 0
   {
@@ -1099,7 +1145,7 @@ void OGLRenderer::RenderGLSubsector(int num)
     if (num < 0 || num > mp->numglsubsectors)
         return;
 
-    // Use GL subsectors with GL segs for proper vertex coordinates
+    // Use GL subsectors for floor/ceiling
     subsector_t *ss = &mp->glsubsectors[num];
     int firstseg = ss->first_seg;
     int segcount = ss->num_segs;
@@ -1173,7 +1219,7 @@ void OGLRenderer::RenderGLSubsector(int num)
         {
 
             fixed_t nx, ny;
-            seg_t *s = &(mp->glsegs[curseg]);
+            seg_t *s = &(mp->segs[curseg]);
             texright = texleft + s->length;
             vertex_t *v1 = s->v1;
             vertex_t *v2 = s->v2;
@@ -1219,7 +1265,7 @@ void OGLRenderer::RenderActors(subsector_t *ssec)
 
     // Handle all things in this subsector.
     for (Actor *thing = sec->thinglist; thing; thing = thing->snext)
-        if (!(thing->flags2 & MF2_DONTDRAW) && thing->pres && thing->subsector == ssec)
+        if (!(thing->flags2 & MF2_DONTDRAW) && thing->pres)
         {
             thing->pres->Draw(thing); // does both sprites and 3d models
         }
@@ -1244,10 +1290,10 @@ void OGLRenderer::GetSegQuads(int num, quad &u, quad &m, quad &l) const
 
     u.m = m.m = l.m = NULL;
 
-    if (num < 0 || num > mp->numglsegs)
+    if (num < 0 || num > mp->numsegs)
         return;
 
-    seg_t *s = &(mp->glsegs[num]);
+    seg_t *s = &(mp->segs[num]);
     line_t *ld = s->linedef;
 
     // Minisegs don't have wall textures so no point in drawing them.
