@@ -101,13 +101,16 @@ void BuildGLNodes(Map* map)
 {
     CONS_Printf("Building GL nodes with minisegs...\n");
 
-    // Step 1: Initialize glvertexes array
-    map->glvertexes = (vertex_t*)Z_Malloc(map->numvertexes * sizeof(vertex_t), PU_LEVEL, 0);
-    for (int i = 0; i < map->numvertexes; i++) {
-        map->glvertexes[i].x = map->vertexes[i].x;
-        map->glvertexes[i].y = map->vertexes[i].y;
+    // Step 1: glvertexes should already be allocated by BuildGLVertexes
+    // Just verify and use existing array
+    if (!map->glvertexes) {
+        map->glvertexes = (vertex_t*)Z_Malloc(map->numvertexes * sizeof(vertex_t), PU_LEVEL, 0);
+        for (int i = 0; i < map->numvertexes; i++) {
+            map->glvertexes[i].x = map->vertexes[i].x;
+            map->glvertexes[i].y = map->vertexes[i].y;
+        }
+        map->numglvertexes = map->numvertexes;
     }
-    map->numglvertexes = map->numvertexes;
 
     // Step 2: Process each subsector
     std::vector<GLSeg> allGLSegs;
