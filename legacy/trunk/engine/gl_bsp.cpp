@@ -116,13 +116,27 @@ void BuildGLNodes(Map* map)
     std::vector<GLSeg> allGLSegs;
     std::map<int, std::vector<GLSeg>> subsectorSegs;
 
+    // Pre-initialize all subsector entries to avoid gaps
+    for (int s = 0; s < map->numsubsectors; s++) {
+        subsectorSegs[s] = std::vector<GLSeg>();
+    }
+
     for (int s = 0; s < map->numsubsectors; s++) {
         subsector_t* sub = &map->subsectors[s];
         int firstSeg = sub->first_seg;
         int numSegs = sub->num_segs;
 
-        if (numSegs < 3) {
-            CONS_Printf("  Warning: Subsector %d has only %d segs\n", s, numSegs);
+        // Skip invalid subsectors - but ensure we have a valid entry
+        if (numSegs < 3 || !sub->sector) {
+            CONS_Printf("  Warning: Subsector %d invalid (segs=%d, sector=%p)\n", s, numSegs, (void*)sub->sector);
+            subsectorSegs[s] = std::vector<GLSeg>();  // Empty but valid
+            continue;
+        }
+
+        // Safety check for valid seg indices
+        if (firstSeg < 0 || firstSeg >= map->numsegs || numSegs < 0) {
+            CONS_Printf("  Warning: Subsector %d has invalid seg range (%d, %d)\n", s, firstSeg, numSegs);
+            subsectorSegs[s] = std::vector<GLSeg>();
             continue;
         }
 
@@ -133,6 +147,12 @@ void BuildGLNodes(Map* map)
 
         for (int i = 0; i < numSegs; i++) {
             seg_t* seg = &map->segs[firstSeg + i];
+
+            // Safety check for valid seg
+            if (!seg || !seg->v1 || !seg->v2) {
+                CONS_Printf("  Warning: Seg %d in subsector %d is invalid\n", firstSeg + i, s);
+                continue;
+            }
 
             float v1x = seg->v1->x.Float();
             float v1y = seg->v1->y.Float();
