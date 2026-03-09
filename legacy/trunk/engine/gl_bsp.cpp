@@ -126,16 +126,17 @@ void BuildGLNodes(Map* map)
         int firstSeg = sub->first_seg;
         int numSegs = sub->num_segs;
 
-        // Skip invalid subsectors - but ensure we have a valid entry
-        if (numSegs < 3 || !sub->sector) {
-            CONS_Printf("  Warning: Subsector %d invalid (segs=%d, sector=%p)\n", s, numSegs, (void*)sub->sector);
-            subsectorSegs[s] = std::vector<GLSeg>();  // Empty but valid
+        // Skip subsectors with no segs at all
+        // Note: sector may be NULL at this point - it's assigned later in GroupLines
+        if (numSegs <= 0) {
+            CONS_Printf("  Warning: Subsector %d has no segs\n", s);
+            subsectorSegs[s] = std::vector<GLSeg>();
             continue;
         }
 
         // Safety check for valid seg indices
-        if (firstSeg < 0 || firstSeg >= map->numsegs || numSegs < 0) {
-            CONS_Printf("  Warning: Subsector %d has invalid seg range (%d, %d)\n", s, firstSeg, numSegs);
+        if (firstSeg < 0 || firstSeg >= map->numsegs) {
+            CONS_Printf("  Warning: Subsector %d has invalid first_seg (%d)\n", s, firstSeg);
             subsectorSegs[s] = std::vector<GLSeg>();
             continue;
         }
@@ -144,6 +145,10 @@ void BuildGLNodes(Map* map)
         std::vector<GLVertex> vertices;
         std::vector<GLSeg> wallSegs;
         std::set<int> vertexSet;
+
+        // Debug: count segs with/without linedefs
+        int segsWithLinedef = 0;
+        int segsWithoutLinedef = 0;
 
         for (int i = 0; i < numSegs; i++) {
             seg_t* seg = &map->segs[firstSeg + i];
@@ -164,6 +169,10 @@ void BuildGLNodes(Map* map)
 
             // Check if this is a miniseg (no linedef)
             bool isMiniseg = (seg->linedef == NULL);
+            if (isMiniseg)
+                segsWithoutLinedef++;
+            else
+                segsWithLinedef++;
 
             int lineIdx = -1;
             int sideIdx = 0;
@@ -206,18 +215,44 @@ void BuildGLNodes(Map* map)
                 return a.angle < b.angle;
             });
 
-        // Add minisegs for gaps between consecutive vertices
-        std::vector<GLSeg> orderedSegs = wallSegs;
+        // Build ordered segs in polygon boundary order (matching sorted vertices)
+        std::vector<GLSeg> orderedSegs;
 
+        // First add all wall segs and minisegs to a map for lookup
+        std::map<std::pair<int,int>, GLSeg> segMap;
+        for (const auto& seg : wallSegs) {
+            std::pair<int,int> key(seg.v1Index, seg.v2Index);
+            segMap[key] = seg;
+        }
+
+        // Now iterate through sorted vertices to build polygon-ordered seg list
         for (size_t i = 0; i < vertices.size(); i++) {
             size_t next = (i + 1) % vertices.size();
             int v1 = vertices[i].originalIndex;
             int v2 = vertices[next].originalIndex;
 
-            // Check if these vertices are already connected
-            if (!VerticesConnected(orderedSegs, v1, v2)) {
-                // Add miniseg to fill the gap
-                orderedSegs.push_back(GLSeg(v1, v2, true, -1, 0));
+            // Look for seg connecting v1->v2
+            std::pair<int,int> key(v1, v2);
+            auto it = segMap.find(key);
+            if (it != segMap.end()) {
+                orderedSegs.push_back(it->second);
+                segMap.erase(it);
+            } else {
+                // Look for reverse direction
+                key = std::pair<int,int>(v2, v1);
+                it = segMap.find(key);
+                if (it != segMap.end()) {
+                    // Reverse the seg so it goes v1->v2
+                    GLSeg revSeg = it->second;
+                    int temp = revSeg.v1Index;
+                    revSeg.v1Index = revSeg.v2Index;
+                    revSeg.v2Index = temp;
+                    orderedSegs.push_back(revSeg);
+                    segMap.erase(it);
+                } else {
+                    // No seg found - this shouldn't happen if we have a closed polygon
+                    orderedSegs.push_back(GLSeg(v1, v2, true, -1, 0));
+                }
             }
         }
 
@@ -226,8 +261,8 @@ void BuildGLNodes(Map* map)
         for (const auto& seg : orderedSegs) {
             if (seg.isMiniseg) minisegCount++;
         }
-        if (minisegCount == (int)orderedSegs.size()) {
-            CONS_Printf("  Warning: Subsector %d is all minisegs!\n", s);
+        if (minisegCount == (int)orderedSegs.size() && numSegs > 2) {
+            CONS_Printf("  Warning: Subsector %d has all minisegs!\n", s);
         }
 
         // Store segs for this subsector
@@ -261,18 +296,30 @@ void BuildGLNodes(Map* map)
             glseg->length = 0;
         }
 
-        // Set linedef if available
+        // Set linedef and sidedef if available
         if (glSeg.linedef >= 0 && glSeg.linedef < map->numlines) {
             glseg->linedef = &map->lines[glSeg.linedef];
             glseg->side = glSeg.side;
+            // Get sidedef from linedef
+            glseg->sidedef = glseg->linedef->sideptr[glseg->side];
+            // Get sectors from sidedef
+            if (glseg->sidedef) {
+                glseg->frontsector = glseg->sidedef->sector;
+                // Check for two-sided line
+                if (glseg->linedef->flags & ML_TWOSIDED) {
+                    glseg->backsector = glseg->linedef->sideptr[glseg->side ^ 1]->sector;
+                } else {
+                    glseg->backsector = NULL;
+                }
+            }
         } else {
             glseg->linedef = NULL;
             glseg->side = 0;
+            glseg->sidedef = NULL;
+            glseg->frontsector = NULL;
+            glseg->backsector = NULL;
         }
 
-        glseg->sidedef = NULL;
-        glseg->frontsector = NULL;
-        glseg->backsector = NULL;
         glseg->numlights = 0;
         glseg->rlights = NULL;
     }
@@ -286,9 +333,22 @@ void BuildGLNodes(Map* map)
         subsector_t* sub = &map->subsectors[s];
         subsector_t* glsub = &map->glsubsectors[s];
 
-        glsub->sector = sub->sector;
+        // Find sector from glsegs - look for first seg with a valid sector
+        glsub->sector = NULL;
+        const std::vector<GLSeg>& subSegs = subsectorSegs[s];
+        for (size_t i = 0; i < subSegs.size() && !glsub->sector; i++) {
+            const GLSeg& glSeg = subSegs[i];
+            if (glSeg.linedef >= 0 && glSeg.linedef < map->numlines) {
+                // Get the actual glseg to check its sector
+                seg_t* actualSeg = &map->glsegs[segOffset + i];
+                if (actualSeg->frontsector) {
+                    glsub->sector = actualSeg->frontsector;
+                }
+            }
+        }
+
         glsub->first_seg = segOffset;
-        glsub->num_segs = subsectorSegs[s].size();
+        glsub->num_segs = subSegs.size();
         glsub->splats = sub->splats;
         glsub->poly = sub->poly;
 

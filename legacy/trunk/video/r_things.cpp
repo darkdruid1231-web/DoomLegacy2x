@@ -642,26 +642,32 @@ void Rend::R_AddSprites(sector_t *sec, int lightlevel)
 
     // Handle all things in sector.
     for (Actor *thing = sec->thinglist; thing; thing = thing->snext)
-        if (!(thing->flags2 & MF2_DONTDRAW) && thing->pres)
-        {
-            // transform the origin point
-            fixed_t tr_x = thing->pos.x - viewx;
-            fixed_t tr_y = thing->pos.y - viewy;
+    {
+        // Debug: count how many things we're checking
+        if (thing->flags2 & MF2_DONTDRAW)
+            continue;
 
-            proj_tz = (tr_x * viewcos) + (tr_y * viewsin);
+        if (!thing->pres)
+            continue;
 
-            // thing is behind view plane?
-            if (proj_tz < MINZ)
-                continue;
+        // transform the origin point
+        fixed_t tr_x = thing->pos.x - viewx;
+        fixed_t tr_y = thing->pos.y - viewy;
 
-            proj_tx = (tr_x * viewsin) - (tr_y * viewcos);
+        proj_tz = (tr_x * viewcos) + (tr_y * viewsin);
 
-            // too far off the side?
-            if (abs(proj_tx) > (proj_tz << 2))
-                continue;
+        // thing is behind view plane?
+        if (proj_tz < MINZ)
+            continue;
 
-            thing->pres->Project(thing);
-        }
+        proj_tx = (tr_x * viewsin) - (tr_y * viewcos);
+
+        // too far off the side?
+        if (abs(proj_tx) > (proj_tz << 2))
+            continue;
+
+        thing->pres->Project(thing);
+    }
 }
 
 const fixed_t PSpriteSY[NUMWEAPONS] = {
