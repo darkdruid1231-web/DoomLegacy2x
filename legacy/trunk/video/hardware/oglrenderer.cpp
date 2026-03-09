@@ -1151,6 +1151,10 @@ void OGLRenderer::RenderGLSubsector(int num)
     int segcount = ss->num_segs;
     sector_t *s = ss->sector;
 
+    // Skip degenerate subsectors
+    if (!s || segcount <= 0)
+        return;
+
     // Set up sector lighting.
     GLfloat light = LightLevelToLum(s->lightlevel) / 255.0;
     GLfloat lmodel_ambient[] = {light, light, light, 1.0};
