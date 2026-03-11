@@ -77,9 +77,118 @@ inline int SDL_GetWindowHeight_wrapper(SDL_Window *w) { int width, height; SDL_G
 #include "w_wad.h" // Need file cache to get playpal.
 #include "z_zone.h"
 
+#include <cmath>
+
 extern trace_t trace;
 
 void MD3_InitNormLookup();
+
+// CVar definition (declared extern in cvars.h; hwr_render.cpp is not compiled).
+// Initialize value=1 so lighting is active before Reg() is called.
+consvar_t cv_grstaticlighting = {"gr_staticlighting", "On", CV_SAVE, CV_OnOff, NULL, 1};
+
+/// Convert Doom light level (0-255) to OpenGL color component (0.0-1.0).
+/// Uses a non-linear curve below 192 to match the software renderer's dark look.
+static float LightLevelToFloat(int lightlevel)
+{
+    if (lightlevel < 0)   lightlevel = 0;
+    if (lightlevel > 255) lightlevel = 255;
+    float f = lightlevel / 255.0f;
+    if (lightlevel < 192)
+        f = (192.0f - (192.0f - lightlevel) * 1.87f) / 255.0f;
+    if (f < 0.0f) f = 0.0f;
+    if (f > 1.0f) f = 1.0f;
+    return f;
+}
+
+// ---------------------------------------------------------------------------
+// Dynamic light emitter table.
+// Maps known decorative mobjtype_t values to light properties.
+// ---------------------------------------------------------------------------
+struct LightEmitterDef {
+    mobjtype_t type;
+    float radius;
+    float r, g, b;
+};
+
+static const LightEmitterDef lightEmitterTable[] = {
+    { MT_MISC29,          256.0f, 1.0f, 1.0f, 0.9f },  // TechLamp (tall)
+    { MT_MISC30,          192.0f, 1.0f, 1.0f, 0.9f },  // Tech2Lamp (short)
+    { MT_ARTITORCH,       200.0f, 1.0f, 0.6f, 0.1f },  // Heretic torch
+    { MT_ZTWINEDTORCH,    256.0f, 1.0f, 0.5f, 0.1f },  // Hexen twined torch
+    { MT_ZWALLTORCH,      192.0f, 1.0f, 0.5f, 0.1f },  // Hexen wall torch
+    { MT_ZFIREBULL,       256.0f, 1.0f, 0.4f, 0.0f },  // Hexen fire bull
+    { MT_BRASSTORCH,      192.0f, 1.0f, 0.5f, 0.1f },  // Hexen brass torch
+    { MT_ZBLUE_CANDLE,    128.0f, 0.4f, 0.5f, 1.0f },  // Hexen blue candle
+};
+static const int NUM_LIGHT_EMITTERS = sizeof(lightEmitterTable) / sizeof(lightEmitterTable[0]);
+
+/// Collect all dynamic lights for this frame: static decorative emitters
+/// plus a point light at the camera when the player fires (extralight).
+void OGLRenderer::CollectDynamicLights(Actor *pov)
+{
+    framelights.clear();
+    if (!mp)
+        return;
+
+    // Player weapon flash: add a white point light at the camera.
+    PlayerPawn *ppawn = dynamic_cast<PlayerPawn *>(pov);
+    if (ppawn && ppawn->extralight > 0)
+    {
+        FrameLight fl;
+        fl.x = x;  fl.y = y;  fl.z = z;
+        fl.r = 1.0f;  fl.g = 1.0f;  fl.b = 1.0f;
+        fl.radius = ppawn->extralight * 96.0f;
+        framelights.push_back(fl);
+    }
+
+    // Walk every sector's thing list for static light emitters.
+    for (int i = 0; i < mp->numsectors; i++)
+    {
+        sector_t *sec = &mp->sectors[i];
+        for (Actor *th = sec->thinglist; th; th = th->snext)
+        {
+            DActor *da = dynamic_cast<DActor *>(th);
+            if (!da)
+                continue;
+            for (int j = 0; j < NUM_LIGHT_EMITTERS; j++)
+            {
+                if (da->type == lightEmitterTable[j].type)
+                {
+                    FrameLight fl;
+                    fl.x = da->pos.x.Float();
+                    fl.y = da->pos.y.Float();
+                    fl.z = da->pos.z.Float() + 32.0f;  // mid-height approx.
+                    fl.r = lightEmitterTable[j].r;
+                    fl.g = lightEmitterTable[j].g;
+                    fl.b = lightEmitterTable[j].b;
+                    fl.radius = lightEmitterTable[j].radius;
+                    framelights.push_back(fl);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+/// Accumulate dynamic light RGB contribution at world point (px, py, pz).
+/// Results are added (not clamped) into r, g, b — caller clamps to [0,1].
+void OGLRenderer::AccumDynLight(float px, float py, float pz,
+                                float &r, float &g, float &b) const
+{
+    for (size_t i = 0; i < framelights.size(); i++)
+    {
+        const FrameLight &fl = framelights[i];
+        float dx = px - fl.x, dy = py - fl.y, dz = pz - fl.z;
+        float dist2 = dx*dx + dy*dy + dz*dz;
+        if (dist2 >= fl.radius * fl.radius)
+            continue;
+        float atten = 1.0f - sqrtf(dist2) / fl.radius;
+        r += fl.r * atten;
+        g += fl.g * atten;
+        b += fl.b * atten;
+    }
+}
 
 // Debug: wireframe mode for diagnosing floor/ceiling issues
 static bool r_wireframe = false;
@@ -173,36 +282,11 @@ void OGLRenderer::InitGLState()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_CULL_FACE);
 
-    // lighting
-    glEnable(GL_COLOR_MATERIAL);
-    glColorMaterial(GL_FRONT,
-                    GL_AMBIENT_AND_DIFFUSE); // now we can use glColor4 to do alpha effects
+    // Sector lighting: disable hardware lighting and use glColor4f + GL_MODULATE.
+    // Each surface sets its own brightness via glColor4f before drawing.
+    glDisable(GL_LIGHTING);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glColor4f(1.0, 1.0, 1.0, 1.0);
-
-    // GLfloat mat_ad[]  = { 1.0, 1.0, 1.0, 1.0 };
-    // glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, );
-    // glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, );
-    // glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, mat_ad);
-    // glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, );
-    // glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0.0);
-    // glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, );
-
-    GLfloat lmodel_ambient[] = {1.0, 1.0, 1.0, 1.0};
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
-    // glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
-    // glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
-
-    // TEST positional/directional light
-    // glEnable(GL_LIGHT0);
-    GLfloat light_ambient[] = {0.0, 0.0, 0.0, 1.0};
-    GLfloat light_diffuse[] = {1.0, 1.0, 1.0, 1.0};
-    GLfloat light_specular[] = {1.0, 1.0, 1.0, 1.0};
-    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-
-    GLfloat light_position[] = {1.0, -1.0, 0.0, 0.0}; // infinitely far away
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
     // red aiming dot parameters
     glEnable(GL_POINT_SMOOTH);
@@ -214,6 +298,10 @@ void OGLRenderer::InitGLState()
 
     // other debugging stuff
     glLineWidth(3.0);
+
+    // Register lighting CVars so they can be toggled via the console.
+    // value=1 is already set in the definition, so lighting works even before this.
+    cv_grstaticlighting.Reg();
 }
 
 /// Clean up stuffage so we can start drawing a new frame.
@@ -543,6 +631,7 @@ void OGLRenderer::Setup2DMode()
     ClearDrawColorAndLights();
 
     glDisable(GL_LIGHTING);
+    glDisable(GL_FOG);
     glDisable(GL_DEPTH_TEST);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -581,7 +670,7 @@ void OGLRenderer::Setup3DMode()
     consolemode = false;
     ClearDrawColorAndLights();
 
-    glEnable(GL_LIGHTING);
+    glDisable(GL_LIGHTING);  // sector lighting is applied per-surface via glColor4f
     glEnable(GL_DEPTH_TEST);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -876,6 +965,9 @@ void OGLRenderer::Render3DView(Actor *pov)
 
     curssec = pov->subsector;
 
+    // Collect dynamic lights for this frame (weapon flash + decorative emitters).
+    CollectDynamicLights(pov);
+
     // Build frustum and we are ready to render.
     CalculateFrustum();
     RenderBSPNode(mp->numnodes - 1);
@@ -1012,7 +1104,7 @@ void OGLRenderer::RenderBSPNode(int nodenum)
 
 /// Draws one single GL subsector polygon that is either a floor or a ceiling.
 void OGLRenderer::RenderGlSsecPolygon(
-    subsector_t *ss, GLfloat height, Material *mat, bool isFloor, GLfloat xoff, GLfloat yoff)
+    subsector_t *ss, GLfloat height, Material *mat, bool isFloor, GLfloat xoff, GLfloat yoff, int lightlevel)
 {
     int loopstart, loopend, loopinc;
 
@@ -1068,19 +1160,20 @@ void OGLRenderer::RenderGlSsecPolygon(
         //    printf("(%.2f, %.2f)\n", x, y);
     }
 
+    // Base static light for this sector (same for every vertex).
+    float base = cv_grstaticlighting.value ? LightLevelToFloat(lightlevel) : 1.0f;
+    bool dynActive = cv_grdynamiclighting.value && !framelights.empty();
+
     // Draw as triangle fan or wireframe for debugging
     if (r_wireframe)
     {
         glDisable(GL_TEXTURE_2D);
         glColor4f(1.0f, 1.0f, 0.0f, 1.0f); // Yellow wireframe
         glBegin(GL_LINES);
-        // Draw lines from center to each vertex
         for (int i = 0; i < numverts; i++)
         {
-            // Line from center (first vertex) to this vertex
             glVertex3f(vertices[0], vertices[1], vertices[2]);
             glVertex3f(vertices[i * 3 + 0], vertices[i * 3 + 1], vertices[i * 3 + 2]);
-            // Line to next vertex
             if (i < numverts - 1)
             {
                 glVertex3f(vertices[i * 3 + 0], vertices[i * 3 + 1], vertices[i * 3 + 2]);
@@ -1093,14 +1186,25 @@ void OGLRenderer::RenderGlSsecPolygon(
     }
     else
     {
-        // Use GL_POLYGON - OpenGL handles triangulation internally
+        // Per-vertex lighting: GL_SMOOTH interpolates between vertices so dynamic
+        // lights fade smoothly across face boundaries instead of snapping.
         glBegin(GL_POLYGON);
         for (int i = 0; i < numverts; i++)
         {
+            float vx = vertices[i * 3 + 0];
+            float vy = vertices[i * 3 + 1];
+            float fr = base, fg = base, fb = base;
+            if (dynActive)
+                AccumDynLight(vx, vy, height, fr, fg, fb);
+            if (fr > 1.0f) fr = 1.0f;
+            if (fg > 1.0f) fg = 1.0f;
+            if (fb > 1.0f) fb = 1.0f;
+            glColor4f(fr, fg, fb, 1.0f);
             glTexCoord2f(texcoords[i * 2 + 0], texcoords[i * 2 + 1]);
-            glVertex3f(vertices[i * 3 + 0], vertices[i * 3 + 1], vertices[i * 3 + 2]);
+            glVertex3f(vx, vy, vertices[i * 3 + 2]);
         }
         glEnd();
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
 #if 0
@@ -1155,10 +1259,24 @@ void OGLRenderer::RenderGLSubsector(int num)
     if (!s || segcount <= 0)
         return;
 
-    // Set up sector lighting.
-    GLfloat light = LightLevelToLum(s->lightlevel) / 255.0;
-    GLfloat lmodel_ambient[] = {light, light, light, 1.0};
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
+    // Distance fog: darker sectors have denser fog (shorter visible range).
+    // This is gated by cv_grstaticlighting so players can toggle it.
+    if (cv_grstaticlighting.value)
+    {
+        float light = (float)s->lightlevel / 255.0f;
+        GLfloat fogColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+        glEnable(GL_FOG);
+        glFogi(GL_FOG_MODE, GL_LINEAR);
+        glFogfv(GL_FOG_COLOR, fogColor);
+        float fogStart = light * 1600.0f;
+        float fogEnd   = fogStart + 800.0f;
+        glFogf(GL_FOG_START, fogStart);
+        glFogf(GL_FOG_END,   fogEnd);
+    }
+    else
+    {
+        glDisable(GL_FOG);
+    }
 
     // Draw ceiling texture, skip sky flats.
     fmat = s->ceilingpic;
@@ -1168,13 +1286,14 @@ void OGLRenderer::RenderGLSubsector(int num)
                             fmat,
                             false,
                             s->ceiling_xoffs.Float(),
-                            s->ceiling_yoffs.Float());
+                            s->ceiling_yoffs.Float(),
+                            s->lightlevel);
 
     // Then the floor.
     fmat = s->floorpic;
     if (fmat && !s->SkyFloor())
         RenderGlSsecPolygon(
-            ss, s->floorheight.Float(), fmat, true, s->floor_xoffs.Float(), s->floor_yoffs.Float());
+            ss, s->floorheight.Float(), fmat, true, s->floor_xoffs.Float(), s->floor_yoffs.Float(), s->lightlevel);
 
     // Draw the walls of this subsector.
     for (curseg = firstseg; curseg < firstseg + segcount; curseg++)
@@ -1187,9 +1306,9 @@ void OGLRenderer::RenderGLSubsector(int num)
 
         GLfloat textop, texbottom, texleft, texright;
         fmat = *ff->toppic;
-        RenderGlSsecPolygon(ss, ff->topheight->Float(), fmat, true);
+        RenderGlSsecPolygon(ss, ff->topheight->Float(), fmat, true, 0, 0, s->lightlevel);
         fmat = *ff->bottompic;
-        RenderGlSsecPolygon(ss, ff->bottomheight->Float(), fmat, false);
+        RenderGlSsecPolygon(ss, ff->bottomheight->Float(), fmat, false, 0, 0, s->lightlevel);
 
         // Draw "edges" of 3D floor.
 
@@ -1333,6 +1452,19 @@ void OGLRenderer::GetSegQuads(int num, quad &u, quad &m, quad &l) const
     ls_ceil = ls->ceilingheight.Float();
     ls_height = ls_ceil - ls_floor;
 
+    // Store front sector lightlevel for wall lighting
+    int ls_lightlevel = ls->lightlevel;
+
+    // Fake contrast: N/S-facing walls are brighter, E/W-facing walls are darker.
+    // Matches Doom's software renderer which uses line slope to vary brightness.
+    {
+        float dx = fabsf((s->v2->x - s->v1->x).Float());
+        float dy = fabsf((s->v2->y - s->v1->y).Float());
+        int lightdelta = (dy > dx) ? +18 : -18;
+        int adjusted = ls_lightlevel + lightdelta;
+        ls_lightlevel = adjusted < 0 ? 0 : adjusted > 255 ? 255 : adjusted;
+    }
+
     if (rsd)
     {
         rs = rsd->sector;
@@ -1385,6 +1517,7 @@ void OGLRenderer::GetSegQuads(int num, quad &u, quad &m, quad &l) const
                 u.t.r = texright / uppertex->worldwidth;
                 u.t.t = textop / uppertex->worldheight;
                 u.t.b = texbottom / uppertex->worldheight;
+                u.lightlevel = ls_lightlevel;
             }
         }
 
@@ -1408,6 +1541,7 @@ void OGLRenderer::GetSegQuads(int num, quad &u, quad &m, quad &l) const
             l.t.r = texright / lowertex->worldwidth;
             l.t.t = textop / lowertex->worldheight;
             l.t.b = texbottom / lowertex->worldheight;
+            l.lightlevel = ls_lightlevel;
         }
 
         // Double sided middle textures do not repeat, so we need some
@@ -1440,6 +1574,7 @@ void OGLRenderer::GetSegQuads(int num, quad &u, quad &m, quad &l) const
             m.t.r = texright / middletex->worldwidth;
             m.t.t = 0.0;
             m.t.b = 1.0;
+            m.lightlevel = ls_lightlevel;
         }
     }
     else if (middletex)
@@ -1462,6 +1597,7 @@ void OGLRenderer::GetSegQuads(int num, quad &u, quad &m, quad &l) const
         m.t.r = texright / middletex->worldwidth;
         m.t.t = textop / middletex->worldheight;
         m.t.b = texbottom / middletex->worldheight;
+        m.lightlevel = ls_lightlevel;
     }
 }
 
@@ -1486,7 +1622,7 @@ void OGLRenderer::RenderGLSeg(int num)
 
 void OGLRenderer::DrawSingleQuad(const quad *q) const
 {
-    DrawSingleQuad(q->m, q->v1, q->v2, q->bottom, q->top, q->t.l, q->t.r, q->t.t, q->t.b);
+    DrawSingleQuad(q->m, q->v1, q->v2, q->bottom, q->top, q->t.l, q->t.r, q->t.t, q->t.b, q->lightlevel);
 }
 
 /// Draw a single textured wall segment.
@@ -1498,12 +1634,10 @@ void OGLRenderer::DrawSingleQuad(Material *m,
                                  GLfloat texleft,
                                  GLfloat texright,
                                  GLfloat textop,
-                                 GLfloat texbottom) const
+                                 GLfloat texbottom,
+                                 int lightlevel) const
 {
     m->GLUse();
-
-    // Calculate surface normamp-> Should we account for degenerate
-    // linedefs?
 
     shader_attribs_t sa; // TEST
     sa.tangent[0] = (v2->x - v1->x).Float();
@@ -1517,18 +1651,29 @@ void OGLRenderer::DrawSingleQuad(Material *m,
         m->shader->SetAttributes(&sa);
     }
 
+    // Per-vertex lighting so dynamic lights blend smoothly at face boundaries.
+    float base = cv_grstaticlighting.value ? LightLevelToFloat(lightlevel) : 1.0f;
+    bool dynActive = cv_grdynamiclighting.value && !framelights.empty();
+    float x1 = v1->x.Float(), y1 = v1->y.Float();
+    float x2 = v2->x.Float(), y2 = v2->y.Float();
+
+    // Helper: compute clamped color at a world point and call glColor4f.
+    // Written inline to avoid a lambda (C++11 lambdas can't call non-const member fns easily here).
+#define VERT_COLOR(vx, vy, vz) \
+    { float fr = base, fg = base, fb = base; \
+      if (dynActive) AccumDynLight(vx, vy, vz, fr, fg, fb); \
+      if (fr > 1.0f) fr = 1.0f; if (fg > 1.0f) fg = 1.0f; if (fb > 1.0f) fb = 1.0f; \
+      glColor4f(fr, fg, fb, 1.0f); }
+
     glBegin(GL_QUADS);
-
-    glTexCoord2f(texleft, texbottom);
-    glVertex3f(v1->x.Float(), v1->y.Float(), lower);
-    glTexCoord2f(texright, texbottom);
-    glVertex3f(v2->x.Float(), v2->y.Float(), lower);
-    glTexCoord2f(texright, textop);
-    glVertex3f(v2->x.Float(), v2->y.Float(), upper);
-    glTexCoord2f(texleft, textop);
-    glVertex3f(v1->x.Float(), v1->y.Float(), upper);
-
+    VERT_COLOR(x1, y1, lower); glTexCoord2f(texleft,  texbottom); glVertex3f(x1, y1, lower);
+    VERT_COLOR(x2, y2, lower); glTexCoord2f(texright, texbottom); glVertex3f(x2, y2, lower);
+    VERT_COLOR(x2, y2, upper); glTexCoord2f(texright, textop);    glVertex3f(x2, y2, upper);
+    VERT_COLOR(x1, y1, upper); glTexCoord2f(texleft,  textop);    glVertex3f(x1, y1, upper);
     glEnd();
+
+#undef VERT_COLOR
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 // Draws the specified item (weapon, monster, flying rocket etc) in

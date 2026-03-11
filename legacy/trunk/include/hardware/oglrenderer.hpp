@@ -123,6 +123,14 @@ struct quad {
   vertex_t *v2;
   GLfloat bottom;
   GLfloat top;
+  int lightlevel;  // Sector light level for this quad
+};
+
+/// A single dynamic light valid for one rendered frame.
+struct FrameLight {
+  float x, y, z;     ///< World position
+  float r, g, b;     ///< Light color (0-1)
+  float radius;      ///< Attenuation radius in world units
 };
 
 /// \brief OpenGL renderer.
@@ -175,13 +183,18 @@ private:
 
   RGB_t *palette;  ///< Converting palette data to OGL colors.
 
+  // Dynamic lights collected at the start of each 3D frame.
+  std::vector<FrameLight> framelights;
+  void CollectDynamicLights(class Actor *pov);
+  void AccumDynLight(float px, float py, float pz, float &r, float &g, float &b) const;
+
   void RenderBSPNode(int nodenum); ///< Render level using BSP.
   void RenderGLSubsector(int num);
-  void RenderGlSsecPolygon(subsector_t *ss, GLfloat height, Material *tex, bool isFloor, GLfloat xoff=0.0, GLfloat yoff=0.0);
+  void RenderGlSsecPolygon(subsector_t *ss, GLfloat height, Material *tex, bool isFloor, GLfloat xoff=0.0, GLfloat yoff=0.0, int lightlevel=255);
   void RenderGLSeg(int num);
   void GetSegQuads(int num, quad &u, quad &m, quad &l) const;
   void RenderActors(subsector_t *ssec);
-  void DrawSingleQuad(Material *m, vertex_t *v1, vertex_t *v2, GLfloat lower, GLfloat upper, GLfloat texleft=0.0, GLfloat texright=1.0, GLfloat textop=0.0, GLfloat texbottom=1.0) const;
+  void DrawSingleQuad(Material *m, vertex_t *v1, vertex_t *v2, GLfloat lower, GLfloat upper, GLfloat texleft=0.0, GLfloat texright=1.0, GLfloat textop=0.0, GLfloat texbottom=1.0, int lightlevel=255) const;
   void DrawSingleQuad(const quad *q) const;
 
   void DrawSimpleSky();

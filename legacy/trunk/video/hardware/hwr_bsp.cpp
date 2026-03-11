@@ -39,6 +39,8 @@
 
 HWBsp::HWBsp(int size, int bspnum) : num_planepolys(size)
 {
+    CONS_Printf("HWBsp::HWBsp: Creating with size=%d, bspnum=%d\n", size, bspnum);
+    CONS_Printf("HWBsp::HWBsp: R.numvertexes=%d, R.numsubsectors=%d\n", R.numvertexes, R.numsubsectors);
     CONS_Printf("Generating subsector polygons... %d subsectors\n", size);
     con.Drawer();     // let the user know what we are doing
     I_FinishUpdate(); // page flip or blit buffer
@@ -501,6 +503,13 @@ Poly *HWBsp::CutOutSubsecPoly(seg_t *lseg, int count, Poly *poly)
     {
         // x, y, dx, dy (like a divline)
         line_t *line = lseg->linedef;
+
+        // Skip minisegs (segs without linedefs) - they don't define walls
+        if (!line)
+        {
+            continue;
+        }
+
         p1.x = (lseg->side ? line->v2->x : line->v1->x).Float();
         p1.y = (lseg->side ? line->v2->y : line->v1->y).Float();
         p2.x = (lseg->side ? line->v1->x : line->v2->x).Float();

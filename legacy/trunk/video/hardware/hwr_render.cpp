@@ -389,12 +389,17 @@ void HWRend::Setup(int bspnum)
 
     // TODO: reset lights, create static lightmaps, prepare texture cache,...
 
+    CONS_Printf("HWR PrepareLevel: about to create HWBsp with R.numsubsectors=%d, bspnum=%d\n",
+        R.numsubsectors, bspnum);
+
     if (bsp) // check for buggy compilers (TODO: remove this test if it's not necessary on all
              // supported plateform)
     {
         delete bsp;
     }
+    CONS_Printf("HWR PrepareLevel: creating HWBsp now...\n");
     bsp = new HWBsp(R.numsubsectors, bspnum); // initialize the data
+    CONS_Printf("HWR PrepareLevel: HWBsp created successfully\n");
 
     // TODO: see if we need a kind of HWR_PrepLevelCache
 
