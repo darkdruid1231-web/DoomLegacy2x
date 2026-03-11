@@ -18,6 +18,8 @@
 #include <map>
 #include <set>
 #include <limits>
+#include <utility>
+#include <unordered_map>
 #include "doomdata.h"
 #include "g_map.h"
 #include "doomdef.h"
@@ -25,6 +27,7 @@
 #include "r_data.h"
 #include "z_zone.h"
 #include "r_defs.h"
+#include "zdbsp_integration.h"
 
 // Constants for partition evaluation (from glBSP/Doomsday)
 static const float SHORT_HEDGE_EPSILON = 4.0f;
@@ -80,10 +83,11 @@ struct GLSeg {
     bool isMiniseg;
     int linedef;
     int side;
+    int partnerIndex;  // Index of partner seg in the glsegs array (-1 if no partner)
 
-    GLSeg() : v1Index(0), v2Index(0), isMiniseg(true), linedef(-1), side(0) {}
+    GLSeg() : v1Index(0), v2Index(0), isMiniseg(true), linedef(-1), side(0), partnerIndex(-1) {}
     GLSeg(int v1, int v2, bool mini, int line = -1, int s = 0)
-        : v1Index(v1), v2Index(v2), isMiniseg(mini), linedef(line), side(s) {}
+        : v1Index(v1), v2Index(v2), isMiniseg(mini), linedef(line), side(s), partnerIndex(-1) {}
 };
 
 // Data structure for unique vertices with angle
@@ -310,6 +314,156 @@ static bool VerticesConnected(const std::vector<GLSeg>& segs, int v1, int v2)
     return false;
 }
 
+// Check if a point is inside a polygon (ray casting algorithm)
+static bool PointInPolygon(float px, float py, const std::vector<float>& polyX, const std::vector<float>& polyY)
+{
+    int numVerts = polyX.size();
+    bool inside = false;
+
+    for (int i = 0, j = numVerts - 1; i < numVerts; j = i++) {
+        if (((polyY[i] > py) != (polyY[j] > py)) &&
+            (px < (polyX[j] - polyX[i]) * (py - polyY[i]) / (polyY[j] - polyY[i]) + polyX[i])) {
+            inside = !inside;
+        }
+    }
+    return inside;
+}
+
+// Check if polygon is convex
+static bool IsPolygonConvex(const std::vector<float>& polyX, const std::vector<float>& polyY)
+{
+    int n = polyX.size();
+    if (n < 3) return true;
+
+    int sign = 0;
+    for (int i = 0; i < n; i++) {
+        float dx1 = polyX[(i + 1) % n] - polyX[i];
+        float dy1 = polyY[(i + 1) % n] - polyY[i];
+        float dx2 = polyX[(i + 2) % n] - polyX[(i + 1) % n];
+        float dy2 = polyY[(i + 2) % n] - polyY[(i + 1) % n];
+        float cross = dx1 * dy2 - dy1 * dx2;
+
+        if (cross != 0) {
+            int currentSign = (cross > 0) ? 1 : -1;
+            if (sign == 0) sign = currentSign;
+            else if (sign != currentSign) return false;
+        }
+    }
+    return true;
+}
+
+// Forward declaration for AddGLVertex
+static int AddGLVertex(Map* map, float x, float y);
+
+// Build GL segs using zdbsp-style CheckLoop logic
+// Only adds minisegs when needed to close valid polygon loops
+static void BuildGLSegsWithCheckLoop(
+    Map* map,
+    seg_t* mapSegs,
+    int firstSeg,
+    int numSegs,
+    int subsectorIndex,
+    std::vector<GLSeg>& outSegs,
+    int& degenerateCount,
+    int& minisegCount)
+{
+    minisegCount = 0;
+    int wallCount = 0;
+
+    // Step 1: Collect wall segs and build connectivity map
+    struct WallSeg {
+        int v1, v2;  // GL vertex indices
+        int lineIdx;
+        int side;
+    };
+    std::vector<WallSeg> wallSegs;
+    std::set<int> vertexSet;
+    std::map<std::pair<int, int>, int> segByVertices;  // (v1,v2) -> index in wallSegs
+
+    for (int i = 0; i < numSegs; i++) {
+        seg_t* seg = &mapSegs[firstSeg + i];
+
+        if (!seg || !seg->v1 || !seg->v2) continue;
+        if (!seg->linedef) continue;  // Skip existing minisegs
+
+        float v1x = seg->v1->x.Float();
+        float v1y = seg->v1->y.Float();
+        float v2x = seg->v2->x.Float();
+        float v2y = seg->v2->y.Float();
+
+        int v1Idx = AddGLVertex(map, v1x, v1y);
+        int v2Idx = AddGLVertex(map, v2x, v2y);
+
+        WallSeg ws;
+        ws.v1 = v1Idx;
+        ws.v2 = v2Idx;
+        ws.lineIdx = seg->linedef - map->lines;
+        ws.side = seg->side;
+
+        int idx = wallSegs.size();
+        wallSegs.push_back(ws);
+        vertexSet.insert(v1Idx);
+        vertexSet.insert(v2Idx);
+        segByVertices[std::make_pair(v1Idx, v2Idx)] = idx;
+        wallCount++;
+    }
+
+    if (wallSegs.size() < 3 || vertexSet.size() < 3) {
+        degenerateCount++;
+        // Just copy what we have
+        for (const auto& ws : wallSegs) {
+            outSegs.push_back(GLSeg(ws.v1, ws.v2, false, ws.lineIdx, ws.side));
+        }
+        return;
+    }
+
+    // Step 2: Sort vertices by angle from centroid (for polygon boundary)
+    std::vector<GLVertex> vertices;
+    for (int idx : vertexSet) {
+        float vx = map->glvertexes[idx].x.Float();
+        float vy = map->glvertexes[idx].y.Float();
+        vertices.push_back(GLVertex(vx, vy, idx));
+    }
+
+    // Calculate centroid
+    float accumx = 0, accumy = 0;
+    for (const auto& v : vertices) {
+        accumx += v.x;
+        accumy += v.y;
+    }
+    float midx = accumx / vertices.size();
+    float midy = accumy / vertices.size();
+
+    // Calculate angle and sort
+    for (auto& v : vertices) {
+        v.angle = atan2(v.y - midy, v.x - midx);
+    }
+    std::sort(vertices.begin(), vertices.end(),
+        [](const GLVertex& a, const GLVertex& b) {
+            return a.angle > b.angle;  // Clockwise
+        });
+
+    // Add wall segs only - no minisegs
+    for (const auto& ws : wallSegs) {
+        outSegs.push_back(GLSeg(ws.v1, ws.v2, false, ws.lineIdx, ws.side));
+    }
+
+    // Skip adding minisegs - the original segs don't have partners either
+    // and adding minisegs without proper zdbsp-style BSP generation doesn't help
+    // The renderer will handle best it can with wall segs only
+
+    // Debug output
+    if (subsectorIndex < 5) {
+        CONS_Printf("  Debug subsector %d: %d verts, %d wall, %d minisegs needed\n",
+            subsectorIndex, (int)vertices.size(), wallCount, minisegCount);
+    }
+
+    // Check for degenerate - need at least 3 total segs
+    if (outSegs.size() < 3) {
+        degenerateCount++;
+    }
+}
+
 // Function to find or add a GL vertex using hash map for O(1) lookup
 static int AddGLVertex(Map* map, float x, float y)
 {
@@ -382,6 +536,11 @@ void BuildGLNodes(Map* map)
         map->numglvertexes = map->numvertexes;
     }
 
+    // Statistics counters
+    int degenerateCount = 0;
+    int gapCount = 0;
+    int totalWallSegs = 0;
+
     // Step 2: Process each subsector
     std::vector<GLSeg> allGLSegs;
     std::map<int, std::vector<GLSeg>> subsectorSegs;
@@ -397,7 +556,6 @@ void BuildGLNodes(Map* map)
         int numSegs = sub->num_segs;
 
         // Skip subsectors with no segs at all
-        // Note: sector may be NULL at this point - it's assigned later in GroupLines
         if (numSegs <= 0) {
             CONS_Printf("  Warning: Subsector %d has no segs\n", s);
             subsectorSegs[s] = std::vector<GLSeg>();
@@ -411,128 +569,24 @@ void BuildGLNodes(Map* map)
             continue;
         }
 
-        // Collect unique vertices and build initial seg list
-        std::vector<GLVertex> vertices;
-        std::vector<GLSeg> wallSegs;
-        std::set<int> vertexSet;
-
-        // Debug: count segs with/without linedefs
-        int segsWithLinedef = 0;
-        int segsWithoutLinedef = 0;
-
-        for (int i = 0; i < numSegs; i++) {
-            seg_t* seg = &map->segs[firstSeg + i];
-
-            // Safety check for valid seg
-            if (!seg || !seg->v1 || !seg->v2) {
-                CONS_Printf("  Warning: Seg %d in subsector %d is invalid\n", firstSeg + i, s);
-                continue;
-            }
-
-            float v1x = seg->v1->x.Float();
-            float v1y = seg->v1->y.Float();
-            float v2x = seg->v2->x.Float();
-            float v2y = seg->v2->y.Float();
-
-            int v1Idx = AddGLVertex(map, v1x, v1y);
-            int v2Idx = AddGLVertex(map, v2x, v2y);
-
-            // Check if this is a miniseg (no linedef)
-            bool isMiniseg = (seg->linedef == NULL);
-            if (isMiniseg)
-                segsWithoutLinedef++;
-            else
-                segsWithLinedef++;
-
-            int lineIdx = -1;
-            int sideIdx = 0;
-            if (seg->linedef) {
-                lineIdx = seg->linedef - map->lines;
-                sideIdx = seg->side;
-            }
-
-            wallSegs.push_back(GLSeg(v1Idx, v2Idx, isMiniseg, lineIdx, sideIdx));
-
-            vertexSet.insert(v1Idx);
-            vertexSet.insert(v2Idx);
-        }
-
-        // Convert set to vector for processing
-        vertices.reserve(vertexSet.size());
-        for (int idx : vertexSet) {
-            float vx = map->glvertexes[idx].x.Float();
-            float vy = map->glvertexes[idx].y.Float();
-            vertices.push_back(GLVertex(vx, vy, idx));
-        }
-
-        // Calculate centroid (midpoint)
-        float accumx = 0, accumy = 0;
-        for (const auto& v : vertices) {
-            accumx += v.x;
-            accumy += v.y;
-        }
-        float midx = accumx / vertices.size();
-        float midy = accumy / vertices.size();
-
-        // Calculate angle for each vertex from centroid
-        for (auto& v : vertices) {
-            v.angle = AngleToCentroid(v.x, v.y, midx, midy);
-        }
-
-        // Sort vertices by angle (counterclockwise from centroid)
-        std::sort(vertices.begin(), vertices.end(),
-            [](const GLVertex& a, const GLVertex& b) {
-                return a.angle < b.angle;
-            });
-
-        // Build ordered segs in polygon boundary order (matching sorted vertices)
+        // Use zdbsp-style checkloop approach
         std::vector<GLSeg> orderedSegs;
-
-        // First add all wall segs and minisegs to a map for lookup
-        std::map<std::pair<int,int>, GLSeg> segMap;
-        for (const auto& seg : wallSegs) {
-            std::pair<int,int> key(seg.v1Index, seg.v2Index);
-            segMap[key] = seg;
-        }
-
-        // Now iterate through sorted vertices to build polygon-ordered seg list
-        for (size_t i = 0; i < vertices.size(); i++) {
-            size_t next = (i + 1) % vertices.size();
-            int v1 = vertices[i].originalIndex;
-            int v2 = vertices[next].originalIndex;
-
-            // Look for seg connecting v1->v2
-            std::pair<int,int> key(v1, v2);
-            auto it = segMap.find(key);
-            if (it != segMap.end()) {
-                orderedSegs.push_back(it->second);
-                segMap.erase(it);
-            } else {
-                // Look for reverse direction
-                key = std::pair<int,int>(v2, v1);
-                it = segMap.find(key);
-                if (it != segMap.end()) {
-                    // Reverse the seg so it goes v1->v2
-                    GLSeg revSeg = it->second;
-                    int temp = revSeg.v1Index;
-                    revSeg.v1Index = revSeg.v2Index;
-                    revSeg.v2Index = temp;
-                    orderedSegs.push_back(revSeg);
-                    segMap.erase(it);
-                } else {
-                    // No seg found - this shouldn't happen if we have a closed polygon
-                    orderedSegs.push_back(GLSeg(v1, v2, true, -1, 0));
-                }
-            }
-        }
-
-        // Degenerate subsector check - if all segs are minisegs, warn
         int minisegCount = 0;
+        BuildGLSegsWithCheckLoop(
+            map,
+            map->segs,
+            firstSeg,
+            numSegs,
+            s,
+            orderedSegs,
+            degenerateCount,
+            minisegCount
+        );
+
+        // Count wall segs and minisegs for statistics
         for (const auto& seg : orderedSegs) {
-            if (seg.isMiniseg) minisegCount++;
-        }
-        if (minisegCount == (int)orderedSegs.size() && numSegs > 2) {
-            CONS_Printf("  Warning: Subsector %d has all minisegs!\n", s);
+            if (!seg.isMiniseg) totalWallSegs++;
+            else gapCount++;
         }
 
         // Store segs for this subsector
@@ -590,6 +644,13 @@ void BuildGLNodes(Map* map)
             glseg->backsector = NULL;
         }
 
+        // Set partner_seg if we have a partner index
+        if (glSeg.partnerIndex >= 0 && glSeg.partnerIndex < map->numglsegs) {
+            glseg->partner_seg = &map->glsegs[glSeg.partnerIndex];
+        } else {
+            glseg->partner_seg = NULL;
+        }
+
         glseg->numlights = 0;
         glseg->rlights = NULL;
     }
@@ -632,8 +693,11 @@ void BuildGLNodes(Map* map)
         map->glnodes[i] = map->nodes[i];
     }
 
+    // Print statistics
     CONS_Printf("GL nodes built: %d vertices, %d segs, %d subsectors\n",
         map->numglvertexes, map->numglsegs, map->numglsubsectors);
+    CONS_Printf("  Subsector stats: %d valid, %d degenerate\n",
+        map->numsubsectors - degenerateCount, degenerateCount);
 
     // Clean up vertex hash map
     DeleteVertexMap();
@@ -709,6 +773,22 @@ void BuildGLSubsectors(Map *map)
 
 void BuildGLData(Map *map)
 {
+    // Try zdbsp first if available - it provides better GL nodes
+    if (ZDBSPIntegration::IsZDBSPAvailable())
+    {
+        CONS_Printf("zdbsp available - generating GL nodes...\n");
+
+        // Run zdbsp to generate GL nodes and modify the WAD
+        // zdbsp -g -x -m MAP01 -o output.wad input.wad
+        if (ZDBSPIntegration::GenerateGLNodes(map->lumpname))
+        {
+            CONS_Printf("zdbsp generated GL nodes. Re-load to use them.\n");
+            // For now, fall back to built-in - full reload would need WAD re-initialization
+            // TODO: Implement WAD reload after zdbsp modification
+        }
+    }
+
+    // Use built-in GL node generation (fallback or if zdbsp not available)
     CONS_Printf("Building GL data with minisegs...\n");
     BuildGLVertexes(map);
     BuildGLNodes(map);

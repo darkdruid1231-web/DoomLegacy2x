@@ -1,5 +1,6 @@
 set(SRC_FILES
 gl_bsp.cpp
+zdbsp_integration.cpp
 g_game.cpp
 g_state.cpp
 g_demo.cpp

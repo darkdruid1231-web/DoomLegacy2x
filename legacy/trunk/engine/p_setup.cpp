@@ -54,6 +54,7 @@
 #include "p_spec.h"
 #include "tables.h"
 #include "gl_bsp.h"
+#include "zdbsp_integration.h"
 
 #include "i_sound.h" //for I_PlayCD()..
 
@@ -1649,6 +1650,26 @@ bool Map::Setup(tic_t start, bool spawnthings)
     if (gllump == -1)
     {
         CONS_Printf(" Map has no GL nodes.\n");
+
+        // Try zdbsp first if available and in OpenGL mode
+        // This generates GL nodes for ALL maps in the WAD at once
+        #if 1
+        if (rendermode == render_opengl && ZDBSPIntegration::IsZDBSPAvailable())
+        {
+            CONS_Printf(" Attempting to generate GL nodes with zdbsp...\n");
+            ZDBSPIntegration::CheckAndGenerateGLNodes();
+
+            // Re-check if GL nodes now exist
+            gllump = fc.FindNumForName(glname.c_str(), false);
+            if (gllump != -1 && gllump > lumpnum)
+            {
+                // Reload with zdbsp-generated nodes
+                gl_version = LoadGLVertexes(gllump + LUMP_GL_VERTEXES);
+                CONS_Printf(" Found v%d GL nodes from zdbsp!\n", gl_version);
+            }
+        }
+        #endif
+
         // Will build GL nodes dynamically after regular data is loaded
         gl_version = 5; // Use v5 format
     }
@@ -1723,6 +1744,10 @@ bool Map::Setup(tic_t start, bool spawnthings)
         LoadGLNodes(gllump + LUMP_GL_NODES, gl_version);
         LoadGLSegs(gllump + LUMP_GL_SEGS, gl_version);
         LoadGLVis(gllump + LUMP_GL_PVS);
+
+        // For prebuilt GL nodes: don't copy to main variables - keep them separate
+        // The renderer should use gl* versions directly
+        CONS_Printf(" Using GL nodes from WAD for rendering.\n");
     }
     else
     {
