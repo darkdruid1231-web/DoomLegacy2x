@@ -145,8 +145,18 @@ bool DActor::Morph(mobjtype_t form)
     if (pres)
         delete pres;
 
+    // Try to load 3D model, fall back to sprites if not found
     if (!info->modelname.empty())
-        pres = new modelpres_t(info->modelname.c_str());
+    {
+        modelpres_t *model = new modelpres_t(info->modelname.c_str());
+        if (model->IsModelLoaded())
+            pres = model;
+        else
+        {
+            delete model;
+            pres = new spritepres_t(info);
+        }
+    }
     else
         pres = new spritepres_t(info);
 

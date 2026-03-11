@@ -171,13 +171,55 @@ void I_FinishUpdate()
     if (rendermode == render_soft)
     {
 #ifdef SDL2
-        // In SDL2 software mode, copy the surface to the texture and render
+        // In SDL2 software mode, convert indexed surface to ARGB and render
         if (vidSurface && sdlRenderer && sdlTexture)
         {
-            SDL_UpdateTexture(sdlTexture, NULL, vidSurface->pixels, vidSurface->pitch);
+            // Lock surface if needed
+            if (SDL_MUSTLOCK(vidSurface) && vidSurface->locked == 0)
+                SDL_LockSurface(vidSurface);
+
+            // Get the surface pixels
+            Uint8 *srcPixels = (Uint8 *)vidSurface->pixels;
+            int pitch = vidSurface->pitch;
+
+            // We need to convert indexed8 to ARGB8888
+            // Create a temporary buffer for conversion if needed
+            static Uint32 *convertBuffer = NULL;
+            static int convertWidth = 0;
+            static int convertHeight = 0;
+
+            int width = vid.width;
+            int height = vid.height;
+
+            // Reallocate buffer if size changed
+            if (convertBuffer == NULL || convertWidth != width || convertHeight != height)
+            {
+                free(convertBuffer);
+                convertBuffer = (Uint32 *)malloc(width * height * sizeof(Uint32));
+                convertWidth = width;
+                convertHeight = height;
+            }
+
+            // Convert indexed to ARGB using the palette
+            for (int y = 0; y < height; y++)
+            {
+                Uint8 *srcRow = srcPixels + y * pitch;
+                Uint32 *dstRow = convertBuffer + y * width;
+                for (int x = 0; x < width; x++)
+                {
+                    Uint8 index = srcRow[x];
+                    SDL_Color col = localPalette[index];
+                    dstRow[x] = (col.a << 24) | (col.r << 16) | (col.g << 8) | col.b;
+                }
+            }
+
+            SDL_UpdateTexture(sdlTexture, NULL, convertBuffer, width * sizeof(Uint32));
             SDL_RenderClear(sdlRenderer);
             SDL_RenderCopy(sdlRenderer, sdlTexture, NULL, NULL);
             SDL_RenderPresent(sdlRenderer);
+
+            if (SDL_MUSTLOCK(vidSurface))
+                SDL_UnlockSurface(vidSurface);
         }
 #else
         /*

@@ -252,8 +252,19 @@ Pawn::Pawn(fixed_t x, fixed_t y, fixed_t z, int type) : Actor(x, y, z)
     attackphase = 0;
     attacker = NULL;
 
+    // Try to load 3D model, fall back to sprites if not found
     if (!info->modelname.empty())
-        pres = new modelpres_t(info->modelname.c_str());
+    {
+        modelpres_t *model = new modelpres_t(info->modelname.c_str());
+        if (model->IsModelLoaded())
+            pres = model;
+        else
+        {
+            // Model files not found, fall back to sprites
+            delete model;
+            pres = new spritepres_t(info, 0);
+        }
+    }
     else
         pres = new spritepres_t(info, 0);
 }

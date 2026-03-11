@@ -773,9 +773,18 @@ void PlayerInfo::LoadPawn()
     pawn = new PlayerPawn(*hubsavepawn);
     pawn->player = this;
 
-    // and a new presentation
+    // and a new presentation - try 3D model, fall back to sprites if not found
     if (!pawn->info->modelname.empty())
-        pawn->pres = new modelpres_t(pawn->info->modelname.c_str());
+    {
+        modelpres_t *model = new modelpres_t(pawn->info->modelname.c_str());
+        if (model->IsModelLoaded())
+            pawn->pres = model;
+        else
+        {
+            delete model;
+            pawn->pres = new spritepres_t(pawn->info, 0);
+        }
+    }
     else
         pawn->pres = new spritepres_t(pawn->info, 0);
 }

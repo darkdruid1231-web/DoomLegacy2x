@@ -804,8 +804,18 @@ int DActor::Marshal(LArchive &a)
         if (!(diff & MD_Z))
             pos.z = floorz;
 
+        // Try to load 3D model, fall back to sprites if not found
         if (!info->modelname.empty())
-            pres = new modelpres_t(info->modelname.c_str());
+        {
+            modelpres_t *model = new modelpres_t(info->modelname.c_str());
+            if (model->IsModelLoaded())
+                pres = model;
+            else
+            {
+                delete model;
+                pres = new spritepres_t(info, 0);
+            }
+        }
         else
             pres = new spritepres_t(info, 0);
 

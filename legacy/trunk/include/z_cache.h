@@ -40,6 +40,9 @@ class cacheitem_t
     cacheitem_t(const char *name);
     virtual ~cacheitem_t(){}; // TODO unnecessary virtualization???
 
+    /// Get the usefulness value (negative means it's a link placeholder)
+    int GetUsefulness() const { return usefulness; }
+
     inline void MakeLink()
     {
         usefulness = -usefulness - 1; // HACK negative usefulness marks them as links, -1 denotes
@@ -164,6 +167,12 @@ template <typename T> class cache_t
     bool Insert(T *t)
     {
         return source.Insert(t);
+    }
+
+    /// Returns the default item (used when requested item is not found)
+    T *GetDefaultItem() const
+    {
+        return default_item;
     }
 
     /// Returns true if the named data item exists in the cache, false otherwise.

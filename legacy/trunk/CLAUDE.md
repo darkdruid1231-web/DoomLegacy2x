@@ -8,7 +8,17 @@ Doom Legacy is a Doom/Doom II source port - a classic first-person shooter game 
 
 ## Building the Project
 
-### CMake (Primary build system)
+### Windows (MSYS2/MinGW64)
+
+```bash
+# Open MSYS2 MinGW64 shell
+cd legacy/trunk
+mkdir build && cd build
+cmake .. -G "MinGW Makefiles"
+/c/msys64/mingw64/bin/mingw32-make.exe -j4
+```
+
+### Linux / MSYS2 POSIX
 
 ```bash
 cd doomlegacy-svn/legacy/trunk
@@ -19,7 +29,17 @@ make -j4
 
 The build requires out-of-tree builds (CMake will error if you try in-tree).
 
+### Single-file compile (fast iteration)
+
+```bash
+# Recompile just one translation unit (e.g., during GL BSP work)
+make engine/CMakeFiles/engine.dir/gl_bsp.cpp.obj
+```
+
 ### Running Tests
+
+Some tests require a WAD file. Copy `doom.wad` or `doom2.wad` into the build
+directory, or symlink from `../../legacy_one/trunk/wads/`.
 
 ```bash
 cd build
@@ -92,10 +112,24 @@ The project has dual networking stacks:
 - `engine/ai_mobjinfo.cpp` - Monster definitions
 - `tests/` - Test suite (unit/ and integration/)
 
+## GL / BSP Rendering Notes
+
+Active development area. Key gotchas:
+- **GL_VERT flag**: Vertices from the GL node builder use the `0x8000` prefix
+  convention — mask with `& 0x7FFF` before indexing into `vertexes[]`
+- **Degenerate subsectors**: Subsectors with near-zero area must be skipped
+  in the renderer (already guarded in `gl_bsp.cpp`)
+- **glvertex allocation**: The GL vertex count is separate from the map vertex
+  count. Don't confuse `numvertexes` with `numglvertexes`.
+- **zdbsp_integration**: New wrapper (`engine/zdbsp_integration.cpp`) around
+  the FNodeBuilder class for in-process GL node generation
+- **hw_gbuffer**: New G-buffer abstraction in `video/hardware/hw_gbuffer.cpp`
+
 ## Dependencies
 
 - SDL + SDL_mixer
 - OpenGL
+- GLEW (OpenGL extension wrangler)
 - PNG / JPEG
 - TNL (The Nethernet)
 - ENet (optional, for lnet)

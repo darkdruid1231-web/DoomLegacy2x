@@ -1274,8 +1274,19 @@ DActor::DActor(fixed_t nx, fixed_t ny, fixed_t nz, const ActorInfo *ai) : Actor(
     else
         I_Error("Actor class %s is missing a spawnstate!\n", info->GetName());
 
+    // Try to load 3D model, fall back to sprites if not found
     if (!info->modelname.empty())
-        pres = new modelpres_t(info->modelname.c_str());
+    {
+        modelpres_t *model = new modelpres_t(info->modelname.c_str());
+        if (model->IsModelLoaded())
+            pres = model;
+        else
+        {
+            // Model files not found, fall back to sprites
+            delete model;
+            pres = new spritepres_t(info);
+        }
+    }
     else
         pres = new spritepres_t(info);
 }

@@ -275,6 +275,20 @@ class modelpres_t : public presentation_t
     modelpres_t(const char *mname, int col = 0, const char *skin = "default");
     virtual ~modelpres_t();
 
+    /// Check if model loaded successfully (not just a placeholder link or default_item)
+    bool IsModelLoaded() const
+    {
+        if (!mdl)
+            return false;
+        // Check if it's the default_item (fallback when model not found)
+        // If mdl points to default_item, the actual model wasn't found
+        if (mdl == models.GetDefaultItem())
+            return false;
+        // Check if it's a real model or just a link placeholder
+        // Links have negative usefulness
+        return mdl->GetUsefulness() >= 0;
+    }
+
     virtual void SetFrame(const state_t *st) {}; // do nothing
     virtual void SetAnim(animseq_e seq);
 
