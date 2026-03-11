@@ -22,6 +22,7 @@ hardware/oglrenderer.cpp
 hardware/md3.cpp
 hardware/oglshaders.cpp
 hardware/oglhelpers.cpp
+hardware/hw_gbuffer.cpp
 )
 
 add_library(video STATIC ${SRC_FILES})
@@ -31,5 +32,6 @@ target_link_libraries(video PUBLIC ${GLEW_LIBRARY} ${OPENGL_LIBRARIES} stdc++)
 target_include_directories(video PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include/hardware
     ${GLEW_INCLUDE_DIR}
 )
