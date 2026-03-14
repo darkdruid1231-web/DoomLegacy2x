@@ -30,7 +30,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Suppress warnings for legacy code
-add_compile_options(-fpermissive)
+add_compile_options(-fpermissive -w)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})

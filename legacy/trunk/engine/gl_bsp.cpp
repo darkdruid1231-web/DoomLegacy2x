@@ -664,22 +664,15 @@ void BuildGLNodes(Map* map)
         subsector_t* sub = &map->subsectors[s];
         subsector_t* glsub = &map->glsubsectors[s];
 
-        // Find sector from glsegs - look for first seg with a valid sector
-        glsub->sector = NULL;
-        const std::vector<GLSeg>& subSegs = subsectorSegs[s];
-        for (size_t i = 0; i < subSegs.size() && !glsub->sector; i++) {
-            const GLSeg& glSeg = subSegs[i];
-            if (glSeg.linedef >= 0 && glSeg.linedef < map->numlines) {
-                // Get the actual glseg to check its sector
-                seg_t* actualSeg = &map->glsegs[segOffset + i];
-                if (actualSeg->frontsector) {
-                    glsub->sector = actualSeg->frontsector;
-                }
-            }
-        }
+        // Use the regular BSP subsector's sector. The GL subsectors have the
+        // same count and 1:1 index mapping as the regular subsectors, so this
+        // is always correct. The old glseg-based search failed for subsectors
+        // composed entirely of minisegs (no linedef), leaving sector=NULL and
+        // causing those subsectors (and their actors) to be silently skipped.
+        glsub->sector = sub->sector;
 
         glsub->first_seg = segOffset;
-        glsub->num_segs = subSegs.size();
+        glsub->num_segs = subsectorSegs[s].size();
         glsub->splats = sub->splats;
         glsub->poly = sub->poly;
 

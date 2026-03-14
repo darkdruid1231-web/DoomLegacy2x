@@ -298,8 +298,7 @@ void GameInfo::Display()
             }
             else
             {
-                if (Menu::active)
-                    hud.RefreshStatusbar();
+                if (Menu::active) { hud.RefreshStatusbar(); R_DrawViewBorder(); refresh_viewborder = false; }
 
                 // see if the border needs to be updated to the screen
                 if (viewwidth != vid.width)
@@ -667,3 +666,5 @@ void GameInfo::Pause(bool on)
     else
         I_UngrabMouse();
 }
+
+

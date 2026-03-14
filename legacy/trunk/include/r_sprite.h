@@ -24,6 +24,7 @@
 #define r_sprite_h 1
 
 #include "doomtype.h"
+#include "info.h"
 #include "r_presentation.h"
 #include "z_cache.h"
 
@@ -99,6 +100,7 @@ class spritepres_t : public presentation_t
     virtual void Project(Actor *p);
     virtual bool Draw(const Actor *p);
     virtual spriteframe_t *GetFrame();
+    virtual int GetFrameFlags() { return state ? state->frame : 0; }
     virtual int Marshal(LArchive &a);
 
     /// Netcode

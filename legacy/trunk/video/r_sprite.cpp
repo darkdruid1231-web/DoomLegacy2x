@@ -800,17 +800,27 @@ bool spritepres_t::Update(int advance)
 
 spriteframe_t *spritepres_t::GetFrame()
 {
-    return &spr->spriteframes[state->frame && TFF_FRAMEMASK];
+    if (!spr)
+        return NULL; // No sprite loaded
+
+    int frame = state->frame & TFF_FRAMEMASK;
+    if (frame >= spr->numframes)
+    {
+        return NULL; // Invalid frame, reject like legacy_one does
+    }
+    return &spr->spriteframes[frame];
 }
 
 bool spritepres_t::Draw(const Actor *p)
 {
+    if (!spr)
+        return false;
+
     int frame = state->frame & TFF_FRAMEMASK;
 
     if (frame >= spr->numframes)
     {
         frame = spr->numframes - 1; // Thing may require more frames than the defaultsprite has...
-        // I_Error("spritepres_t::Project: invalid sprite frame %d (%d)\n", frame, spr->numframes);
     }
 
     spriteframe_t *sprframe = &spr->spriteframes[frame];
@@ -821,17 +831,16 @@ bool spritepres_t::Draw(const Actor *p)
     // decide which patch to use for sprite relative to player
     if (sprframe->rotate)
     {
-        // choose a different rotation based on player view
-        angle_t ang =
-            R_PointToAngle2(fixed_t(oglrenderer->x), fixed_t(oglrenderer->y), p->pos.x, p->pos.y);
-        unsigned rot = (ang - p->yaw + unsigned(ANG45 / 2) * 9) >> 29;
-
-        mat = sprframe->tex[rot];
-        flip = sprframe->flip[rot];
+        // Compute angle from camera to actor in Doom angle_t units.
+        float dx = p->pos.x.Float() - oglrenderer->x;
+        float dy = p->pos.y.Float() - oglrenderer->y;
+        angle_t ang = (angle_t)((double)atan2(dy, dx) * (0x80000000UL / M_PI));
+        unsigned int rot = (ang - p->yaw + (unsigned int)(ANG45 / 2) * 9) >> 29;
+        mat = sprframe->tex[rot & 7];
+        flip = sprframe->flip[rot & 7];
     }
     else
     {
-        // use single rotation for all views
         mat = sprframe->tex[0];
         flip = sprframe->flip[0];
     }

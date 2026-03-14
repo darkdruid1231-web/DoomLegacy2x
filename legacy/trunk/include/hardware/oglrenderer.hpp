@@ -124,6 +124,7 @@ struct quad {
   GLfloat bottom;
   GLfloat top;
   int lightlevel;  // Sector light level for this quad
+  float cmr, cmg, cmb;  // Sector colormap tint multipliers (1.0 = no tint)
 };
 
 /// A single dynamic light valid for one rendered frame.
@@ -188,13 +189,19 @@ private:
   void CollectDynamicLights(class Actor *pov);
   void AccumDynLight(float px, float py, float pz, float &r, float &g, float &b) const;
 
+  // Blob shadow system.
+  GLuint shadowTex;         ///< Circular gradient texture for blob shadows.
+  void InitShadowTexture();
+  void DrawBlobShadow(class Actor *thing) const;
+  void DrawAllBlobShadows() const;
+  void DrawAllCoronas() const;  ///< Draw additive corona halos at dynamic light positions.
+
   void RenderBSPNode(int nodenum); ///< Render level using BSP.
   void RenderGLSubsector(int num);
   void RenderGlSsecPolygon(subsector_t *ss, GLfloat height, Material *tex, bool isFloor, GLfloat xoff=0.0, GLfloat yoff=0.0, int lightlevel=255);
   void RenderGLSeg(int num);
   void GetSegQuads(int num, quad &u, quad &m, quad &l) const;
-  void RenderActors(subsector_t *ssec);
-  void DrawSingleQuad(Material *m, vertex_t *v1, vertex_t *v2, GLfloat lower, GLfloat upper, GLfloat texleft=0.0, GLfloat texright=1.0, GLfloat textop=0.0, GLfloat texbottom=1.0, int lightlevel=255) const;
+  void DrawSingleQuad(Material *m, vertex_t *v1, vertex_t *v2, GLfloat lower, GLfloat upper, GLfloat texleft=0.0, GLfloat texright=1.0, GLfloat textop=0.0, GLfloat texbottom=1.0, int lightlevel=255, float cmr=1.0f, float cmg=1.0f, float cmb=1.0f) const;
   void DrawSingleQuad(const quad *q) const;
 
   void DrawSimpleSky();

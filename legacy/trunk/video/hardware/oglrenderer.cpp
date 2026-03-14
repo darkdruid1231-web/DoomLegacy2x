@@ -68,6 +68,7 @@ inline int SDL_GetWindowHeight_wrapper(SDL_Window *w) { int width, height; SDL_G
 
 #include "am_map.h"
 #include "r_data.h"
+#include "r_draw.h"
 #include "r_main.h"
 #include "r_presentation.h"
 #include "r_sprite.h"
@@ -83,9 +84,13 @@ extern trace_t trace;
 
 void MD3_InitNormLookup();
 
-// CVar definition (declared extern in cvars.h; hwr_render.cpp is not compiled).
-// Initialize value=1 so lighting is active before Reg() is called.
+// CVar definitions (declared extern in cvars.h; hwr_render.cpp is not compiled).
+// Initialize value=1 so features are active before Reg() is called.
 consvar_t cv_grstaticlighting = {"gr_staticlighting", "On", CV_SAVE, CV_OnOff, NULL, 1};
+consvar_t cv_grshadows        = {"gr_shadows",        "On", CV_SAVE, CV_OnOff, NULL, 1};
+consvar_t cv_grcoronas        = {"gr_coronas",        "On", CV_SAVE, CV_OnOff, NULL, 1};
+consvar_t cv_grcoronasize     = {"gr_coronasize",    "1",   CV_SAVE, NULL, NULL, 1};
+consvar_t cv_monball_light    = {"monball_light",     "On", CV_SAVE, CV_OnOff, NULL, 1};
 
 /// Convert Doom light level (0-255) to OpenGL color component (0.0-1.0).
 /// Uses a non-linear curve below 192 to match the software renderer's dark look.
@@ -123,8 +128,38 @@ static const LightEmitterDef lightEmitterTable[] = {
 };
 static const int NUM_LIGHT_EMITTERS = sizeof(lightEmitterTable) / sizeof(lightEmitterTable[0]);
 
-/// Collect all dynamic lights for this frame: static decorative emitters
-/// plus a point light at the camera when the player fires (extralight).
+// ---------------------------------------------------------------------------
+// Sprite-based dynamic light table.
+// Maps projectile/effect sprite numbers to light properties.
+// Values ported from legacy_one/trunk/src/p_lights.c sprite_light[] table.
+// ---------------------------------------------------------------------------
+struct SpriteLightDef {
+    spritenum_t sprite;
+    float r, g, b;
+    float radius;
+};
+
+static const SpriteLightDef spriteLightTable[] = {
+    // Doom projectiles
+    { SPR_MISL, 0.97f, 0.97f, 0.13f, 120.0f },  // Rocket: yellow-white
+    { SPR_PLSS, 0.13f, 0.31f, 1.00f,  80.0f },  // Plasma shot: electric blue
+    { SPR_BFS1, 0.13f, 1.00f, 0.13f, 200.0f },  // BFG ball: green
+    { SPR_BAL1, 1.00f, 0.31f, 0.06f, 100.0f },  // Imp fireball: red-orange
+    { SPR_BAL2, 1.00f, 0.31f, 0.06f, 100.0f },  // Cacodemon fireball: red-orange
+    { SPR_FATB, 1.00f, 0.40f, 0.06f, 100.0f },  // Mancubus fireball: orange
+    { SPR_APLS, 0.13f, 0.31f, 1.00f,  80.0f },  // Arachnotron plasma: blue
+    { SPR_BAL7, 0.94f, 0.60f, 0.10f,  90.0f },  // Revenant tracer: orange-yellow
+    // Doom explosions / impact flashes (larger radius)
+    { SPR_BFE1, 0.13f, 1.00f, 0.13f, 300.0f },  // BFG explosion: bright green
+    { SPR_BFE2, 0.13f, 1.00f, 0.13f, 200.0f },  // BFG secondary flash: green
+    { SPR_PLSE, 0.13f, 0.31f, 1.00f, 100.0f },  // Plasma impact: blue
+    { SPR_APBX, 0.13f, 0.31f, 1.00f, 100.0f },  // Arachnotron impact: blue
+    { SPR_FBXP, 1.00f, 0.60f, 0.10f, 200.0f },  // Fireball explosion: orange
+};
+static const int NUM_SPRITE_LIGHTS = sizeof(spriteLightTable) / sizeof(spriteLightTable[0]);
+
+/// Collect all dynamic lights for this frame: static decorative emitters,
+/// sprite-based projectile lights, and a point light at the camera when firing.
 void OGLRenderer::CollectDynamicLights(Actor *pov)
 {
     framelights.clear();
@@ -142,7 +177,7 @@ void OGLRenderer::CollectDynamicLights(Actor *pov)
         framelights.push_back(fl);
     }
 
-    // Walk every sector's thing list for static light emitters.
+    // Walk every sector's thing list for static emitters and projectile lights.
     for (int i = 0; i < mp->numsectors; i++)
     {
         sector_t *sec = &mp->sectors[i];
@@ -151,6 +186,9 @@ void OGLRenderer::CollectDynamicLights(Actor *pov)
             DActor *da = dynamic_cast<DActor *>(th);
             if (!da)
                 continue;
+
+            // --- Static decorative emitters ---
+            bool handled = false;
             for (int j = 0; j < NUM_LIGHT_EMITTERS; j++)
             {
                 if (da->type == lightEmitterTable[j].type)
@@ -158,11 +196,40 @@ void OGLRenderer::CollectDynamicLights(Actor *pov)
                     FrameLight fl;
                     fl.x = da->pos.x.Float();
                     fl.y = da->pos.y.Float();
-                    fl.z = da->pos.z.Float() + 32.0f;  // mid-height approx.
+                    fl.z = da->pos.z.Float() + 32.0f;
                     fl.r = lightEmitterTable[j].r;
                     fl.g = lightEmitterTable[j].g;
                     fl.b = lightEmitterTable[j].b;
                     fl.radius = lightEmitterTable[j].radius;
+                    framelights.push_back(fl);
+                    handled = true;
+                    break;
+                }
+            }
+            if (handled)
+                continue;
+
+            // --- Sprite-based lights (projectiles and explosions) ---
+            // Any actor whose current sprite matches the table emits light.
+            // Gated by cv_monball_light so players can disable it (legacy_one parity).
+            if (!cv_monball_light.value)
+                continue;
+            if (!da->state)
+                continue;
+            spritenum_t spr = da->state->sprite;
+            for (int j = 0; j < NUM_SPRITE_LIGHTS; j++)
+            {
+                if (spr == spriteLightTable[j].sprite)
+                {
+                    FrameLight fl;
+                    fl.x = da->pos.x.Float();
+                    fl.y = da->pos.y.Float();
+                    // Vertical center of actor.
+                    fl.z = (da->pos.z + (da->height >> 1)).Float();
+                    fl.r = spriteLightTable[j].r;
+                    fl.g = spriteLightTable[j].g;
+                    fl.b = spriteLightTable[j].b;
+                    fl.radius = spriteLightTable[j].radius;
                     framelights.push_back(fl);
                     break;
                 }
@@ -188,6 +255,177 @@ void OGLRenderer::AccumDynLight(float px, float py, float pz,
         g += fl.g * atten;
         b += fl.b * atten;
     }
+}
+
+// ---------------------------------------------------------------------------
+// Blob shadow system (Phase 4)
+// ---------------------------------------------------------------------------
+
+/// Build a 64×64 circular gradient texture used for all blob shadows.
+/// Alpha is highest at the centre, zero at the edges.  Called once from InitGLState.
+void OGLRenderer::InitShadowTexture()
+{
+    const int SIZE = 64;
+    unsigned char data[SIZE * SIZE * 4];
+    const float cx = SIZE * 0.5f, cy = SIZE * 0.5f;
+    const float maxDist = SIZE * 0.5f;
+
+    for (int y = 0; y < SIZE; y++)
+    {
+        for (int x = 0; x < SIZE; x++)
+        {
+            float dx = x - cx, dy = y - cy;
+            float dist = sqrtf(dx*dx + dy*dy);
+            float a = 1.0f - dist / maxDist;
+            if (a < 0.0f) a = 0.0f;
+            a = a * a;  // quadratic falloff — softer edge
+            int i = (y * SIZE + x) * 4;
+            data[i+0] = 0;
+            data[i+1] = 0;
+            data[i+2] = 0;
+            data[i+3] = (unsigned char)(a * 200);  // peak alpha ~78%
+        }
+    }
+
+    glGenTextures(1, &shadowTex);
+    glBindTexture(GL_TEXTURE_2D, shadowTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, SIZE, SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+}
+
+/// Draw a blob shadow on the floor under `thing`.
+/// Only monsters and players cast shadows (Doom64 style — items do not).
+/// The shadow fades as the actor rises above the floor, giving a height cue.
+void OGLRenderer::DrawBlobShadow(Actor *thing) const
+{
+    if (!shadowTex)
+        return;
+
+    // Skip projectiles, out-of-sector actors, and invisible actors.
+    if (thing->flags & (MF_MISSILE | MF_NOSECTOR))
+        return;
+
+    // Only monsters and players cast shadows — items and decorations do not.
+    bool isMonster = (thing->flags & MF_COUNTKILL) != 0;
+    bool isPlayer  = (dynamic_cast<const PlayerPawn *>(thing) != NULL);
+    if (!isMonster && !isPlayer)
+        return;
+
+    float floorZ      = thing->floorz.Float();
+    float actorZ      = thing->pos.z.Float();
+    float heightAbove = actorZ - floorZ;
+
+    // Fade and shrink as the actor rises (full at floor, gone at 192 units up).
+    float fade = 1.0f - heightAbove / 192.0f;
+    if (fade <= 0.0f) return;
+    if (fade > 1.0f)  fade = 1.0f;
+
+    // Shadow radius matches the actor's collision footprint exactly (1:1).
+    float shadowRadius = thing->radius.Float() * fade;
+    if (shadowRadius < 4.0f)
+        return;
+
+    float ax = thing->pos.x.Float();
+    float ay = thing->pos.y.Float();
+    float az = floorZ + 0.5f;  // just above the floor to avoid z-fighting
+
+    glBindTexture(GL_TEXTURE_2D, shadowTex);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_ALPHA_TEST);   // gradient would be clipped at alpha < 0.5
+    glDepthMask(GL_FALSE);      // read depth but don't write it
+
+    glColor4f(0.0f, 0.0f, 0.0f, fade);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(ax - shadowRadius, ay - shadowRadius, az);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(ax + shadowRadius, ay - shadowRadius, az);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(ax + shadowRadius, ay + shadowRadius, az);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(ax - shadowRadius, ay + shadowRadius, az);
+    glEnd();
+}
+
+/// Draw blob shadows for every actor in the map in a single pass after all
+/// floor geometry has been rendered.  The depth test clips each shadow quad
+/// to whichever floor faces it overlaps, so shadows span subsector boundaries.
+void OGLRenderer::DrawAllBlobShadows() const
+{
+    if (!mp || !shadowTex)
+        return;
+
+    // Set up shadow state once for the whole pass.
+    glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);     // ≤ so the shadow sits on the floor surface
+
+    for (int i = 0; i < mp->numsectors; i++)
+    {
+        sector_t *sec = &mp->sectors[i];
+        for (Actor *th = sec->thinglist; th; th = th->snext)
+            if (!(th->flags2 & MF2_DONTDRAW))
+                DrawBlobShadow(th);
+    }
+
+    glPopAttrib();
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+}
+
+/// Draw additive corona halos at each dynamic light position.
+/// Coronas use the same circular gradient texture as blob shadows but are
+/// rendered with additive blending so they glow on top of the scene.
+/// Camera-aligned billboard quads are built from the modelview matrix.
+void OGLRenderer::DrawAllCoronas() const
+{
+    if (framelights.empty() || !shadowTex)
+        return;
+
+    // Extract camera right and up vectors from the current modelview matrix.
+    // In OpenGL's column-major layout the first row of the 3x3 rotation
+    // sub-matrix lives at mv[0], mv[4], mv[8] (right) and
+    // mv[1], mv[5], mv[9] (up).
+    GLfloat mv[16];
+    glGetFloatv(GL_MODELVIEW_MATRIX, mv);
+    float rx = mv[0], ry = mv[4], rz = mv[8];
+    float ux = mv[1], uy = mv[5], uz = mv[9];
+
+    // Corona scale: integer 1–10, where 1 = default size.
+    float coronaScale = (float)cv_grcoronasize.value;
+    if (coronaScale <= 0.0f) coronaScale = 1.0f;
+
+    glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, shadowTex);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);   // additive — glow on top of geometry
+    glDepthMask(GL_FALSE);               // don't write to depth buffer
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    glDisable(GL_ALPHA_TEST);
+
+    for (size_t i = 0; i < framelights.size(); i++)
+    {
+        const FrameLight &fl = framelights[i];
+        // Corona size is proportional to light radius, scaled by the CVar.
+        float size = fl.radius * 0.15f * coronaScale;
+
+        float lx = fl.x, ly = fl.y, lz = fl.z;
+
+        // Build a camera-facing quad centered at the light position.
+        glColor4f(fl.r, fl.g, fl.b, 0.5f);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0,0); glVertex3f(lx - rx*size - ux*size, ly - ry*size - uy*size, lz - rz*size - uz*size);
+        glTexCoord2f(1,0); glVertex3f(lx + rx*size - ux*size, ly + ry*size - uy*size, lz + rz*size - uz*size);
+        glTexCoord2f(1,1); glVertex3f(lx + rx*size + ux*size, ly + ry*size + uy*size, lz + rz*size + uz*size);
+        glTexCoord2f(0,1); glVertex3f(lx - rx*size + ux*size, ly - ry*size + uy*size, lz - rz*size + uz*size);
+        glEnd();
+    }
+
+    glPopAttrib();
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 // Debug: wireframe mode for diagnosing floor/ceiling issues
@@ -235,6 +473,7 @@ OGLRenderer::OGLRenderer()
     glversion = 0;
     screen = NULL;
     curssec = NULL;
+    shadowTex = 0;
 
     palette = static_cast<RGB_t *>(fc.CacheLumpName("PLAYPAL", PU_STATIC));
 
@@ -299,9 +538,16 @@ void OGLRenderer::InitGLState()
     // other debugging stuff
     glLineWidth(3.0);
 
-    // Register lighting CVars so they can be toggled via the console.
-    // value=1 is already set in the definition, so lighting works even before this.
+    // Register lighting/shadow CVars so they can be toggled via the console.
+    // value=1 is already set in the definitions, so features work even before this.
     cv_grstaticlighting.Reg();
+    cv_grshadows.Reg();
+    cv_grcoronas.Reg();
+    cv_grcoronasize.Reg();
+    cv_monball_light.Reg();
+
+    // Build the blob shadow texture.
+    InitShadowTexture();
 }
 
 /// Clean up stuffage so we can start drawing a new frame.
@@ -971,6 +1217,29 @@ void OGLRenderer::Render3DView(Actor *pov)
     // Build frustum and we are ready to render.
     CalculateFrustum();
     RenderBSPNode(mp->numnodes - 1);
+
+    // Draw all actors via thinker list. This is more reliable than
+    // per-subsector sector-thinglist traversal, which misses actors in
+    // sectors that the BSP renderer doesn't visit (e.g. live moving monsters).
+    for (Thinker *th = mp->thinkercap.Next(); th != &mp->thinkercap; th = th->Next())
+    {
+        Actor *a = th->Inherits<Actor>();
+        if (!a || !a->pres) continue;
+        if (a->flags2 & MF2_DONTDRAW) continue;
+        glDisable(GL_CULL_FACE);
+        a->pres->Draw(a);
+        glEnable(GL_CULL_FACE);
+    }
+
+    // Draw all blob shadows in one final pass after all floor geometry is in
+    // the framebuffer.  The depth test clips each shadow quad to every floor
+    // face it overlaps, so shadows cross subsector boundaries correctly.
+    if (cv_grshadows.value)
+        DrawAllBlobShadows();
+
+    // Draw corona halos at dynamic light positions (additive glow over geometry).
+    if (cv_grcoronas.value && cv_grdynamiclighting.value)
+        DrawAllCoronas();
 }
 
 void OGLRenderer::DrawPSprites(PlayerPawn *p)
@@ -1164,6 +1433,25 @@ void OGLRenderer::RenderGlSsecPolygon(
     float base = cv_grstaticlighting.value ? LightLevelToFloat(lightlevel) : 1.0f;
     bool dynActive = cv_grdynamiclighting.value && !framelights.empty();
 
+    // Sector colormap tint (Boom/Hexen per-sector colored lighting).
+    // The rgba field is packed as R+(G<<8)+(B<<16)+(alpha<<24) where alpha
+    // is 0-25.  We lerp from white (no tint) toward the tint color.
+    float cmr = 1.0f, cmg = 1.0f, cmb = 1.0f;
+    {
+        fadetable_t *ec = ss->sector->extra_colormap;
+        if (ec && ec->rgba != 0)
+        {
+            float tr = ((ec->rgba      ) & 0xff) / 255.0f;
+            float tg = ((ec->rgba >> 8 ) & 0xff) / 255.0f;
+            float tb = ((ec->rgba >> 16) & 0xff) / 255.0f;
+            float ta = ((ec->rgba >> 24) & 0xff) / 25.0f;
+            if (ta > 1.0f) ta = 1.0f;
+            cmr = 1.0f + ta * (tr - 1.0f);
+            cmg = 1.0f + ta * (tg - 1.0f);
+            cmb = 1.0f + ta * (tb - 1.0f);
+        }
+    }
+
     // Draw as triangle fan or wireframe for debugging
     if (r_wireframe)
     {
@@ -1193,7 +1481,7 @@ void OGLRenderer::RenderGlSsecPolygon(
         {
             float vx = vertices[i * 3 + 0];
             float vy = vertices[i * 3 + 1];
-            float fr = base, fg = base, fb = base;
+            float fr = base * cmr, fg = base * cmg, fb = base * cmb;
             if (dynActive)
                 AccumDynLight(vx, vy, height, fr, fg, fb);
             if (fr > 1.0f) fr = 1.0f;
@@ -1361,37 +1649,6 @@ void OGLRenderer::RenderGLSubsector(int num)
         }
     }
 
-    // finally the actors
-    RenderActors(ss);
-}
-
-void OGLRenderer::RenderActors(subsector_t *ssec)
-{
-    sector_t *sec = ssec->sector;
-
-    /*
-    if (!sec->numlights)
-      {
-        if (sec->heightsec == -1)
-          lightlevel = sec->lightlevel;
-
-        int lightnum = (lightlevel >> LIGHTSEGSHIFT)+extralight;
-
-        if (lightnum < 0)
-          spritelights = scalelight[0];
-        else if (lightnum >= LIGHTLEVELS)
-          spritelights = scalelight[LIGHTLEVELS-1];
-        else
-          spritelights = scalelight[lightnum];
-      }
-    */
-
-    // Handle all things in this subsector.
-    for (Actor *thing = sec->thinglist; thing; thing = thing->snext)
-        if (!(thing->flags2 & MF2_DONTDRAW) && thing->pres)
-        {
-            thing->pres->Draw(thing); // does both sprites and 3d models
-        }
 }
 
 /// Calculates the necessary numbers to render upper, middle, and
@@ -1431,6 +1688,10 @@ void OGLRenderer::GetSegQuads(int num, quad &u, quad &m, quad &l) const
 
     u.v1 = m.v1 = l.v1 = s->v1;
     u.v2 = m.v2 = l.v2 = s->v2;
+    // Default: no colormap tint
+    u.cmr = u.cmg = u.cmb = 1.0f;
+    m.cmr = m.cmg = m.cmb = 1.0f;
+    l.cmr = l.cmg = l.cmb = 1.0f;
 
     if (s->side == 0)
     {
@@ -1451,6 +1712,22 @@ void OGLRenderer::GetSegQuads(int num, quad &u, quad &m, quad &l) const
     ls_floor = ls->floorheight.Float();
     ls_ceil = ls->ceilingheight.Float();
     ls_height = ls_ceil - ls_floor;
+
+    // Compute colormap tint from front sector's extra_colormap.
+    {
+        fadetable_t *ec = ls->extra_colormap;
+        if (ec && ec->rgba != 0)
+        {
+            float tr = ((ec->rgba      ) & 0xff) / 255.0f;
+            float tg = ((ec->rgba >> 8 ) & 0xff) / 255.0f;
+            float tb = ((ec->rgba >> 16) & 0xff) / 255.0f;
+            float ta = ((ec->rgba >> 24) & 0xff) / 25.0f;
+            if (ta > 1.0f) ta = 1.0f;
+            u.cmr = m.cmr = l.cmr = 1.0f + ta * (tr - 1.0f);
+            u.cmg = m.cmg = l.cmg = 1.0f + ta * (tg - 1.0f);
+            u.cmb = m.cmb = l.cmb = 1.0f + ta * (tb - 1.0f);
+        }
+    }
 
     // Store front sector lightlevel for wall lighting
     int ls_lightlevel = ls->lightlevel;
@@ -1622,7 +1899,8 @@ void OGLRenderer::RenderGLSeg(int num)
 
 void OGLRenderer::DrawSingleQuad(const quad *q) const
 {
-    DrawSingleQuad(q->m, q->v1, q->v2, q->bottom, q->top, q->t.l, q->t.r, q->t.t, q->t.b, q->lightlevel);
+    DrawSingleQuad(q->m, q->v1, q->v2, q->bottom, q->top, q->t.l, q->t.r, q->t.t, q->t.b, q->lightlevel,
+                   q->cmr, q->cmg, q->cmb);
 }
 
 /// Draw a single textured wall segment.
@@ -1635,7 +1913,10 @@ void OGLRenderer::DrawSingleQuad(Material *m,
                                  GLfloat texright,
                                  GLfloat textop,
                                  GLfloat texbottom,
-                                 int lightlevel) const
+                                 int lightlevel,
+                                 float cmr,
+                                 float cmg,
+                                 float cmb) const
 {
     m->GLUse();
 
@@ -1658,9 +1939,10 @@ void OGLRenderer::DrawSingleQuad(Material *m,
     float x2 = v2->x.Float(), y2 = v2->y.Float();
 
     // Helper: compute clamped color at a world point and call glColor4f.
+    // cmr/cmg/cmb are sector colormap tint multipliers (1.0 = no tint).
     // Written inline to avoid a lambda (C++11 lambdas can't call non-const member fns easily here).
 #define VERT_COLOR(vx, vy, vz) \
-    { float fr = base, fg = base, fb = base; \
+    { float fr = base * cmr, fg = base * cmg, fb = base * cmb; \
       if (dynActive) AccumDynLight(vx, vy, vz, fr, fg, fb); \
       if (fr > 1.0f) fr = 1.0f; if (fg > 1.0f) fg = 1.0f; if (fb > 1.0f) fb = 1.0f; \
       glColor4f(fr, fg, fb, 1.0f); }
@@ -1713,10 +1995,14 @@ void OGLRenderer::DrawSpriteItem(const vec_t<fixed_t> &pos, Material *mat, int f
     left = mat->leftoffs;
     right = left - mat->worldwidth;
 
-    // top = mat->worldheight; bottom = 0; // HACK, too high
-    top = mat->topoffs; // this is correct but causes the sprite to penetrate the floor, hence the
-                        // depth test trick
+    top = mat->topoffs;
     bottom = top - mat->worldheight;
+
+    // If the sprite extends below the actor's origin (floor level), lift it up
+    // so its bottom edge sits exactly on the floor instead of clipping through it.
+    float zoffset = (bottom < 0) ? -bottom : 0.0f;
+    top += zoffset;
+    bottom = 0.0f;
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
