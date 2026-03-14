@@ -73,13 +73,14 @@ void test_acs_constants()
 {
     TEST("ACS_WORLD_VARS equals 64");
     ASSERT_EQ(64, ACS_WORLD_VARS, "World vars count");
+    PASS();
 
     TEST("ACS_LOCAL_VARS equals 10");
     ASSERT_EQ(10, ACS_LOCAL_VARS, "Local vars count");
+    PASS();
 
     TEST("ACS_STACKSIZE equals 32");
     ASSERT_EQ(32, ACS_STACKSIZE, "Stack size");
-
     PASS();
 }
 
@@ -107,25 +108,30 @@ void test_acs_script_state_enum()
 
     TEST("ACS_stopped state equals 0");
     ASSERT_EQ(0, ACS_stopped, "ACS_stopped = 0");
+    PASS();
 
     TEST("ACS_running state equals 1");
     ASSERT_EQ(1, ACS_running, "ACS_running = 1");
+    PASS();
 
     TEST("ACS_suspended state equals 2");
     ASSERT_EQ(2, ACS_suspended, "ACS_suspended = 2");
+    PASS();
 
     TEST("ACS_waitforscript state equals 3");
     ASSERT_EQ(3, ACS_waitforscript, "ACS_waitforscript = 3");
+    PASS();
 
     TEST("ACS_waitfortag state equals 4");
     ASSERT_EQ(4, ACS_waitfortag, "ACS_waitfortag = 4");
+    PASS();
 
     TEST("ACS_waitforpoly state equals 5");
     ASSERT_EQ(5, ACS_waitforpoly, "ACS_waitforpoly = 5");
+    PASS();
 
     TEST("ACS_terminating state equals 6");
     ASSERT_EQ(6, ACS_terminating, "ACS_terminating = 6");
-
     PASS();
 }
 
@@ -331,7 +337,7 @@ void test_acs_bitwise_operations()
     ASSERT_EQ(0x3F, a ^ b, "Bitwise XOR");
 
     // Bitwise NOT
-    ASSERT_EQ(0xF0, ~a, "Bitwise NOT");
+    ASSERT_EQ((Uint8)0xF0, (Uint8)~a, "Bitwise NOT");
 
     // Left shift
     ASSERT_EQ(0x1E, a << 1, "Left shift");

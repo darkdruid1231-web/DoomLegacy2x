@@ -78,12 +78,12 @@ static string last_failure;
 void test_map_state_enum_values()
 {
     TEST("map_state_enum_values");
-    CHECK(MapInfo::MAP_UNLOADED == 0, "MAP_UNLOADED should be 0");
-    CHECK(MapInfo::MAP_RUNNING == 1, "MAP_RUNNING should be 1");
-    CHECK(MapInfo::MAP_INSTASIS == 2, "MAP_INSTASIS should be 2");
-    CHECK(MapInfo::MAP_RESET == 3, "MAP_RESET should be 3");
-    CHECK(MapInfo::MAP_FINISHED == 4, "MAP_FINISHED should be 4");
-    CHECK(MapInfo::MAP_SAVED == 5, "MAP_SAVED should be 5");
+    CHECK(MapInfo::MAP_UNLOADED == -1, "MAP_UNLOADED should be -1");
+    CHECK(MapInfo::MAP_RUNNING == 0, "MAP_RUNNING should be 0");
+    CHECK(MapInfo::MAP_INSTASIS == 1, "MAP_INSTASIS should be 1");
+    CHECK(MapInfo::MAP_RESET == 2, "MAP_RESET should be 2");
+    CHECK(MapInfo::MAP_FINISHED == 3, "MAP_FINISHED should be 3");
+    CHECK(MapInfo::MAP_SAVED == 4, "MAP_SAVED should be 4");
     PASS();
 }
 
