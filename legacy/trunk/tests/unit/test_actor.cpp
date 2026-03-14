@@ -283,6 +283,52 @@ void test_playerpawn_stepup_structure()
     PASS();
 }
 
+/// Verify the exact flag values used by the thinker-list actor render filter
+/// in Render3DView() (video/hardware/oglrenderer.cpp).
+///
+/// The filter is:
+///   Actor *a = th->Inherits<Actor>();
+///   if (!a || !a->pres) continue;
+///   if (a->flags2 & MF2_DONTDRAW) continue;   // skip invisible actors
+///
+/// MF_MONSTER / MF_COUNTKILL used to distinguish live monsters (previously
+/// rendered via sector-thinglist, now rendered via thinker-list pass).
+/// MF_CORPSE distinguishes dead monsters.
+///
+/// If any of these values change, the render filter silently breaks.
+void test_actor_render_filter_flags()
+{
+    TEST("MF_COUNTKILL = 0x00200000 (live monsters rendered by thinker pass)");
+    ASSERT_EQ(0x00200000, MF_COUNTKILL, "MF_COUNTKILL value changed");
+    PASS();
+
+    TEST("MF_SPECIAL = 0x00800000 (items — must not match monster filter)");
+    ASSERT_EQ(0x00800000, MF_SPECIAL, "MF_SPECIAL value changed");
+    PASS();
+
+    TEST("MF_CORPSE = 0x04000000 (dead monsters)");
+    ASSERT_EQ(0x04000000, MF_CORPSE, "MF_CORPSE value changed");
+    PASS();
+
+    TEST("MF_MONSTER = 0x08000000 (live monsters)");
+    ASSERT_EQ(0x08000000, MF_MONSTER, "MF_MONSTER value changed");
+    PASS();
+
+    TEST("MF2_DONTDRAW = 0x02000000 (invisible actors — must be filtered out)");
+    ASSERT_EQ(0x02000000, MF2_DONTDRAW, "MF2_DONTDRAW value changed");
+    PASS();
+
+    // Sanity: item flags must not accidentally match monster flags.
+    TEST("MF_SPECIAL and MF_COUNTKILL are distinct (items != monsters)");
+    ASSERT_EQ(0, (int)(MF_SPECIAL & MF_COUNTKILL), "item and monster flags must not overlap");
+    PASS();
+
+    // Sanity: live monster and corpse flags are distinct.
+    TEST("MF_MONSTER and MF_CORPSE are distinct (live != dead)");
+    ASSERT_EQ(0, (int)(MF_MONSTER & MF_CORPSE), "monster and corpse flags must not overlap");
+    PASS();
+}
+
 int main()
 {
     std::cout << "=== Actor Tests ===" << std::endl;
@@ -307,6 +353,7 @@ int main()
     test_actor_telefog_height();
     test_actor_footclip_size();
     test_playerpawn_stepup_structure();
+    test_actor_render_filter_flags();
 
     std::cout << std::endl;
     std::cout << "Results: " << tests_passed << "/" << tests_run << " tests passed" << std::endl;

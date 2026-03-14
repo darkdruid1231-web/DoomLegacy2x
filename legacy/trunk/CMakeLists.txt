@@ -2,8 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(doomlegacy C CXX)
 
-# Disable tests for now to avoid Catch2 issues
-option(BUILD_TESTING "Build tests" OFF)
+option(BUILD_TESTING "Build tests" ON)
 
 # Global include directories
 include_directories(
@@ -174,3 +173,9 @@ target_link_libraries(doomlegacy PRIVATE
 # Workaround for multiple definition errors with dummy Shader classes
 # The Shader/ShaderProg classes are compiled in both video and grammars with NO_SHADERS
 target_link_options(doomlegacy PRIVATE "-Wl,--allow-multiple-definition")
+
+# Tests — added after all include dirs and libraries are resolved.
+if(BUILD_TESTING)
+    enable_testing()
+    add_subdirectory(tests)
+endif()

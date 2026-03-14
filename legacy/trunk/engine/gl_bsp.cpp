@@ -11,6 +11,7 @@
 // - Partition evaluation for BSP building (future use)
 //-----------------------------------------------------------------------------
 
+#include <assert.h>
 #include <string.h>
 #include <math.h>
 #include <algorithm>
@@ -658,6 +659,11 @@ void BuildGLNodes(Map* map)
     // Step 4: Create glsubsectors
     map->glsubsectors = (subsector_t*)Z_Malloc(map->numsubsectors * sizeof(subsector_t), PU_LEVEL, 0);
     map->numglsubsectors = map->numsubsectors;
+
+    // Invariant: glsubsectors and subsectors are 1:1 parallel arrays.
+    // The thinker-list actor renderer relies on glsubsectors[i].sector == subsectors[i].sector.
+    // If this fires, something has broken the parallel allocation above.
+    assert(map->numglsubsectors == map->numsubsectors);
 
     int segOffset = 0;
     for (int s = 0; s < map->numsubsectors; s++) {
