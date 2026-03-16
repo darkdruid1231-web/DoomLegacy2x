@@ -2333,17 +2333,17 @@ static void M_OpenGLOption(int choice)
 }
 
 static menuitem_t VideoOptions_MI[] = {
-    menuitem_t(IT_HEADER, NULL, "DISPLAY", 0),
+    menuitem_t(IT_HEADER, NULL, "DISPLAY"),
     menuitem_t(IT_LINK, NULL, "Video modes...", &VidModeDef, 0),
     menuitem_t(IT_CVAR_DROPDOWN, NULL, "Display Mode", &cv_fullscreen, 0),
     menuitem_t(IT_CVAR_DROPDOWN, NULL, "Aspect Ratio", &cv_aspectratio, 0),
     menuitem_t(IT_CVAR_DROPDOWN, NULL, "VSync", &cv_vsync, 0),
     menuitem_t(IT_CVAR_DROPDOWN, NULL, "FPS Limit", &cv_fpslimit, 0),
-    menuitem_t(IT_HEADER, NULL, "IMAGE", 0),
+    menuitem_t(IT_HEADER, NULL, "IMAGE"),
     menuitem_t(IT_CV_SLIDER | IT_STRING, NULL, "Brightness", &cv_video_gamma, 0),
     menuitem_t(IT_CV_SLIDER | IT_STRING, NULL, "Screen size", &cv_viewsize, 0),
     menuitem_t(IT_CVAR, NULL, "Scale status bar", &cv_scalestatusbar, 0),
-    menuitem_t(IT_HEADER, NULL, "EFFECTS", 0),
+    menuitem_t(IT_HEADER, NULL, "EFFECTS"),
     menuitem_t(IT_CVAR, NULL, "Translucency", &cv_translucency, 0),
     menuitem_t(IT_CVAR, NULL, "Splats", &cv_splats, 0),
     menuitem_t(IT_CVAR, NULL, "Bloodtime", &cv_bloodtime, 0),
