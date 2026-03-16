@@ -424,7 +424,9 @@ void GameInfo::SV_SetServerState(bool open)
         net->SV_Open(false);
         netgame = multiplayer = true;
     }
-    // TODO else net->SV_Close()
+    // NOTE: net->SV_Close() is not called here because the implementation is stubbed out.
+    // When SV_Close() is properly implemented in n_interface.cpp it should be called in this
+    // else-branch to release the server port on normal game-end.
 }
 
 /// starts or restarts the game. assumes that we have set up the clustermap.
@@ -548,6 +550,7 @@ void Command_Listserv_f()
 
 void Command_Clear_f();
 void Command_Bind_f();
+void Command_Autoload_f();
 
 void Command_SaveConfig_f();
 void Command_LoadConfig_f();
@@ -663,6 +666,7 @@ void SV_Init()
     COM.AddCommand("playdemo", Command_Playdemo_f);
     COM.AddCommand("stopdemo", Command_Stopdemo_f);
     COM.AddCommand("addfile", Command_Addfile_f);
+    COM.AddCommand("autoload", Command_Autoload_f);
     COM.AddCommand("kick", Command_Kick_f);
     COM.AddCommand("kill", Command_Kill_f);
 
@@ -734,6 +738,5 @@ void SV_Init()
     // add chat macro consvars
     HU_HackChatmacros();
 
-    R_ServerInit(); // even server needs to know the texture heights etc.
     InitNetwork();
 }

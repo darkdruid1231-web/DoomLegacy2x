@@ -383,7 +383,7 @@ void Command_Addfile_f() // TODO
         return;
     }
     /*
-        // here check if file exist !!!
+        // here check if file exist !!!</parameter>
         if( !findfile(MAPNAME,NULL,false) )
           {
         CONS_Printf("\2File %s' not found\n",MAPNAME);
@@ -392,6 +392,19 @@ void Command_Addfile_f() // TODO
     */
 
     // P_AddWadFile(COM.Argv(1), NULL);
+}
+
+// Autoload command for config files
+void Command_Autoload_f()
+{
+    if (COM.Argc() != 2)
+    {
+        CONS_Printf("autoload <filename> : add file to autoload list\n");
+        return;
+    }
+
+    extern void D_AddAutoloadFile(const char *file);
+    D_AddAutoloadFile(COM.Argv(1));
 }
 
 /// Initialize a new game using a MAPINFO lump

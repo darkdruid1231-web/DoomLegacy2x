@@ -25,11 +25,17 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#ifdef SDL2
+#include <SDL2/SDL.h>
+#endif
+
 #include "command.h"
 #include "console.h"
 
 #include "d_event.h"
+#include "doomdef.h"
 #include "g_game.h"
+#include "g_input.h"
 
 #include "i_sound.h"
 #include "i_system.h"
@@ -91,6 +97,60 @@ enum gamemission_t
 
 static gamemission_t mission = gmi_doom2;
 
+// Autoload functionality
+#define MAX_AUTOLOAD_FILES 32
+static char *autoload_files[MAX_AUTOLOAD_FILES];
+static int num_autoload_files = 0;
+static bool autoload_frozen = false; // true once file cache is built; ignores further autoload cmds
+
+// Add a file to the autoload list (called from sv_cmds.cpp via extern declaration)
+void D_AddAutoloadFile(const char *file)
+{
+    if (autoload_frozen)
+    {
+        CONS_Printf("autoload: '%s' ignored (file cache already built)\n", file);
+        return;
+    }
+
+    if (num_autoload_files >= MAX_AUTOLOAD_FILES)
+    {
+        CONS_Printf("Too many autoload files (max %d)\n", MAX_AUTOLOAD_FILES);
+        return;
+    }
+
+    char *newfile = (char *)malloc(strlen(file) + 1);
+    strcpy(newfile, file);
+    autoload_files[num_autoload_files++] = newfile;
+}
+
+// Resolve path variables like $PROGDIR
+static char *D_ResolveAutoloadPath(const char *path)
+{
+    static char resolved_path[1024];
+
+    if (path[0] == '$')
+    {
+        if (!strncmp(path, "$PROGDIR", 8))
+        {
+            // Get the directory where the executable is located
+#ifdef SDL2
+            char *basepath = SDL_GetBasePath();
+            snprintf(resolved_path, sizeof(resolved_path), "%s%s",
+                     basepath ? basepath : "", path + 8);
+            if (basepath)
+                SDL_free(basepath);
+#else
+            snprintf(resolved_path, sizeof(resolved_path), "%s", path + 8);
+#endif
+            return resolved_path;
+        }
+        // Add other path variables here if needed
+    }
+
+    // No variable to resolve, return as-is
+    return (char *)path;
+}
+
 // Helper function: start a new game
 void BeginGame(int episode, int skill, bool public_server)
 {
@@ -111,6 +171,12 @@ void BeginGame(int episode, int skill, bool public_server)
 event_t events[MAXEVENTS];
 int eventhead = 0;
 int eventtail = 0;
+
+// FPS limiter CVar
+static CV_PossibleValue_t fpslimit_cons_t[] = {
+    {0,"Uncapped"},{35,"35"},{60,"60"},{120,"120"},{144,"144"},{240,"240"},{0,NULL}
+};
+consvar_t cv_fpslimit = {"fpslimit","0", CV_SAVE, fpslimit_cons_t, NULL};
 
 bool shiftdown = false, altdown = false;
 
@@ -136,6 +202,16 @@ void D_ProcessEvents()
             con.Responder(ev); // dedicated server only has a console interface
         else
         {
+            // Console toggle key always wins — even over open menus
+            if (ev->type == ev_keydown)
+            {
+                int key = ev->data1;
+                if (key == commoncontrols[gk_console][0] || key == commoncontrols[gk_console][1])
+                {
+                    con.Toggle();
+                    continue;
+                }
+            }
             // Menu input
             if (Menu::Responder(ev))
                 continue; // menu ate the event
@@ -161,6 +237,10 @@ void D_DoomLoop()
     // main game loop
     while (1)
     {
+#ifdef SDL2
+        Uint32 frame_start = SDL_GetTicks();
+#endif
+
         // How much time has elapsed?
         tic_t now = I_GetTics();
         tic_t elapsed = now - oldtics;
@@ -207,6 +287,17 @@ void D_DoomLoop()
 #ifdef HW3SOUND
         HW3S_EndFrameUpdate();
 #endif
+
+#ifdef SDL2
+        // FPS limiter: sleep remainder of the frame budget if a cap is set
+        if (cv_fpslimit.value > 0)
+        {
+            Uint32 target_ms = 1000 / (Uint32)cv_fpslimit.value;
+            Uint32 elapsed_ms = SDL_GetTicks() - frame_start;
+            if (elapsed_ms < target_ms)
+                SDL_Delay(target_ms - elapsed_ms);
+        }
+#endif
     }
 }
 
@@ -218,6 +309,8 @@ static char *startupwadfiles[MAX_WADFILES];
 static void D_AddFile(const char *file)
 {
     static int i = 0;
+
+    CONS_Printf(" D_AddFile: queuing '%s'\n", file);
 
     if (i >= MAX_WADFILES)
         return;
@@ -283,11 +376,38 @@ static void D_IdentifyVersion()
     if (M_CheckParm("-iwad"))
     {
         const char *s = M_GetNextParm();
+        const char *found_path = NULL;
 
-        if (!fc.Access(s))
+        // First try the path as specified
+        if (fc.Access(s))
+        {
+            found_path = s;
+        }
+        else
+        {
+            // If not found, try relative to the executable directory
+#ifdef SDL2
+            char *basepath = SDL_GetBasePath();
+            if (basepath)
+            {
+                static char exe_path[1024];
+                // Build path: basepath + "/" + filename
+                strcpy(exe_path, basepath);
+                strcat(exe_path, "/");
+                strcat(exe_path, s);
+                if (fc.Access(exe_path))
+                {
+                    found_path = exe_path;
+                }
+                SDL_free(basepath);
+            }
+#endif
+        }
+
+        if (!found_path)
             I_Error("IWAD %s not found!\n", s);
 
-        D_AddFile(s);
+        D_AddFile(found_path);
 
         // point to start of filename only
         s = FIL_StripPath(s);
@@ -516,11 +636,39 @@ bool D_DoomMain()
     D_SetPaths();
 
     // external Legacy data file (load it before iwad!)
-    D_AddFile("legacy.wad");
+    // Make it optional - if it doesn't exist, continue without it
+    if (fc.Access("legacy.wad"))
+        D_AddFile("legacy.wad");
 
     // identify the main IWAD file to use (if any),
     // set game.mode, mission accordingly
     D_IdentifyVersion();
+
+    // Early config loading for autoload support
+    //------------------------------------- CONFIG.CFG (after IWAD identification)
+    // We need to load config after IWAD but before file cache init
+    {
+        // command buffer (needed for config loading)
+        COM.Init();
+
+        // system-specific stuff (needed for some config vars)
+        I_SysInit();
+
+        // generate a couple of lookup tables (needed before SV_Init)
+        GenerateTables();
+
+        // Server init (registers autoload command; R_ServerInit moved to after file cache)
+        SV_Init();
+
+        // NOTE: CL_Init is intentionally NOT called here.
+        // CL_Init calls vid.Startup/R_Init/con.Init which all require the file cache.
+        // It is called after fc.InitMultipleFiles below.
+
+        // Load config early to collect autoload entries.
+        // Client CVars (video, input, etc.) are not yet registered, so they
+        // will be applied on the second M_FirstLoadConfig call below.
+        M_FirstLoadConfig(); // WARNING : this does a "COM_BufExecute()"
+    }
 
     // game title
     const char *Titles[] = {//"No game mode chosen.",
@@ -544,15 +692,33 @@ bool D_DoomMain()
         CONS_Printf("Development mode on.\n");
 
     // add any files specified on the command line with -file to the wad list
-    if (M_CheckParm("-file"))
+    // Support multiple -file flags: -file a.pk3 -file b.pk3
+    CONS_Printf("Scanning %d argv for -file flags\n", myargc);
+    for (int p = 1; p < myargc; p++)
     {
-        // the parms after p are wadfile/lump names,
-        // until end of parms or another - preceded parm
-        while (M_IsNextParm())
-            D_AddFile(M_GetNextParm());
+        CONS_Printf(" argv[%d] = '%s'\n", p, myargv[p]);
+        if (!strcasecmp(myargv[p], "-file"))
+        {
+            for (p++; p < myargc && myargv[p][0] != '-' && myargv[p][0] != '+'; p++)
+                D_AddFile(myargv[p]);
+            p--; // outer loop will increment again
+        }
     }
 
-    //========================== start subsystem initializations ==========================
+    // Load autoload files into startup list (before file cache initialization)
+    for (int i = 0; i < num_autoload_files; i++)
+    {
+        char *resolved_path = D_ResolveAutoloadPath(autoload_files[i]);
+        CONS_Printf("Autoloading %s\n", resolved_path);
+        D_AddFile(resolved_path);
+        free(autoload_files[i]);
+    }
+    num_autoload_files = 0;
+    // Freeze autoload list: the file cache is about to be built.
+    // Any autoload commands from the second M_FirstLoadConfig call will be ignored.
+    autoload_frozen = true;
+
+    //========================== continue subsystem initializations ==========================
 
     // memory management
     Z_Init();
@@ -561,34 +727,29 @@ bool D_DoomMain()
     if (!fc.InitMultipleFiles(startupwadfiles))
         I_Error("A WAD file was not found\n");
 
-    // see that legacy.wad version matches program version
-    if (!M_CheckParm("-noversioncheck"))
+    // see that legacy.wad version matches program version (only if legacy.wad was loaded)
+    if (!M_CheckParm("-noversioncheck") && fc.FindNumForName("VERSION", true) != -1)
         D_CheckWadVersion();
 
-    // command buffer
-    COM.Init();
+    // Initialize renderer data (textures, sprites) now that the file cache is ready.
+    // R_ServerInit was removed from SV_Init because SV_Init is called early (before
+    // the file cache) to register CVars for config loading.
+    extern void R_ServerInit();
+    R_ServerInit();
 
-    // system-specific stuff
-    I_SysInit();
-
-    // generate a couple of lookup tables
-    GenerateTables();
-
-    // Server init
-    SV_Init();
-
-    // Client init
+    // Now that the file cache is ready, initialize the client subsystems.
+    // This was intentionally omitted from the early block above.
     if (!game.dedicated)
         CL_Init();
+
+    // Second config load: all CVars (including client CVars from CL_Init) are now
+    // registered, so saved video/input/sound settings are properly applied.
+    // autoload commands are silently ignored this time (autoload_frozen = true).
+    M_FirstLoadConfig();
 
     // Convert old static game data structures into dynamic ones.
     // DEHACKED patches etc. must be applied before this.
     PrepareGameData();
-
-    // all consvars are now registered
-    //------------------------------------- CONFIG.CFG
-    // loads and executes config file
-    M_FirstLoadConfig(); // WARNING : this does a "COM_BufExecute()"
 
     if (!game.dedicated)
     {
@@ -689,6 +850,9 @@ bool D_DoomMain()
 
     // end of loading screen: CONS_Printf() will no more call FinishUpdate()
     con.refresh = false;
+    // Always close the startup full-screen console; the -warp/autostart path skips StartIntro()
+    // which normally does this. Safe to call even when StartIntro() already closed it (idempotent).
+    con.Toggle(true);
     vid.SetMode(); // change video mode if needed, recalculate...
     return true;
 }
