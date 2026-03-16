@@ -409,6 +409,7 @@ class Material : public cacheitem_t
         /// To be called after bitmap size and scale are known
         inline void InitializeTexRef()
         {
+            if (!t) return;
             worldwidth = t->width / xscale;
             worldheight = t->height / yscale;
         }
@@ -418,7 +419,20 @@ class Material : public cacheitem_t
     };
 
     std::vector<TextureRef> tex; ///< allow several textures per material
+    // tex slot conventions:
+    //  0 = diffuse
+    //  1 = normal map
+    //  2 = metallic
+    //  3 = roughness
+    //  4 = ambient occlusion
+    //  5 = specular
+    //  6 = brightmap
+    //  7 = displacement / height
+
     class ShaderProg *shader;
+    float glossiness;    ///< Specular shininess scalar (from GLDEFS, default 1.0)
+    float specularlevel; ///< Specular intensity scalar (from GLDEFS, default 1.0)
+    std::string shader_lump; ///< Path to .fp material processor snippet (from GLDEFS)
 
     void InitializeMaterial()
     {
@@ -511,6 +525,7 @@ class material_cache_t
     std::vector<Material *> all_materials;
     typedef std::vector<Material *>::iterator material_iterator_t;
 
+
     /// Inserts the Material into the all_materials vector and gives it a corresponding id.
     inline void Register(Material *m)
     {
@@ -550,6 +565,9 @@ class material_cache_t
     }
 
   public:
+    /// Read-only access to all materials for external systems (e.g. shader compiler).
+    const std::vector<Material *> &GetAllMaterials() const { return all_materials; }
+
     material_cache_t();
     ~material_cache_t();
 
@@ -584,6 +602,11 @@ class material_cache_t
 
     /// Reads the TEXTUREn/PNAMES lumps and F_START lists, generates the corresponding Materials.
     int ReadTextures();
+
+    /// Assigns prog as the shader for every Material that has tex.size() >= 2 and no shader yet.
+    void AssignNormalMapShader(class ShaderProg *prog);
+    void ClearAllShaders(); ///< Set shader=NULL on every material (call before GL context destroy).
+    void ReadGLDEFS(); ///< Parse GLDEFS lumps and attach PBR maps + scalars to materials.
 };
 
 extern material_cache_t materials;

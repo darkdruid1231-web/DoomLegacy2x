@@ -61,8 +61,11 @@ static CV_PossibleValue_t scr_depth_cons_t[] = {
 consvar_t cv_scr_width = {"scr_width", "320", CV_SAVE, CV_Unsigned};
 consvar_t cv_scr_height = {"scr_height", "200", CV_SAVE, CV_Unsigned};
 consvar_t cv_scr_depth = {"scr_depth", "16 bits", CV_SAVE, scr_depth_cons_t};
+// 0=Windowed, 1=Fullscreen, 2=Borderless. Old configs with "Yes"→1 and "No"→0 load correctly.
+static CV_PossibleValue_t displaymode_cons_t[] = {
+    {0,"Windowed"}, {1,"Fullscreen"}, {2,"Borderless"}, {0,NULL}};
 consvar_t cv_fullscreen = {
-    "fullscreen", "Yes", CV_SAVE | CV_CALL | CV_NOINIT, CV_YesNo, CV_Fullscreen_OnChange};
+    "fullscreen", "Fullscreen", CV_SAVE | CV_CALL | CV_NOINIT, displaymode_cons_t, CV_Fullscreen_OnChange};
 
 // Are invisible things translucent or fuzzy?
 consvar_t cv_fuzzymode = {"fuzzymode", "Off", CV_SAVE | CV_CALL, CV_OnOff, CV_Fuzzymode_OnChange};

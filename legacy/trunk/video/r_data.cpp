@@ -734,6 +734,8 @@ Material::Material(const char *name) : cacheitem_t(name)
 {
     id_number = -1;
     shader = NULL;
+    glossiness = 1.0f;
+    specularlevel = 1.0f;
     // The rest are taken care of by InitializeMaterial() later when Textures have been attached.
 }
 
@@ -742,6 +744,8 @@ Material::Material(const char *name, Texture *t, float xs, float ys) : cacheitem
 {
     id_number = -1;
     shader = NULL;
+    glossiness = 1.0f;
+    specularlevel = 1.0f;
 
     tex.resize(1);
     tex[0].t = t;
@@ -759,7 +763,7 @@ Material::~Material()
 {
     int n = tex.size(); // number of texture units
     for (int i = 0; i < n; i++)
-        tex[i].t->Release();
+        if (tex[i].t) tex[i].t->Release();
 }
 
 Material::TextureRef::TextureRef()
@@ -790,20 +794,36 @@ void Material::TextureRef::GLSetTextureParams()
 
 int Material::GLUse()
 {
+    // Bind textures BEFORE activating the shader.
+    // gluBuild2DMipmaps (called on first GLPrepare) resets GL_CURRENT_PROGRAM to 0,
+    // so we must activate the shader after all texture uploads are done.
+    int n = tex.size(); // number of texture units
+    for (int i = 0; i < n; i++)
+    {
+        if (!tex[i].t)
+        {
+            if (shader && i >= 1) BindPBRNeutral(i); // neutral for empty slot (1=flat normal, 2-7=PBR)
+            continue;
+        }
+        glActiveTexture(GL_TEXTURE0 + i); // activate correct texture unit
+        tex[i].GLSetTextureParams();      // and set its parameters (may trigger texture upload)
+    }
+    // Bind neutrals for any PBR slots beyond what this material defines
+    if (shader)
+        for (int i = n; i <= 7; i++)
+            BindPBRNeutral(i);
+
+    if (n > 1)
+        glActiveTexture(GL_TEXTURE0); // restore default unit
+
     if (shader)
     {
         shader->Use();
         shader->SetUniforms();
+        shader->SetPerMaterialUniforms(glossiness, specularlevel);
     }
     else
         ShaderProg::DisableShaders();
-
-    int n = tex.size(); // number of texture units
-    for (int i = 0; i < n; i++)
-    {
-        glActiveTexture(GL_TEXTURE0 + i); // activate correct texture unit
-        tex[i].GLSetTextureParams();      // and set its parameters
-    }
 
     return n;
 }
@@ -860,7 +880,7 @@ void material_cache_t::ClearGLTextures()
         {
             int n = m->tex.size();
             for (int k = 0; k < n; k++)
-                if (m->tex[k].t->ClearGLTexture())
+                if (m->tex[k].t && m->tex[k].t->ClearGLTexture())
                     count++;
         }
     }
@@ -920,9 +940,34 @@ Material *material_cache_t::BuildMaterial(Texture *t, cachesource_t<Material> &s
     if (!t)
         return NULL;
 
+    string name = t->GetName(); // char* won't do since we may change the Texture's name
+
+    if (h_start) // H_START / hires replacement: must find an existing original first
+    {
+        // Check BEFORE inserting — if this source has no original, leave the
+        // texture untouched so subsequent calls with other sources can try.
+        Material *m = source.Find(name.c_str());
+        if (!m)
+            return NULL;
+
+        // Original found — now commit the texture into the cache and replace.
+        if (textures.Exists(name.c_str()))
+            t->SetName((name + "_xxx").c_str());
+        if (!textures.Insert(t))
+            CONS_Printf("Error: Overlapping Texture names '%s'!\n", t->GetName());
+
+        // Take over the original, scale so that worldsize stays the same.
+        Material::TextureRef &r = m->tex[0];
+        r.t->Release();
+        t->AddRef();
+        r.t = t;
+        r.xscale = t->width / r.worldwidth;
+        r.yscale = t->height / r.worldheight;
+        return m;
+    }
+    // Normal (non-hires) case: insert texture, then create or replace material.
     // insert Texture into cache, change name if it is already taken (HACK for namespace overlaps,
     // just a few)
-    string name = t->GetName(); // char* won't do since we may change the Texture's name
     if (textures.Exists(name.c_str()))
     {
         CONS_Printf("Overlap in Texture names '%s'!\n", name.c_str());
@@ -935,42 +980,23 @@ Material *material_cache_t::BuildMaterial(Texture *t, cachesource_t<Material> &s
     // see if we already have a Material with this name
     Material *m = source.Find(name.c_str());
 
-    if (h_start) // H_START blocks work a bit differently
+    if (!m)
     {
-        if (!m)
-            return NULL; // no original with same name, ignore
-
-        // take over the original, scale so that worldsize stays the same
-        Material::TextureRef &r = m->tex[0];
-
-        // replace Texture
-        r.t->Release();
-        t->AddRef();
-        r.t = t;
-        r.xscale = t->width / r.worldwidth;
-        r.yscale = t->height / r.worldheight;
+        m = new Material(name.c_str(), t); // create a new Material
+        source.Insert(m);
+        Register(m);
     }
     else
     {
-        // normal material
-        if (!m)
-        {
-            m = new Material(name.c_str(), t); // create a new Material
-            source.Insert(m);
-            Register(m);
-        }
-        else
-        {
-            // replace Texture in an existing Material (assume it has just one)
-            Material::TextureRef &r = m->tex[0];
+        // replace Texture in an existing Material (assume it has just one)
+        Material::TextureRef &r = m->tex[0];
 
-            r.t->Release();
-            t->AddRef();
-            r.t = t;
-            r.xscale = 1;
-            r.yscale = 1;
-            m->InitializeMaterial();
-        }
+        r.t->Release();
+        t->AddRef();
+        r.t = t;
+        r.xscale = 1;
+        r.yscale = 1;
+        m->InitializeMaterial();
     }
 
     return m;
@@ -1139,6 +1165,62 @@ Material *material_cache_t::GetMaterialOrTransmap(const char *name, int &map_num
 }
 
 bool Read_NTEXTURE(int lump);
+
+/// ZDoom-compatible PK3 namespace directories.
+enum pk3_ns_t { PK3_NONE, PK3_TEXTURES, PK3_PATCHES, PK3_FLATS, PK3_SPRITES, PK3_HIRES, PK3_HIRES_SPRITES };
+
+/// Given a full ZIP entry path (e.g. "textures/walls/WALL01.png"), identify its
+/// namespace and fill stem with the uppercased basename without extension.
+/// Returns PK3_NONE if the entry is not in a recognized namespace.
+static pk3_ns_t PK3_GetNamespace(const char *fullpath, char *stem, size_t stem_size)
+{
+    static const struct { const char *prefix; size_t len; pk3_ns_t ns; } ns_table[] = {
+        { "textures/",       9,  PK3_TEXTURES },
+        { "patches/",        8,  PK3_PATCHES  },
+        { "flats/",          6,  PK3_FLATS    },
+        { "sprites/",        7,  PK3_SPRITES  },
+        // hires/sprites/ scales HD sprites to match original world dimensions.
+        // All other hires/ sub-dirs fall through to the generic hires/ entry below.
+        { "hires/sprites/",  14, PK3_HIRES_SPRITES },
+        // Generic hires/ (including hires/textures/, hires/flats/, etc.):
+        // replace existing materials with dimension scaling (h_start=true).
+        { "hires/",          6,  PK3_HIRES         },
+    };
+
+    // Strip optional "filter/GAME/" prefix (ZDoom filter/ convention for IWAD-specific resources).
+    // e.g. "filter/doom/hires/textures/STARTAN3.png" -> "hires/textures/STARTAN3.png"
+    const char *check = fullpath;
+    if (strncasecmp(check, "filter/", 7) == 0)
+    {
+        check += 7; // skip "filter/"
+        const char *slash = strchr(check, '/');
+        if (!slash) return PK3_NONE; // bare "filter/GAME" with no further path
+        check = slash + 1; // skip "GAME/"
+    }
+
+    for (size_t i = 0; i < sizeof(ns_table)/sizeof(ns_table[0]); i++)
+    {
+        if (strncasecmp(check, ns_table[i].prefix, ns_table[i].len) != 0)
+            continue;
+
+        const char *base = check + ns_table[i].len;
+        // Support subdirectories: use only the final component
+        const char *slash = strrchr(base, '/');
+        if (slash) base = slash + 1;
+
+        // Strip extension
+        const char *dot = strrchr(base, '.');
+        size_t copy_len = dot ? (size_t)(dot - base) : strlen(base);
+        if (copy_len == 0 || copy_len >= stem_size)
+            return PK3_NONE;
+
+        strncpy(stem, base, copy_len);
+        stem[copy_len] = '\0';
+        strupr(stem);
+        return ns_table[i].ns;
+    }
+    return PK3_NONE;
+}
 
 /// Initializes the material cache, fills the cachesource_t containers with Material objects.
 /*!
@@ -1439,10 +1521,489 @@ int material_cache_t::ReadTextures()
         }
     }
 
+    // ZDoom-compatible PK3 namespace directories.
+    // textures/ and patches/ -> wall/ceiling textures (doom_tex)
+    // flats/                 -> floor textures (flat_tex)
+    // sprites/               -> sprites (sprite_tex)
+    // hires/                 -> hi-res replacements, scale-preserving (like H_START)
+    // Later-loaded files take precedence (iterate nwads-1 down to 0).
+    {
+        char stem[64]; // CACHE_NAME_LEN is 63
+
+        for (i = nwads - 1; i >= 0; i--)
+        {
+            int nlumps = fc.GetNumLumps(i);
+            int ns_count[6] = {0,0,0,0,0,0}; // per-namespace hit counts (indices 0..5 = TEXTURES..HIRES_SPRITES)
+            int replaced = 0, created = 0, hires_ok = 0, hires_miss = 0;
+
+            for (int item = 0; item < (int)nlumps; item++)
+            {
+                int lump = (i << 16) | item;
+                const char *fullname = fc.FindNameForNum(lump);
+                if (!fullname || !strchr(fullname, '/'))
+                    continue; // not a path-based ZIP entry
+
+                pk3_ns_t ns = PK3_GetNamespace(fullname, stem, sizeof(stem));
+                if (ns == PK3_NONE)
+                    continue;
+
+                ns_count[ns - 1]++;
+
+                Texture *tex = textures.LoadLump(stem, lump);
+                if (!tex)
+                    continue;
+
+                switch (ns)
+                {
+                    case PK3_TEXTURES:
+                    case PK3_PATCHES:
+                    {
+                        bool existed = textures.Exists(stem);
+                        // ZDoom's textures/ is a universal namespace — it can replace
+                        // walls, flats, or sprites. Route to whichever cache owns the name.
+                        Material *m;
+                        if (flat_tex.Find(stem))
+                            m = BuildMaterial(tex, flat_tex);
+                        else if (sprite_tex.Find(stem))
+                            m = BuildMaterial(tex, sprite_tex);
+                        else
+                            m = BuildMaterial(tex, doom_tex);
+                        if (m) { existed ? replaced++ : created++; num_textures++; }
+                        break;
+                    }
+                    case PK3_FLATS:
+                    {
+                        bool existed = textures.Exists(stem);
+                        Material *m = BuildMaterial(tex, flat_tex);
+                        if (m) { existed ? replaced++ : created++; num_textures++; }
+                        break;
+                    }
+                    case PK3_SPRITES:
+                    {
+                        bool existed = textures.Exists(stem);
+                        Material *m = BuildMaterial(tex, sprite_tex);
+                        if (m) { existed ? replaced++ : created++; num_textures++; }
+                        break;
+                    }
+                    case PK3_HIRES_SPRITES:
+                    {
+                        // Scale HD sprite to match original world dimensions.
+                        Material *m = BuildMaterial(tex, sprite_tex, true);
+                        if (m) { replaced++; }
+                        else
+                        {
+                            // No original sprite yet (e.g. mod-only sprite) — add directly.
+                            m = BuildMaterial(tex, sprite_tex, false);
+                            if (m) { created++; num_textures++; }
+                        }
+                        break;
+                    }
+                    case PK3_HIRES:
+                        if (BuildMaterial(tex, doom_tex, true) ||
+                            BuildMaterial(tex, flat_tex, true) ||
+                            BuildMaterial(tex, sprite_tex, true))
+                            hires_ok++;
+                        else
+                            hires_miss++;
+                        break;
+
+                    default: break;
+                }
+            }
+
+            if (ns_count[0] + ns_count[1] + ns_count[2] + ns_count[3] + ns_count[4] + ns_count[5] > 0)
+            {
+                CONS_Printf(" PK3 ns scan '%s': tex=%d pat=%d flat=%d spr=%d hires=%d hspr=%d"
+                            " -> replaced=%d new=%d hires_ok=%d hires_miss=%d\n",
+                            fc.Name(i),
+                            ns_count[PK3_TEXTURES-1],      ns_count[PK3_PATCHES-1],
+                            ns_count[PK3_FLATS-1],         ns_count[PK3_SPRITES-1],
+                            ns_count[PK3_HIRES-1],         ns_count[PK3_HIRES_SPRITES-1],
+                            replaced, created, hires_ok, hires_miss);
+            }
+        }
+    }
+
+    // PK3 normal maps: materials/normalmaps/TEXNAME.png -> attach as tex[1] on matching Material.
+    // Shader assignment happens later in R_Init() once a GL context exists.
+    {
+        int nm_attached = 0;
+        for (i = nwads - 1; i >= 0; i--)
+        {
+            int nlumps = fc.GetNumLumps(i);
+            for (int item = 0; item < nlumps; item++)
+            {
+                int lump = (i << 16) | item;
+                const char *fullname = fc.FindNameForNum(lump);
+                if (!fullname || !strchr(fullname, '/'))
+                    continue;
+
+                // Strip optional filter/GAME/ prefix
+                const char *check = fullname;
+                if (strncasecmp(check, "filter/", 7) == 0)
+                {
+                    check += 7;
+                    const char *sl = strchr(check, '/');
+                    if (!sl) continue;
+                    check = sl + 1;
+                }
+
+                if (strncasecmp(check, "materials/normalmaps/", 21) != 0)
+                    continue;
+
+                // Extract uppercased stem (basename without extension)
+                const char *base = check + 21;
+                const char *sl2  = strrchr(base, '/');
+                if (sl2) base = sl2 + 1;
+                const char *dot  = strrchr(base, '.');
+                size_t copy_len  = dot ? (size_t)(dot - base) : strlen(base);
+                if (copy_len == 0 || copy_len >= 64)
+                    continue;
+
+                char nm_stem[64];
+                strncpy(nm_stem, base, copy_len);
+                nm_stem[copy_len] = '\0';
+                strupr(nm_stem);
+
+                // Find matching wall or flat material
+                Material *m = doom_tex.Find(nm_stem);
+                if (!m) m = flat_tex.Find(nm_stem);
+                if (!m)
+                    continue;
+                if ((int)m->tex.size() >= 2)
+                    continue; // already assigned
+
+                // Load the normal map under a prefixed key to avoid cache collision
+                char nmt_key[72];
+                snprintf(nmt_key, sizeof(nmt_key), "NM_%s", nm_stem);
+                Texture *nmt = textures.LoadLump(nmt_key, lump);
+                if (!nmt)
+                    continue;
+
+                m->tex.resize(2);
+                m->tex[1].t = nmt;
+                nmt->AddRef(); // Material destructor calls Release() on all tex slots
+                nm_attached++;
+            }
+        }
+        if (nm_attached > 0)
+            CONS_Printf(" Normal maps attached: %d materials.\n", nm_attached);
+    }
+
+    // GLDEFS: per-material PBR maps, scalars, and shader paths.
+    // Runs after the normalmaps scan so GLDEFS paths take precedence for tex[1].
+    ReadGLDEFS();
+
     Read_NTEXTURE(fc.FindNumForName("NTEXTURE"));
     Read_NTEXTURE(fc.FindNumForName("NSPRITES"));
 
     return num_textures;
+}
+
+// ---------------------------------------------------------------------------
+// GLDEFS parser
+// ---------------------------------------------------------------------------
+
+/// Find a lump by its full path (case-insensitive). Searches the given file first,
+/// then all other files from newest to oldest.
+static int FindLumpByPath(const char *path, int preferred_file)
+{
+    int nfiles = (int)fc.Size();
+    for (int pass = 0; pass < 2; pass++)
+    {
+        for (int fi = nfiles - 1; fi >= 0; fi--)
+        {
+            if ((pass == 0) != (fi == preferred_file))
+                continue;
+            int nlumps = fc.GetNumLumps(fi);
+            for (int j = 0; j < nlumps; j++)
+            {
+                int lump = (fi << 16) | j;
+                const char *n = fc.FindNameForNum(lump);
+                if (n && strcasecmp(n, path) == 0)
+                    return lump;
+            }
+        }
+    }
+    return -1;
+}
+
+/// Attach a texture from a GLDEFS path into a specific material slot.
+/// Uses a prefixed cache key so it won't collide with diffuse textures.
+static void AttachGLDEFSTex(Material *m, int slot, const char *path,
+                             const char *prefix, int file_hint)
+{
+    int lump = FindLumpByPath(path, file_hint);
+    if (lump < 0)
+        return;
+
+    // Grow the tex vector if needed
+    if ((int)m->tex.size() <= slot)
+        m->tex.resize(slot + 1);
+
+    // Build a unique cache key: prefix + basename-without-extension
+    const char *base = strrchr(path, '/');
+    base = base ? base + 1 : path;
+    const char *dot = strrchr(base, '.');
+    size_t blen = dot ? (size_t)(dot - base) : strlen(base);
+
+    char key[128];
+    snprintf(key, sizeof(key), "%s_", prefix);
+    size_t plen = strlen(key);
+    if (blen + plen >= sizeof(key))
+        blen = sizeof(key) - plen - 1;
+    strncpy(key + plen, base, blen);
+    key[plen + blen] = '\0';
+    strupr(key);
+
+    Texture *t = textures.LoadLump(key, lump);
+    if (!t)
+        return;
+
+    // Release old occupant if any
+    if (m->tex[slot].t)
+        m->tex[slot].t->Release();
+
+    m->tex[slot].t = t;
+    t->AddRef();
+}
+
+void material_cache_t::ReadGLDEFS()
+{
+    int total_mats = 0, total_maps = 0;
+
+    for (int fi = (int)fc.Size() - 1; fi >= 0; fi--)
+    {
+        // The lump may be "GLDEFS" (WAD) or "GLDEFS.txt" / "GLDEFS.TXT" (PK3).
+        // Search only within this specific file — no cross-file fallback.
+        int lump = fc.FindNumForNameFile("GLDEFS", fi, 0);
+        if (lump < 0)
+        {
+            int nlumps = (int)fc.GetNumLumps(fi);
+            for (int j = 0; j < nlumps && lump < 0; j++)
+            {
+                int candidate = (fi << 16) | j;
+                const char *n = fc.FindNameForNum(candidate);
+                if (n && (strcasecmp(n, "GLDEFS.txt") == 0 || strcasecmp(n, "GLDEFS.TXT") == 0))
+                    lump = candidate;
+            }
+        }
+        if (lump < 0)
+            continue;
+
+        int len = fc.LumpLength(lump);
+        char *buf = static_cast<char *>(Z_Malloc(len + 1, PU_DAVE, NULL));
+        fc.ReadLump(lump, buf);
+        buf[len] = '\0';
+
+        // Simple line-by-line parser
+        const char *p = buf;
+        while (*p)
+        {
+            // Skip whitespace and blank lines
+            while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n')
+                p++;
+            if (!*p)
+                break;
+
+            // Skip line comments
+            if (p[0] == '/' && p[1] == '/')
+            {
+                while (*p && *p != '\n') p++;
+                continue;
+            }
+
+            // Match "material texture" keyword
+            if (strncasecmp(p, "material", 8) != 0)
+            {
+                while (*p && *p != '\n') p++;
+                continue;
+            }
+            p += 8;
+            while (*p == ' ' || *p == '\t') p++;
+            if (strncasecmp(p, "texture", 7) != 0)
+            {
+                while (*p && *p != '\n') p++;
+                continue;
+            }
+            p += 7;
+            while (*p == ' ' || *p == '\t') p++;
+
+            // Read quoted texture name
+            if (*p != '"') { while (*p && *p != '\n') p++; continue; }
+            p++;
+            const char *name_start = p;
+            while (*p && *p != '"' && *p != '\n') p++;
+            if (*p != '"') continue;
+            size_t name_len = p - name_start;
+            p++; // skip closing quote
+
+            char mat_name[64];
+            if (name_len == 0 || name_len >= sizeof(mat_name)) continue;
+            strncpy(mat_name, name_start, name_len);
+            mat_name[name_len] = '\0';
+            strupr(mat_name);
+
+            // Find the material in any cache
+            Material *m = doom_tex.Find(mat_name);
+            if (!m) m = flat_tex.Find(mat_name);
+            if (!m) m = sprite_tex.Find(mat_name);
+            if (!m)
+            {
+                // Skip to closing brace
+                while (*p && *p != '{') p++;
+                if (*p == '{') { int depth=1; p++; while (*p && depth) { if (*p=='{') depth++; else if (*p=='}') depth--; p++; } }
+                continue;
+            }
+
+            // Skip to opening brace
+            while (*p && *p != '{') p++;
+            if (*p != '{') continue;
+            p++;
+
+            total_mats++;
+
+            // Parse key-value pairs inside the block
+            while (*p)
+            {
+                while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n') p++;
+                if (*p == '}') { p++; break; }
+                if (p[0] == '/' && p[1] == '/') { while (*p && *p != '\n') p++; continue; }
+
+                // Read key token
+                const char *key_start = p;
+                while (*p && *p != ' ' && *p != '\t' && *p != '\r' && *p != '\n') p++;
+                size_t key_len = p - key_start;
+                if (key_len == 0) continue;
+
+                char key[32];
+                if (key_len >= sizeof(key)) key_len = sizeof(key) - 1;
+                strncpy(key, key_start, key_len);
+                key[key_len] = '\0';
+
+                while (*p == ' ' || *p == '\t') p++;
+
+                // Dispatch on key
+                if (strcasecmp(key, "normal") == 0 ||
+                    strcasecmp(key, "metallic") == 0 ||
+                    strcasecmp(key, "roughness") == 0 ||
+                    strcasecmp(key, "ao") == 0 ||
+                    strcasecmp(key, "specular") == 0 ||
+                    strcasecmp(key, "brightmap") == 0 ||
+                    strcasecmp(key, "shader") == 0)
+                {
+                    // Expect quoted path
+                    if (*p != '"') { while (*p && *p != '\n') p++; continue; }
+                    p++;
+                    const char *val_start = p;
+                    while (*p && *p != '"' && *p != '\n') p++;
+                    size_t val_len = p - val_start;
+                    if (*p == '"') p++;
+
+                    char val[256];
+                    if (val_len == 0 || val_len >= sizeof(val)) continue;
+                    strncpy(val, val_start, val_len);
+                    val[val_len] = '\0';
+
+                    if (strcasecmp(key, "shader") == 0)
+                    {
+                        m->shader_lump = val;
+                    }
+                    else
+                    {
+                        static const struct { const char *key; int slot; const char *prefix; } map[] = {
+                            {"normal",    1, "NM"},
+                            {"metallic",  2, "MT"},
+                            {"roughness", 3, "RG"},
+                            {"ao",        4, "AO"},
+                            {"specular",  5, "SP"},
+                            {"brightmap", 6, "BM"},
+                        };
+                        for (int k = 0; k < 6; k++)
+                        {
+                            if (strcasecmp(key, map[k].key) == 0)
+                            {
+                                AttachGLDEFSTex(m, map[k].slot, val, map[k].prefix, fi);
+                                total_maps++;
+                                break;
+                            }
+                        }
+                    }
+                }
+                else if (strcasecmp(key, "texture") == 0)
+                {
+                    // "texture displacement <quoted-path>"
+                    const char *sub_start = p;
+                    while (*p && *p != ' ' && *p != '\t' && *p != '\r' && *p != '\n') p++;
+                    size_t sub_len = p - sub_start;
+                    char sub[32];
+                    if (sub_len >= sizeof(sub)) sub_len = sizeof(sub) - 1;
+                    strncpy(sub, sub_start, sub_len);
+                    sub[sub_len] = '\0';
+
+                    while (*p == ' ' || *p == '\t') p++;
+                    if (*p != '"') { while (*p && *p != '\n') p++; continue; }
+                    p++;
+                    const char *val_start = p;
+                    while (*p && *p != '"' && *p != '\n') p++;
+                    size_t val_len = p - val_start;
+                    if (*p == '"') p++;
+
+                    char val[256];
+                    if (val_len == 0 || val_len >= sizeof(val)) continue;
+                    strncpy(val, val_start, val_len);
+                    val[val_len] = '\0';
+
+                    if (strcasecmp(sub, "displacement") == 0)
+                    {
+                        AttachGLDEFSTex(m, 7, val, "DP", fi);
+                        total_maps++;
+                    }
+                }
+                else if (strcasecmp(key, "glossiness") == 0)
+                {
+                    m->glossiness = (float)atof(p);
+                    while (*p && *p != '\n') p++;
+                }
+                else if (strcasecmp(key, "specularlevel") == 0)
+                {
+                    m->specularlevel = (float)atof(p);
+                    while (*p && *p != '\n') p++;
+                }
+                else
+                {
+                    // Unknown key — skip rest of line
+                    while (*p && *p != '\n') p++;
+                }
+            }
+        }
+
+        Z_Free(buf);
+    }
+
+    CONS_Printf(" GLDEFS: %d materials, %d extra maps loaded.\n", total_mats, total_maps);
+}
+
+void material_cache_t::ClearAllShaders()
+{
+    for (size_t mi = 0; mi < all_materials.size(); mi++)
+        if (all_materials[mi])
+            all_materials[mi]->shader = NULL;
+}
+
+void material_cache_t::AssignNormalMapShader(ShaderProg *prog)
+{
+    int count = 0;
+    for (size_t mi = 0; mi < all_materials.size(); mi++)
+    {
+        Material *m = all_materials[mi];
+        if (m && (int)m->tex.size() >= 2 && !m->shader)
+        {
+            m->shader = prog;
+            count++;
+        }
+    }
+    CONS_Printf("AssignNormalMapShader: %d materials assigned.\n", count);
 }
 
 //==================================================================

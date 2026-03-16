@@ -617,6 +617,10 @@ void font_t::Init()
         CONS_Printf("TT font face style name: %s\n", p);
 
     // TTF_Quit();
-    hud_font = tt; // TEST
+    // NOTE: do NOT assign hud_font = tt here. TTF materials store worldheight
+    // in screen pixels (rendered at the point size), so V_SSIZE would double-scale
+    // them by fdupy, making console text massively oversized. The raster font
+    // (set above) uses virtual-unit worldheight and works correctly with V_SSIZE.
+    delete tt; // TTF font is not yet wired up; release it until integration is ready
 #endif
 }

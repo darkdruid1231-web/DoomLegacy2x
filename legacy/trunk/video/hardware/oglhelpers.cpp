@@ -22,6 +22,7 @@
 
 #include "hardware/oglhelpers.hpp"
 #include "command.h"
+#include "cvars.h"
 #include "doomdef.h"
 #include "i_video.h"
 #include "m_bbox.h"
@@ -82,6 +83,65 @@ consvar_t cv_grfog = {"gr_fog", "On", CV_SAVE, CV_OnOff};
 consvar_t cv_grfogcolor = {"gr_fogcolor", "000000", CV_SAVE, NULL};
 consvar_t cv_grfogdensity = {"gr_fogdensity", "100", CV_SAVE, CV_Unsigned};
 
+static CV_PossibleValue_t normalmapstrength_cons_t[] = {{0, "MIN"}, {20, "MAX"}, {0, NULL}};
+consvar_t cv_grnormalmapstrength = {"gr_normalmapstrength", "10", CV_SAVE, normalmapstrength_cons_t};
+
+// Quality preset CVar — bundles several settings into one choice
+static void CV_GLQuality_OnChange()
+{
+    switch (cv_glquality.value)
+    {
+        case 0: // Low
+            cv_granisotropy.Set(1);
+            cv_grfiltermode.Set(0);
+            cv_grshadows.Set(0);
+            cv_grdynamiclighting.Set(0);
+            cv_grcoronas.Set(0);
+            cv_grfog.Set(0);
+            break;
+        case 1: // Medium
+            cv_granisotropy.Set(4);
+            cv_grfiltermode.Set(2);
+            cv_grshadows.Set(1);
+            cv_grdynamiclighting.Set(0);
+            cv_grcoronas.Set(1);
+            cv_grfog.Set(1);
+            break;
+        case 2: // High
+            cv_granisotropy.Set(8);
+            cv_grfiltermode.Set(3);
+            cv_grshadows.Set(1);
+            cv_grdynamiclighting.Set(1);
+            cv_grcoronas.Set(1);
+            cv_grfog.Set(1);
+            break;
+        case 3: // Ultra
+            cv_granisotropy.Set(16);
+            cv_grfiltermode.Set(3);
+            cv_grshadows.Set(1);
+            cv_grdynamiclighting.Set(1);
+            cv_grcoronas.Set(1);
+            cv_grfog.Set(1);
+            break;
+        default:
+            break;
+    }
+}
+
+static CV_PossibleValue_t glquality_cons_t[] = {
+    {0,"Low"}, {1,"Medium"}, {2,"High"}, {3,"Ultra"}, {0,NULL}
+};
+consvar_t cv_glquality = {
+    "gr_quality", "Medium", CV_SAVE | CV_CALL, glquality_cons_t, CV_GLQuality_OnChange
+};
+
+// Post-processing CVars
+consvar_t cv_grbloom           = {"gr_bloom",           "Off", CV_SAVE, CV_OnOff, NULL, 0};
+consvar_t cv_grbloomthreshold  = {"gr_bloomthreshold",  "0.8", CV_SAVE | CV_FLOAT, NULL, NULL, 0};
+consvar_t cv_grbloomstrength   = {"gr_bloomstrength",   "0.4", CV_SAVE | CV_FLOAT, NULL, NULL, 0};
+consvar_t cv_grssao            = {"gr_ssao",            "Off", CV_SAVE, CV_OnOff, NULL, 0};
+consvar_t cv_grssaostrength    = {"gr_ssaostrength",    "0.6", CV_SAVE | CV_FLOAT, NULL, NULL, 0};
+
 void OGL_AddCommands()
 {
     cv_grgammared.Reg();
@@ -101,6 +161,16 @@ void OGL_AddCommands()
     cv_grfog.Reg();
     cv_grfogdensity.Reg();
     cv_grfogcolor.Reg();
+    cv_grnormalmapstrength.Reg();
+
+    cv_glquality.Reg();
+    cv_fpslimit.Reg();
+
+    cv_grbloom.Reg();
+    cv_grbloomthreshold.Reg();
+    cv_grbloomstrength.Reg();
+    cv_grssao.Reg();
+    cv_grssaostrength.Reg();
 }
 
 // Converts Doom sector light values to suitable background pixel
@@ -152,8 +222,8 @@ bool GLExtAvailable(const char *extension)
     if (where || *extension == '\0')
         return false;
 
-    if (!gl_extensions)
-        gl_extensions = glGetString(GL_EXTENSIONS);
+    // Always re-query: the pointer is context-specific and becomes stale after a context switch.
+    gl_extensions = glGetString(GL_EXTENSIONS);
 
     start = gl_extensions;
     for (;;)

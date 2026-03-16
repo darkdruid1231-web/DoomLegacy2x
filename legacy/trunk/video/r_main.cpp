@@ -36,6 +36,7 @@
 #include "hud.h"
 #include "p_camera.h"
 
+#include "hardware/oglshaders.h"
 #include "i_video.h"
 #include "r_bsp.h"
 #include "r_data.h"
@@ -334,20 +335,26 @@ void R_ExecuteSetViewSize()
     if (rendermode != render_soft)
         return;
 
-    // added 16-6-98:splitscreen
-    // NOTE: we only support two viewports in software
-    int hhh = cv_splitscreen.value ? vid.height / 2 : vid.height;
+    // Compute per-player viewport dimensions for split-screen.
+    // 2-player (top/bottom): full width, half height each.
+    // 3-4 player (quadrants): half width, half height each.
+    int hhh = vid.height;
+    int www = vid.width;
+    if (cv_splitscreen.value >= 1)
+        hhh /= 2;  // 2+ players: each viewport is half the screen height
+    if (cv_splitscreen.value >= 2)
+        www /= 2;  // 3-4 players: each viewport is half the screen width
 
     // added 01-01-98: full screen view, without statusbar
     if (cv_viewsize.value > 10) // no statusbar
     {
-        viewwidth = vid.width;
+        viewwidth  = www;
         viewheight = hhh;
     }
     else
     {
         // added 01-01-98: always a multiple of eight
-        viewwidth = (cv_viewsize.value * vid.width / 10) & ~7;
+        viewwidth = (cv_viewsize.value * www / 10) & ~7;
         // added:05-02-98: make viewheight multiple of 2 because sometimes a line is not refreshed
         // by R_DrawViewBorder()
         viewheight = (cv_viewsize.value * (hhh - hud.stbarheight) / 10) & ~1;
@@ -361,8 +368,10 @@ void R_ExecuteSetViewSize()
     // added:01-02-98:aspect ratio is now correct, added an 'projectiony'
     //       since the scale is not always the same between horiz. & vert.
     projection = centerxfrac;
-    if (vid.width > 0 && BASEVIDHEIGHT > 0)
-        projectiony = ((vid.height * centerx * BASEVIDWIDTH) / BASEVIDHEIGHT) / vid.width;
+    // projectiony: vertical projection scale. Use www (per-viewport width) so that the
+    // aspect ratio is computed relative to the actual viewport, not the full screen.
+    if (www > 0 && BASEVIDHEIGHT > 0)
+        projectiony = ((vid.height * centerx * BASEVIDWIDTH) / BASEVIDHEIGHT) / www;
     else
         projectiony = 0;
 
@@ -392,7 +401,8 @@ void R_ExecuteSetViewSize()
     pspritescale = fixed_t(viewwidth) / BASEVIDWIDTH;
     pspriteiscale = fixed_t(BASEVIDWIDTH) / viewwidth; // x axis scale
     // added:02-02-98:now aspect ratio correct for psprites
-    pspriteyscale = fixed_t((vid.height * viewwidth) / vid.width) / BASEVIDHEIGHT;
+    // Use www (per-viewport width) to get correct aspect ratio in split-screen.
+    pspriteyscale = fixed_t((vid.height * viewwidth) / www) / BASEVIDHEIGHT;
 
     int i;
 
@@ -548,7 +558,10 @@ void R_ServerInit()
     // server needs to know the texture names and dimensions
     CONS_Printf("Creating textures...\n");
     materials.Clear();
-    materials.SetDefaultItem("DEF_TEX");
+    if (fc.FindNumForName("DEF_TEX") >= 0)
+        materials.SetDefaultItem("DEF_TEX");
+    else
+        CONS_Printf("Warning: DEF_TEX not found (legacy.wad missing?)\n");
     materials.ReadTextures();
     // materials.Inventory();
 
@@ -613,14 +626,19 @@ void R_Init()
         for (int i = 0; i < HU_CROSSHAIRS; i++)
             crosshair[i] = NULL;
     }
+    // Compile normal map GLSL shader and assign to materials that had tex[1] attached
+    // in ReadTextures(). GL context is guaranteed to exist at this point.
+    CONS_Printf("R_Init: InitNormalMapShader\n");
+    InitNormalMapShader();
+    if (normalmap_shaderprog)
+        materials.AssignNormalMapShader(normalmap_shaderprog);
+
     CONS_Printf("R_Init: done\n");
 }
 
 //
 // R_SetupFrame
 //
-bool drawPsprites; // FIXME HACK
-
 void Rend::R_SetupFrame(PlayerInfo *player)
 {
     extralight = player->pawn->extralight;
@@ -687,20 +705,73 @@ void Rend::R_SetupFrame(PlayerInfo *player)
 
 void R_SetViewport(int viewport)
 {
-    if (viewport == 0) // support just two viewports for now
+    // Support up to 4 viewports for split-screen
+    if (cv_splitscreen.value == 0) // Single player
     {
-        viewwindowy = 0;
+        viewwindowx = (vid.width - viewwidth) >> 1;
+        viewwindowy = (vid.height - viewheight) >> 1;
         ylookup = ylookup1;
-        vid.scaledofs = (cv_splitscreen.value) ? -vid.width * vid.height / 2 : 0;
-        // for 2d drawing in upper splitscreen viewport we pretend the actual screen is shifted up
-        // by 0.5*vid.height
-    }
-    else
-    {
-        // faB: Boris hack :P !!
-        viewwindowy = vid.height / 2;
-        ylookup = ylookup2;
         vid.scaledofs = 0;
+    }
+    else if (cv_splitscreen.value == 1) // 2 players (top/bottom)
+    {
+        if (viewport == 0) // Player 1 (top)
+        {
+            viewwindowx = (vid.width - viewwidth) >> 1;
+            viewwindowy = 0;
+            ylookup = ylookup1;
+            vid.scaledofs = -vid.width * vid.height / 2;
+        }
+        else // Player 2 (bottom)
+        {
+            viewwindowx = (vid.width - viewwidth) >> 1;
+            viewwindowy = vid.height / 2;
+            ylookup = ylookup2;
+            vid.scaledofs = 0;
+        }
+    }
+    else if (cv_splitscreen.value >= 2) // 3-4 players (quadrants)
+    {
+        int quadrant_width = vid.width / 2;
+        int quadrant_height = vid.height / 2;
+
+        if (viewport == 0) // Player 1 (top-left)
+        {
+            viewwindowx = (quadrant_width - viewwidth) >> 1;
+            viewwindowy = 0;
+            ylookup = ylookup1;
+            vid.scaledofs = -quadrant_width * quadrant_height / 2;
+        }
+        else if (viewport == 1) // Player 2 (top-right)
+        {
+            viewwindowx = quadrant_width + ((quadrant_width - viewwidth) >> 1);
+            viewwindowy = 0;
+            ylookup = ylookup1;
+            vid.scaledofs = quadrant_width * quadrant_height / 2;
+        }
+        else if (viewport == 2) // Player 3 (bottom-left)
+        {
+            viewwindowx = (quadrant_width - viewwidth) >> 1;
+            viewwindowy = quadrant_height;
+            ylookup = ylookup2;
+            vid.scaledofs = -quadrant_width * quadrant_height / 2;
+        }
+        else // Player 4 (bottom-right)
+        {
+            viewwindowx = quadrant_width + ((quadrant_width - viewwidth) >> 1);
+            viewwindowy = quadrant_height;
+            ylookup = ylookup2;
+            vid.scaledofs = quadrant_width * quadrant_height / 2;
+        }
+    }
+
+    // For split-screen, viewwindowx/viewwindowy change each player.
+    // Rebuild columnofs[] and ylookup[] for the current viewport position,
+    // and rebuild the angle-to-x tables (xtoviewangle/viewangletox/clipangle).
+    if (cv_splitscreen.value > 0)
+    {
+        R_InitViewBuffer(viewwidth, viewheight);
+        R_InitTextureMapping();
     }
 }
 

@@ -41,17 +41,16 @@ struct visplane_t;
 
 class Rend
 {
-    friend class HWRend;    // FIXME: this is temporary. Later, HWRend should probably inherit from
-                            // Rend
-    friend class HWBsp;     // FIXME: this is temporary.
-    friend class Subsector; // FIXME: this is temporary.
-    friend class spritepres_t; // this is a HACK too, for software renderer
+    friend class HWRend;    // TODO(architecture): HWRend should inherit from Rend
+    friend class HWBsp;
+    friend class Subsector;
+    friend class spritepres_t; // HACK for software renderer
   private:
     const class Map *m; // currently rendered Map
 
-    // FIXME temporary this is the dirtiest HACK ever
-    // temporarily we have here COPIES of, or pointers to certain Map data members (geometry).
-    // these MUST be set every time before rendering begins
+    // Copies of / pointers to Map geometry members.
+    // These MUST be set every time before rendering begins (via SetMap).
+    // TODO(architecture): access Map geometry directly rather than copying here.
 
     int numvertexes;
     vertex_t *vertexes;
@@ -80,6 +79,8 @@ class Rend
 
     PlayerPawn *viewplayer; // may be NULL
     Actor *viewactor;       // may be NULL
+
+    bool drawPsprites; // true when pov == player pawn (not a camera)
 
   public:
     /// Currently used fadetable

@@ -99,6 +99,9 @@ extern consvar_t cons_msgtimeout;
 extern consvar_t cons_speed;
 extern consvar_t cons_height;
 extern consvar_t cons_backpic;
+extern consvar_t cons_conwidth;
+extern consvar_t cons_alpha;
+extern consvar_t cons_logfile;
 
 // client hud (hu_stuff.cpp)
 extern consvar_t cv_stbaroverlay;
@@ -163,6 +166,7 @@ extern consvar_t cv_grtranswall;
 extern consvar_t cv_grfog;
 extern consvar_t cv_grfogcolor;
 extern consvar_t cv_grfogdensity;
+extern consvar_t cv_grnormalmapstrength;
 extern consvar_t cv_grcontrast;
 extern consvar_t cv_grgammared;
 extern consvar_t cv_grgammagreen;
@@ -172,4 +176,17 @@ extern consvar_t cv_grcorrecttricks;
 extern consvar_t cv_grnearclippingplane;
 extern consvar_t cv_grfarclippingplane;
 extern consvar_t cv_grfiltermode;
+
+// modern graphics quality controls
+extern consvar_t cv_vsync;
+extern consvar_t cv_fpslimit;
+extern consvar_t cv_glquality;
+extern consvar_t cv_msaa;
+
+// post-processing effects
+extern consvar_t cv_grbloom;
+extern consvar_t cv_grbloomthreshold;
+extern consvar_t cv_grbloomstrength;
+extern consvar_t cv_grssao;
+extern consvar_t cv_grssaostrength;
 #endif

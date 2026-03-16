@@ -51,8 +51,6 @@ static fixed_t waterfrac;
 static fixed_t waterstep;
 #endif
 
-// FIXME HACK
-#define FixedMul(x, y) ((x) * (y))
 
 // OPTIMIZE: closed two sided lines as single sided
 
@@ -296,7 +294,7 @@ void Rend::R_DrawWallSplats()
             //            CONS_Printf ("%.2f width %d, %d[x],
             //            %.1f[off]-%.1f[soff]-tg(%d)=%.1f*%.1f[d] = %.1f\n",
             //                         FIXED_TO_FLOAT(texturecolumn), tex->width,
-            //                         dc_x,FIXED_TO_FLOAT(rw_offset2),FIXED_TO_FLOAT(splat->offset),angle,FIXED_TO_FLOAT(finetangent[angle]),FIXED_TO_FLOAT(rw_distance),FIXED_TO_FLOAT(FixedMul(finetangent[angle],rw_distance)));
+            //                         dc_x,FIXED_TO_FLOAT(rw_offset2),FIXED_TO_FLOAT(splat->offset),angle,FIXED_TO_FLOAT(finetangent[angle]),FIXED_TO_FLOAT(rw_distance),FIXED_TO_FLOAT((finetangent[angle]) * (rw_distance)));
 
             if (texturecolumn < 0 || texturecolumn >= tr.worldwidth)
                 continue;
@@ -418,7 +416,7 @@ void Rend::R_RenderMaskedSegRange(drawseg_t *ds, int x1, int x2)
         for (i = 0; i < dc_numlights; i++)
         {
             dc_lightlist[i].height =
-                (centeryfrac)-FixedMul((frontsector->lightlist[i].height - viewz), spryscale);
+                (centeryfrac)-((frontsector->lightlist[i].height - viewz)) * (spryscale);
             dc_lightlist[i].heightstep =
                 -(rw_scalestep * (frontsector->lightlist[i].height - viewz));
             dc_lightlist[i].lightlevel = *frontsector->lightlist[i].lightlevel;
@@ -663,19 +661,17 @@ void Rend::R_RenderThickSideRange(drawseg_t *ds, int x1, int x2, ffloor_t *ffloo
         for (i = 0; i < dc_numlights; i++)
         {
             dc_lightlist[i].heightstep =
-                -FixedMul(rw_scalestep, (frontsector->lightlist[i].height - viewz));
+                -(rw_scalestep) * ((frontsector->lightlist[i].height - viewz));
             dc_lightlist[i].height =
-                (centeryfrac)-FixedMul((frontsector->lightlist[i].height - viewz), spryscale) -
+                (centeryfrac)-((frontsector->lightlist[i].height - viewz)) * (spryscale) -
                 dc_lightlist[i].heightstep;
             if (frontsector->lightlist[i].caster)
             {
                 if (frontsector->lightlist[i].caster->flags & FF_CUTLEVEL)
                 {
-                    dc_lightlist[i].botheightstep = -FixedMul(
-                        rw_scalestep, (*frontsector->lightlist[i].caster->bottomheight - viewz));
+                    dc_lightlist[i].botheightstep = -(rw_scalestep) * ((*frontsector->lightlist[i].caster->bottomheight - viewz));
                     dc_lightlist[i].botheight =
-                        (centeryfrac)-FixedMul(
-                            (*frontsector->lightlist[i].caster->bottomheight - viewz), spryscale) -
+                        (centeryfrac)-((*frontsector->lightlist[i].caster->bottomheight - viewz)) * (spryscale) -
                         dc_lightlist[i].botheightstep;
                 }
                 dc_lightlist[i].flags = frontsector->lightlist[i].caster->flags;
@@ -787,9 +783,9 @@ void Rend::R_RenderThickSideRange(drawseg_t *ds, int x1, int x2, ffloor_t *ffloo
                 int solid = 0;
                 int lighteffect = 0;
 
-                sprtopscreen = windowtop = (centeryfrac - FixedMul(world_texturemid, spryscale));
+                sprtopscreen = windowtop = (centeryfrac - (world_texturemid) * (spryscale));
                 sprbotscreen = windowbottom =
-                    FixedMul(*ffloor->topheight - *ffloor->bottomheight, spryscale) + sprtopscreen;
+                    (*ffloor->topheight - *ffloor->bottomheight) * (spryscale) + sprtopscreen;
 
                 // SoM: If column is out of range, why bother with it??
                 if (windowbottom < topbounds || windowtop > bottombounds)
@@ -1452,8 +1448,8 @@ void Rend::R_StoreWallRange(int start, int stop)
             trx = curline->v1->x - viewx;
             try = curline->v1->y - viewy;
             
-            gxt = FixedMul(trx,viewcos);
-            gyt = -FixedMul(try,viewsin);
+            gxt = (trx) * (viewcos);
+            gyt = -(try) * (viewsin);
             ds_p->scale1 = FixedDiv(projection, gxt-gyt);
         }
 #endif
@@ -1512,7 +1508,9 @@ void Rend::R_StoreWallRange(int start, int stop)
             markwater = false;
 #endif
 
-        if (linedef->flags & ML_DONTPEGBOTTOM && midtexture) // FIXME correct?
+        // ML_DONTPEGBOTTOM on a solid (1-sided) line: anchor the middle texture to the floor so
+        // it scrolls with the floor rather than the ceiling.  Doom source confirms this behaviour.
+        if (linedef->flags & ML_DONTPEGBOTTOM && midtexture)
         {
             // bottom of texture at bottom
             rw_midtexturemid = frontsector->floorheight - viewz;
@@ -1666,7 +1664,10 @@ void Rend::R_StoreWallRange(int start, int stop)
 
             // top texture
             toptexture = sidedef->toptexture;
-            if (linedef->flags & ML_DONTPEGTOP || !toptexture) // FIXME correct?
+            // ML_DONTPEGTOP: anchor upper texture to ceiling (scrolls with ceiling, not floor).
+            // Without the flag the upper texture is anchored to the back-sector ceiling so it
+            // doesn't "swim" when the ceiling moves.  Doom source (r_segs.c) confirms the sense.
+            if (linedef->flags & ML_DONTPEGTOP || !toptexture)
             {
                 // top of texture at top
                 rw_toptexturemid = worldtop;
@@ -1882,7 +1883,7 @@ void Rend::R_StoreWallRange(int start, int stop)
             offsetangle = ANG90;
 
         sineval = finesine[offsetangle >> ANGLETOFINESHIFT];
-        rw_offset = FixedMul(hyp, sineval);
+        rw_offset = (hyp) * (sineval);
 
         if (rw_normalangle - rw_angle1 < ANG180)
             rw_offset = -rw_offset;
@@ -1939,8 +1940,8 @@ void Rend::R_StoreWallRange(int start, int stop)
     worldtop >>= 4;
     worldbottom >>= 4;
 
-    topstep = -FixedMul(rw_scalestep, worldtop);
-    topfrac = (centeryfrac >> 4) - FixedMul(worldtop, rw_scale);
+    topstep = -(rw_scalestep) * (worldtop);
+    topfrac = (centeryfrac >> 4) - (worldtop) * (rw_scale);
 
 #ifdef OLDWATER
     // added:18-02-98:WATER!
@@ -1949,13 +1950,13 @@ void Rend::R_StoreWallRange(int start, int stop)
     {
         if (waterplane == NULL)
             I_Error("fuck no waterplane!");
-        waterstep = -FixedMul(rw_scalestep, waterz);
-        waterfrac = (centeryfrac >> 4) - FixedMul(waterz, rw_scale);
+        waterstep = -(rw_scalestep) * (waterz);
+        waterfrac = (centeryfrac >> 4) - (waterz) * (rw_scale);
     }
 #endif
 
-    bottomstep = -FixedMul(rw_scalestep, worldbottom);
-    bottomfrac = (centeryfrac >> 4) - FixedMul(worldbottom, rw_scale);
+    bottomstep = -(rw_scalestep) * (worldbottom);
+    bottomfrac = (centeryfrac >> 4) - (worldbottom) * (rw_scale);
 
     dc_numlights = curline->numlights = 0;
 
@@ -1972,16 +1973,14 @@ void Rend::R_StoreWallRange(int start, int stop)
         for (i = 0; i < dc_numlights; i++)
         {
             dc_lightlist[i].height =
-                (centeryfrac)-FixedMul((frontsector->lightlist[i].height - viewz), rw_scale);
+                (centeryfrac)-((frontsector->lightlist[i].height - viewz)) * (rw_scale);
             dc_lightlist[i].heightstep =
-                -FixedMul(rw_scalestep, (frontsector->lightlist[i].height - viewz));
+                -(rw_scalestep) * ((frontsector->lightlist[i].height - viewz));
             if (frontsector->lightlist[i].caster &&
                 frontsector->lightlist[i].caster->flags & FF_SOLID)
             {
-                dc_lightlist[i].botheight = (centeryfrac)-FixedMul(
-                    (*frontsector->lightlist[i].caster->bottomheight - viewz), rw_scale);
-                dc_lightlist[i].botheightstep = -FixedMul(
-                    rw_scalestep, (*frontsector->lightlist[i].caster->bottomheight - viewz));
+                dc_lightlist[i].botheight = (centeryfrac)-((*frontsector->lightlist[i].caster->bottomheight - viewz)) * (rw_scale);
+                dc_lightlist[i].botheightstep = -(rw_scalestep) * ((*frontsector->lightlist[i].caster->bottomheight - viewz));
                 dc_lightlist[i].flags = frontsector->lightlist[i].caster->flags;
             }
             else
@@ -2015,10 +2014,10 @@ void Rend::R_StoreWallRange(int start, int stop)
       dc_wallportals = linedef->wallportals;
       for(wpr = dc_wallportals; wpr; wpr = wpr->next)
       {
-        wpr->top = (centeryfrac) - FixedMul((*wpr->topheight - viewz), rw_scale) + FRACUNIT;
-        wpr->topstep = -FixedMul (rw_scalestep, (*wpr->topheight - viewz));
-        wpr->bottom = (centeryfrac) - FixedMul((*wpr->bottomheight - viewz), rw_scale);
-        wpr->bottomstep = -FixedMul (rw_scalestep, (*wpr->bottomheight - viewz));
+        wpr->top = (centeryfrac) - ((*wpr->topheight - viewz)) * (rw_scale) + FRACUNIT;
+        wpr->topstep = -(rw_scalestep) * (*wpr->topheight - viewz);
+        wpr->bottom = (centeryfrac) - ((*wpr->bottomheight - viewz)) * (rw_scale);
+        wpr->bottomstep = -(rw_scalestep) * (*wpr->bottomheight - viewz);
       }
     }
     else
@@ -2029,8 +2028,8 @@ void Rend::R_StoreWallRange(int start, int stop)
         for (i = 0; i < numffloors; i++)
         {
             ffloor[i].f_pos >>= 4;
-            ffloor[i].f_step = FixedMul(-rw_scalestep, ffloor[i].f_pos);
-            ffloor[i].f_frac = (centeryfrac >> 4) - FixedMul(ffloor[i].f_pos, rw_scale);
+            ffloor[i].f_step = (-rw_scalestep) * (ffloor[i].f_pos);
+            ffloor[i].f_frac = (centeryfrac >> 4) - (ffloor[i].f_pos) * (rw_scale);
         }
     }
 
@@ -2041,14 +2040,14 @@ void Rend::R_StoreWallRange(int start, int stop)
 
         if (worldhigh < worldtop)
         {
-            pixhigh = (centeryfrac >> 4) - FixedMul(worldhigh, rw_scale);
-            pixhighstep = -FixedMul(rw_scalestep, worldhigh);
+            pixhigh = (centeryfrac >> 4) - (worldhigh) * (rw_scale);
+            pixhighstep = -(rw_scalestep) * (worldhigh);
         }
 
         if (worldlow > worldbottom)
         {
-            pixlow = (centeryfrac >> 4) - FixedMul(worldlow, rw_scale);
-            pixlowstep = -FixedMul(rw_scalestep, worldlow);
+            pixlow = (centeryfrac >> 4) - (worldlow) * (rw_scale);
+            pixlowstep = -(rw_scalestep) * (worldlow);
         }
 
         {
@@ -2070,8 +2069,8 @@ void Rend::R_StoreWallRange(int start, int stop)
                         ffloor[i].mark = true;
                         ffloor[i].b_pos = *rover->bottomheight;
                         ffloor[i].b_pos = (ffloor[i].b_pos - viewz) >> 4;
-                        ffloor[i].b_step = FixedMul(-rw_scalestep, ffloor[i].b_pos);
-                        ffloor[i].b_frac = (centeryfrac >> 4) - FixedMul(ffloor[i].b_pos, rw_scale);
+                        ffloor[i].b_step = (-rw_scalestep) * (ffloor[i].b_pos);
+                        ffloor[i].b_frac = (centeryfrac >> 4) - (ffloor[i].b_pos) * (rw_scale);
                         i++;
                     }
                     if (i >= MAXFFLOORS)
@@ -2084,8 +2083,8 @@ void Rend::R_StoreWallRange(int start, int stop)
                         ffloor[i].mark = true;
                         ffloor[i].b_pos = *rover->topheight;
                         ffloor[i].b_pos = (ffloor[i].b_pos - viewz) >> 4;
-                        ffloor[i].b_step = FixedMul(-rw_scalestep, ffloor[i].b_pos);
-                        ffloor[i].b_frac = (centeryfrac >> 4) - FixedMul(ffloor[i].b_pos, rw_scale);
+                        ffloor[i].b_step = (-rw_scalestep) * (ffloor[i].b_pos);
+                        ffloor[i].b_frac = (centeryfrac >> 4) - (ffloor[i].b_pos) * (rw_scale);
                         i++;
                     }
                 }
@@ -2105,8 +2104,8 @@ void Rend::R_StoreWallRange(int start, int stop)
                         ffloor[i].mark = true;
                         ffloor[i].b_pos = *rover->bottomheight;
                         ffloor[i].b_pos = (ffloor[i].b_pos - viewz) >> 4;
-                        ffloor[i].b_step = FixedMul(-rw_scalestep, ffloor[i].b_pos);
-                        ffloor[i].b_frac = (centeryfrac >> 4) - FixedMul(ffloor[i].b_pos, rw_scale);
+                        ffloor[i].b_step = (-rw_scalestep) * (ffloor[i].b_pos);
+                        ffloor[i].b_frac = (centeryfrac >> 4) - (ffloor[i].b_pos) * (rw_scale);
                         i++;
                     }
                     if (i >= MAXFFLOORS)
@@ -2119,8 +2118,8 @@ void Rend::R_StoreWallRange(int start, int stop)
                         ffloor[i].mark = true;
                         ffloor[i].b_pos = *rover->topheight;
                         ffloor[i].b_pos = (ffloor[i].b_pos - viewz) >> 4;
-                        ffloor[i].b_step = FixedMul(-rw_scalestep, ffloor[i].b_pos);
-                        ffloor[i].b_frac = (centeryfrac >> 4) - FixedMul(ffloor[i].b_pos, rw_scale);
+                        ffloor[i].b_step = (-rw_scalestep) * (ffloor[i].b_pos);
+                        ffloor[i].b_frac = (centeryfrac >> 4) - (ffloor[i].b_pos) * (rw_scale);
                         i++;
                     }
                 }
