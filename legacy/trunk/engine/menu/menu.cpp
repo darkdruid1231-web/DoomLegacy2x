@@ -81,7 +81,8 @@
 extern Menu MainMenuDef, SinglePlayerDef, MultiPlayerDef, SetupPlayerDef, EpiDef, ClassDef,
     SkillDef, OptionsDef, VidModeDef, ControlDef, SoundDef, ReadDef2, ReadDef1, SaveDef, LoadDef,
     ControlDef2, GameOptionDef, NetOptionDef, VideoOptionsDef, OpenGLOptionDef, MouseOptionsDef,
-    Mouse2OptionsDef, ServerOptionsDef;
+    Mouse2OptionsDef, ServerOptionsDef, QualitySettingsDef, InputSettingsDef,
+    LocalPlayDef, OnlinePlayDef, PlayerSetupDef, HostGameDef;
 
 static void M_DrawTextBox(int x, int y, int width, int height);
 
@@ -1342,37 +1343,59 @@ void M_SaveGame(int choice)
 void M_StartServerMenu(int choice);
 void M_ConnectMenu(int choice);
 void M_SetupPlayer(int choice);
+void M_SetupPlayerDirect(int choice);
 void M_NetOption(int choice);
 
-enum multiplayer_e
-{
-    MI_mp_createserver = 0,
-    MI_mp_twoplayer = 2,
-    MI_mp_setup_p1 = 3,
-    MI_mp_setup_p2 = 4,
-};
+// New modern menu functions
+void M_StartLocalGame(int players);
+void M_StartHostGame(int local_players);
+void M_JoinGame(int choice);
 
+// IT_LINK = IT_SUBMENU | IT_STRING | IT_WHITE (uses hud_font, no WAD patch needed)
+// IT_CALL = IT_FUNC   | IT_STRING             (uses hud_font, no WAD patch needed)
 static menuitem_t MultiPlayer_MI[] = {
-    menuitem_t(IT_ACT, "M_STSERV", "CREATE SERVER", M_StartServerMenu, 'a'),
-    menuitem_t(IT_ACT, "M_CONNEC", "CONNECT SERVER", M_ConnectMenu, 'c'),
-    menuitem_t(IT_ACT, "M_2PLAYR", "TWO PLAYER GAME", M_StartServerMenu, 'n'),
-    menuitem_t(IT_ACT, "M_SETUPA", "SETUP PLAYER 1", M_SetupPlayer, 's'),
-    menuitem_t(IT_ACT, "M_SETUPB", "SETUP PLAYER 2", M_SetupPlayer, 't'),
-    menuitem_t(IT_ACT, "M_OPTION", "OPTIONS", M_NetOption, 'o'),
-    menuitem_t(IT_ACT, "M_ENDGAM", "END GAME", M_EndGame, 'e')};
+    menuitem_t(IT_LINK,            NULL, "Local Play",   &LocalPlayDef,   'l'),
+    menuitem_t(IT_LINK,            NULL, "Online Play",  &OnlinePlayDef,  'o'),
+    menuitem_t(IT_LINK,            NULL, "Player Setup", &PlayerSetupDef, 'p'),
+    menuitem_t(IT_CALL | IT_WHITE, NULL, "Options",      M_NetOption,     't'),
+    menuitem_t(IT_CALL | IT_WHITE, NULL, "End Game",     M_EndGame,       'e')};
+
+static menuitem_t LocalPlay_MI[] = {
+    menuitem_t(IT_CALL | IT_WHITE, NULL, "2 Players", M_StartLocalGame, 0),
+    menuitem_t(IT_CALL | IT_WHITE, NULL, "3 Players", M_StartLocalGame, 0),
+    menuitem_t(IT_CALL | IT_WHITE, NULL, "4 Players", M_StartLocalGame, 0)};
+
+Menu LocalPlayDef(NULL, "Local Play", &MultiPlayerDef, ITEMS(LocalPlay_MI), 85, 40);
+
+static menuitem_t HostGame_MI[] = {
+    menuitem_t(IT_CALL | IT_WHITE, NULL, "1 Player (Host Only)", M_StartHostGame, 0),
+    menuitem_t(IT_CALL | IT_WHITE, NULL, "2 Players",            M_StartHostGame, 0),
+    menuitem_t(IT_CALL | IT_WHITE, NULL, "3 Players",            M_StartHostGame, 0),
+    menuitem_t(IT_CALL | IT_WHITE, NULL, "4 Players",            M_StartHostGame, 0)};
+
+Menu HostGameDef(NULL, "Host Game", &OnlinePlayDef, ITEMS(HostGame_MI), 85, 40);
+
+static menuitem_t OnlinePlay_MI[] = {
+    menuitem_t(IT_LINK,            NULL, "Host Game", &HostGameDef, 'h'),
+    menuitem_t(IT_CALL | IT_WHITE, NULL, "Join Game", M_JoinGame,  'j')};
+
+Menu OnlinePlayDef(NULL, "Online Play", &MultiPlayerDef, ITEMS(OnlinePlay_MI), 85, 40);
+
+static menuitem_t PlayerSetup_MI[] = {
+    menuitem_t(IT_CALL | IT_WHITE, NULL, "Setup Player 1", M_SetupPlayerDirect, 0),
+    menuitem_t(IT_CALL | IT_WHITE, NULL, "Setup Player 2", M_SetupPlayerDirect, 0),
+    menuitem_t(IT_CALL | IT_WHITE, NULL, "Setup Player 3", M_SetupPlayerDirect, 0),
+    menuitem_t(IT_CALL | IT_WHITE, NULL, "Setup Player 4", M_SetupPlayerDirect, 0)};
+
+Menu PlayerSetupDef(NULL, "Player Setup", &MultiPlayerDef, ITEMS(PlayerSetup_MI), 85, 40);
 
 Menu MultiPlayerDef("M_MULTI", "Multiplayer", &MainMenuDef, ITEMS(MultiPlayer_MI), 85, 40);
 
 // called at splitscreen changes
 void M_SwitchSplitscreen()
 {
-    // activate setup for player 2
-    if (cv_splitscreen.value)
-        MultiPlayer_MI[MI_mp_setup_p2].flags = IT_ACT;
-    else
-        MultiPlayer_MI[MI_mp_setup_p2].flags = IT_OFF_BIG;
-
-    // if (MultiPlayerDef.lastOn==MI_mp_setup_p2) MultiPlayerDef.lastOn= MI_mp_setup_p1;
+    // Player setup options are always available via the Player Setup submenu.
+    // No items in MultiPlayer_MI need to be toggled.
 }
 
 //===========================================================================
@@ -1392,6 +1415,7 @@ static void M_GameOption(int choice)
 static menuitem_t Options_MI[] = {
     menuitem_t(IT_CALL | IT_WHITE, NULL, "Setup Players...", M_SetupPlayer, 0),
 
+    menuitem_t(IT_LINK | IT_DY, NULL, "Input Settings...", &InputSettingsDef, 4),
     menuitem_t(IT_LINK | IT_DY, NULL, "Server Options...", &ServerOptionsDef, 4),
     menuitem_t(IT_CALL | IT_WHITE, NULL, "Game Options...", M_GameOption, 0),
     menuitem_t(IT_LINK, NULL, "Sound Options...", &SoundDef, 0),
@@ -1471,8 +1495,7 @@ void M_StartServerMenu(int choice)
         return;
     }
 
-    if (choice == MI_mp_twoplayer)
-        cv_splitscreen.Set("1");
+    // cv_splitscreen is set by M_StartLocalGame/M_StartHostGame before reaching here.
 
     // HACK, update map name
     Startmap_Handler(&cv_menu_startmap, 0);
@@ -1795,15 +1818,64 @@ static void SetupPlayer_OnChange()
         p.ptype = allowed_pawntypes[0];
 }
 
-// setup the local player(s)
+// New modern menu functions
+
+// M_StartLocalGame: called with itemOn (0=2p, 1=3p, 2=4p).
+// cv_splitscreen = choice + 1 → 1, 2, 3 (= 2, 3, 4 players).
+void M_StartLocalGame(int players)
+{
+    if (game.Playing())
+    {
+        mbox.Set(ALREADYPLAYING, NULL, MsgBox::NOTHING);
+        return;
+    }
+
+    cv_splitscreen.Set(va("%d", players + 1)); // index 0=2p→sc=1, 1=3p→sc=2, 2=4p→sc=3
+    cv_publicserver.Set("0"); // Local only, no network
+
+    // Start the server setup menu
+    Menu::SetupNextMenu(&Serverdef);
+}
+
+// M_StartHostGame: called with itemOn (0=1p, 1=2p, 2=3p, 3=4p).
+// cv_splitscreen = choice → 0, 1, 2, 3 (= 1, 2, 3, 4 players).
+void M_StartHostGame(int local_players)
+{
+    if (game.Playing())
+    {
+        mbox.Set(ALREADYPLAYING, NULL, MsgBox::NOTHING);
+        return;
+    }
+
+    cv_splitscreen.Set(va("%d", local_players)); // index 0=1p→sc=0, 1=2p→sc=1, etc.
+    cv_publicserver.Set("1"); // Allow network connections
+
+    // Start the server setup menu
+    Menu::SetupNextMenu(&Serverdef);
+}
+
+void M_JoinGame(int choice)
+{
+    // Go to connect menu
+    Menu::SetupNextMenu(&Connectdef);
+    game.net->CL_StartPinging(false);
+}
+
+// setup the local player(s) — called from the old options-path with MI_options_setup_p1
 void M_SetupPlayer(int choice)
 {
-    if (choice == MI_mp_setup_p1 || choice == MI_options_setup_p1) // First local player
+    if (choice == MI_options_setup_p1) // First local player (from Options menu)
         cv_menu_setupplayer.Set(0);
-    else
-        cv_menu_setupplayer.Set(1);
 
     current_setup = cv_menu_setupplayer.value;
+    Menu::SetupNextMenu(&SetupPlayerDef);
+}
+
+// M_SetupPlayerDirect: called from PlayerSetup_MI with itemOn (0-3 = player 1-4).
+void M_SetupPlayerDirect(int choice)
+{
+    cv_menu_setupplayer.Set(choice);
+    current_setup = choice;
     Menu::SetupNextMenu(&SetupPlayerDef);
 }
 
@@ -1960,7 +2032,9 @@ static void M_OpenGLOption(int choice)
 
 static menuitem_t VideoOptions_MI[] = {
     menuitem_t(IT_LINK, NULL, "Video modes...", &VidModeDef, 0),
-    menuitem_t(IT_CVAR, NULL, "Fullscreen", &cv_fullscreen, 0),
+    menuitem_t(IT_CVAR, NULL, "Display Mode", &cv_fullscreen, 0),
+    menuitem_t(IT_CVAR, NULL, "VSync", &cv_vsync, 0),
+    menuitem_t(IT_CVAR, NULL, "FPS Limit", &cv_fpslimit, 0),
     menuitem_t(IT_CV_SLIDER | IT_STRING, NULL, "Brightness", &cv_video_gamma, 0),
     menuitem_t(IT_CV_SLIDER | IT_STRING, NULL, "Screen size", &cv_viewsize, 0),
     menuitem_t(IT_CVAR, NULL, "Scale status bar", &cv_scalestatusbar, 0),
@@ -1968,7 +2042,8 @@ static menuitem_t VideoOptions_MI[] = {
     menuitem_t(IT_CVAR, NULL, "Splats", &cv_splats, 0),
     menuitem_t(IT_CVAR, NULL, "Bloodtime", &cv_bloodtime, 0),
     menuitem_t(IT_CVAR, NULL, "Screenslink effect", &cv_screenslink, 0),
-    menuitem_t(IT_CALL | IT_WHITE | IT_DY, NULL, "OpenGL options...", M_OpenGLOption, 20),
+    menuitem_t(IT_LINK | IT_DY, NULL, "Quality Settings...", &QualitySettingsDef, 10),
+    menuitem_t(IT_CALL | IT_WHITE | IT_DY, NULL, "Advanced GL...", M_OpenGLOption, 10),
 };
 
 Menu VideoOptionsDef("M_OPTTTL", "OPTIONS", &OptionsDef, ITEMS(VideoOptions_MI), 60, 40);
@@ -2015,67 +2090,41 @@ void Menu::DrawVideoMode()
     vidm_nummodes = 0;
     nummodes = I_NumVideoModes();
 
-#ifdef __WIN32__
-    // faB: clean that later : skip windowed mode 0, video modes menu only shows
-    //      FULL SCREEN modes
-    if (nummodes < 1)
-    {
-        // put the windowed mode so that there is at least one mode
-        modedescs[0].modenum = 0;
-        modedescs[0].desc = I_GetVideoModeName(0);
-        modedescs[0].iscur = 1;
-        vidm_nummodes = 1;
-    }
-    for (i = 1; i <= nummodes && vidm_nummodes < MAXMODEDESCS; i++)
-#else
-    // DOS does not skip mode 0, because mode 0 is ALWAYS present
     for (i = 0; i < nummodes && vidm_nummodes < MAXMODEDESCS; i++)
-#endif
     {
         desc = I_GetVideoModeName(i);
         if (desc)
         {
-            dup = 0;
-
-            // when a resolution exists both under VGA and VESA, keep the
-            //  VESA mode, which is always a higher modenum
-            for (j = 0; j < vidm_nummodes; j++)
-            {
-                if (!strcmp(modedescs[j].desc, desc))
-                {
-                    // mode(0): 320x200 is always standard VGA, not vesa
-                    if (modedescs[j].modenum != 0)
-                    {
-                        modedescs[j].modenum = i;
-                        dup = 1;
-
-                        if (i == vid.modenum)
-                            modedescs[j].iscur = 1;
-                    }
-                    else
-                    {
-                        dup = 1;
-                    }
-
-                    break;
-                }
-            }
-
-            if (!dup)
-            {
-                modedescs[vidm_nummodes].modenum = i;
-                modedescs[vidm_nummodes].desc = desc;
-                modedescs[vidm_nummodes].iscur = 0;
-
-                if (i == vid.modenum)
-                    modedescs[vidm_nummodes].iscur = 1;
-
-                vidm_nummodes++;
-            }
+            modedescs[vidm_nummodes].modenum = i;
+            modedescs[vidm_nummodes].desc    = desc;
+            modedescs[vidm_nummodes].iscur   = (i == vid.modenum) ? 1 : 0;
+            vidm_nummodes++;
         }
     }
 
     vidm_column_size = (vidm_nummodes + 2) / 3;
+
+    // Sync cursor to the active mode the first time this menu is drawn per session.
+    // Consecutive tics with NowTic == prev+1 mean the user is already navigating.
+    static tic_t vidm_prev_tic = (tic_t)-2;
+    if (NowTic != vidm_prev_tic + 1)
+    {
+        // Menu was just (re-)opened — place cursor on the current active mode.
+        vidm_current = 0;
+        for (j = 0; j < vidm_nummodes; j++)
+        {
+            if (modedescs[j].modenum == vid.modenum)
+            {
+                vidm_current = j;
+                break;
+            }
+        }
+    }
+    vidm_prev_tic = NowTic;
+
+    // Clamp in case the list shrank (e.g. display mode switch).
+    if (vidm_current >= vidm_nummodes)
+        vidm_current = vidm_nummodes - 1;
 
     row = 16;
     col = y;
@@ -2189,6 +2238,21 @@ void M_HandleVideoMode(int key)
             break;
     }
 }
+
+//===========================================================================
+//                        INPUT SETTINGS MENU
+//===========================================================================
+
+static menuitem_t InputSettings_MI[] = {
+    menuitem_t(IT_CVAR, NULL, "Use Mouse", &cv_usemouse[0], 0),
+    menuitem_t(IT_CVAR, NULL, "Always MouseLook", &cv_automlook[0], 0),
+    menuitem_t(IT_CVAR, NULL, "Mouse Move", &cv_mousemove[0], 0),
+    menuitem_t(IT_CVAR, NULL, "Invert Mouse", &cv_invertmouse[0], 0),
+    menuitem_t(IT_CV_SLIDER | IT_STRING, NULL, "Mouse x-speed", &cv_mousesensx[0], 0),
+    menuitem_t(IT_CV_SLIDER | IT_STRING, NULL, "Mouse y-speed", &cv_mousesensy[0], 0)
+};
+
+Menu InputSettingsDef("M_OPTTTL", "INPUT SETTINGS", &OptionsDef, ITEMS(InputSettings_MI), 50, 40);
 
 //===========================================================================
 //                        Mouse OPTIONS MENU
@@ -2942,10 +3006,13 @@ void Menu::Drawer()
 
         // added:18-02-98: it should always be 0 for non-menu scaled graphics.
         vid.scaledofs = 0;
+
+        if (con.IsOpen())
+            con.Drawer(); // only overlay the console panel when it is actually visible
     }
     else
     {
-        con.Drawer(); // menu beats console
+        con.Drawer(); // no menu open — draw console (or HUD notify lines)
 
         // draw pause pic
         if (game.paused)
@@ -3097,7 +3164,11 @@ void Menu::Init()
     currentMenu = &MainMenuDef;
     itemOn = currentMenu->lastOn;
 
-    font = big_font;
+    // Choose font based on resolution to improve text quality in higher resolutions
+    if (BASEVIDWIDTH >= 1280 || BASEVIDHEIGHT >= 720)
+        font = big_font;
+    else
+        font = hud_font;
 
     // Here we could catch other version dependencies,
     //  like HELP1/2, and four episodes.
@@ -3168,10 +3239,29 @@ void Menu::Init()
 }
 
 //======================================================================
+// Quality Settings submenu
+//======================================================================
+
+static menuitem_t QualitySettings_MI[] = {
+    menuitem_t(IT_CVAR, NULL, "Quality Preset",     &cv_glquality,         0),
+    menuitem_t(IT_CVAR, NULL, "Anti-Aliasing (MSAA)", &cv_msaa,            10),
+    menuitem_t(IT_NONE | IT_CSTRING | IT_DISABLED | IT_GRAY | IT_DY, NULL,
+               "(MSAA change requires restart)", 2),
+    menuitem_t(IT_CVAR, NULL, "Texture Filter",     &cv_grfiltermode,      20),
+    menuitem_t(IT_CV_SLIDER | IT_STRING, NULL, "Anisotropic Filter", &cv_granisotropy, 30),
+    menuitem_t(IT_CVAR, NULL, "Dynamic Lighting",   &cv_grdynamiclighting, 40),
+    menuitem_t(IT_CVAR, NULL, "Shadows",            &cv_grshadows,         50),
+    menuitem_t(IT_CVAR, NULL, "Coronas",            &cv_grcoronas,         60),
+    menuitem_t(IT_CVAR, NULL, "Field of View",      &cv_fov,               70),
+};
+
+Menu QualitySettingsDef("M_OPTTTL", "OPTIONS", &VideoOptionsDef, ITEMS(QualitySettings_MI), 60, 40);
+
+//======================================================================
 // OpenGL specific options
 //======================================================================
 
-extern Menu OGL_LightingDef, OGL_FogDef, OGL_ColorDef, OGL_DevDef;
+extern Menu OGL_LightingDef, OGL_FogDef, OGL_ColorDef, OGL_DevDef, OGL_NormalMapDef;
 
 static menuitem_t OpenGLOptions_MI[] = {
     // menuitem_t(IT_CVAR, NULL, "Mouse look"          , &cv_grcrappymlook     ,  0),
@@ -3183,7 +3273,8 @@ static menuitem_t OpenGLOptions_MI[] = {
     menuitem_t(IT_LINK, NULL, "Lighting...", &OGL_LightingDef, 60),
     menuitem_t(IT_LINK, NULL, "Fog...", &OGL_FogDef, 70),
     menuitem_t(IT_LINK, NULL, "Gamma...", &OGL_ColorDef, 80),
-    // menuitem_t(IT_LINK, NULL, "Development..."    , &OGL_DevDef        , 90),
+    menuitem_t(IT_LINK, NULL, "Normal maps...", &OGL_NormalMapDef, 90),
+    // menuitem_t(IT_LINK, NULL, "Development..."    , &OGL_DevDef        , 100),
 };
 
 static menuitem_t OGL_Lighting_MI[] = {
@@ -3198,6 +3289,10 @@ static menuitem_t OGL_Fog_MI[] = {
     menuitem_t(IT_CVAR, NULL, "Fog", &cv_grfog, 0),
     menuitem_t(IT_TEXTBOX, NULL, "Fog color", &cv_grfogcolor, 10),
     menuitem_t(IT_CVAR, NULL, "Fog density", &cv_grfogdensity, 20),
+};
+
+static menuitem_t OGL_NormalMap_MI[] = {
+    menuitem_t(IT_CVAR | IT_CV_SLIDER, NULL, "Normal map strength", &cv_grnormalmapstrength, 0),
 };
 
 static menuitem_t OGL_Color_MI[] = {
@@ -3219,6 +3314,7 @@ Menu OGL_LightingDef("M_OPTTTL", "OPTIONS", &OpenGLOptionDef, ITEMS(OGL_Lighting
 Menu OGL_FogDef("M_OPTTTL", "OPTIONS", &OpenGLOptionDef, ITEMS(OGL_Fog_MI), 60, 40);
 Menu OGL_ColorDef("M_OPTTTL", "OPTIONS", &OpenGLOptionDef, ITEMS(OGL_Color_MI), 60, 40);
 Menu OGL_DevDef("M_OPTTTL", "OPTIONS", &OpenGLOptionDef, ITEMS(OGL_Dev_MI), 60, 40);
+Menu OGL_NormalMapDef("M_OPTTTL", "OPTIONS", &OpenGLOptionDef, ITEMS(OGL_NormalMap_MI), 60, 40);
 
 /*
 void Menu::DrawOpenGLMenu()
