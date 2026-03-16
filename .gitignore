@@ -118,6 +118,10 @@ xcuserdata/
 /.emacs.desktop
 /.emacs.desktop.lock
 *.elc
+
+# Local assistant settings
+.claude/
+.grok/
 auto-save-list
 tramp
 .\#*
