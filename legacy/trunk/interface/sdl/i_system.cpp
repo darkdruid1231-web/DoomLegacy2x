@@ -63,8 +63,41 @@
 #define SDL_WarpMouse(x, y) SDL_WarpMouseInWindow(NULL, x, y)
 #define SDL_WM_SetCaption(t, i) SDL_SetWindowTitle(NULL, t)
 #define SDL_EnableUNICODE(x) // no-op in SDL2
-// SDL2 removed unicode field in keysym - we use text input events instead
-#define SDL_Keysym_unicode(keysym) 0
+
+// SDL2 removed the unicode field in keysym. Translate keycode + modifiers to a
+// Unicode code point for printable ASCII characters (US QWERTY layout).
+// Covers all console input needs without requiring SDL_TEXTINPUT events.
+static int SDL_Keysym_unicode(SDL_Keysym keysym)
+{
+    SDL_Keycode sym = keysym.sym;
+    int mod = keysym.mod;
+
+    // SDL2 printable ASCII keycodes match their ASCII values (32-126)
+    if (sym < 32 || sym > 126)
+        return 0;
+
+    bool shift = (mod & KMOD_SHIFT) != 0;
+    bool caps  = (mod & KMOD_CAPS)  != 0;
+
+    if (sym >= 'a' && sym <= 'z')
+        return (shift ^ caps) ? sym - 32 : sym;
+
+    if (!shift)
+        return sym; // digits and unshifted punctuation pass through as-is
+
+    // shifted digits and punctuation (US QWERTY)
+    switch (sym)
+    {
+    case '1': return '!';  case '2': return '@';  case '3': return '#';
+    case '4': return '$';  case '5': return '%';  case '6': return '^';
+    case '7': return '&';  case '8': return '*';  case '9': return '(';
+    case '0': return ')';  case '-': return '_';  case '=': return '+';
+    case '[': return '{';  case ']': return '}';  case '\\': return '|';
+    case ';': return ':';  case '\'': return '"'; case ',': return '<';
+    case '.': return '>';  case '/': return '?';  case '`': return '~';
+    default:  return sym;
+    }
+}
 
 // SDL2 mouse grab - use GetSDLWindow from i_video.cpp
 extern SDL_Window* GetSDLWindow();
@@ -439,6 +472,7 @@ void I_OutputMsg(const char *fmt, ...)
     va_start(argptr, fmt);
     vfprintf(stdout, fmt, argptr);
     va_end(argptr);
+    fflush(stdout); // ensure crash logs show all output up to the crash
 }
 
 int I_GetKey()

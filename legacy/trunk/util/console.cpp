@@ -10,6 +10,7 @@
 
 #include "d_event.h"
 #include "doomdef.h"
+#include "cvars.h"
 
 #include "command.h"
 #include "console.h"
@@ -25,6 +26,7 @@
 #include "i_system.h"
 #include "i_video.h"
 #include "v_video.h"
+#include "hardware/oglrenderer.hpp"
 #include "w_wad.h"
 #include "z_zone.h"
 
@@ -208,10 +210,10 @@ static void CON_SetupColormaps()
 
 CV_PossibleValue_t CV_Positive[] = {{1, "MIN"}, {999999999, "MAX"}, {0, NULL}};
 
-// how many seconds the hud messages lasts on the screen
+// how many seconds the hud messages last on the screen when console is closed
 consvar_t cons_msgtimeout = {"con_hudtime", "5", CV_SAVE, CV_Unsigned};
 
-// number of lines console move per frame
+// console slide speed in pixels per frame
 consvar_t cons_speed = {"con_speed", "8", CV_SAVE, CV_Positive};
 
 // percentage of screen height to use for console
@@ -219,7 +221,17 @@ consvar_t cons_height = {"con_height", "50", CV_SAVE, CV_Positive};
 
 CV_PossibleValue_t backpic_cons_t[] = {{0, "translucent"}, {1, "picture"}, {0, NULL}};
 // whether to use console background picture, or translucent mode
-consvar_t cons_backpic = {"con_backpic", "0", CV_SAVE, backpic_cons_t};
+consvar_t cons_backpic = {"con_backpic", "1", CV_SAVE, backpic_cons_t};
+
+// console width in pixels (0 = full screen width)
+consvar_t cons_conwidth = {"con_width", "0", CV_SAVE, CV_Unsigned};
+
+// console background opacity 0-100 (only in translucent mode)
+static CV_PossibleValue_t CV_Alpha[] = {{0, "MIN"}, {100, "MAX"}, {0, NULL}};
+consvar_t cons_alpha = {"con_alpha", "80", CV_SAVE, CV_Alpha};
+
+// console log file path (empty = disabled)
+consvar_t cons_logfile = {"con_logfile", "", CV_SAVE, NULL};
 
 //  Clear console text buffer
 void Command_Clear_f()
@@ -325,6 +337,9 @@ void Console::Init()
     cons_speed.Reg();
     cons_height.Reg();
     cons_backpic.Reg();
+    cons_conwidth.Reg();
+    cons_alpha.Reg();
+    cons_logfile.Reg();
 
     graphic = true;
 
@@ -340,10 +355,14 @@ void Console::RecalcSize()
 {
     recalc = false;
 
-    float cw = vid.width - vid.fdupx * (con_lborder->worldwidth +
-                                        con_rborder->worldwidth); // printing space between borders
-    if (cw < 100)                                                 // minimal reasonable width
-        cw = 100;
+    // con_width is in virtual (BASEVIDWIDTH=320) units matching StringWidth() return values.
+    // vid.fdupx converts screen pixels to virtual units.
+    float virt_width = (vid.fdupx > 0) ? vid.width / vid.fdupx : (float)vid.width;
+    float cw = (cons_conwidth.value > 0 && cons_conwidth.value < virt_width)
+                   ? (float)cons_conwidth.value
+                   : virt_width;
+    if (cw < 40) // minimal reasonable width in virtual units
+        cw = 40;
 
     // check for change of video width
     if (cw == con_width)
@@ -394,19 +413,36 @@ void Console::Toggle(bool forceoff)
             con_height = 0;
             con_clipviewtop = -1; // remove console clipping of view
         }
+
+        // unpause single-player game (mirrors Menu::Close behavior)
+        if (!game.netgame)
+            game.paused = false;
     }
     else
     {
         // toggle console on
-        con_destheight = (cons_height.value * vid.height) / 100;
-        if (con_destheight < 20)
-            con_destheight = 20;
-        else if (con_destheight > vid.height - hud.stbarheight)
-            con_destheight = vid.height - hud.stbarheight;
+        // In split-screen, the console is a full-app overlay so it must span
+        // all player viewports (the full screen height).
+        if (cv_splitscreen.value > 0)
+            con_destheight = vid.height;
+        else
+        {
+            con_destheight = (cons_height.value * vid.height) / 100;
+            if (con_destheight < 20)
+                con_destheight = 20;
+            else if (con_destheight > vid.height - hud.stbarheight)
+                con_destheight = vid.height - hud.stbarheight;
+        }
 
-        con_destheight = int(CON_margin + (con_destheight / con_lineheight) *
-                                              con_lineheight); // multiple of text row height
+        // Round down to a whole number of text row heights (legacy_one style)
+        float lh = con_lineheight * vid.fdupy;
+        if (lh > 0)
+            con_destheight = int(con_destheight / lh) * int(lh);
         active = true;
+
+        // pause single-player game while console is open (mirrors Menu::Open behavior)
+        if (!game.netgame && game.state != GameInfo::GS_DEMOPLAYBACK)
+            game.paused = true;
     }
 }
 
@@ -591,33 +627,56 @@ bool Console::Responder(event_t *ev)
         return true;
     }
 
-    // move up (backward) in console textbuffer
-    if (key == KEY_PGUP)
+    // mouse wheel scrolls console output (posted as ev_keydown by SDL)
     {
-        if (con_scrollup < CON_LINES - int((con_height - CON_margin) / con_lineheight) + 1)
-            con_scrollup += 5;
-        return true;
-    }
-    else if (key == KEY_PGDN)
-    {
-        if (con_scrollup >= 5)
-            con_scrollup -= 5;
-        else
-            con_scrollup = 0;
-        return true;
-    }
+        // visible lines count: con_height and con_lineheight must be in same units.
+        // con_height is screen pixels; con_lineheight is virtual units → scale by fdupy.
+        float lh = (vid.fdupy > 0) ? con_lineheight * vid.fdupy : con_lineheight;
+        int maxscroll = CON_LINES - int(con_height / lh) + 1;
 
-    // oldset text in buffer
-    if (key == KEY_HOME)
-    {
-        con_scrollup = CON_LINES - int((con_height - CON_margin) / con_lineheight) + 1;
-        return true;
-    }
-    else if (key == KEY_END)
-    {
-        // most recent text in buffer
-        con_scrollup = 0;
-        return true;
+        if (key == KEY_MOUSEWHEELUP)
+        {
+            if (con_scrollup < maxscroll)
+                con_scrollup += 3;
+            return true;
+        }
+        if (key == KEY_MOUSEWHEELDOWN)
+        {
+            if (con_scrollup >= 3)
+                con_scrollup -= 3;
+            else
+                con_scrollup = 0;
+            return true;
+        }
+
+        // move up (backward) in console textbuffer
+        if (key == KEY_PGUP)
+        {
+            if (con_scrollup < maxscroll)
+                con_scrollup += 5;
+            return true;
+        }
+        else if (key == KEY_PGDN)
+        {
+            if (con_scrollup >= 5)
+                con_scrollup -= 5;
+            else
+                con_scrollup = 0;
+            return true;
+        }
+
+        // oldest text in buffer
+        if (key == KEY_HOME)
+        {
+            con_scrollup = maxscroll;
+            return true;
+        }
+        if (key == KEY_END)
+        {
+            // most recent text in buffer
+            con_scrollup = 0;
+            return true;
+        }
     }
 
     // enter current input line to command buffer
@@ -698,6 +757,8 @@ bool Console::Responder(event_t *ev)
     // enter a char into the command prompt
     if (c < 32) // ignore control characters
         return false;
+
+    con_scrollup = 0; // typing snaps view back to most recent output
 
     // add key to cmd line here
     string &input_line = input_history[input_browse];
@@ -809,8 +870,9 @@ void Console::Print(char *msg)
 // draw the last lines of console text to the top of the screen
 void Console::DrawHudlines()
 {
-    float y =
-        hud.chat_on ? hud_font->Height() : 0; // leave place for chat input in the first row of text
+    // y is in screen pixels; scale virtual font height by fdupy
+    float lh = hud_font->Height() * vid.fdupy;
+    float y = hud.chat_on ? lh : 0; // leave place for chat input in the first row of text
 
     for (int i = con_cy - CON_HUDLINES + 1; i <= con_cy; i++)
     {
@@ -821,8 +883,8 @@ void Console::DrawHudlines()
             continue;
 
         // FIXME lineowner! use viewport locations!
-        hud_font->DrawString(0, y, con_buffer[i % CON_LINES], 0);
-        y += hud_font->Height();
+        hud_font->DrawString(0, y, con_buffer[i % CON_LINES], V_SSIZE);
+        y += lh;
     }
 
     // top screen lines that might need clearing when view is reduced
@@ -837,44 +899,67 @@ void Console::DrawConsole()
     con_hudupdate = true;        // always refresh while console is on
 
     // draw console background
+    // In OGL mode: always use CONSBACK picture (legacy_one OGL always used CONSBACK,
+    // regardless of cons_backpic). In SW mode: respect cons_backpic (picture vs translucent).
+    // OGL Material::Draw requires Setup2DMode() (consolemode=true); during startup refresh
+    // rendermode is still render_soft, so the SW path safely handles that case.
     float x = 0;
-    float y = con_height - vid.height;
-    if (cons_backpic.value)
+    float y = con_height - vid.height; // image anchor: negative → only bottom portion shows
+
+    if (rendermode != render_soft)
+    {
+        // OGL: always draw CONSBACK picture. Goes through Material::Draw / Setup2DMode,
+        // the same coordinate path as text, so background and text are inherently aligned.
+        if (con_backpic)
+            con_backpic->Draw(0, y, V_SSIZE);
+        else if (oglrenderer)
+            oglrenderer->DrawConsoleBackground((float)con_height / vid.height,
+                                               cons_alpha.value / 100.0f);
+    }
+    else if (cons_backpic.value)
+    {
+        // SW picture mode: CONSBACK image
         con_backpic->Draw(0, y, V_SSIZE);
+    }
     else
     {
-        float wl = con_lborder->worldwidth * vid.fdupx;
-        float wr = con_rborder->worldwidth * vid.fdupx;
-
-        x = vid.width - wr;
-        con_lborder->Draw(0, y, V_SSIZE);
-        con_rborder->Draw(x, y, V_SSIZE);
-
-        V_DrawFadeConsBack(wl, 0, x, con_height); // translucent background
-        x = wl;                                   // console printing area starts here
+        // SW translucent mode: decorative left/right borders + translucent fill
+        float wl = 0;
+        float x2 = (float)vid.width;
+        if (con_lborder && con_rborder)
+        {
+            wl = con_lborder->worldwidth * vid.fdupx;
+            x2 = vid.width - con_rborder->worldwidth * vid.fdupx;
+            con_lborder->Draw(0, y, V_SSIZE);
+            con_rborder->Draw(x2, y, V_SSIZE);
+        }
+        V_DrawFadeConsBack(wl, 0, x2, con_height);
+        x = wl; // indent text past the left border
     }
 
-    // draw console text lines from bottom to top
-    // (going backward in console buffer text)
+    // All text coordinates are in screen pixels.
+    // con_lineheight is in virtual units → scale by fdupy to get screen pixels.
+    float lh = con_lineheight * vid.fdupy;
 
-    float minheight = 2 * con_lineheight + CON_margin;
+    // Minimum console height to show any text: 2 lines (history + prompt)
+    float minheight = 2 * lh;
 
     if (con_height < minheight)
         return;
 
     int i = con_cy - con_scrollup;
 
-    // skip the last empty line due to the cursor being at the start
-    // of a new line
+    // skip the last empty line due to the cursor being at the start of a new line
     if (!con_scrollup && !con_cx)
         i--;
 
-    for (y = con_height - minheight; y >= 0; y -= con_lineheight, i--)
+    // draw text lines from just above the prompt line, going up toward the top
+    for (y = con_height - 2 * lh; y >= 0; y -= lh, i--)
     {
         if (i < 0)
             i += CON_LINES; // wrap
 
-        hud_font->DrawString(x, y, con_buffer[i % CON_LINES], 0);
+        hud_font->DrawString(x, y, con_buffer[i % CON_LINES], V_SSIZE);
     }
 
     // draw prompt if enough space (not while game startup)
@@ -889,13 +974,13 @@ void Console::DrawConsole()
         if (n >= CON_MAXLINECHARS)
             p += n - CON_MAXLINECHARS + 1;
 
-        y = con_height - CON_margin - con_lineheight;
-        x += hud_font->DrawString(x, y, CON_PROMPT, 0);
-        x += hud_font->DrawString(x, y, p, 0);
+        y = con_height - lh; // prompt sits at the bottom line of the console
+        x += hud_font->DrawString(x, y, CON_PROMPT, V_SSIZE);
+        x += hud_font->DrawString(x, y, p, V_SSIZE);
 
         // draw the blinking cursor
         if (con_tick < 4)
-            hud_font->DrawCharacter(x, y, '_', 0);
+            hud_font->DrawCharacter(x, y, '_', V_SSIZE);
     }
 }
 
@@ -940,6 +1025,17 @@ void CONS_Printf(const char *fmt, ...)
     va_end(ap);
 
     I_OutputMsg("%s", txt); // send copies of console messages to stdout for debugging
+
+    // write to log file if configured
+    if (cons_logfile.str[0])
+    {
+        FILE *f = fopen(cons_logfile.str, "a");
+        if (f)
+        {
+            fputs(txt, f);
+            fclose(f);
+        }
+    }
 
     if (!con.graphic)
         return;

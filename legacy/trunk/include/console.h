@@ -80,7 +80,7 @@ class Console
 
     // console output
 #define CON_MAXLINECHARS 120                          // nobody wants to read lines longer than this
-#define CON_LINES 100                                 // reasonable output history
+#define CON_LINES 1024                                // 1024-line scrollback buffer (classic Quake standard)
     char con_buffer[CON_LINES][CON_MAXLINECHARS + 1]; ///< wrapping output buffer (ASCII or UTF-8)
     char *con_line;                                   ///< pointer to current output line
 
@@ -137,6 +137,9 @@ class Console
 
     /// draws the console
     void Drawer();
+
+    /// returns true if the console panel is currently visible (sliding in or fully open)
+    bool IsOpen() const { return con_height > 0; }
 
     /// wrapper
     friend void CONS_Printf(const char *fmt, ...);
