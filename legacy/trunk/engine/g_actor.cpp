@@ -232,6 +232,11 @@ U32 Actor::packUpdate(GhostConnection *c, U32 mask, class BitStream *stream)
         stream->writeInt(pitch >> (32 - ACTOR_AR), ACTOR_AR);
     }
 
+    // Force animation updates for animating player pawns
+    if (dynamic_cast<PlayerPawn*>(this) && pres && dynamic_cast<spritepres_t*>(pres) &&
+        static_cast<spritepres_t*>(pres)->GetAnim() != presentation_t::Idle)
+        mask |= M_ANIM;
+
     // NOTE: here we are in fact transferring presentation_t data.
     // Decided not to make presentation_t a NetObject of its own, since
     // it is always associated with an Actor and this is simpler.
@@ -814,7 +819,8 @@ void Actor::LandOnFloor(bool floor)
         v *= 0.5; // less falling damage
 
     if (cv_fallingdamage.value && v < -cv_fallingdamage.value)
-        FallingDamage(v); // TODO floor may be moving, use relative v...
+        FallingDamage(v); // NOTE: for moving floors the relative velocity (v - floor_vel) should
+                          // be used, but sector motion velocity is not readily available here.
 
     vel.z = 0;
 }
@@ -1163,11 +1169,9 @@ int Actor::HitFloor()
                         p->vel.z = 1 + 0.5 * Random();
                 }
 
-                // FIXME Hexen lava damage
-                /*
-                if (thing->player && leveltime&31)
-                  P_DamageMobj(thing, &LavaInflictor, NULL, 5);
-                */
+                // Hexen lava damage: 5 heat damage every 32 tics for players.
+                if (Inherits<PlayerPawn>() && !(mp->maptic & 31))
+                    Damage(NULL, NULL, 5, dt_heat);
                 break;
 
             case FLOOR_SLUDGE:

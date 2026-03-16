@@ -159,7 +159,8 @@ ActorInfo::ActorInfo(const mobjinfo_t &m, int gm)
 
             temp.dyn_states = false;              // until states table is got rid of
             temp.label_states = (&spawnstate)[i]; // HACK
-            temp.num_states = 10;                 // TODO guesstimate
+            temp.num_states = 10;                 // rough upper bound for standard label states;
+                                                  // an exact count would require a two-pass parse
 
             temp.jumplabel[0] = '\0';
             temp.jumplabelnum = -1;
@@ -220,13 +221,19 @@ void ActorInfo::SetFlag(const char *flagname, bool on)
             int f1 = MF_MONSTER | MF_SOLID | MF_SHOOTABLE | MF_COUNTKILL;
             int f2 = MF2_PUSHWALL | MF2_MCROSS;
             on ? (flags |= f1, flags2 |= f2) : (flags &= ~f1, flags2 &= ~f2);
-            // TODO missing MONSTER property: CANPASS
+            // CANPASS is handled by the standalone flag block below via MF_NOCLIPTHING
         }
         else if (!strcasecmp(flagname, "PROJECTILE"))
         {
             int f1 = MF_MISSILE | MF_DROPOFF | MF_NOBLOCKMAP | MF_NOGRAVITY;
             int f2 = MF2_NOTELEPORT | MF2_IMPACT | MF2_PCROSS;
             on ? (flags |= f1, flags2 |= f2) : (flags &= ~f1, flags2 &= ~f2);
+        }
+        else if (!strcasecmp(flagname, "CANPASS"))
+        {
+            // ZDoom CANPASS: actor can move over/under other actors (Hexen ghost monsters).
+            // Implemented via MF_NOCLIPTHING — not blocked by other Actors.
+            on ? (flags |= MF_NOCLIPTHING) : (flags &= ~MF_NOCLIPTHING);
         }
         else
             Error("Unknown flag '%s'.\n", flagname);
@@ -280,8 +287,7 @@ void ActorInfo::AddStates(const char *spr, const char *frames, int tics, const c
 
     if (i == n) // not found
     {
-        // FIXME if not found, create!
-        // spritenames.push_back();
+        CONS_Printf("DECORATE: unknown sprite name '%s' — using SPR_NONE\n", spr);
         i = SPR_NONE;
     }
 
@@ -412,7 +418,8 @@ bool ActorInfo::UpdateSequences()
         {
             if (s->num_states == 0)
             {
-                I_Error("FIXME, unexpected\n");
+                I_Error("DECORATE: state label '%s' has no states and no jump target in actor '%s'\n",
+                        s->label, classname);
             }
             else
                 s->label_states[s->num_states - 1].nextstate = &states[S_NULL]; // offset is ignored

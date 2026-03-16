@@ -558,8 +558,9 @@ PlayerInfo *GameInfo::AddPlayer(PlayerInfo *p)
     if (n >= maxplayers || !p)
         return NULL; // no room in game or no player given
 
-    // TODO what if maxplayers has recently been set to a lower-than-n value?
-    // when are the extra players kicked? cv_maxplayers action func?
+    // NOTE: if maxplayers was just reduced below the current player count, excess players are
+    // not automatically kicked here.  The cv_maxplayers action function (or a dedicated
+    // SV_KickExcessPlayers pass) should handle that case.
 
     // player numbers range from 1 to maxplayers
     int pnum = p->number;

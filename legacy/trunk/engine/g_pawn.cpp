@@ -362,6 +362,20 @@ void PlayerPawn::Think()
     if (!player)
     {
         Actor::Think();
+        // For remote players, update animation based on movement
+        if (pres)
+        {
+            if (vel.x != 0 || vel.y != 0)
+            {
+                if (pres->GetAnim() <= presentation_t::LAST_LOOPING)
+                    pres->SetAnim(presentation_t::Run);
+            }
+            else
+            {
+                if (pres->GetAnim() <= presentation_t::LAST_LOOPING)
+                    pres->SetAnim(presentation_t::Idle);
+            }
+        }
         return;
     }
 
@@ -488,6 +502,10 @@ void PlayerPawn::Think()
     // cycle psprites
     MovePsprites();
 
+    // Update player sprite animation
+    if (pres)
+        pres->Update(1);
+
     // Counters, time dependend power ups.
     // Strength counts up to diminish fade.
     if (powers[pw_strength])
@@ -575,6 +593,21 @@ void PlayerPawn::Think()
         }
     }
 
+    // For remote players, update animation based on movement
+    if (!player && pres)
+    {
+        if (vel.x != 0 || vel.y != 0)
+        {
+            if (pres->GetAnim() <= presentation_t::LAST_LOOPING)
+                pres->SetAnim(presentation_t::Run);
+        }
+        else
+        {
+            if (pres->GetAnim() <= presentation_t::LAST_LOOPING)
+                pres->SetAnim(presentation_t::Idle);
+        }
+    }
+
 actor_think:
     // this is where the "actor part" of the thinking begins
     // we call Actor::Think(), because a playerpawn is an actor too
@@ -586,6 +619,10 @@ actor_think:
 void PlayerPawn::DeathThink()
 {
     MovePsprites();
+
+    // Update player sprite animation
+    if (pres)
+        pres->Update(1);
 
     // fall to the ground
     if (player->viewheight > 6)

@@ -634,8 +634,7 @@ void HUD::UpdateWidgets(PlayerInfo *st_player, int vp)
     }
 
     if (st_pawn->powers[pw_strength])
-        st_berzerk = 12 - (st_pawn->powers[pw_strength] >>
-                           6); // slowly fade the berzerk out??? FIXME it's on/off!
+        st_berzerk = 1; // binary on/off indicator while berzerk is active
     else
         st_berzerk = 0;
 
@@ -798,16 +797,15 @@ void HUD::PaletteFlash(PlayerInfo *p)
     {
         palette = p->palette;
     }
-    else /* if (p->pawn->poisoncount) TODO
-      {
+    else if (p->pawn && p->pawn->poisoncount)
+    {
         palette = (p->pawn->poisoncount + 7) >> 3;
         if (palette >= NUMPOISONPALS)
-          palette = NUMPOISONPALS-1;
+            palette = NUMPOISONPALS - 1;
 
         palette += STARTPOISONPALS;
-      }
-    else */
-        if (dcount)
+    }
+    else if (dcount)
         {
             palette = (dcount + 7) >> 3;
 
@@ -827,12 +825,11 @@ void HUD::PaletteFlash(PlayerInfo *p)
         }
         else if (st_radiation)
             palette = RADIATIONPAL; // not relevant in heretic
-    /*
-    else if (sbpawn->flags2 & MF2_ICEDAMAGE)
-      { // TODO Frozen player
+    else if (p->pawn && (p->pawn->flags & MF_ICECORPSE))
+    {
+        // Frozen player (Hexen ice death)
         palette = ICEPAL;
-      }
-    */
+    }
 
     palette = min(palette, NUM_PALETTES - 1);
 
@@ -974,7 +971,9 @@ void HUD::CreateHexenWidgets()
         // V_DrawPatch(38, 162, PatchKILLS);
         h = new HudNumber(st_x + 50, st_y + 16, 3, &st_fragscount, PatchINum);
     else
-        // TODO: use red numbers if health is low
+        // NOTE: Hexen vanilla uses red (FONTB) numbers when health < 25.
+        // Implementing this requires a second Material* array loaded from the red-number lumps
+        // and a HudNumber subclass (or Update callback) that switches patch set dynamically.
         h = new HudNumber(st_x + 65, st_y + 16, 3, &st_health, PatchINum);
     mainbar.push_back(h);
 
@@ -1382,7 +1381,7 @@ void HUD::CreateOverlayWidgets()
                if ((!cv_deathmatch.value) && (!cv_splitscreen.value))
                  {
                    char buf[16];
-                   sprintf(buf, "%d/%d", 0, 0); // FIXME! should be sbpawn.kills, map.kills
+                   sprintf(buf, "%d/%d", st_pawn->player->kills, st_pawn->mp->kills);
                    V_DrawString(SCX(318-V_StringWidth(buf)), SCY(1), V_NOSCALESTART, buf);
 
                  }
@@ -1392,7 +1391,7 @@ void HUD::CreateOverlayWidgets()
                if ((!cv_deathmatch.value) && (!cv_splitscreen.value))
                  {
                    char buf[16];
-                   sprintf(buf, "%d/%d", 0, 0); // FIXME! should be sbpawn., map.secrets
+                   sprintf(buf, "%d/%d", st_pawn->player->secrets, st_pawn->mp->secrets);
                    V_DrawString(SCX(318-V_StringWidth(buf)), SCY(11), V_NOSCALESTART, buf);
                  }
                break;

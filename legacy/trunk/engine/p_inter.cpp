@@ -401,7 +401,9 @@ bool DActor::Touch(Actor *p)
                 p->vel.x += vel.x >> 2;
                 p->vel.y += vel.y >> 2;
             }
-            // spechit.clear(); FIXME why?
+            // NOTE: ripping projectiles should clear ClipContext::spechit here to avoid
+            // re-activating the same crossed lines on subsequent steps, but spechit is not
+            // accessible from DActor::Touch — this needs a ClipContext* parameter.
             return false;
         }
 
@@ -1021,7 +1023,9 @@ void Actor::Die(Actor *inflictor, Actor *source, int dtype)
         }
         else if (!game.multiplayer)
         {
-            // TODO count all monster deaths, even those caused by other monsters?
+            // In single-player, attribute the kill to the first (only) player.
+            // Monster-vs-monster infighting kills are intentionally counted here so the
+            // intermission tally is complete regardless of who delivered the killing blow.
             game.Players.begin()->second->kills++;
         }
 

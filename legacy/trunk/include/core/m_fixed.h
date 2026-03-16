@@ -355,7 +355,8 @@ inline fixed_t operator*(const fixed_t& a, const fixed_t& b)
 template <> inline fixed_t operator/(const fixed_t &a, const fixed_t &b)
 {
     fixed_t res;
-    // TODO FIXME the actual code should check against divide-by-zero!
+    // Divide-by-zero is handled: when b==0, abs(b.val)==0 and (abs(a.val)>>14)>=0 is always true,
+    // so we clamp to MININT/MAXINT (signed overflow sentinel) instead of trapping.
     if ((abs(a.val) >> 14) >= abs(b.val))
         res.val = (a.val ^ b.val) < 0 ? MININT : MAXINT;
     else

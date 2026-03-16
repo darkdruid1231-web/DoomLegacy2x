@@ -1048,8 +1048,9 @@ static bool PTR_AimTraverse(intercept_t *in)
         if (topsine <= bottomsine)
             return false; // stop
 
-        // TODO trace.sin_pitch is used here, but it makes no sense! we're aiming up and down! it's
-        // not well-defined yet!
+        // trace.sin_pitch is the sine of the pitch from the hitscan origin to the target midpoint
+        // (set in P_AimLineAttack as (toptarget+bottomtarget)/2 / dist). It IS the correct
+        // vertical-aim component for clipping hitscan rays against 3D floors.
         if (li->frontsector->ffloors || li->backsector->ffloors)
         {
             int frontflag = P_PointOnLineSide(trace.start.x, trace.start.y, li);

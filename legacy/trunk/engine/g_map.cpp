@@ -172,7 +172,7 @@ Map::~Map()
     // TODO sound sequences?
 
     // clear the splats from deleted map
-    R_ClearLevelSplats(); // FIXME find a better way
+    R_ClearLevelSplats(); // TODO: move into renderer's UnsetMap() teardown path
     // 3D sounds must be stopped when their sources are deleted...
     S.Stop3DSounds(); // TODO not correct, since several maps may run simultaneously.
 }
@@ -263,7 +263,7 @@ void Map::SpawnPlayer(PlayerInfo *pi, mapthing_t *mthing)
     if (!pi->options.originalweaponswitch)
         p->UseFavoriteWeapon();
 
-    // FIXME set skin sprite here
+    // TODO: apply skin sprite via SetSkin/spritepres_t here at spawn time
     // set color translations for player sprites
 
     p->yaw = ANG45 * (mthing->angle / 45);

@@ -87,9 +87,11 @@ enum mobjflag_t
     MF_VALIDTARGET =
         MF_MONSTER | MF_PLAYER, ///< Valid target for autoaim and bots (if not already dead)
 
+    MF_ICECORPSE = 0x20000000, ///< Hexen: frozen corpse (ice death). Skipped by corpse-queue and
+                               ///< shatter on impact instead of being queued for removal.
     MF_TOUCHFUNC = 0x80000000, ///< Actor has a touch function. A HACK to handle complex Hexen
                                ///< mapthing behavior.
-                               // 4 bits free
+                               // 3 bits free: 0x40000000, and the two unused low bits 0x0004/0x0080
 };
 
 /// More semi-permanent flags. Mostly came with Heretic.

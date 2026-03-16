@@ -151,7 +151,7 @@ bool P_CheckSpecialDeath(DActor *m, int dtype)
     if ((dtype & dt_TYPEMASK) == dt_cold)
     {
         ret = true;
-        // flags |= MF_ICECORPSE; // TODO
+        m->flags |= MF_ICECORPSE; // frozen corpse: shatter on impact, skip corpse-queue rotation
         switch (m->type)
         {
             case MT_BISHOP:
@@ -558,7 +558,8 @@ void DActor::P_NewChaseDir()
 static Actor *looker;
 static int search_count;
 
-// TODO save CPU, add realism, use blockmap or BSP to only seek surroundings
+// PERF: linear scan over all thinkers. A spatial improvement would use
+// P_BlockThingsIterator (blockmap API) to limit the search radius instead.
 static bool IT_FindEnemies(Thinker *th)
 {
     const int MONS_LOOK_RANGE = 20 * 64;
@@ -659,13 +660,6 @@ bool DActor::LookForEnemies(bool allaround)
     }
 
 noplayerfound:
-    if (false) // TEST FIXME
-    {
-        looker = this;
-        search_count = 0;
-        return (!mp->IterateThinkers(IT_FindEnemies) && target);
-    }
-
     return false;
 }
 
@@ -844,8 +838,8 @@ nomissile:
             S_StartScreamSound(actor, actor->info->seesound);
         else if (actor->flags2 & MF2_BOSS)
             S_StartAmbSound(NULL, actor->info->activesound);
-        // FIXME else if (actor->type == MT_PIG) S_StartScreamSound(actor,
-        // SFX_PIG_ACTIVE1+(P_Random()&1));
+        else if (actor->type == MT_PIG)
+            S_StartScreamSound(actor, SFX_PIG_ACTIVE1 + (P_Random() & 1));
         else
             S_StartScreamSound(actor, actor->info->activesound);
     }
@@ -903,8 +897,9 @@ void A_NoBlocking(DActor *actor)
 {
     A_Fall(actor);
 
-    // Check for monsters dropping things TODO ZDoom-style droplist into ActorInfo, merge with
-    // A_Fall
+    // Check for monsters dropping things.
+    // NOTE: hardcoded switch; ZDoom uses a drop_type/drop_chance pair in ActorInfo so DECORATE can
+    // override drops without code changes. That approach should replace this switch eventually.
     switch (actor->type)
     {
             // Heretic
@@ -1418,7 +1413,9 @@ void A_VileTarget(DActor *actor)
     A_FaceTarget(actor);
 
     DActor *fire = actor->mp->SpawnDActor(actor->target->pos, MT_FIRE); // was x,x,z
-    actor->owner = fire; // TODO slight misuse of owner!
+    actor->owner = fire; // NOTE: owner repurposed to track the Arch-Vile's fire actor.
+                         // ZDoom uses a separate 'tracer' pointer for secondary targets; adding
+                         // that to Actor would require save/load/net changes.
     fire->owner = actor;
     fire->target = actor->target;
     A_Fire(fire);
@@ -1445,7 +1442,7 @@ void A_VileAttack(DActor *actor)
 
     an = actor->yaw >> ANGLETOFINESHIFT;
 
-    Actor *fire = actor->owner; // TODO misuse of owner...
+    Actor *fire = actor->owner; // NOTE: owner holds the fire actor (see A_VileChase)
 
     if (!fire)
         return;

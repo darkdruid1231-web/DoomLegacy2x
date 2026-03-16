@@ -809,8 +809,9 @@ static struct
 /// Sets some floortype-dependent attributes depending on the floor texture.
 void sector_t::SetFloorType(const char *pic)
 {
-    // Ohhhh... This sucks so much... FIXME, TERRAIN lump?
-    for (int i = 0; i < 10; i++)
+    // Hardcoded flat-name table.  The TERRAIN lump (ZDoom spec, zdoom.org/wiki/TERRAIN) would
+    // replace this with a data-driven list — deferred until a full TERRAIN parser is written.
+    for (int i = 0; i < (int)(sizeof(ftypes) / sizeof(ftypes[0])); i++)
         if (!strncasecmp(pic, ftypes[i].name, 8))
         {
             floortype = ftypes[i].type;
@@ -889,10 +890,9 @@ void Map::AddFakeFloor(sector_t *sec, sector_t *sec2, line_t *master, int flags)
 
     if (flags & FF_TRANSLUCENT)
     {
-        if (master->sideptr[0]->toptexture != nullptr)
-            ffloor->alpha = 0; // FIXME NOW master->sideptr[0]->toptexture;
-        else
-            ffloor->alpha = 0x70;
+        // TODO: derive per-floor alpha from texture name encoding once p_setup.cpp
+        // decodes the "#NNN" convention into a dedicated field.
+        ffloor->alpha = 0x70;
     }
 
     if (sec2->numattached == 0)
