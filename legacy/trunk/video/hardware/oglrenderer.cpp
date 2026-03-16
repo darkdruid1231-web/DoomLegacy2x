@@ -65,6 +65,8 @@ inline int SDL_GetWindowHeight_wrapper(SDL_Window *w) { int width, height; SDL_G
 #include "hardware/oglhelpers.hpp"
 #include "hardware/oglrenderer.hpp"
 #include "hardware/oglshaders.h"
+#include "hardware/hw_postfx.h"
+#include "hardware/hw_lightdefs.h"
 
 #include "am_map.h"
 #include "r_data.h"
@@ -106,27 +108,8 @@ static float LightLevelToFloat(int lightlevel)
     return f;
 }
 
-// ---------------------------------------------------------------------------
-// Dynamic light emitter table.
-// Maps known decorative mobjtype_t values to light properties.
-// ---------------------------------------------------------------------------
-struct LightEmitterDef {
-    mobjtype_t type;
-    float radius;
-    float r, g, b;
-};
-
-static const LightEmitterDef lightEmitterTable[] = {
-    { MT_MISC29,          256.0f, 1.0f, 1.0f, 0.9f },  // TechLamp (tall)
-    { MT_MISC30,          192.0f, 1.0f, 1.0f, 0.9f },  // Tech2Lamp (short)
-    { MT_ARTITORCH,       200.0f, 1.0f, 0.6f, 0.1f },  // Heretic torch
-    { MT_ZTWINEDTORCH,    256.0f, 1.0f, 0.5f, 0.1f },  // Hexen twined torch
-    { MT_ZWALLTORCH,      192.0f, 1.0f, 0.5f, 0.1f },  // Hexen wall torch
-    { MT_ZFIREBULL,       256.0f, 1.0f, 0.4f, 0.0f },  // Hexen fire bull
-    { MT_BRASSTORCH,      192.0f, 1.0f, 0.5f, 0.1f },  // Hexen brass torch
-    { MT_ZBLUE_CANDLE,    128.0f, 0.4f, 0.5f, 1.0f },  // Hexen blue candle
-};
-static const int NUM_LIGHT_EMITTERS = sizeof(lightEmitterTable) / sizeof(lightEmitterTable[0]);
+// Dynamic light emitter table is now managed by hw_lightdefs.cpp (Phase B).
+// InitLightDefs() populates the table at startup; ParseLightDefs() extends it.
 
 // ---------------------------------------------------------------------------
 // Sprite-based dynamic light table.
@@ -187,27 +170,13 @@ void OGLRenderer::CollectDynamicLights(Actor *pov)
             if (!da)
                 continue;
 
-            // --- Static decorative emitters ---
-            bool handled = false;
-            for (int j = 0; j < NUM_LIGHT_EMITTERS; j++)
+            // --- Static decorative emitters (data-driven via hw_lightdefs) ---
+            FrameLight fl;
+            if (GetActorLight(da, fl))
             {
-                if (da->type == lightEmitterTable[j].type)
-                {
-                    FrameLight fl;
-                    fl.x = da->pos.x.Float();
-                    fl.y = da->pos.y.Float();
-                    fl.z = da->pos.z.Float() + 32.0f;
-                    fl.r = lightEmitterTable[j].r;
-                    fl.g = lightEmitterTable[j].g;
-                    fl.b = lightEmitterTable[j].b;
-                    fl.radius = lightEmitterTable[j].radius;
-                    framelights.push_back(fl);
-                    handled = true;
-                    break;
-                }
-            }
-            if (handled)
+                framelights.push_back(fl);
                 continue;
+            }
 
             // --- Sprite-based lights (projectiles and explosions) ---
             // Any actor whose current sprite matches the table emits light.
@@ -255,6 +224,41 @@ void OGLRenderer::AccumDynLight(float px, float py, float pz,
         g += fl.g * atten;
         b += fl.b * atten;
     }
+}
+
+/// Transform framelights world positions to eye-space and upload to the shader.
+/// Called once per surface when a GLSL shader is active — replaces CPU AccumDynLight.
+void OGLRenderer::SetShaderDynamicLights(ShaderProg *prog) const
+{
+    int count = (int)framelights.size();
+    if (count > MAX_SHADER_LIGHTS) count = MAX_SHADER_LIGHTS;
+    if (count == 0)
+    {
+        prog->SetDynamicLights(NULL, NULL, 0);
+        return;
+    }
+
+    // Read current ModelView matrix to transform world → eye space.
+    GLfloat mv[16];
+    glGetFloatv(GL_MODELVIEW_MATRIX, mv);
+
+    float eyePos[MAX_SHADER_LIGHTS * 4];
+    float colors[MAX_SHADER_LIGHTS * 3];
+
+    for (int i = 0; i < count; i++)
+    {
+        const FrameLight &fl = framelights[i];
+        float wx = fl.x, wy = fl.y, wz = fl.z;
+        // Column-major MV multiply: eye = MV * [wx wy wz 1]
+        eyePos[i*4+0] = mv[0]*wx + mv[4]*wy + mv[8] *wz + mv[12];
+        eyePos[i*4+1] = mv[1]*wx + mv[5]*wy + mv[9] *wz + mv[13];
+        eyePos[i*4+2] = mv[2]*wx + mv[6]*wy + mv[10]*wz + mv[14];
+        eyePos[i*4+3] = fl.radius;
+        colors[i*3+0] = fl.r;
+        colors[i*3+1] = fl.g;
+        colors[i*3+2] = fl.b;
+    }
+    prog->SetDynamicLights(eyePos, colors, count);
 }
 
 // ---------------------------------------------------------------------------
@@ -332,18 +336,54 @@ void OGLRenderer::DrawBlobShadow(Actor *thing) const
     float ay = thing->pos.y.Float();
     float az = floorZ + 0.5f;  // just above the floor to avoid z-fighting
 
+    // Phase E: find the nearest dynamic light within 256 units.
+    // Brighter/closer lights cast a slightly directional shadow and reduce
+    // the blob's opacity (the floor is already lit, so the shadow is less noticeable).
+    float shadowOpacity = fade;
+    float offsetX = 0.0f, offsetY = 0.0f;
+    {
+        float bestDist2 = 256.0f * 256.0f;
+        const FrameLight *nearest = NULL;
+        for (size_t li = 0; li < framelights.size(); li++)
+        {
+            const FrameLight &fl = framelights[li];
+            float dx = ax - fl.x, dy = ay - fl.y;
+            float d2 = dx*dx + dy*dy;
+            if (d2 < bestDist2) { bestDist2 = d2; nearest = &fl; }
+        }
+        if (nearest)
+        {
+            float atten = 1.0f - sqrtf(bestDist2) / 256.0f;
+            float brightness = (nearest->r * 0.299f + nearest->g * 0.587f + nearest->b * 0.114f)
+                               * atten;
+            // Bright light → lighter shadow (floor is already lit)
+            shadowOpacity *= 1.0f - brightness * 0.5f;
+
+            // Offset shadow slightly away from light source (directional shadow).
+            float ldx = ax - nearest->x, ldy = ay - nearest->y;
+            float llen = sqrtf(ldx*ldx + ldy*ldy);
+            if (llen > 1.0f)
+            {
+                float shift = shadowRadius * 0.25f * atten;
+                offsetX = (ldx / llen) * shift;
+                offsetY = (ldy / llen) * shift;
+            }
+        }
+    }
+
     glBindTexture(GL_TEXTURE_2D, shadowTex);
     glEnable(GL_BLEND);
     glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_ALPHA_TEST);   // gradient would be clipped at alpha < 0.5
     glDepthMask(GL_FALSE);      // read depth but don't write it
 
-    glColor4f(0.0f, 0.0f, 0.0f, fade);
+    float cx = ax + offsetX, cy = ay + offsetY;
+    glColor4f(0.0f, 0.0f, 0.0f, shadowOpacity);
     glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f); glVertex3f(ax - shadowRadius, ay - shadowRadius, az);
-    glTexCoord2f(1.0f, 0.0f); glVertex3f(ax + shadowRadius, ay - shadowRadius, az);
-    glTexCoord2f(1.0f, 1.0f); glVertex3f(ax + shadowRadius, ay + shadowRadius, az);
-    glTexCoord2f(0.0f, 1.0f); glVertex3f(ax - shadowRadius, ay + shadowRadius, az);
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(cx - shadowRadius, cy - shadowRadius, az);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(cx + shadowRadius, cy - shadowRadius, az);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(cx + shadowRadius, cy + shadowRadius, az);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(cx - shadowRadius, cy + shadowRadius, az);
     glEnd();
 }
 
@@ -472,6 +512,9 @@ OGLRenderer::OGLRenderer()
     workinggl = false;
     glversion = 0;
     screen = NULL;
+#ifdef SDL2
+    glCtx = NULL;
+#endif
     curssec = NULL;
     shadowTex = 0;
 
@@ -502,7 +545,18 @@ OGLRenderer::~OGLRenderer()
 {
     CONS_Printf("Closing OpenGL renderer.\n");
     Z_Free(palette);
-    // No need to release screen. SDL does it automatically.
+#ifdef SDL2
+    if (glCtx)
+    {
+        SDL_GL_DeleteContext(glCtx);
+        glCtx = NULL;
+    }
+    if (screen)
+    {
+        SDL_DestroyWindow(screen);
+        screen = NULL;
+    }
+#endif
 }
 
 /// Sets up those GL states that never change during rendering.
@@ -546,6 +600,9 @@ void OGLRenderer::InitGLState()
     cv_grcoronasize.Reg();
     cv_monball_light.Reg();
 
+    // Populate the data-driven light emitter table with hardcoded defaults.
+    InitLightDefs();
+
     // Build the blob shadow texture.
     InitShadowTexture();
 }
@@ -553,6 +610,8 @@ void OGLRenderer::InitGLState()
 /// Clean up stuffage so we can start drawing a new frame.
 void OGLRenderer::StartFrame()
 {
+    if (postfx.IsActive())
+        postfx.BindSceneFBO();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     ClearDrawColorAndLights();
 }
@@ -560,6 +619,9 @@ void OGLRenderer::StartFrame()
 /// Done with drawing. Swap buffers.
 void OGLRenderer::FinishFrame()
 {
+    // Apply post-processing (bloom, SSAO) before swap.
+    if (postfx.IsActive())
+        postfx.ApplyEffects();
 #ifdef SDL2
     SDL_GL_SwapWindow(screen); // Double buffered OpenGL goodness.
 #else
@@ -661,7 +723,7 @@ bool OGLRenderer::WriteScreenshot(const char *fname)
 }
 #endif
 
-bool OGLRenderer::InitVideoMode(const int w, const int h, const bool fullscreen)
+bool OGLRenderer::InitVideoMode(const int w, const int h, const int displaymode)
 {
     Uint32 surfaceflags;
     int mindepth = 16;
@@ -674,10 +736,27 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const bool fullscreen)
     // resolution. Unload them all, just in case.
     materials.ClearGLTextures();
 
+    // Destroy shader programs and GL resources while the old context is still current.
+    postfx.Destroy();
+    materials.ClearAllShaders();
+    ClearFpShaders();
+    DeletePBRNeutralTextures();
+    if (normalmap_shaderprog)
+    {
+        delete normalmap_shaderprog;
+        normalmap_shaderprog = NULL;
+    }
+
     workinggl = false;
 
 #ifdef SDL2
-    // Clean up old window and context if they exist
+    // Clean up old context and window if they exist.
+    // Context must be deleted BEFORE the window is destroyed.
+    if (glCtx)
+    {
+        SDL_GL_DeleteContext(glCtx);
+        glCtx = NULL;
+    }
     if (screen)
     {
         SDL_DestroyWindow(screen);
@@ -685,16 +764,43 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const bool fullscreen)
     }
 
     surfaceflags = SDL_WINDOW_OPENGL;
-    if (fullscreen)
+    if (displaymode == 1)
         surfaceflags |= SDL_WINDOW_FULLSCREEN;
+    else if (displaymode == 2)
+        surfaceflags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+    // MSAA — must be set before window/context creation
+    {
+        int msaa = cv_msaa.value;
+        if (msaa > 0)
+        {
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, msaa);
+        }
+        else
+        {
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+        }
+    }
 
     // In SDL2, we just try to create the window - no need for SDL_VideoModeOK
     screen = SDL_CreateWindow("Doom Legacy",
                               SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                               w, h, surfaceflags);
+    if (!screen && cv_msaa.value > 0)
+    {
+        // MSAA request rejected by driver — fall back to no anti-aliasing
+        CONS_Printf(" MSAA %dx not available, falling back to no anti-aliasing.\n", cv_msaa.value);
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+        screen = SDL_CreateWindow("Doom Legacy",
+                                  SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                                  w, h, surfaceflags);
+    }
     if (!screen)
     {
         CONS_Printf(" Could not obtain requested resolution.\n");
@@ -702,12 +808,20 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const bool fullscreen)
     }
 
     // Create OpenGL context
-    SDL_GLContext glcontext = SDL_GL_CreateContext(screen);
-    if (!glcontext)
+    glCtx = SDL_GL_CreateContext(screen);
+    if (!glCtx)
     {
         CONS_Printf(" Could not create OpenGL context.\n");
         return false;
     }
+    SDL_GL_MakeCurrent(screen, glCtx);
+
+    // VSync
+    SDL_GL_SetSwapInterval(cv_vsync.value);
+
+    // Enable MSAA if the driver provided multisampling
+    if (cv_msaa.value > 0)
+        glEnable(GL_MULTISAMPLE);
 
     // Initialize GLEW
     GLenum glewErr = glewInit();
@@ -784,13 +898,13 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const bool fullscreen)
 
     // Print state and debug info.
     CONS_Printf(" Set OpenGL video mode %dx%dx%d", w, h, cbpp);
-    CONS_Printf(fullscreen ? " (fullscreen)\n" : " (windowed)\n");
+    CONS_Printf((displaymode == 1) ? " (fullscreen)\n" : (displaymode == 2) ? " (borderless)\n" : " (windowed)\n");
 
     // Calculate the screen's aspect ratio. Assumes square pixels.
 #ifdef SDL2
-    if (w == 1280 && h == 1024 && fullscreen)
+    if (w == 1280 && h == 1024 && displaymode == 1)
         screenar = 4.0 / 3.0;
-    else if (w == 320 && h == 200 && fullscreen)
+    else if (w == 320 && h == 200 && displaymode == 1)
         screenar = 4.0 / 3.0;
     else
         screenar = GLfloat(w) / h;
@@ -817,6 +931,16 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const bool fullscreen)
     // Clear any old GL errors.
     while (glGetError() != GL_NO_ERROR)
         ;
+
+    // Recompile shaders in the new GL context.
+    InitNormalMapShader();
+    CompileGLDEFSShaders();  // .fp shaders for GLDEFS materials (before AssignNormalMapShader)
+    if (normalmap_shaderprog)
+        materials.AssignNormalMapShader(normalmap_shaderprog);
+
+    // Post-processing framework (bloom, SSAO).
+    postfx.Destroy();
+    postfx.Init(w, h);
 
     if (GLExtAvailable("GL_ARB_multitexture"))
         CONS_Printf(" GL multitexturing supported.\n");
@@ -1035,6 +1159,37 @@ void OGLRenderer::Draw2DGraphic_Doom(GLfloat x, GLfloat y, Material *mat, int fl
     Draw2DGraphic(l, 1 - b, r, 1 - t, mat);
 }
 
+/// Draw a semi-transparent console background.
+/// Draws within the current Setup2DMode() coordinate space so that it is
+/// aligned with text drawn via Material::Draw (both share the same
+/// centering/aspect-ratio transform).
+void OGLRenderer::DrawConsoleBackground(float height_frac, float alpha)
+{
+    if (!workinggl || !consolemode)
+        return;
+
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Dark semi-transparent background (very dark blue-black, classic console look)
+    glColor4f(0.0f, 0.0f, 0.05f, alpha);
+
+    // GL Y: 0=bottom, 1=top in the Setup2DMode coordinate space.
+    // Console covers the top height_frac of the display.
+    float y_bottom = 1.0f - height_frac;
+    glBegin(GL_QUADS);
+    glVertex2f(0.0f, y_bottom);
+    glVertex2f(1.0f, y_bottom);
+    glVertex2f(1.0f, 1.0f);
+    glVertex2f(0.0f, 1.0f);
+    glEnd();
+
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glDisable(GL_BLEND);
+    glEnable(GL_TEXTURE_2D);
+}
+
 void OGLRenderer::Draw2DGraphicFill_Doom(
     GLfloat x, GLfloat y, GLfloat width, GLfloat height, Material *mat)
 {
@@ -1091,9 +1246,11 @@ void OGLRenderer::RenderPlayerView(PlayerInfo *player)
     Setup3DMode();
 
     if (!mp->skybox_pov)
+    {
         // This simple sky rendering algorithm uses 2D mode. We should
         // probably do something more fancy in the future.
         DrawSimpleSky();
+    }
     else
     {
         // render skybox
@@ -1169,10 +1326,21 @@ void OGLRenderer::RenderPlayerView(PlayerInfo *player)
     glPopMatrix();
     Setup2DMode();
 
-    if (player->pawn && LocalPlayers[0].crosshair) // FIXME
+    // Find the LocalPlayerInfo that owns this PlayerInfo so we use the correct
+    // crosshair setting for each viewport rather than hardcoding LocalPlayers[0].
+    LocalPlayerInfo *lpi = nullptr;
+    for (int k = 0; k < NUM_LOCALPLAYERS; k++)
+    {
+        if (LocalPlayers[k].info == player)
+        {
+            lpi = &LocalPlayers[k];
+            break;
+        }
+    }
+    if (player->pawn && lpi && lpi->crosshair)
     {
         extern Material *crosshair[];
-        int c = LocalPlayers[0].crosshair & 3;
+        int c = lpi->crosshair & 3;
         Material *mat = crosshair[c - 1];
 
         GLfloat top, left, bottom, right;
@@ -1253,7 +1421,12 @@ void OGLRenderer::DrawPSprites(PlayerPawn *p)
 
         // decide which patch to use
         sprite_t *sprdef = sprites.Get(spritenames[psp->state->sprite]);
-        spriteframe_t *sprframe = &sprdef->spriteframes[psp->state->frame & TFF_FRAMEMASK];
+        if (!sprdef)
+            continue; // sprite not loaded (missing WAD resource), skip gracefully
+        int frame_idx = psp->state->frame & TFF_FRAMEMASK;
+        if (frame_idx >= sprdef->numframes)
+            continue; // frame out of range for this sprite, skip gracefully
+        spriteframe_t *sprframe = &sprdef->spriteframes[frame_idx];
 
 #ifdef PARANOIA
         if (!sprframe)
@@ -1280,8 +1453,21 @@ void OGLRenderer::DrawPSprites(PlayerPawn *p)
         else
         // local light
         */
-        // TODO extralight, extra_colormap, planelights
+        // Apply psprite lighting: full-bright if fixed colormap (IR visor) or full-bright frame,
+        // otherwise scale by sector light + extralight so weapon shading matches the viewport.
+        bool fullbright = p->fixedcolormap || (psp->state->frame & TFF_FULLBRIGHT);
+        if (fullbright)
+        {
+            glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        }
+        else
+        {
+            float light = (p->subsector->sector->lightlevel + p->extralight * 16) / 255.0f;
+            if (light > 1.0f) light = 1.0f;
+            glColor4f(light, light, light, 1.0f);
+        }
         Draw2DGraphic_Doom(tx, ty, mat, V_SCALE);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f); // restore default colour
     }
 }
 
@@ -1296,11 +1482,17 @@ void OGLRenderer::CalculateFrustum()
     fr_cx = x;
     fr_cy = y;
 
-    fr_lx = x + fsize * cos((phi + 0.5 * viewportar * fov) * (M_PI / 180.0));
-    fr_ly = y + fsize * sin((phi + 0.5 * viewportar * fov) * (M_PI / 180.0));
+    // Compute the horizontal half-FOV to match gluPerspective(fov*hudar/viewportar, viewportar).
+    // gluPerspective takes a vertical FOV and an aspect ratio; the actual horizontal FOV is
+    //   H_FOV = 2 * atan(tan(fovY/2) * aspect)
+    // Using fovY = fov * hudar / viewportar and aspect = viewportar:
+    float fovy_deg = fov * hudar / viewportar;
+    float half_h_fov = (float)(atan(tan(fovy_deg * (M_PI / 360.0)) * viewportar) * (180.0 / M_PI));
+    fr_lx = x + fsize * cos((phi + half_h_fov) * (M_PI / 180.0));
+    fr_ly = y + fsize * sin((phi + half_h_fov) * (M_PI / 180.0));
 
-    fr_rx = x + fsize * cos((phi - 0.5 * viewportar * fov) * (M_PI / 180.0));
-    fr_ry = y + fsize * sin((phi - 0.5 * viewportar * fov) * (M_PI / 180.0));
+    fr_rx = x + fsize * cos((phi - half_h_fov) * (M_PI / 180.0));
+    fr_ry = y + fsize * sin((phi - half_h_fov) * (M_PI / 180.0));
 }
 
 // Checks BSP node/subtree bounding box.
@@ -1399,6 +1591,19 @@ void OGLRenderer::RenderGlSsecPolygon(
     glNormal3f(0.0, 0.0, -loopinc);
     mat->GLUse();
 
+    // For normal-mapped flats, supply a world-space tangent along +X.
+    // The floor normal is (0,0,±1), so T=(1,0,0) gives B=cross(N,T)=(0,±1,0),
+    // correctly orienting the normal map red=+X, green=+Y on the floor plane.
+    bool flatShaderActive = (mat->shader != NULL);
+    if (flatShaderActive)
+    {
+        shader_attribs_t flat_sa;
+        flat_sa.tangent[0] = 1.0f;
+        flat_sa.tangent[1] = 0.0f;
+        flat_sa.tangent[2] = 0.0f;
+        mat->shader->SetAttributes(&flat_sa);
+    }
+
     // Collect vertices first to build a triangle fan
     // For a convex subsector, this should work better than GL_POLYGON
     GLfloat vertices[512 * 3]; // Max 512 vertices
@@ -1432,6 +1637,9 @@ void OGLRenderer::RenderGlSsecPolygon(
     // Base static light for this sector (same for every vertex).
     float base = cv_grstaticlighting.value ? LightLevelToFloat(lightlevel) : 1.0f;
     bool dynActive = cv_grdynamiclighting.value && !framelights.empty();
+    // Shaded flat: upload dynamic lights as uniforms, skip CPU per-vertex accum.
+    if (flatShaderActive && dynActive)
+        SetShaderDynamicLights(mat->shader);
 
     // Sector colormap tint (Boom/Hexen per-sector colored lighting).
     // The rgba field is packed as R+(G<<8)+(B<<16)+(alpha<<24) where alpha
@@ -1482,7 +1690,7 @@ void OGLRenderer::RenderGlSsecPolygon(
             float vx = vertices[i * 3 + 0];
             float vy = vertices[i * 3 + 1];
             float fr = base * cmr, fg = base * cmg, fb = base * cmb;
-            if (dynActive)
+            if (dynActive && !flatShaderActive)
                 AccumDynLight(vx, vy, height, fr, fg, fb);
             if (fr > 1.0f) fr = 1.0f;
             if (fg > 1.0f) fg = 1.0f;
@@ -1534,7 +1742,7 @@ void OGLRenderer::RenderGLSubsector(int num)
 
     ffloor_t *ff;
     Material *fmat;
-    if (num < 0 || num > mp->numglsubsectors)
+    if (num < 0 || num >= mp->numglsubsectors)
         return;
 
     // Use GL subsectors for floor/ceiling
@@ -1548,11 +1756,26 @@ void OGLRenderer::RenderGLSubsector(int num)
         return;
 
     // Distance fog: darker sectors have denser fog (shorter visible range).
-    // This is gated by cv_grstaticlighting so players can toggle it.
+    // Phase F: when the sector has a fade_color set via extra_colormap,
+    // use it as the fog end color (Doom 64-style colored fade).
     if (cv_grstaticlighting.value)
     {
         float light = (float)s->lightlevel / 255.0f;
+        // Default fog color is black; use extra_colormap fade tint when present.
         GLfloat fogColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+        {
+            fadetable_t *ec = s->extra_colormap;
+            if (ec && ec->rgba != 0)
+            {
+                float ta = ((ec->rgba >> 24) & 0xff) / 25.0f;
+                if (ta > 0.3f)  // only apply fog tint if tint alpha is significant
+                {
+                    fogColor[0] = ((ec->rgba      ) & 0xff) / 255.0f;
+                    fogColor[1] = ((ec->rgba >> 8 ) & 0xff) / 255.0f;
+                    fogColor[2] = ((ec->rgba >> 16) & 0xff) / 255.0f;
+                }
+            }
+        }
         glEnable(GL_FOG);
         glFogi(GL_FOG_MODE, GL_LINEAR);
         glFogfv(GL_FOG_COLOR, fogColor);
@@ -1670,7 +1893,7 @@ void OGLRenderer::GetSegQuads(int num, quad &u, quad &m, quad &l) const
 
     u.m = m.m = l.m = NULL;
 
-    if (num < 0 || num > mp->numsegs)
+    if (num < 0 || num >= mp->numsegs)
         return;
 
     seg_t *s = &(mp->segs[num]);
@@ -1832,9 +2055,12 @@ void OGLRenderer::GetSegQuads(int num, quad &u, quad &m, quad &l) const
                     bottom = rs_floor;
                 else
                     bottom = ls_floor;
-                top = bottom + middletex->worldheight; // FIXME, should be at most
-                                                       // the height of the remote
-                                                       // sector?
+                top = bottom + middletex->worldheight;
+                // Clamp to the lower ceiling so the texture doesn't bleed above
+                // the adjacent sector's ceiling.
+                GLfloat min_ceil = (ls_ceil < rs_ceil) ? ls_ceil : rs_ceil;
+                if (top > min_ceil)
+                    top = min_ceil;
             }
             else
             {
@@ -1928,13 +2154,17 @@ void OGLRenderer::DrawSingleQuad(Material *m,
     glNormal3f(sa.tangent[1], -sa.tangent[0], 0.0);
 
     if (m->shader)
-    {
         m->shader->SetAttributes(&sa);
-    }
 
     // Per-vertex lighting so dynamic lights blend smoothly at face boundaries.
     float base = cv_grstaticlighting.value ? LightLevelToFloat(lightlevel) : 1.0f;
     bool dynActive = cv_grdynamiclighting.value && !framelights.empty();
+    // When a GLSL shader is active the dynamic lights are passed as uniforms
+    // (per-pixel, normal-map aware).  Skip CPU vertex-color accumulation for
+    // those surfaces so lights are not double-counted.
+    bool shaderActive = (m->shader != NULL);
+    if (shaderActive && dynActive)
+        SetShaderDynamicLights(m->shader);
     float x1 = v1->x.Float(), y1 = v1->y.Float();
     float x2 = v2->x.Float(), y2 = v2->y.Float();
 
@@ -1943,7 +2173,7 @@ void OGLRenderer::DrawSingleQuad(Material *m,
     // Written inline to avoid a lambda (C++11 lambdas can't call non-const member fns easily here).
 #define VERT_COLOR(vx, vy, vz) \
     { float fr = base * cmr, fg = base * cmg, fb = base * cmb; \
-      if (dynActive) AccumDynLight(vx, vy, vz, fr, fg, fb); \
+      if (dynActive && !shaderActive) AccumDynLight(vx, vy, vz, fr, fg, fb); \
       if (fr > 1.0f) fr = 1.0f; if (fg > 1.0f) fg = 1.0f; if (fb > 1.0f) fb = 1.0f; \
       glColor4f(fr, fg, fb, 1.0f); }
 
@@ -2013,7 +2243,7 @@ void OGLRenderer::DrawSpriteItem(const vec_t<fixed_t> &pos, Material *mat, int f
 
     mat->GLUse();
 
-    // TEST FIXME
+    // Sky textures must not tile — clamp to avoid seam artefacts at edges.
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
