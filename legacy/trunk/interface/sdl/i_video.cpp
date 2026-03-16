@@ -193,6 +193,22 @@ static bool AspectRatioMatches(int w, int h)
     return fabsf(ratio - target) / target <= tolerance;
 }
 
+static void AddUniqueMode(std::vector<vidmode_t> &list, int w, int h)
+{
+    if (w <= 0 || h <= 0)
+        return;
+    for (size_t i = 0; i < list.size(); i++)
+    {
+        if (list[i].w == w && list[i].h == h)
+            return;
+    }
+    vidmode_t m;
+    m.w = w;
+    m.h = h;
+    sprintf(m.name, "%dx%d", m.w, m.h);
+    list.push_back(m);
+}
+
 static void BuildDisplayModeLists()
 {
     int display = GetActiveDisplayIndex();
@@ -209,8 +225,8 @@ static void BuildDisplayModeLists()
     windowedModes.clear();
 
     int num = SDL_GetNumDisplayModes(display);
-    if (num <= 0)
-        return;
+    if (num < 0)
+        num = 0;
 
     std::vector<vidmode_t> raw;
     raw.reserve(num);
@@ -242,11 +258,88 @@ static void BuildDisplayModeLists()
             fullscreenModes.push_back(raw[i]);
     }
 
+    int usable_w = 0;
+    int usable_h = 0;
+    SDL_Rect usable;
+    if (SDL_GetDisplayUsableBounds(display, &usable) == 0)
+    {
+        usable_w = usable.w;
+        usable_h = usable.h;
+    }
+    else
+    {
+        SDL_DisplayMode dm;
+        if (SDL_GetDesktopDisplayMode(display, &dm) == 0)
+        {
+            usable_w = dm.w;
+            usable_h = dm.h;
+        }
+    }
+
     for (size_t i = 0; i < raw.size(); i++)
     {
         if (AspectRatioMatches(raw[i].w, raw[i].h))
-            windowedModes.push_back(raw[i]);
+        {
+            if (usable_w > 0 && usable_h > 0)
+            {
+                if (raw[i].w <= usable_w && raw[i].h <= usable_h)
+                    AddUniqueMode(windowedModes, raw[i].w, raw[i].h);
+            }
+            else
+            {
+                AddUniqueMode(windowedModes, raw[i].w, raw[i].h);
+            }
+        }
     }
+
+    // Always include the desktop resolution for windowed mode if it fits.
+    SDL_DisplayMode dm;
+    if (SDL_GetDesktopDisplayMode(display, &dm) == 0)
+    {
+        if (AspectRatioMatches(dm.w, dm.h) &&
+            (usable_w == 0 || (dm.w <= usable_w && dm.h <= usable_h)))
+            AddUniqueMode(windowedModes, dm.w, dm.h);
+    }
+
+    // Add common windowed sizes so typical resolutions appear even if not in the mode list.
+    const int common_modes[][2] = {
+        {640, 480},
+        {800, 600},
+        {1024, 768},
+        {1152, 864},
+        {1280, 720},
+        {1280, 800},
+        {1360, 768},
+        {1366, 768},
+        {1440, 900},
+        {1600, 900},
+        {1680, 1050},
+        {1920, 1080},
+        {1920, 1200},
+        {2560, 1080},
+        {2560, 1440},
+        {2560, 1600},
+        {3440, 1440},
+        {3840, 2160},
+    };
+    for (size_t i = 0; i < sizeof(common_modes) / sizeof(common_modes[0]); i++)
+    {
+        int w = common_modes[i][0];
+        int h = common_modes[i][1];
+        if (!AspectRatioMatches(w, h))
+            continue;
+        if (usable_w > 0 && usable_h > 0)
+        {
+            if (w > usable_w || h > usable_h)
+                continue;
+        }
+        AddUniqueMode(windowedModes, w, h);
+    }
+
+    std::sort(windowedModes.begin(), windowedModes.end(), [](const vidmode_t &a, const vidmode_t &b) {
+        if (a.w != b.w) return a.w < b.w;
+        return a.h < b.h;
+    });
 
     // Fallback if no windowed modes fit (shouldn't happen, but be safe).
     if (windowedModes.empty() && !fullscreenModes.empty())

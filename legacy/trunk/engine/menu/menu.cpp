@@ -92,6 +92,36 @@ static int controltochange;
 
 static Material *paused_tex = NULL;
 
+static bool menu_use_newui = false;
+static bool menu_dropdown_open = false;
+static int menu_dropdown_index = 0;
+static int menu_dropdown_item = -1;
+
+static Material *menu_panel = NULL;
+static Material *menu_header = NULL;
+static Material *menu_focus = NULL;
+
+struct MenuStyle
+{
+    int panel_margin;
+    int panel_padding;
+    int row_height;
+    int header_height;
+    int value_box_w;
+    int value_box_h;
+    int footer_gap;
+};
+
+static const MenuStyle menu_style = {
+    18, // panel_margin
+    10, // panel_padding
+    16, // row_height
+    18, // header_height
+    120, // value_box_w
+    14, // value_box_h
+    10 // footer_gap
+};
+
 //===========================================================================
 //  Menu item class
 //===========================================================================
@@ -134,6 +164,8 @@ enum menuflag_t
     IT_WHITE = 0x0800,          ///< use white colormap
     IT_GRAY = 0x1000,           ///< use gray colormap
     IT_COLORMAP_MASK = IT_WHITE | IT_GRAY,
+    IT_HEADER_FLAG = 0x2000,    ///< section header (modern sub-menus)
+    IT_DROPDOWN = 0x4000,       ///< render a dropdown/select for the cvar
 
     // shorthand for some common uses
     IT_OFF_BIG = IT_NONE | IT_PATCH | IT_DISABLED | IT_GRAY,
@@ -144,6 +176,8 @@ enum menuflag_t
     IT_CALL = IT_FUNC | IT_STRING,
     IT_CVAR = IT_CV | IT_STRING,
     IT_TEXTBOX = IT_CV_TEXTBOX | IT_STRING,
+    IT_CVAR_DROPDOWN = IT_CV | IT_STRING | IT_DROPDOWN,
+    IT_HEADER = IT_NONE | IT_CSTRING | IT_DISABLED | IT_WHITE | IT_HEADER_FLAG,
 };
 
 typedef void (*menufunc_t)(int choice);
@@ -211,6 +245,10 @@ struct menuitem_t
         return ((flags & IT_UNION_MASK) == IT_FUNC) ? func : NULL;
     }
     consvar_t *GetCV()
+    {
+        return ((flags & IT_UNION_MASK) == IT_CV) ? cvar : NULL;
+    }
+    const consvar_t *GetCV() const
     {
         return ((flags & IT_UNION_MASK) == IT_CV) ? cvar : NULL;
     }
@@ -697,6 +735,63 @@ static void M_CenterText(int y, const char *str)
     hud_font->DrawString(x, y, str, V_SCALE);
 }
 
+static Material *MenuGetMaterial(const char *name, Material *fallback)
+{
+    if (name && fc.FindNumForName(name) >= 0)
+        return materials.Get(name);
+    return fallback;
+}
+
+static bool MenuIsSubMenu(const Menu *menu)
+{
+    return menu && menu != &MainMenuDef;
+}
+
+static bool MenuIsSoftwareOnly(const consvar_t *cv)
+{
+    return cv == &cv_screenslink;
+}
+
+static const char *MenuDisabledReason(const menuitem_t &item)
+{
+    const consvar_t *cv = item.GetCV();
+    if (cv && MenuIsSoftwareOnly(cv) && rendermode != render_soft)
+        return "Software renderer only";
+    return NULL;
+}
+
+static bool MenuItemDisabled(const menuitem_t &item)
+{
+    if (item.flags & IT_DISABLED)
+        return true;
+    return MenuDisabledReason(item) != NULL;
+}
+
+static int MenuPossibleValueCount(const consvar_t *cv)
+{
+    if (!cv || !cv->PossibleValue)
+        return 0;
+    int n = 0;
+    while (cv->PossibleValue[n].strvalue)
+        n++;
+    return n;
+}
+
+static int MenuPossibleValueIndex(const consvar_t *cv)
+{
+    if (!cv || !cv->PossibleValue)
+        return 0;
+    int n = 0;
+    int idx = 0;
+    while (cv->PossibleValue[n].strvalue)
+    {
+        if (cv->PossibleValue[n].value == cv->value)
+            idx = n;
+        n++;
+    }
+    return idx;
+}
+
 void Menu::DrawTitle()
 {
     if (font && title)
@@ -729,6 +824,12 @@ void Menu::DrawTitle()
 
 void Menu::DrawMenu()
 {
+    if (menu_use_newui && MenuIsSubMenu(this))
+    {
+        DrawMenuModern();
+        return;
+    }
+
     int cursory = 0;
     int dy = y; // y for drawing
 
@@ -740,11 +841,14 @@ void Menu::DrawMenu()
         if (items[i].flags & IT_DY)
             dy += items[i].alphaKey;
 
+        bool disabled = MenuItemDisabled(items[i]);
         // colormap?
         int flags = V_SCALE;
-        if (items[i].flags & IT_COLORMAP_MASK)
+        if ((items[i].flags & IT_COLORMAP_MASK) || disabled)
             flags |= V_MAP;
-        if (items[i].flags & IT_WHITE)
+        if (disabled)
+            current_colormap = graymap;
+        else if (items[i].flags & IT_WHITE)
             current_colormap = whitemap;
         else if (items[i].flags & IT_GRAY)
             current_colormap = graymap;
@@ -861,6 +965,201 @@ void Menu::DrawMenu()
         pointer[which_pointer]->Draw(x - 32, cursory - 5, V_SCALE);
     else if (AnimCount < 4) // blink cursor
         hud_font->DrawCharacter(x - 10, cursory, '*', V_WHITEMAP | V_SCALE);
+}
+
+void Menu::DrawMenuModern()
+{
+    DrawTitle();
+
+    if (!menu_panel)
+        menu_panel = MenuGetMaterial("menu/panel.png", window_background);
+    if (!menu_header)
+        menu_header = MenuGetMaterial("menu/header.png", window_background);
+    if (!menu_focus)
+        menu_focus = MenuGetMaterial("menu/focus.png", window_background);
+
+    int panel_x = menu_style.panel_margin;
+    int panel_w = BASEVIDWIDTH - (menu_style.panel_margin * 2);
+    int panel_y = max(menu_style.panel_margin, y - menu_style.panel_padding - menu_style.header_height);
+
+    int content_h = 0;
+    for (int i = 0; i < numitems; i++)
+    {
+        if (items[i].flags & IT_HEADER_FLAG)
+            content_h += menu_style.header_height;
+        else if ((items[i].flags & IT_DISPLAY_MASK) == IT_SPACE)
+            content_h += menu_style.row_height;
+        else
+            content_h += menu_style.row_height;
+    }
+
+    int panel_h = content_h + menu_style.panel_padding * 2 + menu_style.footer_gap + 8;
+    if (panel_y + panel_h > BASEVIDHEIGHT - menu_style.panel_margin)
+        panel_h = BASEVIDHEIGHT - menu_style.panel_margin - panel_y;
+
+    menu_panel->DrawFill(panel_x, panel_y, panel_w, panel_h);
+
+    int dy = panel_y + menu_style.panel_padding;
+    int dropdown_y = -1;
+    int dropdown_x = 0;
+    int dropdown_w = 0;
+
+    for (int i = 0; i < numitems; i++)
+    {
+        const menuitem_t &item = items[i];
+        bool is_header = (item.flags & IT_HEADER_FLAG) != 0;
+        bool disabled = MenuItemDisabled(item);
+
+        if (item.flags & IT_DY)
+            dy += item.alphaKey;
+
+        int row_h = is_header ? menu_style.header_height : menu_style.row_height;
+
+        if (!is_header && i == itemOn && !disabled)
+            menu_focus->DrawFill(panel_x + 4, dy - 2, panel_w - 8, row_h);
+
+        if (is_header)
+        {
+            menu_header->DrawFill(panel_x + 4, dy - 1, panel_w - 8, row_h - 2);
+            if (item.text)
+                hud_font->DrawString(panel_x + menu_style.panel_padding,
+                                     dy + 2,
+                                     item.text,
+                                     V_WHITEMAP | V_SCALE);
+            dy += row_h;
+            continue;
+        }
+
+        int flags = V_SCALE;
+        if (disabled)
+            flags |= V_MAP, current_colormap = graymap;
+        else if (item.flags & IT_WHITE)
+            current_colormap = whitemap;
+
+        int x0 = panel_x + menu_style.panel_padding;
+
+        switch (item.flags & IT_DISPLAY_MASK)
+        {
+            case IT_PATCH:
+                if (item.pic && item.pic[0])
+                    materials.Get(item.pic)->Draw(x0, dy, flags);
+                else if (font && item.text)
+                    font->DrawString(x0, dy, item.text, flags);
+                break;
+
+            case IT_STRING:
+            case IT_CSTRING:
+                if (item.text)
+                    hud_font->DrawString(x0, dy, item.text, flags);
+                break;
+
+            default:
+                break;
+        }
+
+        if (const consvar_t *cv = item.GetCV())
+        {
+            int value_x = panel_x + panel_w - menu_style.panel_padding - menu_style.value_box_w;
+
+            if (item.flags & IT_DROPDOWN)
+            {
+                menu_header->DrawFill(value_x, dy - 2, menu_style.value_box_w, menu_style.row_height - 2);
+                hud_font->DrawString(value_x + 6, dy, cv->str, V_WHITEMAP | V_SCALE);
+                hud_font->DrawString(value_x + menu_style.value_box_w - 10, dy, ">", V_WHITEMAP | V_SCALE);
+
+                if (menu_dropdown_open && i == menu_dropdown_item)
+                {
+                    dropdown_y = dy;
+                    dropdown_x = value_x;
+                    dropdown_w = menu_style.value_box_w;
+                }
+            }
+            else if ((item.flags & IT_TYPE_MASK) == IT_CV_SLIDER)
+            {
+                int slider_x = panel_x + panel_w - menu_style.panel_padding - SLIDER_WIDTH;
+                M_DrawSlider(slider_x,
+                             dy,
+                             ((cv->value - cv->PossibleValue[0].value) * 100 /
+                              (cv->PossibleValue[1].value - cv->PossibleValue[0].value)));
+            }
+            else if ((item.flags & IT_TYPE_MASK) == IT_CV_TEXTBOX)
+            {
+                M_DrawTextBox(x0, dy + 4, MAXSTRINGLENGTH, 1);
+                if (item.flags & IT_TEXTBOX_IN_USE)
+                {
+                    const char *t = textbox.GetText();
+                    hud_font->DrawString(x0 + 8, dy + 12, t, V_SCALE);
+                    if (AnimCount < 4)
+                        hud_font->DrawCharacter(x0 + 8 + hud_font->StringWidth(t),
+                                                dy + 12,
+                                                '_',
+                                                V_WHITEMAP | V_SCALE);
+                }
+                else
+                {
+                    hud_font->DrawString(x0 + 8, dy + 12, cv->str, V_SCALE);
+                }
+            }
+            else
+            {
+                hud_font->DrawString(value_x,
+                                     dy,
+                                     cv->str,
+                                     V_WHITEMAP | V_SCALE);
+            }
+        }
+
+        dy += row_h;
+    }
+
+    if (menu_dropdown_open && dropdown_y >= 0)
+    {
+        menuitem_t &item = items[menu_dropdown_item];
+        consvar_t *cv = item.GetCV();
+        int count = MenuPossibleValueCount(cv);
+        if (count > 0)
+        {
+            int visible = min(count, 8);
+            int start = menu_dropdown_index - visible / 2;
+            if (start < 0)
+                start = 0;
+            if (start + visible > count)
+                start = count - visible;
+
+            int list_h = visible * menu_style.row_height;
+            int list_y = dropdown_y + menu_style.row_height;
+            if (list_y + list_h > panel_y + panel_h)
+                list_y = dropdown_y - list_h;
+            if (list_y < panel_y + menu_style.panel_padding)
+                list_y = panel_y + menu_style.panel_padding;
+
+            menu_panel->DrawFill(dropdown_x, list_y, dropdown_w, list_h);
+            for (int i = 0; i < visible; i++)
+            {
+                int idx = start + i;
+                int row_y = list_y + i * menu_style.row_height;
+                if (idx == menu_dropdown_index)
+                    menu_focus->DrawFill(dropdown_x + 2, row_y - 1, dropdown_w - 4, menu_style.row_height - 2);
+                if (cv->PossibleValue[idx].strvalue)
+                    hud_font->DrawString(dropdown_x + 6,
+                                         row_y + 1,
+                                         cv->PossibleValue[idx].strvalue,
+                                         V_WHITEMAP | V_SCALE);
+            }
+        }
+    }
+
+    if (!MenuItemDisabled(items[itemOn]))
+        return;
+
+    if (const char *reason = MenuDisabledReason(items[itemOn]))
+    {
+        int msg_y = panel_y + panel_h - menu_style.footer_gap;
+        hud_font->DrawString(panel_x + menu_style.panel_padding,
+                             msg_y,
+                             reason,
+                             V_WHITEMAP | V_SCALE);
+    }
 }
 
 //===========================================================================
@@ -2034,14 +2333,17 @@ static void M_OpenGLOption(int choice)
 }
 
 static menuitem_t VideoOptions_MI[] = {
+    menuitem_t(IT_HEADER, NULL, "DISPLAY", 0),
     menuitem_t(IT_LINK, NULL, "Video modes...", &VidModeDef, 0),
-    menuitem_t(IT_CVAR, NULL, "Display Mode", &cv_fullscreen, 0),
-    menuitem_t(IT_CVAR, NULL, "Aspect Ratio", &cv_aspectratio, 0),
-    menuitem_t(IT_CVAR, NULL, "VSync", &cv_vsync, 0),
-    menuitem_t(IT_CVAR, NULL, "FPS Limit", &cv_fpslimit, 0),
+    menuitem_t(IT_CVAR_DROPDOWN, NULL, "Display Mode", &cv_fullscreen, 0),
+    menuitem_t(IT_CVAR_DROPDOWN, NULL, "Aspect Ratio", &cv_aspectratio, 0),
+    menuitem_t(IT_CVAR_DROPDOWN, NULL, "VSync", &cv_vsync, 0),
+    menuitem_t(IT_CVAR_DROPDOWN, NULL, "FPS Limit", &cv_fpslimit, 0),
+    menuitem_t(IT_HEADER, NULL, "IMAGE", 0),
     menuitem_t(IT_CV_SLIDER | IT_STRING, NULL, "Brightness", &cv_video_gamma, 0),
     menuitem_t(IT_CV_SLIDER | IT_STRING, NULL, "Screen size", &cv_viewsize, 0),
     menuitem_t(IT_CVAR, NULL, "Scale status bar", &cv_scalestatusbar, 0),
+    menuitem_t(IT_HEADER, NULL, "EFFECTS", 0),
     menuitem_t(IT_CVAR, NULL, "Translucency", &cv_translucency, 0),
     menuitem_t(IT_CVAR, NULL, "Splats", &cv_splats, 0),
     menuitem_t(IT_CVAR, NULL, "Bloodtime", &cv_bloodtime, 0),
@@ -2832,6 +3134,59 @@ bool Menu::MenuResponder(int key)
         return true;
     }
 
+    if (menu_dropdown_open)
+    {
+        if (menu_dropdown_item < 0 || menu_dropdown_item >= numitems ||
+            menu_dropdown_item != itemOn)
+        {
+            menu_dropdown_open = false;
+        }
+        else
+        {
+            menuitem_t &item = items[menu_dropdown_item];
+            consvar_t *cv = item.GetCV();
+            int count = MenuPossibleValueCount(cv);
+            if (count <= 0)
+            {
+                menu_dropdown_open = false;
+            }
+            else
+            {
+                switch (key)
+                {
+                    case KEY_UPARROW:
+                        menu_dropdown_index = (menu_dropdown_index - 1 + count) % count;
+                        S_StartLocalAmbSound(sfx_menu_move);
+                        return true;
+                    case KEY_DOWNARROW:
+                        menu_dropdown_index = (menu_dropdown_index + 1) % count;
+                        S_StartLocalAmbSound(sfx_menu_move);
+                        return true;
+                    case KEY_LEFTARROW:
+                        menu_dropdown_index = (menu_dropdown_index - 1 + count) % count;
+                        S_StartLocalAmbSound(sfx_menu_move);
+                        return true;
+                    case KEY_RIGHTARROW:
+                        menu_dropdown_index = (menu_dropdown_index + 1) % count;
+                        S_StartLocalAmbSound(sfx_menu_move);
+                        return true;
+                    case KEY_ENTER:
+                        if (cv && cv->PossibleValue)
+                            cv->Set(cv->PossibleValue[menu_dropdown_index].strvalue);
+                        menu_dropdown_open = false;
+                        S_StartLocalAmbSound(sfx_menu_choose);
+                        return true;
+                    case KEY_BACKSPACE:
+                        menu_dropdown_open = false;
+                        S_StartLocalAmbSound(sfx_menu_close);
+                        return true;
+                    default:
+                        return true;
+                }
+            }
+        }
+    }
+
     int type = items[itemOn].flags & IT_TYPE_MASK;
 
     // full keyhandler (eats anything but esc)
@@ -2849,7 +3204,8 @@ bool Menu::MenuResponder(int key)
             {
                 if (++itemOn >= numitems)
                     itemOn = 0;
-            } while ((items[itemOn].flags & IT_TYPE_MASK) == IT_NONE);
+            } while ((items[itemOn].flags & IT_TYPE_MASK) == IT_NONE ||
+                     MenuItemDisabled(items[itemOn]));
             S_StartLocalAmbSound(sfx_menu_move);
             return true;
 
@@ -2860,7 +3216,8 @@ bool Menu::MenuResponder(int key)
                     itemOn = numitems - 1;
                 else
                     itemOn--;
-            } while ((items[itemOn].flags & IT_TYPE_MASK) == IT_NONE);
+            } while ((items[itemOn].flags & IT_TYPE_MASK) == IT_NONE ||
+                     MenuItemDisabled(items[itemOn]));
             S_StartLocalAmbSound(sfx_menu_move);
             return true;
 
@@ -2869,6 +3226,9 @@ bool Menu::MenuResponder(int key)
     }
 
     // response to keypress depends on menuitem type
+    if (MenuItemDisabled(items[itemOn]))
+        return true;
+
     switch (type)
     {
         case IT_CONTROL:
@@ -2930,6 +3290,14 @@ bool Menu::MenuResponder(int key)
             {
                 S_StartLocalAmbSound(sfx_menu_adjust);
                 consvar_t *cv = items[itemOn].GetCV();
+                if ((items[itemOn].flags & IT_DROPDOWN) && key == KEY_ENTER)
+                {
+                    menu_dropdown_open = true;
+                    menu_dropdown_item = itemOn;
+                    menu_dropdown_index = MenuPossibleValueIndex(cv);
+                    S_StartLocalAmbSound(sfx_menu_choose);
+                    return true;
+                }
                 if (cv->flags & CV_FLOAT)
                 {
                     char s[20];
@@ -3071,6 +3439,8 @@ void Menu::Close(bool callexitmenufunc)
     if (!active)
         return;
 
+    menu_dropdown_open = false;
+
     if (currentMenu->quitroutine && callexitmenufunc)
     {
         if (!currentMenu->quitroutine())
@@ -3089,6 +3459,7 @@ void Menu::Close(bool callexitmenufunc)
 
 void Menu::SetupNextMenu(Menu *m)
 {
+    menu_dropdown_open = false;
     currentMenu = m;
     itemOn = currentMenu->lastOn;
 
@@ -3097,7 +3468,7 @@ void Menu::SetupNextMenu(Menu *m)
     if (itemOn >= n)
         itemOn = n - 1;
 
-    if (!(currentMenu->items[itemOn].flags & IT_DISABLED))
+    if (!MenuItemDisabled(currentMenu->items[itemOn]))
         return;
 
     // the current item can be disabled,
@@ -3106,7 +3477,7 @@ void Menu::SetupNextMenu(Menu *m)
     do
     {
         itemOn = (itemOn + 1) % n;
-    } while (currentMenu->items[itemOn].flags & IT_DISABLED && itemOn != startitem);
+    } while (MenuItemDisabled(currentMenu->items[itemOn]) && itemOn != startitem);
 }
 
 void Menu::Startup()
@@ -3133,6 +3504,16 @@ void Menu::Startup()
     which_pointer = 0;
 
     Menu::Init();
+}
+
+void Menu::SetNewUI(bool enabled)
+{
+    menu_use_newui = enabled;
+}
+
+bool Menu::UsingNewUI()
+{
+    return menu_use_newui;
 }
 
 // resets the menu system according to current game.mode
@@ -3247,11 +3628,11 @@ void Menu::Init()
 //======================================================================
 
 static menuitem_t QualitySettings_MI[] = {
-    menuitem_t(IT_CVAR, NULL, "Quality Preset",     &cv_glquality,         0),
-    menuitem_t(IT_CVAR, NULL, "Anti-Aliasing (MSAA)", &cv_msaa,            10),
+    menuitem_t(IT_CVAR_DROPDOWN, NULL, "Quality Preset",     &cv_glquality,         0),
+    menuitem_t(IT_CVAR_DROPDOWN, NULL, "Anti-Aliasing (MSAA)", &cv_msaa,            10),
     menuitem_t(IT_NONE | IT_CSTRING | IT_DISABLED | IT_GRAY | IT_DY, NULL,
                "(MSAA change requires restart)", 2),
-    menuitem_t(IT_CVAR, NULL, "Texture Filter",     &cv_grfiltermode,      20),
+    menuitem_t(IT_CVAR_DROPDOWN, NULL, "Texture Filter",     &cv_grfiltermode,      20),
     menuitem_t(IT_CV_SLIDER | IT_STRING, NULL, "Anisotropic Filter", &cv_granisotropy, 30),
     menuitem_t(IT_CVAR, NULL, "Dynamic Lighting",   &cv_grdynamiclighting, 40),
     menuitem_t(IT_CVAR, NULL, "Shadows",            &cv_grshadows,         50),
@@ -3270,8 +3651,8 @@ extern Menu OGL_LightingDef, OGL_FogDef, OGL_ColorDef, OGL_DevDef, OGL_NormalMap
 static menuitem_t OpenGLOptions_MI[] = {
     // menuitem_t(IT_CVAR, NULL, "Mouse look"          , &cv_grcrappymlook     ,  0),
     menuitem_t(IT_CVAR, NULL, "Field of view", &cv_fov, 10),
-    menuitem_t(IT_CVAR, NULL, "Quality", &cv_scr_depth, 20),
-    menuitem_t(IT_CVAR, NULL, "Texture Filter", &cv_grfiltermode, 30),
+    menuitem_t(IT_CVAR_DROPDOWN, NULL, "Quality", &cv_scr_depth, 20),
+    menuitem_t(IT_CVAR_DROPDOWN, NULL, "Texture Filter", &cv_grfiltermode, 30),
     menuitem_t(IT_CV_SLIDER | IT_STRING, NULL, "Anisotropy", &cv_granisotropy, 40),
 
     menuitem_t(IT_LINK, NULL, "Lighting...", &OGL_LightingDef, 60),

@@ -54,6 +54,9 @@ void CV_Fuzzymode_OnChange();
 void CV_Fullscreen_OnChange();
 void CV_video_gamma_OnChange();
 void CV_ScrDepth_OnChange();
+extern consvar_t cv_grgammared;
+extern consvar_t cv_grgammagreen;
+extern consvar_t cv_grgammablue;
 
 static CV_PossibleValue_t scr_depth_cons_t[] = {
     {8, "8 bits"}, {16, "16 bits"}, {24, "24 bits"}, {32, "32 bits"}, {0, NULL}};
@@ -97,6 +100,18 @@ void CV_video_gamma_OnChange()
     // reload palette
     vid.LoadPalette("PLAYPAL");
     vid.SetPalette(0);
+
+    if (rendermode != render_soft)
+    {
+        int mapped = 10 + cv_video_gamma.value * 2;
+        if (mapped < 1)
+            mapped = 1;
+        if (mapped > 20)
+            mapped = 20;
+        cv_grgammared.Set(mapped);
+        cv_grgammagreen.Set(mapped);
+        cv_grgammablue.Set(mapped);
+    }
 }
 
 // change drawer function when fuzzymode is changed

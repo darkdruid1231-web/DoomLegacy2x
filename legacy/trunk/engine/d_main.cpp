@@ -601,8 +601,8 @@ bool D_DoomMain()
     if (M_CheckParm("--help") || M_CheckParm("-h"))
     {
         printf("%s\n", D_MakeTitleString(LEGACY_VERSION_BANNER));
-        printf("Usage: legacy [-opengl] [-iwad xxx.wad] [-file pwad.wad stuff.zip ...] [-warp "
-               "<map>] [-skill <1-5>]\n");
+        printf("Usage: legacy [-opengl] [-newui] [-iwad xxx.wad] [-file pwad.wad stuff.zip ...] "
+               "[-warp <map>] [-skill <1-5>]\n");
         return false;
     }
 
@@ -632,6 +632,8 @@ bool D_DoomMain()
     // adds parameters found within file to myargc, myargv.
     M_FindResponseFile();
 
+    Menu::SetNewUI(M_CheckParm("-newui"));
+
     // set up correct paths to wads, configfiles and saves
     D_SetPaths();
 
@@ -639,6 +641,8 @@ bool D_DoomMain()
     // Make it optional - if it doesn't exist, continue without it
     if (fc.Access("legacy.wad"))
         D_AddFile("legacy.wad");
+    if (fc.Access("legacy_ui.pk3"))
+        D_AddFile("legacy_ui.pk3");
 
     // identify the main IWAD file to use (if any),
     // set game.mode, mission accordingly

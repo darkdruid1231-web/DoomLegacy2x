@@ -88,6 +88,11 @@ class Menu
     /// starts up the menu system
     static void Startup();
 
+    /// toggles the modern sub-menu UI (main menu unchanged)
+    static void SetNewUI(bool enabled);
+    /// returns true if modern sub-menu UI is enabled
+    static bool UsingNewUI();
+
     /// resets the menu system according to current game.mode
     static void Init();
 
@@ -109,6 +114,7 @@ class Menu
     /// the actual drawing
     void DrawTitle();
     void DrawMenu();
+    void DrawMenuModern();
 
     void HereticMainMenuDrawer();
     void HexenMainMenuDrawer();
