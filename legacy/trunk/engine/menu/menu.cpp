@@ -997,7 +997,7 @@ void Menu::DrawMenuModern()
     if (panel_y + panel_h > BASEVIDHEIGHT - menu_style.panel_margin)
         panel_h = BASEVIDHEIGHT - menu_style.panel_margin - panel_y;
 
-    menu_panel->DrawFill(panel_x, panel_y, panel_w, panel_h);
+    menu_panel->DrawFill(panel_x, panel_y, panel_w, panel_h, V_SCALE);
 
     int dy = panel_y + menu_style.panel_padding;
     int dropdown_y = -1;
@@ -1016,11 +1016,11 @@ void Menu::DrawMenuModern()
         int row_h = is_header ? menu_style.header_height : menu_style.row_height;
 
         if (!is_header && i == itemOn && !disabled)
-            menu_focus->DrawFill(panel_x + 4, dy - 2, panel_w - 8, row_h);
+            menu_focus->DrawFill(panel_x + 4, dy - 2, panel_w - 8, row_h, V_SCALE);
 
         if (is_header)
         {
-            menu_header->DrawFill(panel_x + 4, dy - 1, panel_w - 8, row_h - 2);
+            menu_header->DrawFill(panel_x + 4, dy - 1, panel_w - 8, row_h - 2, V_SCALE);
             if (item.text)
                 hud_font->DrawString(panel_x + menu_style.panel_padding,
                                      dy + 2,
@@ -1063,7 +1063,11 @@ void Menu::DrawMenuModern()
 
             if (item.flags & IT_DROPDOWN)
             {
-                menu_header->DrawFill(value_x, dy - 2, menu_style.value_box_w, menu_style.row_height - 2);
+                menu_header->DrawFill(value_x,
+                                      dy - 2,
+                                      menu_style.value_box_w,
+                                      menu_style.row_height - 2,
+                                      V_SCALE);
                 hud_font->DrawString(value_x + 6, dy, cv->str, V_WHITEMAP | V_SCALE);
                 hud_font->DrawString(value_x + menu_style.value_box_w - 10, dy, ">", V_WHITEMAP | V_SCALE);
 
@@ -1133,13 +1137,17 @@ void Menu::DrawMenuModern()
             if (list_y < panel_y + menu_style.panel_padding)
                 list_y = panel_y + menu_style.panel_padding;
 
-            menu_panel->DrawFill(dropdown_x, list_y, dropdown_w, list_h);
+            menu_panel->DrawFill(dropdown_x, list_y, dropdown_w, list_h, V_SCALE);
             for (int i = 0; i < visible; i++)
             {
                 int idx = start + i;
                 int row_y = list_y + i * menu_style.row_height;
                 if (idx == menu_dropdown_index)
-                    menu_focus->DrawFill(dropdown_x + 2, row_y - 1, dropdown_w - 4, menu_style.row_height - 2);
+                    menu_focus->DrawFill(dropdown_x + 2,
+                                         row_y - 1,
+                                         dropdown_w - 4,
+                                         menu_style.row_height - 2,
+                                         V_SCALE);
                 if (cv->PossibleValue[idx].strvalue)
                     hud_font->DrawString(dropdown_x + 6,
                                          row_y + 1,
