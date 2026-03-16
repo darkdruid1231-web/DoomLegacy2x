@@ -53,6 +53,7 @@ Video vid;
 void CV_Fuzzymode_OnChange();
 void CV_Fullscreen_OnChange();
 void CV_video_gamma_OnChange();
+void CV_ScrDepth_OnChange();
 
 static CV_PossibleValue_t scr_depth_cons_t[] = {
     {8, "8 bits"}, {16, "16 bits"}, {24, "24 bits"}, {32, "32 bits"}, {0, NULL}};
@@ -60,7 +61,7 @@ static CV_PossibleValue_t scr_depth_cons_t[] = {
 // added:03-02-98: default screen mode, as loaded/saved in config
 consvar_t cv_scr_width = {"scr_width", "320", CV_SAVE, CV_Unsigned};
 consvar_t cv_scr_height = {"scr_height", "200", CV_SAVE, CV_Unsigned};
-consvar_t cv_scr_depth = {"scr_depth", "16 bits", CV_SAVE, scr_depth_cons_t};
+consvar_t cv_scr_depth = {"scr_depth", "32 bits", CV_SAVE | CV_CALL, scr_depth_cons_t, CV_ScrDepth_OnChange};
 // 0=Windowed, 1=Fullscreen, 2=Borderless. Old configs with "Yes"→1 and "No"→0 load correctly.
 static CV_PossibleValue_t displaymode_cons_t[] = {
     {0,"Windowed"}, {1,"Fullscreen"}, {2,"Borderless"}, {0,NULL}};
@@ -106,6 +107,12 @@ void CV_Fuzzymode_OnChange()
 // Change fullscreen on/off when cv_fullscreen is changed
 void CV_Fullscreen_OnChange()
 {
+    vid.setmodeneeded = I_GetVideoModeForSize(cv_scr_width.value, cv_scr_height.value) + 1;
+}
+
+void CV_ScrDepth_OnChange()
+{
+    // Changing color depth requires a mode reset (software and OpenGL).
     vid.setmodeneeded = I_GetVideoModeForSize(cv_scr_width.value, cv_scr_height.value) + 1;
 }
 
@@ -324,6 +331,19 @@ void Video::CheckDefaultMode()
         cv_scr_width.value = 320;
     if (cv_scr_height.value == 0)
         cv_scr_height.value = 200;
+
+    // Default to desktop resolution if config is still at the defaults and no overrides are set
+    if (!scr_forcex && !scr_forcey &&
+        cv_scr_width.value == 320 && cv_scr_height.value == 200)
+    {
+        int dw = 0, dh = 0;
+        I_GetDesktopResolution(dw, dh);
+        if (dw > 0 && dh > 0)
+        {
+            cv_scr_width.value = dw;
+            cv_scr_height.value = dh;
+        }
+    }
 
     if (scr_forcex && scr_forcey)
     {

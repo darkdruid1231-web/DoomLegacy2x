@@ -772,6 +772,35 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const int displaymode)
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
+    // Color buffer depth from scr_depth (legacy_one behavior)
+    {
+        int depth = cv_scr_depth.value;
+        if (depth <= 16)
+        {
+            SDL_GL_SetAttribute(SDL_GL_RED_SIZE,   5);
+            SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 6);
+            SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,  5);
+            SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
+            SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 16);
+        }
+        else if (depth <= 24)
+        {
+            SDL_GL_SetAttribute(SDL_GL_RED_SIZE,   8);
+            SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+            SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,  8);
+            SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
+            SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 24);
+        }
+        else
+        {
+            SDL_GL_SetAttribute(SDL_GL_RED_SIZE,   8);
+            SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+            SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,  8);
+            SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+            SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
+        }
+    }
+
     // MSAA — must be set before window/context creation
     {
         int msaa = cv_msaa.value;

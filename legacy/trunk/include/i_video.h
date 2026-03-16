@@ -44,6 +44,8 @@ int I_SetVideoMode(int modenum);
 int I_NumVideoModes();
 const char *I_GetVideoModeName(unsigned modenum);
 int I_GetVideoModeForSize(int w, int h);
+void I_GetDesktopResolution(int &w, int &h);
+void I_GetDisplayUsableBounds(int &w, int &h);
 
 void I_FinishUpdate();
 

@@ -22,6 +22,9 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <vector>
+#include <algorithm>
+#include <limits.h>
 
 #include "SDL.h"
 
@@ -50,6 +53,7 @@ static SDL_DisplayMode* vidInfo_ptr = NULL;
 
 #include "m_argv.h"
 #include "screen.h"
+#include "cvars.h"
 
 #include "m_dll.h"
 
@@ -123,8 +127,12 @@ struct vidmode_t
     char name[16];
 };
 
-
-// windowed video modes (modern list including widescreen and 4K)
+#ifdef SDL2
+static std::vector<vidmode_t> fullscreenModes;
+static std::vector<vidmode_t> windowedModes;
+static int modesDisplayIndex = -1;
+#else
+// windowed video modes (legacy SDL1 list)
 static vidmode_t windowedModes[] = {
     {320,  200 },
     {640,  480 },
@@ -135,12 +143,98 @@ static vidmode_t windowedModes[] = {
     {1366, 768 },
     {1600, 900 },
     {1920, 1080},
-    {2560, 1080},
-    {2560, 1440},
-    {3440, 1440},
-    {3840, 2160},
 };
 #define MAXWINMODES (int)(sizeof(windowedModes)/sizeof(windowedModes[0]))
+#endif
+
+#ifdef SDL2
+static int GetActiveDisplayIndex()
+{
+    SDL_Window *w = GetSDLWindow();
+    if (w)
+    {
+        int idx = SDL_GetWindowDisplayIndex(w);
+        if (idx >= 0)
+            return idx;
+    }
+    return 0;
+}
+
+static void BuildDisplayModeLists()
+{
+    int display = GetActiveDisplayIndex();
+    if (display < 0)
+        display = 0;
+    if (display == modesDisplayIndex && !fullscreenModes.empty())
+        return;
+
+    modesDisplayIndex = display;
+    fullscreenModes.clear();
+    windowedModes.clear();
+
+    int num = SDL_GetNumDisplayModes(display);
+    if (num <= 0)
+        return;
+
+    std::vector<vidmode_t> raw;
+    raw.reserve(num);
+    for (int i = 0; i < num; i++)
+    {
+        SDL_DisplayMode dm;
+        if (SDL_GetDisplayMode(display, i, &dm) != 0)
+            continue;
+
+        vidmode_t m;
+        m.w = dm.w;
+        m.h = dm.h;
+        sprintf(m.name, "%dx%d", m.w, m.h);
+        raw.push_back(m);
+    }
+
+    std::sort(raw.begin(), raw.end(), [](const vidmode_t &a, const vidmode_t &b) {
+        if (a.w != b.w) return a.w < b.w;
+        return a.h < b.h;
+    });
+
+    raw.erase(std::unique(raw.begin(), raw.end(), [](const vidmode_t &a, const vidmode_t &b) {
+        return a.w == b.w && a.h == b.h;
+    }), raw.end());
+
+    fullscreenModes = raw;
+
+    int usable_w = 0, usable_h = 0;
+    I_GetDisplayUsableBounds(usable_w, usable_h);
+    if (usable_w <= 0 || usable_h <= 0)
+    {
+        I_GetDesktopResolution(usable_w, usable_h);
+    }
+
+    for (size_t i = 0; i < raw.size(); i++)
+    {
+        if (raw[i].w <= usable_w && raw[i].h <= usable_h)
+            windowedModes.push_back(raw[i]);
+    }
+
+    // Fallback if no windowed modes fit (shouldn't happen, but be safe).
+    if (windowedModes.empty() && !fullscreenModes.empty())
+        windowedModes.push_back(fullscreenModes.front());
+}
+
+static void ApplySoftwareBpp()
+{
+    if (cv_scr_depth.value <= 8)
+    {
+        vid.BitsPerPixel = 8;
+        vid.BytesPerPixel = 1;
+    }
+    else
+    {
+        // Software renderer only supports 8-bit and 16-bit paths.
+        vid.BitsPerPixel = 16;
+        vid.BytesPerPixel = 2;
+    }
+}
+#endif
 
 //
 // I_StartFrame
@@ -180,7 +274,7 @@ void I_FinishUpdate()
     if (rendermode == render_soft)
     {
 #ifdef SDL2
-        // In SDL2 software mode, convert indexed surface to ARGB and render
+        // In SDL2 software mode, convert surface to ARGB and render
         if (vidSurface && sdlRenderer && sdlTexture)
         {
             // Lock surface if needed
@@ -191,7 +285,7 @@ void I_FinishUpdate()
             Uint8 *srcPixels = (Uint8 *)vidSurface->pixels;
             int pitch = vidSurface->pitch;
 
-            // We need to convert indexed8 to ARGB8888
+            // We need to convert surface (indexed8 or RGB565) to ARGB8888
             // Create a temporary buffer for conversion if needed
             static Uint32 *convertBuffer = NULL;
             static int convertWidth = 0;
@@ -209,16 +303,40 @@ void I_FinishUpdate()
                 convertHeight = height;
             }
 
-            // Convert indexed to ARGB using the palette
-            for (int y = 0; y < height; y++)
+            if (vidSurface->format->BitsPerPixel == 8)
             {
-                Uint8 *srcRow = srcPixels + y * pitch;
-                Uint32 *dstRow = convertBuffer + y * width;
-                for (int x = 0; x < width; x++)
+                // Convert indexed to ARGB using the palette
+                for (int y = 0; y < height; y++)
                 {
-                    Uint8 index = srcRow[x];
-                    SDL_Color col = localPalette[index];
-                    dstRow[x] = (col.a << 24) | (col.r << 16) | (col.g << 8) | col.b;
+                    Uint8 *srcRow = srcPixels + y * pitch;
+                    Uint32 *dstRow = convertBuffer + y * width;
+                    for (int x = 0; x < width; x++)
+                    {
+                        Uint8 index = srcRow[x];
+                        SDL_Color col = localPalette[index];
+                        dstRow[x] = (col.a << 24) | (col.r << 16) | (col.g << 8) | col.b;
+                    }
+                }
+            }
+            else if (vidSurface->format->BitsPerPixel == 16)
+            {
+                // Convert RGB565 to ARGB8888
+                for (int y = 0; y < height; y++)
+                {
+                    Uint16 *srcRow = (Uint16 *)(srcPixels + y * pitch);
+                    Uint32 *dstRow = convertBuffer + y * width;
+                    for (int x = 0; x < width; x++)
+                    {
+                        Uint16 p = srcRow[x];
+                        Uint8 r = (Uint8)((p >> 11) & 0x1F);
+                        Uint8 g = (Uint8)((p >> 5) & 0x3F);
+                        Uint8 b = (Uint8)(p & 0x1F);
+                        // Expand to 8-bit
+                        r = (r << 3) | (r >> 2);
+                        g = (g << 2) | (g >> 4);
+                        b = (b << 3) | (b >> 2);
+                        dstRow[x] = 0xFF000000 | (r << 16) | (g << 8) | b;
+                    }
                 }
             }
 
@@ -271,18 +389,60 @@ void I_SetGamma(float r, float g, float b)
 // All three display modes (Windowed/Fullscreen/Borderless) share the same resolution list.
 int I_NumVideoModes()
 {
+#ifdef SDL2
+    BuildDisplayModeLists();
+    if (cv_fullscreen.value == 1)
+        return (int)fullscreenModes.size();
+    return (int)windowedModes.size();
+#else
     return MAXWINMODES;
+#endif
 }
 
 const char *I_GetVideoModeName(unsigned n)
 {
+#ifdef SDL2
+    BuildDisplayModeLists();
+    const std::vector<vidmode_t> &list =
+        (cv_fullscreen.value == 1) ? fullscreenModes : windowedModes;
+    if (n >= list.size())
+        return NULL;
+    return list[n].name;
+#else
     if (n >= (unsigned)MAXWINMODES)
         return NULL;
     return windowedModes[n].name;
+#endif
 }
 
 int I_GetVideoModeForSize(int w, int h)
 {
+#ifdef SDL2
+    BuildDisplayModeLists();
+    const std::vector<vidmode_t> &list =
+        (cv_fullscreen.value == 1) ? fullscreenModes : windowedModes;
+    if (list.empty())
+        return 0;
+    for (size_t i = 0; i < list.size(); i++)
+    {
+        if (list[i].w == w && list[i].h == h)
+            return (int)i;
+    }
+    // No exact match — return the closest resolution by area
+    int best = 0;
+    long long bestDiff = LLONG_MAX;
+    long long target = (long long)w * h;
+    for (size_t i = 0; i < list.size(); i++)
+    {
+        long long diff = llabs((long long)list[i].w * list[i].h - target);
+        if (diff < bestDiff)
+        {
+            bestDiff = diff;
+            best = (int)i;
+        }
+    }
+    return best;
+#else
     for (int i = 0; i < MAXWINMODES; i++)
     {
         if (windowedModes[i].w == w && windowedModes[i].h == h)
@@ -302,6 +462,36 @@ int I_GetVideoModeForSize(int w, int h)
         }
     }
     return best;
+#endif
+}
+
+void I_GetDesktopResolution(int &w, int &h)
+{
+#ifdef SDL2
+    SDL_DisplayMode dm;
+    if (SDL_GetDesktopDisplayMode(GetActiveDisplayIndex(), &dm) == 0)
+    {
+        w = dm.w;
+        h = dm.h;
+        return;
+    }
+#endif
+    w = 640;
+    h = 480;
+}
+
+void I_GetDisplayUsableBounds(int &w, int &h)
+{
+#ifdef SDL2
+    SDL_Rect r;
+    if (SDL_GetDisplayUsableBounds(GetActiveDisplayIndex(), &r) == 0)
+    {
+        w = r.w;
+        h = r.h;
+        return;
+    }
+#endif
+    I_GetDesktopResolution(w, h);
 }
 
 int I_SetVideoMode(int modeNum)
@@ -312,22 +502,61 @@ int I_SetVideoMode(int modeNum)
 #ifdef SDL2
     int dispmode = cv_fullscreen.value; // 0=Windowed, 1=Fullscreen, 2=Borderless
 
+    BuildDisplayModeLists();
+
+    if (rendermode == render_soft)
+        ApplySoftwareBpp();
+
+    int log_bpp = (rendermode == render_soft) ? vid.BitsPerPixel : cv_scr_depth.value;
+
     if (dispmode == 2)
     {
         // Borderless: always use desktop resolution
-        SDL_DisplayMode dm;
-        SDL_GetDesktopDisplayMode(0, &dm);
-        vid.width  = dm.w;
-        vid.height = dm.h;
-        CONS_Printf("I_SetVideoMode: borderless %d x %d\n", vid.width, vid.height);
+        I_GetDesktopResolution(vid.width, vid.height);
+        CONS_Printf("I_SetVideoMode: borderless %d x %d (%d bpp)\n",
+                    vid.width, vid.height, log_bpp);
     }
     else
     {
-        vid.width  = windowedModes[modeNum].w;
-        vid.height = windowedModes[modeNum].h;
+        const std::vector<vidmode_t> &list =
+            (dispmode == 1) ? fullscreenModes : windowedModes;
+        int idx = modeNum;
+        if (idx < 0) idx = 0;
+        if (list.empty())
+        {
+            I_GetDesktopResolution(vid.width, vid.height);
+        }
+        else
+        {
+            if (idx >= (int)list.size())
+                idx = (int)list.size() - 1;
+            vid.width  = list[idx].w;
+            vid.height = list[idx].h;
+        }
+
+        if (dispmode == 0)
+        {
+            // Windowed: clamp to usable bounds so the title bar stays visible.
+            int usable_w = 0, usable_h = 0;
+            I_GetDisplayUsableBounds(usable_w, usable_h);
+            if (usable_w > 0 && usable_h > 0)
+            {
+                if (vid.width > usable_w)
+                    vid.width = usable_w;
+                if (vid.height > usable_h)
+                    vid.height = usable_h;
+            }
+
+            if (vid.width != cv_scr_width.value || vid.height != cv_scr_height.value)
+            {
+                cv_scr_width.Set(vid.width);
+                cv_scr_height.Set(vid.height);
+            }
+        }
+
         const char *tag = (dispmode == 1) ? "fullscreen" : "windowed";
         CONS_Printf("I_SetVideoMode: %s %d x %d (%d bpp)\n",
-                    tag, vid.width, vid.height, vid.BitsPerPixel);
+                    tag, vid.width, vid.height, log_bpp);
     }
 
     if (rendermode == render_soft)
@@ -373,7 +602,7 @@ int I_SetVideoMode(int modeNum)
         if (sdlRenderer == NULL)
             I_Error("Could not create renderer: %s\n", SDL_GetError());
 
-        // Create texture for rendering
+        // Create texture for rendering (ARGB8888 backing)
         sdlTexture = SDL_CreateTexture(sdlRenderer,
             SDL_PIXELFORMAT_ARGB8888,
             SDL_TEXTUREACCESS_STREAMING,
@@ -382,10 +611,17 @@ int I_SetVideoMode(int modeNum)
             I_Error("Could not create texture: %s\n", SDL_GetError());
 
         // Create surface for software rendering (for direct pixel access)
-        // Use 8-bit indexed format for DOOM's paletted graphics
-        // Note: SDL2 renderer doesn't directly support 8-bit, so we convert in I_FinishUpdate
-        vidSurface = SDL_CreateRGBSurfaceWithFormat(0, vid.width, vid.height, 8,
-            SDL_PIXELFORMAT_INDEX8);
+        // Note: SDL2 renderer doesn't directly support 8-bit, so we convert in I_FinishUpdate.
+        if (vid.BitsPerPixel <= 8)
+        {
+            vidSurface = SDL_CreateRGBSurfaceWithFormat(0, vid.width, vid.height, 8,
+                SDL_PIXELFORMAT_INDEX8);
+        }
+        else
+        {
+            vidSurface = SDL_CreateRGBSurfaceWithFormat(0, vid.width, vid.height, 16,
+                SDL_PIXELFORMAT_RGB565);
+        }
 
         if (vidSurface == NULL)
             I_Error("Could not create surface: %s\n", SDL_GetError());
@@ -411,19 +647,34 @@ int I_SetVideoMode(int modeNum)
     return 1;
 #else
     // Original SDL1 code (fullscreen/windowed only; borderless not supported on SDL1)
+    if (rendermode == render_soft)
+    {
+        if (cv_scr_depth.value <= 8)
+        {
+            vid.BitsPerPixel = 8;
+            vid.BytesPerPixel = 1;
+        }
+        else
+        {
+            vid.BitsPerPixel = 16;
+            vid.BytesPerPixel = 2;
+        }
+    }
     vid.width  = windowedModes[modeNum].w;
     vid.height = windowedModes[modeNum].h;
+
+    int log_bpp = (rendermode == render_soft) ? vid.BitsPerPixel : cv_scr_depth.value;
 
     if (cv_fullscreen.value == 1)
     {
         flags |= SDL_FULLSCREEN;
         CONS_Printf("I_SetVideoMode: fullscreen %d x %d (%d bpp)\n",
-                    vid.width, vid.height, vid.BitsPerPixel);
+                    vid.width, vid.height, log_bpp);
     }
     else
     {
         CONS_Printf("I_SetVideoMode: windowed %d x %d (%d bpp)\n",
-                    vid.width, vid.height, vid.BitsPerPixel);
+                    vid.width, vid.height, log_bpp);
     }
 
     if (rendermode == render_soft)
@@ -459,15 +710,13 @@ bool I_StartupGraphics()
 
 #ifdef SDL2
     // Get desktop display mode for reference
-    if (SDL_GetDesktopDisplayMode(0, &vidInfo_mode) < 0)
+    if (SDL_GetDesktopDisplayMode(GetActiveDisplayIndex(), &vidInfo_mode) < 0)
     {
         CONS_Printf("Could not get desktop display mode: %s\n", SDL_GetError());
         return false;
     }
 
-    // Name the unified mode list
-    for (int n = 0; n < MAXWINMODES; n++)
-        sprintf(windowedModes[n].name, "%dx%d", windowedModes[n].w, windowedModes[n].h);
+    BuildDisplayModeLists();
 
     vid.BytesPerPixel = 1;
     vid.BitsPerPixel = 8;
@@ -486,6 +735,7 @@ bool I_StartupGraphics()
     {
         // software mode - create window and use software renderer
         rendermode = render_soft;
+        ApplySoftwareBpp();
         CONS_Printf("I_StartupGraphics: windowed %d x %d x %d bpp\n",
                     vid.width,
                     vid.height,
@@ -526,10 +776,18 @@ bool I_StartupGraphics()
             return false;
         }
 
-        // Create surface for software rendering (for direct pixel access)
-        // Use 8-bit indexed format for DOOM's paletted graphics
-        vidSurface = SDL_CreateRGBSurfaceWithFormat(0, vid.width, vid.height, 8,
-            SDL_PIXELFORMAT_INDEX8);
+        // Create surface for software rendering (for direct pixel access).
+        // Use paletted 8-bit for classic mode; RGB565 for highcolor (16-bit).
+        if (vid.BitsPerPixel <= 8)
+        {
+            vidSurface = SDL_CreateRGBSurfaceWithFormat(0, vid.width, vid.height, 8,
+                SDL_PIXELFORMAT_INDEX8);
+        }
+        else
+        {
+            vidSurface = SDL_CreateRGBSurfaceWithFormat(0, vid.width, vid.height, 16,
+                SDL_PIXELFORMAT_RGB565);
+        }
 
         if (vidSurface == NULL)
         {
@@ -589,8 +847,16 @@ bool I_StartupGraphics()
         vid.BitsPerPixel = 8;
     }
 #else
-    vid.BytesPerPixel = 1; // videoInfo->vfmt->BytesPerPixel
-    vid.BitsPerPixel = 8;
+    if (cv_scr_depth.value <= 8)
+    {
+        vid.BytesPerPixel = 1;
+        vid.BitsPerPixel = 8;
+    }
+    else
+    {
+        vid.BytesPerPixel = 2;
+        vid.BitsPerPixel = 16;
+    }
 #endif
 
     // default resolution
