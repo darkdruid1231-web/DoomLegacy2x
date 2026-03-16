@@ -44,8 +44,10 @@ bool OglSdlSurface()
 #ifdef SDL2
     Uint32 windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
 
-    if (cv_fullscreen.value)
+    if (cv_fullscreen.value == 1)
         windowFlags |= SDL_WINDOW_FULLSCREEN;
+    else if (cv_fullscreen.value == 2)
+        windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
     // Clean up old window
     if (oglWindow)
@@ -95,7 +97,7 @@ bool OglSdlSurface()
 #endif
     }
 
-    if (cv_fullscreen.value)
+    if (cv_fullscreen.value == 1)
         surfaceFlags = SDL_OPENGL | SDL_FULLSCREEN;
     else
         surfaceFlags = SDL_OPENGL;

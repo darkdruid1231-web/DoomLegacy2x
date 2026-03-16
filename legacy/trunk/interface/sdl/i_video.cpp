@@ -22,7 +22,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <vector>
 
 #include "SDL.h"
 
@@ -59,6 +58,29 @@ static SDL_DisplayMode* vidInfo_ptr = NULL;
 
 extern consvar_t cv_fullscreen; // for fullscreen support
 
+// VSync CVar
+static CV_PossibleValue_t vsync_cons_t[] = {{0,"Off"},{1,"On"},{-1,"Adaptive"},{0,NULL}};
+#ifdef SDL2
+static void CV_VSync_OnChange();
+#endif
+consvar_t cv_vsync = {"vsync","On", CV_SAVE|CV_CALL, vsync_cons_t,
+#ifdef SDL2
+    CV_VSync_OnChange
+#else
+    NULL
+#endif
+};
+#ifdef SDL2
+static void CV_VSync_OnChange()
+{
+    SDL_GL_SetSwapInterval(cv_vsync.value);
+}
+#endif
+
+// MSAA CVar (applied before GL context creation; changing at runtime requires a vid restart)
+static CV_PossibleValue_t msaa_cons_t[] = {{0,"Off"},{2,"2x"},{4,"4x"},{8,"8x"},{0,NULL}};
+consvar_t cv_msaa = {"msaa","0", CV_SAVE, msaa_cons_t, NULL};
+
 // globals
 OGLRenderer *oglrenderer = NULL;
 rendermode_t rendermode = render_soft;
@@ -82,19 +104,18 @@ static const SDL_VideoInfo *vidInfo = NULL;
 static SDL_Surface *vidSurface = NULL;
 static SDL_Color localPalette[256];
 
-// Export window pointer for other modules (like i_system.cpp)
+// Export window pointer for other modules (like i_system.cpp).
+// In GL mode the active window is owned by oglrenderer, not sdlWindow.
 #ifdef SDL2
-SDL_Window* GetSDLWindow() { return sdlWindow; }
+SDL_Window* GetSDLWindow()
+{
+    if (rendermode == render_opengl && oglrenderer)
+        return oglrenderer->GetScreen();
+    return sdlWindow;
+}
 #endif
 
 const static Uint32 surfaceFlags = SDL_SWSURFACE | SDL_HWPALETTE;
-
-// maximum number of windowed modes (see windowedModes[][])
-#if !defined(__MACOS__) && !defined(__APPLE_CC__)
-#define MAXWINMODES (9)
-#else
-#define MAXWINMODES (12)
-#endif
 
 struct vidmode_t
 {
@@ -102,36 +123,24 @@ struct vidmode_t
     char name[16];
 };
 
-static std::vector<vidmode_t> fullscrModes;
 
-// windowed video modes from which to choose from.
-static vidmode_t windowedModes[MAXWINMODES] = {
-#ifdef __APPLE_CC__
-    {MAXVIDWIDTH /*1600*/, MAXVIDHEIGHT /*1200*/},
-    {1440, 900}, /* iMac G5 native res */
+// windowed video modes (modern list including widescreen and 4K)
+static vidmode_t windowedModes[] = {
+    {320,  200 },
+    {640,  480 },
+    {800,  600 },
+    {1024, 768 },
+    {1280, 720 },
     {1280, 1024},
-    {1152, 720}, /* iMac G5 native res */
-    {1024, 768},
-    {1024, 640},
-    {800, 600},
-    {800, 500},
-    {640, 480},
-    {512, 384},
-    {400, 300},
-    {320, 200}
-#else
-    {MAXVIDWIDTH /*1600*/, MAXVIDHEIGHT /*1200*/},
-    {1280, 1024}, // 1.25
-    {1024, 768},  // 1.3_
-    {800, 600},   // 1.3_
-    {640, 480},   // 1.3_
-    {640, 400},   // 1.6
-    {512, 384},   // 1.3_
-    {400, 300},   // 1.3_
-    {320, 200}    // original Doom resolution (pixel ar 1.6), meant for 1.3_ aspect ratio monitors
-                  // (nonsquare pixels!)
-#endif
+    {1366, 768 },
+    {1600, 900 },
+    {1920, 1080},
+    {2560, 1080},
+    {2560, 1440},
+    {3440, 1440},
+    {3840, 2160},
 };
+#define MAXWINMODES (int)(sizeof(windowedModes)/sizeof(windowedModes[0]))
 
 //
 // I_StartFrame
@@ -259,66 +268,40 @@ void I_SetGamma(float r, float g, float b)
     SDL_SetGamma(r, g, b);
 }
 
-// return number of fullscreen or windowed modes
+// All three display modes (Windowed/Fullscreen/Borderless) share the same resolution list.
 int I_NumVideoModes()
 {
-    if (cv_fullscreen.value)
-        return fullscrModes.size();
-    else
-        return MAXWINMODES;
+    return MAXWINMODES;
 }
 
 const char *I_GetVideoModeName(unsigned n)
 {
-    if (cv_fullscreen.value)
-    {
-        if (n >= fullscrModes.size())
-            return NULL;
-
-        return fullscrModes[n].name;
-    }
-
-    // windowed modes
-    if (n >= MAXWINMODES)
+    if (n >= (unsigned)MAXWINMODES)
         return NULL;
-
     return windowedModes[n].name;
 }
 
 int I_GetVideoModeForSize(int w, int h)
 {
-    int matchMode = -1;
-
-    if (cv_fullscreen.value)
+    for (int i = 0; i < MAXWINMODES; i++)
     {
-        for (unsigned i = 0; i < fullscrModes.size(); i++)
-        {
-            if (fullscrModes[i].w == w && fullscrModes[i].h == h)
-            {
-                matchMode = i;
-                break;
-            }
-        }
-
-        if (matchMode == -1) // use smallest mode
-            matchMode = fullscrModes.size() - 1;
+        if (windowedModes[i].w == w && windowedModes[i].h == h)
+            return i;
     }
-    else
+    // No exact match — return the closest resolution by area
+    int best = 0;
+    long bestDiff = LONG_MAX;
+    long target = (long)w * h;
+    for (int i = 0; i < MAXWINMODES; i++)
     {
-        for (unsigned i = 0; i < MAXWINMODES; i++)
+        long diff = labs((long)windowedModes[i].w * windowedModes[i].h - target);
+        if (diff < bestDiff)
         {
-            if (windowedModes[i].w == w && windowedModes[i].h == h)
-            {
-                matchMode = i;
-                break;
-            }
+            bestDiff = diff;
+            best = i;
         }
-
-        if (matchMode == -1) // use smallest mode
-            matchMode = MAXWINMODES - 1;
     }
-
-    return matchMode;
+    return best;
 }
 
 int I_SetVideoMode(int modeNum)
@@ -327,24 +310,24 @@ int I_SetVideoMode(int modeNum)
     vid.modenum = modeNum;
 
 #ifdef SDL2
-    if (cv_fullscreen.value)
-    {
-        vid.width = fullscrModes[modeNum].w;
-        vid.height = fullscrModes[modeNum].h;
-        flags |= SDL_WINDOW_FULLSCREEN;
+    int dispmode = cv_fullscreen.value; // 0=Windowed, 1=Fullscreen, 2=Borderless
 
-        CONS_Printf("I_SetVideoMode: fullscreen %d x %d (%d bpp)\n",
-                    vid.width,
-                    vid.height,
-                    vid.BitsPerPixel);
+    if (dispmode == 2)
+    {
+        // Borderless: always use desktop resolution
+        SDL_DisplayMode dm;
+        SDL_GetDesktopDisplayMode(0, &dm);
+        vid.width  = dm.w;
+        vid.height = dm.h;
+        CONS_Printf("I_SetVideoMode: borderless %d x %d\n", vid.width, vid.height);
     }
     else
     {
-        vid.width = windowedModes[modeNum].w;
+        vid.width  = windowedModes[modeNum].w;
         vid.height = windowedModes[modeNum].h;
-
-        CONS_Printf(
-            "I_SetVideoMode: windowed %d x %d (%d bpp)\n", vid.width, vid.height, vid.BitsPerPixel);
+        const char *tag = (dispmode == 1) ? "fullscreen" : "windowed";
+        CONS_Printf("I_SetVideoMode: %s %d x %d (%d bpp)\n",
+                    tag, vid.width, vid.height, vid.BitsPerPixel);
     }
 
     if (rendermode == render_soft)
@@ -373,8 +356,10 @@ int I_SetVideoMode(int modeNum)
 
         // Create new window
         Uint32 windowFlags = SDL_WINDOW_SHOWN;
-        if (cv_fullscreen.value)
+        if (dispmode == 1)
             windowFlags |= SDL_WINDOW_FULLSCREEN;
+        else if (dispmode == 2)
+            windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
         sdlWindow = SDL_CreateWindow("Doom Legacy",
             SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -413,33 +398,32 @@ int I_SetVideoMode(int modeNum)
     }
     else
     {
-        if (!oglrenderer->InitVideoMode(vid.width, vid.height, cv_fullscreen.value))
+        if (!oglrenderer->InitVideoMode(vid.width, vid.height, dispmode))
             I_Error("Could not set OpenGL vidmode.\n");
     }
+
+    // Flush stale SDL events (resize, focus, etc.) generated during window
+    // creation so they don't confuse the input system this frame.
+    SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
 
     I_StartupMouse(); // grabs mouse and keyboard input if necessary
 
     return 1;
 #else
-    // Original SDL1 code
-    if (cv_fullscreen.value)
-    {
-        vid.width = fullscrModes[modeNum].w;
-        vid.height = fullscrModes[modeNum].h;
-        flags |= SDL_FULLSCREEN;
+    // Original SDL1 code (fullscreen/windowed only; borderless not supported on SDL1)
+    vid.width  = windowedModes[modeNum].w;
+    vid.height = windowedModes[modeNum].h;
 
+    if (cv_fullscreen.value == 1)
+    {
+        flags |= SDL_FULLSCREEN;
         CONS_Printf("I_SetVideoMode: fullscreen %d x %d (%d bpp)\n",
-                    vid.width,
-                    vid.height,
-                    vid.BitsPerPixel);
+                    vid.width, vid.height, vid.BitsPerPixel);
     }
     else
-    { // !cv_fullscreen.value
-        vid.width = windowedModes[modeNum].w;
-        vid.height = windowedModes[modeNum].h;
-
-        CONS_Printf(
-            "I_SetVideoMode: windowed %d x %d (%d bpp)\n", vid.width, vid.height, vid.BitsPerPixel);
+    {
+        CONS_Printf("I_SetVideoMode: windowed %d x %d (%d bpp)\n",
+                    vid.width, vid.height, vid.BitsPerPixel);
     }
 
     if (rendermode == render_soft)
@@ -454,12 +438,11 @@ int I_SetVideoMode(int modeNum)
             I_Error("Didn't get a valid pixels pointer (SDL). Exiting.\n");
 
         vid.direct = static_cast<byte *>(vidSurface->pixels);
-        // VB: FIXME this stops execution at the latest
         vid.direct[0] = 1;
     }
     else
     {
-        if (!oglrenderer->InitVideoMode(vid.width, vid.height, cv_fullscreen.value))
+        if (!oglrenderer->InitVideoMode(vid.width, vid.height, dispmode))
             I_Error("Could not set OpenGL vidmode.\n");
     }
 
@@ -482,46 +465,9 @@ bool I_StartupGraphics()
         return false;
     }
 
-    // Get available fullscreen modes
-    int numModes = SDL_GetNumDisplayModes(0);
-    for (int i = 0; i < numModes; i++)
-    {
-        SDL_DisplayMode mode;
-        if (SDL_GetDisplayMode(0, i, &mode) == 0)
-        {
-            if (mode.w <= MAXVIDWIDTH && mode.h <= MAXVIDHEIGHT)
-            {
-                vidmode_t temp;
-                temp.w = mode.w;
-                temp.h = mode.h;
-                sprintf(temp.name, "%dx%d", temp.w, temp.h);
-
-                // Avoid duplicates
-                bool found = false;
-                for (unsigned j = 0; j < fullscrModes.size(); j++)
-                {
-                    if (fullscrModes[j].w == temp.w && fullscrModes[j].h == temp.h)
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found)
-                    fullscrModes.push_back(temp);
-            }
-        }
-    }
-
-    CONS_Printf(" Found %d video modes.\n", fullscrModes.size());
-    if (fullscrModes.empty())
-    {
-        CONS_Printf(" No suitable video modes found!\n");
-        return false;
-    }
-
-    // name the windowed modes
+    // Name the unified mode list
     for (int n = 0; n < MAXWINMODES; n++)
-        sprintf(windowedModes[n].name, "win %dx%d", windowedModes[n].w, windowedModes[n].h);
+        sprintf(windowedModes[n].name, "%dx%d", windowedModes[n].w, windowedModes[n].h);
 
     vid.BytesPerPixel = 1;
     vid.BitsPerPixel = 8;
@@ -546,8 +492,10 @@ bool I_StartupGraphics()
                     vid.BitsPerPixel);
 
         Uint32 flags = SDL_WINDOW_SHOWN;
-        if (cv_fullscreen.value)
+        if (cv_fullscreen.value == 1)
             flags |= SDL_WINDOW_FULLSCREEN;
+        else if (cv_fullscreen.value == 2)
+            flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
         sdlWindow = SDL_CreateWindow("Doom Legacy",
             SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -622,33 +570,9 @@ bool I_StartupGraphics()
         return false;
     }
 
-    // copy suitable modes to our own list
-    int n = 0;
-    while (modeList[n])
-    {
-        if (modeList[n]->w <= MAXVIDWIDTH && modeList[n]->h <= MAXVIDHEIGHT)
-        {
-            vidmode_t temp;
-            temp.w = modeList[n]->w;
-            temp.h = modeList[n]->h;
-            sprintf(temp.name, "%dx%d", temp.w, temp.h);
-
-            fullscrModes.push_back(temp);
-            // CONS_Printf("  %s\n", temp.name);
-        }
-        n++;
-    }
-
-    CONS_Printf(" Found %d video modes.\n", fullscrModes.size());
-    if (fullscrModes.empty())
-    {
-        CONS_Printf(" No suitable video modes found!\n");
-        return false;
-    }
-
-    // name the windowed modes
-    for (n = 0; n < MAXWINMODES; n++)
-        sprintf(windowedModes[n].name, "win %dx%d", windowedModes[n].w, windowedModes[n].h);
+    // Name the unified mode list
+    for (int n = 0; n < MAXWINMODES; n++)
+        sprintf(windowedModes[n].name, "%dx%d", windowedModes[n].w, windowedModes[n].h);
 
         // even if I set vid.bpp and highscreen properly it does seem to
         // support only 8 bit  ...  strange

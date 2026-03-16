@@ -157,9 +157,10 @@ private:
   GLfloat glversion;  ///< Current (runtime) OpenGL version (major.minor).
 
 #ifdef SDL2
-  SDL_Window *screen; ///< Main screen window (SDL2)
+  SDL_Window *screen;    ///< Main screen window (SDL2)
+  SDL_GLContext glCtx;   ///< OpenGL context (SDL2)
 #else
-  SDL_Surface *screen; ///< Main screen surface (SDL1)
+  SDL_Surface *screen;   ///< Main screen surface (SDL1)
 #endif
   GLint viewportw; ///< Width of current viewport in pixels.
   GLint viewporth; ///< Height of current viewport in pixels.
@@ -188,6 +189,8 @@ private:
   std::vector<FrameLight> framelights;
   void CollectDynamicLights(class Actor *pov);
   void AccumDynLight(float px, float py, float pz, float &r, float &g, float &b) const;
+  /// Transform framelights to eye-space and upload as shader uniforms.
+  void SetShaderDynamicLights(class ShaderProg *prog) const;
 
   // Blob shadow system.
   GLuint shadowTex;         ///< Circular gradient texture for blob shadows.
@@ -212,7 +215,7 @@ private:
 public:
   OGLRenderer();
   ~OGLRenderer();
-  bool InitVideoMode(const int w, const int h, const bool fullscreen);
+  bool InitVideoMode(const int w, const int h, const int displaymode);
 
   void InitGLState();
   void StartFrame();
@@ -221,6 +224,10 @@ public:
   bool WriteScreenshot(const char *fname = NULL);
 
   bool ReadyToDraw() const { return workinggl; } // Console tries to draw to screen before video is initialized.
+
+#ifdef SDL2
+  SDL_Window *GetScreen() const { return screen; }
+#endif
 
   bool In2DMode() const {return consolemode;}
 
@@ -257,6 +264,11 @@ public:
   static void DrawViewBorder() {}
   static void DrawFill(int x, int y, int w, int h, int color) {}
   static void FadeScreenMenuBack(unsigned color, int height) {}
+
+  /// Draw full-screen semi-transparent console background, bypassing HUD aspect-ratio centering.
+  /// height_frac: fraction of screen height covered (0.0 = none, 1.0 = full screen).
+  /// alpha: opacity 0.0 (invisible) to 1.0 (opaque).
+  void DrawConsoleBackground(float height_frac, float alpha);
 };
 
 extern OGLRenderer *oglrenderer;
