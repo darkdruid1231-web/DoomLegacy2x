@@ -283,7 +283,9 @@ float soundchannel_t::Adjust()
     else
         angle += (ANGLE_MAX - l->yaw);
 
-    const float SURROUND_SEP = 0.5f; // TODO wtf?
+    const float SURROUND_SEP = 0.5f; // centre pan (0.5 = equal left/right) for virtual-surround;
+                                      // sounds behind the listener (105°–255°) are centred so they
+                                      // appear to come from "behind" rather than hard left or right.
     const float STEREO_SWING = 0.375f;
 
     // Produce a surround sound for angle from 105 till 255
@@ -724,10 +726,10 @@ void SoundSystem::Stop3DSound(void *origin)
     int cnum, n = channels.size();
     for (cnum = 0; cnum < n; cnum++)
     {
-        if (channels[cnum].si && channels[cnum].source.act == origin)
+        if (channels[cnum].source.act == origin)
         {
-            StopChannel(cnum);
-            break; // what about several sounds from one origin?
+            channels[cnum].source.act = NULL; // null out before stopping so Adjust() never sees dangling ptr
+            StopChannel(cnum); // stop all channels from this origin (not just the first)
         }
     }
 }
