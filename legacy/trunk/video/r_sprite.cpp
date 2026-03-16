@@ -700,7 +700,22 @@ spritepres_t::~spritepres_t()
 /// (but what about 3d models, which have no frames???)
 void spritepres_t::SetFrame(const state_t *st)
 {
-    // FIXME for now the name of SPR_NONE is "NONE", fix it when we have the default sprite
+    // SPR_NONE is the invisible/null sprite (used by S_NULL and MF2_DONTDRAW actors).
+    // There is no WAD lump for it and sprites.default_item is unset, so calling
+    // sprites.Get("NONE") would null-deref default_item.  Just clear spr and record
+    // the state so that rendering code can skip the draw.
+    if (st->sprite == SPR_NONE)
+    {
+        if (spr)
+        {
+            spr->Release();
+            spr = NULL;
+        }
+        state = st;
+        flags = 0;
+        lastupdate = -1;
+        return;
+    }
 
     // some sprites change name during animation (!!!)
     const char *name = spritenames[st->sprite];
@@ -721,7 +736,6 @@ void spritepres_t::SetFrame(const state_t *st)
 /// This is needed for PlayerPawns.
 void spritepres_t::SetAnim(animseq_e seq)
 {
-    /*
     const state_t *st;
 
     if (animseq == seq)
@@ -736,6 +750,7 @@ void spritepres_t::SetAnim(animseq_e seq)
         break;
 
       case Run:
+      case Back:  // For now, use the same animation for forward/back
         st = info->seestate;
         break;
 
@@ -745,7 +760,7 @@ void spritepres_t::SetAnim(animseq_e seq)
 
       case Melee:
         st = info->meleestate;
-        if (st)
+        if (st && st != &states[S_NULL])
           break;
         // if no melee anim, fallthrough to shoot anim
 
@@ -770,8 +785,8 @@ void spritepres_t::SetAnim(animseq_e seq)
         break;
       }
 
-    SetFrame(st);
-    */
+    if (st)
+        SetFrame(st);
 }
 
 bool spritepres_t::Update(int advance)

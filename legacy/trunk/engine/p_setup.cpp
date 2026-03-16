@@ -426,7 +426,8 @@ void Map::LoadThings(int lump, bool heed_spawnflags)
 
             playerstarts.insert(pair<int, mapthing_t *>(ednum, t));
 
-#warning FIXME TEST
+            // tid=-100 sentinel: all 4 split-screen players may spawn immediately at maptic=0.
+            // CheckRespawnSpot blocks re-use for PLAYERSPAWN_HALF_DELAY ticks after each spawn.
             t->tid = -100; // respawn timer
             continue;
         }
@@ -1116,21 +1117,30 @@ void Map::GroupLines()
             continue;
 
         // Go through segs one by one. Stop when any assignation is done.
-        for (unsigned csnum = ss->first_seg; csnum < ss->first_seg + ss->num_segs; csnum++)
+        unsigned segend = ss->first_seg + ss->num_segs;
+        if (segend > (unsigned)numsegs)
         {
-            seg_t *seg = &segs[csnum];
-            if (seg->sidedef)
+            CONS_Printf("GL subsector %d: first_seg=%d num_segs=%d exceeds numsegs=%d — skipping\n",
+                        i, ss->first_seg, ss->num_segs, numsegs);
+        }
+        else
+        {
+            for (unsigned csnum = ss->first_seg; csnum < segend; csnum++)
             {
-                ss->sector = seg->sidedef->sector;
-                break;
+                seg_t *seg = &segs[csnum];
+                if (seg->sidedef)
+                {
+                    ss->sector = seg->sidedef->sector;
+                    break;
+                }
             }
         }
 
         // Every gl subsector should have at least one non-miniseg.
         if (!ss->sector)
-            CONS_Printf("GL subsector %d consists entirely of minisegs. Unpredictable things may "
-                        "happen at any time.\n",
-                        i);
+            CONS_Printf("GL subsector %d (first_seg=%d, num_segs=%d) has no sector — "
+                        "consists entirely of minisegs or has invalid seg refs.\n",
+                        i, ss->first_seg, ss->num_segs);
     }
 
     // count number of lines in each sector
@@ -1748,6 +1758,20 @@ bool Map::Setup(tic_t start, bool spawnthings)
         // For prebuilt GL nodes: don't copy to main variables - keep them separate
         // The renderer should use gl* versions directly
         CONS_Printf(" Using GL nodes from WAD for rendering.\n");
+        CONS_Printf("  GL data: %d subsectors, %d segs, %d nodes, %d glvertexes\n",
+                    numglsubsectors, numsegs, numnodes, numglvertexes);
+
+        // Validate subsector seg references against the loaded seg count.
+        int oob_ssecs = 0;
+        for (int si = 0; si < numglsubsectors; si++)
+        {
+            unsigned end = subsectors[si].first_seg + subsectors[si].num_segs;
+            if (end > (unsigned)numsegs)
+                oob_ssecs++;
+        }
+        if (oob_ssecs > 0)
+            CONS_Printf("  WARNING: %d GL subsectors have first_seg+num_segs > numsegs (%d)!\n",
+                        oob_ssecs, numsegs);
     }
     else
     {
