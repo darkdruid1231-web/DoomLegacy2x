@@ -67,6 +67,10 @@ static CV_PossibleValue_t displaymode_cons_t[] = {
     {0,"Windowed"}, {1,"Fullscreen"}, {2,"Borderless"}, {0,NULL}};
 consvar_t cv_fullscreen = {
     "fullscreen", "Fullscreen", CV_SAVE | CV_CALL | CV_NOINIT, displaymode_cons_t, CV_Fullscreen_OnChange};
+// 0=Auto (no filtering), 4=4:3, 16=16:9, 21=21:9
+static CV_PossibleValue_t aspectratio_cons_t[] = {
+    {0, "Auto"}, {4, "4:3"}, {16, "16:9"}, {21, "21:9"}, {0, NULL}};
+consvar_t cv_aspectratio = {"aspectratio", "Auto", CV_SAVE, aspectratio_cons_t};
 
 // Are invisible things translucent or fuzzy?
 consvar_t cv_fuzzymode = {"fuzzymode", "Off", CV_SAVE | CV_CALL, CV_OnOff, CV_Fuzzymode_OnChange};

@@ -198,13 +198,16 @@ float font_t::DrawString(float x, float y, const char *str, int flags)
 
     if (rendermode == render_opengl)
     {
+        const bool base_coords = (flags & V_SLOC) && (flags & V_SSIZE);
+
         if (flags & V_SSIZE)
         {
-            dupx = vid.fdupx;
-            dupy = vid.fdupy;
+            // When drawing in Doom base coordinates, keep advances unscaled.
+            dupx = base_coords ? 1.0f : vid.fdupx;
+            dupy = base_coords ? 1.0f : vid.fdupy;
         }
 
-        if (flags & V_SLOC)
+        if ((flags & V_SLOC) && !base_coords)
         {
             x *= vid.fdupx;
             y *= vid.fdupy;

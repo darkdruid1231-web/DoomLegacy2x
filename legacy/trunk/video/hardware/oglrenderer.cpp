@@ -768,6 +768,8 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const int displaymode)
         surfaceflags |= SDL_WINDOW_FULLSCREEN;
     else if (displaymode == 2)
         surfaceflags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+    else
+        surfaceflags |= SDL_WINDOW_RESIZABLE;
 
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);

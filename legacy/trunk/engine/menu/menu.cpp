@@ -2036,6 +2036,7 @@ static void M_OpenGLOption(int choice)
 static menuitem_t VideoOptions_MI[] = {
     menuitem_t(IT_LINK, NULL, "Video modes...", &VidModeDef, 0),
     menuitem_t(IT_CVAR, NULL, "Display Mode", &cv_fullscreen, 0),
+    menuitem_t(IT_CVAR, NULL, "Aspect Ratio", &cv_aspectratio, 0),
     menuitem_t(IT_CVAR, NULL, "VSync", &cv_vsync, 0),
     menuitem_t(IT_CVAR, NULL, "FPS Limit", &cv_fpslimit, 0),
     menuitem_t(IT_CV_SLIDER | IT_STRING, NULL, "Brightness", &cv_video_gamma, 0),

@@ -134,6 +134,7 @@ extern consvar_t cv_scr_width;
 extern consvar_t cv_scr_height;
 extern consvar_t cv_scr_depth;
 extern consvar_t cv_fullscreen;
+extern consvar_t cv_aspectratio;
 extern consvar_t cv_video_gamma;
 
 extern consvar_t cv_viewsize;

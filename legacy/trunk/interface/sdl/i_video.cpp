@@ -25,6 +25,7 @@
 #include <vector>
 #include <algorithm>
 #include <limits.h>
+#include <math.h>
 
 #include "SDL.h"
 
@@ -61,6 +62,7 @@ static SDL_DisplayMode* vidInfo_ptr = NULL;
 #include "hardware/oglrenderer.hpp"
 
 extern consvar_t cv_fullscreen; // for fullscreen support
+extern consvar_t cv_aspectratio;
 
 // VSync CVar
 static CV_PossibleValue_t vsync_cons_t[] = {{0,"Off"},{1,"On"},{-1,"Adaptive"},{0,NULL}};
@@ -131,6 +133,7 @@ struct vidmode_t
 static std::vector<vidmode_t> fullscreenModes;
 static std::vector<vidmode_t> windowedModes;
 static int modesDisplayIndex = -1;
+static int modesAspectRatio = -1;
 #else
 // windowed video modes (legacy SDL1 list)
 static vidmode_t windowedModes[] = {
@@ -160,15 +163,48 @@ static int GetActiveDisplayIndex()
     return 0;
 }
 
+static bool AspectRatioMatches(int w, int h)
+{
+    if (h <= 0)
+        return false;
+
+    int mode = cv_aspectratio.value;
+    if (mode == 0)
+        return true;
+
+    float ratio = (float)w / (float)h;
+    float target = 0.0f;
+    switch (mode)
+    {
+        case 4: // 4:3
+            target = 4.0f / 3.0f;
+            break;
+        case 16: // 16:9
+            target = 16.0f / 9.0f;
+            break;
+        case 21: // 21:9
+            target = 21.0f / 9.0f;
+            break;
+        default:
+            return true;
+    }
+
+    const float tolerance = 0.02f; // allow common variants like 1366x768 and 2560x1080
+    return fabsf(ratio - target) / target <= tolerance;
+}
+
 static void BuildDisplayModeLists()
 {
     int display = GetActiveDisplayIndex();
     if (display < 0)
         display = 0;
-    if (display == modesDisplayIndex && !fullscreenModes.empty())
+    if (display == modesDisplayIndex &&
+        modesAspectRatio == cv_aspectratio.value &&
+        !fullscreenModes.empty())
         return;
 
     modesDisplayIndex = display;
+    modesAspectRatio = cv_aspectratio.value;
     fullscreenModes.clear();
     windowedModes.clear();
 
@@ -200,18 +236,15 @@ static void BuildDisplayModeLists()
         return a.w == b.w && a.h == b.h;
     }), raw.end());
 
-    fullscreenModes = raw;
-
-    int usable_w = 0, usable_h = 0;
-    I_GetDisplayUsableBounds(usable_w, usable_h);
-    if (usable_w <= 0 || usable_h <= 0)
+    for (size_t i = 0; i < raw.size(); i++)
     {
-        I_GetDesktopResolution(usable_w, usable_h);
+        if (AspectRatioMatches(raw[i].w, raw[i].h))
+            fullscreenModes.push_back(raw[i]);
     }
 
     for (size_t i = 0; i < raw.size(); i++)
     {
-        if (raw[i].w <= usable_w && raw[i].h <= usable_h)
+        if (AspectRatioMatches(raw[i].w, raw[i].h))
             windowedModes.push_back(raw[i]);
     }
 
@@ -589,6 +622,8 @@ int I_SetVideoMode(int modeNum)
             windowFlags |= SDL_WINDOW_FULLSCREEN;
         else if (dispmode == 2)
             windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+        else
+            windowFlags |= SDL_WINDOW_RESIZABLE;
 
         sdlWindow = SDL_CreateWindow("Doom Legacy",
             SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,

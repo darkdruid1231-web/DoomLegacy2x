@@ -224,6 +224,7 @@ void CL_Init()
     cv_scr_height.Reg();
     cv_scr_depth.Reg();
     cv_fullscreen.Reg();
+    cv_aspectratio.Reg();
     cv_video_gamma.Reg();
     cv_vsync.Reg();
     cv_msaa.Reg();
