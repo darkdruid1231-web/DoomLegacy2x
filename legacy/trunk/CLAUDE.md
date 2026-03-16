@@ -14,27 +14,26 @@ Doom Legacy is a Doom/Doom II source port - a classic first-person shooter game 
 # Open MSYS2 MinGW64 shell
 cd legacy/trunk
 mkdir build && cd build
-cmake .. -G "MinGW Makefiles"
-/c/msys64/mingw64/bin/mingw32-make.exe -j4
+cmake .. -G Ninja
+ninja
 ```
+
+Incremental builds: just run `ninja` again — it correctly detects changed files.
+
+**Do not use `cmake .. -G "MinGW Makefiles"` or `mingw32-make` directly** — the MinGW
+Makefile generator has a broken `compiler_depend.make` on this machine and will silently
+skip recompilation of changed files.
 
 ### Linux / MSYS2 POSIX
 
 ```bash
 cd doomlegacy-svn/legacy/trunk
 mkdir build && cd build
-cmake ..
-make -j4
+cmake .. -G Ninja
+ninja
 ```
 
 The build requires out-of-tree builds (CMake will error if you try in-tree).
-
-### Single-file compile (fast iteration)
-
-```bash
-# Recompile just one translation unit (e.g., during GL BSP work)
-make engine/CMakeFiles/engine.dir/gl_bsp.cpp.obj
-```
 
 ### Running Tests
 
@@ -124,6 +123,17 @@ Active development area. Key gotchas:
 - **zdbsp_integration**: New wrapper (`engine/zdbsp_integration.cpp`) around
   the FNodeBuilder class for in-process GL node generation
 - **hw_gbuffer**: New G-buffer abstraction in `video/hardware/hw_gbuffer.cpp`
+- **WAD GL nodes pointer aliasing**: When GL nodes come from the WAD (`gllump != -1`),
+  `mp->nodes == mp->glnodes`, `mp->segs == mp->glsegs`, `mp->subsectors == mp->glsubsectors`
+  (same allocation). However `glvertexes` and `vertexes` stay **separate** — linedef v1/v2
+  still point into `vertexes[]`, not `glvertexes[]`. The dynamic-build path merges them; the
+  WAD path does not.
+- **Player start spawn timing**: Player start mapthing_t objects are initialized with `tid=-100`
+  so all 4 split-screen players can spawn immediately at maptic=0. `CheckRespawnSpot` blocks
+  reuse for `PLAYERSPAWN_HALF_DELAY` (10) ticks after each spawn.
+- **RenderGLSubsector bounds check**: Use `>=` not `>` when checking subsector index against
+  `mp->numglsubsectors`. The fixed check is `if (num < 0 || num >= mp->numglsubsectors)`.
+  The off-by-one (`>` instead of `>=`) caused a crash in 4-player split-screen (fixed 2026-03-15).
 
 ## Dependencies
 

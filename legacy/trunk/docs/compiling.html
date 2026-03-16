@@ -118,47 +118,42 @@ by default, so network multiplayer requires additional setup.</p>
 <h3>Compiling on Windows with MSYS2/MinGW</h3>
 
 <p>Doom Legacy can be built on Windows using MSYS2 with MinGW-w64. This is the
-recommended approach for Windows builds.</p>
+recommended approach for Windows builds. The build uses the
+<a href="https://ninja-build.org/">Ninja</a> generator — do <b>not</b> use
+<tt>-G "MinGW Makefiles"</tt>, as that generator has a broken incremental-build
+dependency tracker on Windows and will silently skip recompilation of changed files.</p>
 
 <h4>Prerequisites</h4>
 
 <ul>
-<li><a href="https://www.msys2.org/">MSYS2</a> - Install MSYS2 and ensure you have the MinGW-w64 toolchain</li>
+<li><a href="https://www.msys2.org/">MSYS2</a> — install MSYS2 and open the
+<b>MSYS2 MinGW 64-bit</b> shell (not the plain MSYS shell).</li>
 <li>Install the required development packages:
-<div class="code">pacman -S mingw-w64-x86_64-cmake mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_mixer mingw-w64-x86_64-glew mingw-w64-x86_64-libpng mingw-w64-x86_64-zlib</div>
+<div class="code">pacman -S mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_mixer mingw-w64-x86_64-glew mingw-w64-x86_64-libpng mingw-w64-x86_64-zlib</div>
 </li>
-<li>Ensure your Doom WAD file (doom.wad) is available</li>
+<li>Ensure your Doom WAD file (doom.wad) is available.</li>
 </ul>
 
 <h4>Build Steps</h4>
 
 <ol>
-<li>Open MSYS2 MinGW 64-bit terminal (not the MSYS terminal, use the MinGW one)</li>
+<li>Open the <b>MSYS2 MinGW 64-bit</b> terminal.</li>
 <li>Navigate to the source directory:
-<div class="code">cd /c/Users/Geoffrey/Desktop/Doom/doomlegacy/doomlegacy-svn/legacy/trunk</div>
+<div class="code">cd /c/path/to/doomlegacy/legacy/trunk</div>
 </li>
 <li>Create and enter the build directory:
 <div class="code">mkdir -p build &amp;&amp; cd build</div>
 </li>
-<li>Configure with CMake:
-<div class="code">cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release ..</div>
+<li>Configure with CMake (Ninja generator):
+<div class="code">cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..</div>
 </li>
 <li>Build the project:
-<div class="code">cmake --build . --config Release</div>
+<div class="code">ninja</div>
 </li>
 </ol>
 
-<p><b>Alternative: Using msys2_shell.cmd directly</b></p>
-
-<p>You can also build from a regular Windows command prompt or CI script using:</p>
-
-<div class="code"></div>
-MSYS_NO_PATHCONV=1 C:/msys64/msys2_shell.cmd -defterm -here -no-start -mingw64 -c "cd C:/Users/Geoffrey/Desktop/Doom/doomlegacy/doomlegacy-svn/legacy/trunk/build && cmake --build . --config Release"
-<p>Environment variables:</p>
-<ul>
-<li><b>MSYS_NO_PATHCONV=1</b> - Prevents MSYS from converting paths</li>
-<li><b>-defterm -here -no-start -mingw64</b> - Runs in MinGW 64-bit environment without starting a new window</li>
-</ul>
+<p>For subsequent incremental builds, just run <tt>ninja</tt> again from the build
+directory — it will recompile only what changed.</p>
 
 <h4>Running the Game</h4>
 
