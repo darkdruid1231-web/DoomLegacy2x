@@ -761,13 +761,16 @@ void Menu::DrawMenu()
                 break;
 
             case IT_PATCH:
-                if (font && items[i].text)
+                if (items[i].pic && items[i].pic[0])
+                {
+                    materials.Get(items[i].pic)->Draw(x, dy, flags);
+                    h = FONTBHEIGHT;
+                }
+                else if (font && items[i].text)
                 {
                     font->DrawString(x, dy, items[i].text, flags);
                     h = FONTBHEIGHT;
                 }
-                else if (items[i].pic && items[i].pic[0])
-                    materials.Get(items[i].pic)->Draw(x, dy, flags);
                 break;
 
                 // then the "short" ones:
