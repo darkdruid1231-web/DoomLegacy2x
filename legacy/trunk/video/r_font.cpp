@@ -31,7 +31,10 @@
 #include "w_wad.h"
 #include "z_zone.h"
 
-#define NO_TTF // TrueType fonts off by default
+// SDL_ttf is enabled via CMake when HAVE_TTF is defined
+#ifndef HAVE_TTF
+#define NO_TTF
+#endif
 
 /// ucs2 because SDL_ttf currently only understands Unicode codepoints within the BMP.
 static int utf8_to_ucs2(const char *utf8, Uint16 *ucs2)
@@ -351,7 +354,7 @@ class ttfont_t : public font_t
     ttfont_t(int lump)
     {
         data = static_cast<byte *>(fc.CacheLumpNum(lump, PU_DAVE));
-        font = TTF_OpenFontRW(SDL_RWFromConstMem(data, fc.LumpLength(lump)), true, 24);
+        font = TTF_OpenFontRW(SDL_RWFromConstMem(data, fc.LumpLength(lump)), true, 12);
         // font = TTF_OpenFont("font.ttf", 16); // TEST
 
         ascent = TTF_FontAscent(font);
@@ -438,11 +441,14 @@ class SDLTexture : public LumpTexture
         {
             glGenTextures(1, &gl_id);
             glBindTexture(GL_TEXTURE_2D, gl_id);
-            // default params
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            // Use linear filtering for smoother text
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            // Create mipmaps
             gluBuild2DMipmaps(
-                GL_TEXTURE_2D, GL_RGBA, width, height, gl_format, GL_UNSIGNED_BYTE, pixels);
+                GL_TEXTURE_2D, GL_RGBA, width, height, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
 
             //  CONS_Printf("Created GL texture %d for %s.\n", gl_id, name);
             // do not free pixels!!
@@ -456,7 +462,8 @@ class SDLTexture : public LumpTexture
         surf = s;
         pixels = static_cast<byte *>(surf->pixels);
 
-        // For some strange reason SDL_ttf uses BGRA order.
+        // SDL_ttf renders with BGRA format (blended rendering)
+        // Using BGRA since SDL_ttf outputs BGRA surfaces
         gl_format = GL_BGRA;
     }
 
@@ -507,6 +514,7 @@ bool ttfont_t::BuildGlyph(glyph_t &g, int c, SDL_Color color)
 {
     TTF_GlyphMetrics(font, c, &g.minx, &g.maxx, &g.miny, &g.maxy, &g.advance);
 
+    // Use blended rendering for proper alpha support
     SDL_Surface *glyph = TTF_RenderGlyph_Blended(font, c, color);
     if (!glyph)
     {
@@ -524,6 +532,8 @@ bool ttfont_t::BuildGlyph(glyph_t &g, int c, SDL_Color color)
     g.mat = new Material(name.c_str(), t, SCALE, SCALE); // create a new Material
     return true;
 }
+
+
 
 float ttfont_t::DrawCharacter(float x, float y, int c, int flags)
 {
@@ -567,6 +577,11 @@ float ttfont_t::DrawCharacter(float x, float y, int c, int flags)
 
 #endif
 
+// Global pointer to TTF font for console use (separate from HUD font)
+#ifndef NO_TTF
+static ttfont_t *console_ttf = NULL;
+#endif
+
 // initialize the font system, load the fonts
 void font_t::Init()
 {
@@ -598,32 +613,55 @@ void font_t::Init()
     }
 
 #ifndef NO_TTF
+    // Initialize SDL_ttf and load the TrueType font for console use
+    CONS_Printf("=== TTF Debug: Initializing SDL_ttf ===\n");
+    
     if (TTF_Init() < 0)
     {
-        CONS_Printf("TTF_Init error: %s\n", TTF_GetError());
+        CONS_Printf("TTF Debug: TTF_Init FAILED: %s\n", TTF_GetError());
+        return;
+    }
+    CONS_Printf("TTF Debug: TTF_Init OK\n");
+
+    int lump = fc.FindNumForName("TTFCONSL");
+    CONS_Printf("TTF Debug: FindNumForName(\"TTFCONSL\") = %d\n", lump);
+    if (lump < 0)
+    {
+        CONS_Printf("TTF Debug: TrueType font 'TTFCONSL' not found in WAD, using raster fonts only\n");
         return;
     }
 
-    int lump = fc.FindNumForName("TTF_TEST");
-    if (lump < 0)
-    {
-        I_Error("font_t::Init: Default TrueType font not found!\n");
-    }
-    ttfont_t *tt = new ttfont_t(lump);
+    CONS_Printf("TTF Debug: Creating ttfont_t with lump %d\n", lump);
+    console_ttf = new ttfont_t(lump);
+    CONS_Printf("TTF Debug: ttfont_t created\n");
 
-    const char *p = tt->GetFaceFamilyName();
+    const char *p = console_ttf->GetFaceFamilyName();
     if (p)
-        CONS_Printf("TT font face family name: %s\n", p);
+        CONS_Printf("TTF Debug: Font face family: %s\n", p);
+    else
+        CONS_Printf("TTF Debug: Could not get font family name\n");
 
-    p = tt->GetFaceStyleName();
+    p = console_ttf->GetFaceStyleName();
     if (p)
-        CONS_Printf("TT font face style name: %s\n", p);
+        CONS_Printf("TTF Debug: Font style: %s\n", p);
 
-    // TTF_Quit();
-    // NOTE: do NOT assign hud_font = tt here. TTF materials store worldheight
-    // in screen pixels (rendered at the point size), so V_SSIZE would double-scale
-    // them by fdupy, making console text massively oversized. The raster font
-    // (set above) uses virtual-unit worldheight and works correctly with V_SSIZE.
-    delete tt; // TTF font is not yet wired up; release it until integration is ready
+    CONS_Printf("TTF Debug: TrueType console font loaded successfully!\n");
+#endif
+
+}
+
+// Get the TTF font for console rendering (or NULL if not available)
+// NOTE: TTF rendering currently has issues with the OpenGL setup, returning NULL to use raster fonts
+font_t *font_t::GetConsoleFont()
+{
+    // Temporarily disabled - TTF rendering needs more work for compatibility
+    return NULL;
+    
+#ifdef NO_TTF
+    return NULL;
+#else
+    return console_ttf;
 #endif
 }
+
+

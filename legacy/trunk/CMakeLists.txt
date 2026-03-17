@@ -68,6 +68,22 @@ if(USE_SDL2)
             message(STATUS "SDL2_mixer not found, disabling sound")
         endif()
     endif()
+    # SDL_ttf for TrueType font support
+    option(USE_TTF "Enable TrueType font support" ON)
+    if(USE_TTF STREQUAL "ON")
+        pkg_check_modules(SDL2TTF SDL2_ttf)
+        if(SDL2TTF_LIBRARY_DIRS)
+            link_directories(${SDL2TTF_LIBRARY_DIRS})
+        endif()
+        if(SDL2TTF_FOUND)
+            set(HAVE_TTF 1)
+            add_compile_definitions(HAVE_TTF)
+            include_directories(${SDL2TTF_INCLUDE_DIRS})
+            message(STATUS "SDL2_ttf found, TrueType fonts enabled")
+        else()
+            message(STATUS "SDL2_ttf not found, TrueType fonts disabled")
+        endif()
+    endif()
     if(SDL2_FOUND)
         include_directories(${SDL2_INCLUDE_DIRS})
     endif()
@@ -103,6 +119,16 @@ find_package(ZLIB REQUIRED)
 find_package(PNG REQUIRED)
 # JPEG
 find_package(JPEG REQUIRED)
+
+# OpenAL for hardware-accelerated 3D audio
+find_package(OpenAL QUIET)
+if(OpenAL_FOUND)
+    add_compile_definitions(HAVE_OPENAL)
+    message(STATUS "OpenAL found - hardware-accelerated 3D audio enabled")
+else()
+    message(STATUS "OpenAL not found - using software audio")
+endif()
+
 # ENet
 pkg_check_modules(ENET libenet)
 if(ENET_LIBRARY_DIRS)
@@ -164,6 +190,7 @@ target_link_libraries(doomlegacy PRIVATE
     "-Wl,--end-group"
     ${SDL2_LIBRARIES}
     ${SDL2MIXER_LIBRARIES}
+    ${SDL2TTF_LIBRARIES}
     ${ZLIB_LIBRARIES}
     ${PNG_LIBRARY}
     ${JPEG_LIBRARY}

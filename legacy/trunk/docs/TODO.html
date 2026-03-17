@@ -46,7 +46,21 @@ responsive, but is not strictly necessary)</li>
 <li>Give all attacks a relevant damage type.</li>
 
 <li>TrueType font system using SDL_ttf, UTF-8 -based console, UCS-4
-codes in keydown events.</li>
+codes in keydown events.
+ <ul>
+ <li><strong>IN PROGRESS</strong>: SDL_ttf integration added, font loads from WAD</li>
+ <li><strong>ISSUE</strong>: TTF-rendered glyphs show as white boxes instead of text when rendered via OpenGL textures.
+   The issue appears to be with alpha channel handling in the texture pipeline. Possible solutions:
+   <ul>
+   <li>Investigate proper pixel format conversion (SDL_ttf outputs BGRA with alpha, OpenGL may need RGBA)</li>
+   <li>Consider using SDL_RenderText or SDL_gpu library instead of raw SDL_ttf surfaces</li>
+   <li>Try alternative TTF libraries compatible with SDL2 (e.g., FreeType directly)</li>
+   <li>Ensure proper alpha blending state is enabled when rendering TTF textures</li>
+   </ul>
+ </li>
+ <li>Note: We are using SDL2_ttf (SDL2_ttf-2.x), which is the correct library for SDL2</li>
+ </ul></li>
+
 
 <li>Game modifications using DLLs. <a href="ctf.html">Capture the Flag</a>,
  <a href="doomfortress.html">Doom Fortress</a>...</li>

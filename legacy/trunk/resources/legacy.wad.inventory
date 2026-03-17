@@ -90,3 +90,5 @@ WATER4.lmp  		WATER4
 WATER5.lmp  		WATER5
 WATER6.lmp  		WATER6
 WATER7.lmp  		WATER7
+# TrueType font for console (UTF-8 support)
+DooM.ttf	TTFCONSL

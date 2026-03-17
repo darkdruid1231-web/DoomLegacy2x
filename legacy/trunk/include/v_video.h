@@ -89,6 +89,9 @@ class font_t
 
     /// Initialize the font system.
     static void Init();
+
+    /// Get the TrueType console font (or NULL if not available).
+    static font_t *GetConsoleFont();
 };
 
 extern font_t *hud_font;

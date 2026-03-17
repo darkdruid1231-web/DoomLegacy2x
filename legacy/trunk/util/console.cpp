@@ -313,6 +313,9 @@ Console::~Console()
 {
 }
 
+// Pointer to the TTF console font (if available)
+static font_t *console_font = NULL;
+
 /// Client init (not executed on dedicated server!): Setup the console text buffer
 void Console::Init()
 {
@@ -331,7 +334,14 @@ void Console::Init()
     con_lborder = materials.Get("CBLEFT");
     con_rborder = materials.Get("CBRIGHT");
 
-    con_lineheight = hud_font->Height();
+    // Try to get the TTF console font, fall back to hud_font if not available
+    console_font = font_t::GetConsoleFont();
+    if (!console_font)
+        console_font = hud_font;
+
+    con_lineheight = console_font->Height();
+
+    CONS_Printf("Console font: %s\n", console_font == hud_font ? "raster" : "TrueType");
 
     cons_msgtimeout.Reg();
     cons_speed.Reg();
@@ -804,7 +814,7 @@ void Console::Print(char *msg)
             if (c == ' ')
             {
                 con_line[con_cx++] = ' ';
-                width += hud_font->StringWidth(" ", 1);
+                width += console_font->StringWidth(" ", 1);
             }
             else if (c == '\2') // set white color
             {
@@ -844,7 +854,7 @@ void Console::Print(char *msg)
         float w;
         for (k = 0, w = 0.0; (c > ' ') && (k < CON_MAXLINECHARS) && (w < con_width);)
         {
-            w += hud_font->StringWidth(&msg[k], 1);
+            w += console_font->StringWidth(&msg[k], 1);
             k += utf8_numbytes(&msg[k]); // pick full utf-8 chars
             c = msg[k];
         }
@@ -871,7 +881,7 @@ void Console::Print(char *msg)
 void Console::DrawHudlines()
 {
     // y is in screen pixels; scale virtual font height by fdupy
-    float lh = hud_font->Height() * vid.fdupy;
+    float lh = console_font->Height() * vid.fdupy;
     float y = hud.chat_on ? lh : 0; // leave place for chat input in the first row of text
 
     for (int i = con_cy - CON_HUDLINES + 1; i <= con_cy; i++)
@@ -883,7 +893,7 @@ void Console::DrawHudlines()
             continue;
 
         // FIXME lineowner! use viewport locations!
-        hud_font->DrawString(0, y, con_buffer[i % CON_LINES], V_SSIZE);
+        console_font->DrawString(0, y, con_buffer[i % CON_LINES], V_SSIZE);
         y += lh;
     }
 
@@ -959,7 +969,7 @@ void Console::DrawConsole()
         if (i < 0)
             i += CON_LINES; // wrap
 
-        hud_font->DrawString(x, y, con_buffer[i % CON_LINES], V_SSIZE);
+        console_font->DrawString(x, y, con_buffer[i % CON_LINES], V_SSIZE);
     }
 
     // draw prompt if enough space (not while game startup)
@@ -975,12 +985,12 @@ void Console::DrawConsole()
             p += n - CON_MAXLINECHARS + 1;
 
         y = con_height - lh; // prompt sits at the bottom line of the console
-        x += hud_font->DrawString(x, y, CON_PROMPT, V_SSIZE);
-        x += hud_font->DrawString(x, y, p, V_SSIZE);
+        x += console_font->DrawString(x, y, CON_PROMPT, V_SSIZE);
+        x += console_font->DrawString(x, y, p, V_SSIZE);
 
         // draw the blinking cursor
         if (con_tick < 4)
-            hud_font->DrawCharacter(x, y, '_', V_SSIZE);
+            console_font->DrawCharacter(x, y, '_', V_SSIZE);
     }
 }
 

@@ -15,7 +15,15 @@ clang-format
 
 # SDL (graphics/sound/input)
 libsdl1.2-dev
-libsdl-mixer1.2-dev
+
+# Sound libraries (OpenAL + SDL_sound replaces SDL_mixer)
+libopenal-dev
+libsdl-sound-dev
+libvorbis-dev      # For OGG support in SDL_sound
+libflac-dev        # For FLAC support in SDL_sound
+
+# Optional: Keep SDL_mixer for fallback
+# libsdl-mixer1.2-dev
 
 # Image libraries
 libpng-dev

@@ -49,8 +49,15 @@
 #include "s_sound.h"
 #include "sounds.h"
 
+#include "g_actor.h"
+#include "g_player.h"
+#include "g_pawn.h"
+
+#include "doomdata.h"
+
 #include "w_wad.h"
 #include "z_zone.h"
+#include "m_fixed.h"
 
 void GenerateTables();
 void SV_Init();
@@ -267,6 +274,25 @@ void D_DoomLoop()
                 // render if gametics have passed since last rendering
                 rendertic = game.tic;
                 rendertimeout = now + TICRATE / 17;
+
+                // Update listener (player) position for 3D audio
+                if (ViewPlayers.size() > 0 && ViewPlayers[0]->pawn)
+                {
+                    PlayerPawn *p = ViewPlayers[0]->pawn;
+                    // Position (fixed-point to float conversion using Float() method)
+                    float px = p->pos.x.Float();
+                    float py = p->pos.y.Float();
+                    float pz = p->pos.z.Float();
+                    // Velocity (for Doppler effect)
+                    float vx = p->vel.x.Float();
+                    float vy = p->vel.y.Float();
+                    float vz = p->vel.z.Float();
+                    // Forward direction (facing)
+                    float fx = 0, fy = 0, fz = -1; // Simplified - would need actual yaw/pitch
+                    float ux = 0, uy = 1, uz = 0;  // Up direction
+
+                    I_SetListenerPosition(px, py, pz, vx, vy, vz, fx, fy, fz, ux, uy, uz);
+                }
 
                 // move positional sounds, adjust volumes
                 S.UpdateSounds();
