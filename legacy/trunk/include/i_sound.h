@@ -47,6 +47,13 @@ int I_StartSound(class soundchannel_t *c);
 // Stops a sound channel.
 void I_StopSound(soundchannel_t *c);
 
+// Update the listener (player) position for 3D audio
+// Called each frame from the game loop with player position and orientation
+void I_SetListenerPosition(float x, float y, float z,
+                           float vx, float vy, float vz,
+                           float forward_x, float forward_y, float forward_z,
+                           float up_x, float up_y, float up_z);
+
 //
 //  MUSIC I/O
 //
