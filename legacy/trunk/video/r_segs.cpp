@@ -1596,6 +1596,9 @@ void Rend::R_StoreWallRange(int start, int stop)
         if (frontsector->SkyCeiling() && backsector->SkyCeiling())
         {
             worldtop = worldhigh;
+            // Sky-to-sky: always mark ceiling to properly clip visibility
+            // This prevents seeing through sky into other map areas
+            markceiling = true;
         }
 
         if (worldlow != worldbottom || backsector->floorpic != frontsector->floorpic ||

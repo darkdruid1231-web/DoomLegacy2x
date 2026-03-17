@@ -925,6 +925,9 @@ void elevator_t::Think()
             res2 = mp->T_MovePlane(sector, floorspeed, floordest, crush, 0);
     }
 
+    // Update player position when elevator moves
+    mp->CheckSector(sector, crush);
+
     if (res1 == res_pastdest && res2 == res_pastdest) // if destination height acheived
     {
         sector->floordata = NULL;

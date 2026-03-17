@@ -151,6 +151,9 @@ void plat_t::Think()
         case up:
             res = mp->T_MovePlane(sector, speed, high, crush, 0);
 
+            // Update player position when floor moves
+            mp->CheckSector(sector, crush);
+
             if (res == res_crushed && !crush)
             {
                 // blocked, try again
@@ -187,6 +190,9 @@ void plat_t::Think()
 
         case down:
             res = mp->T_MovePlane(sector, -speed, low, false, 0);
+
+            // Update player position when floor moves
+            mp->CheckSector(sector, false);
 
             if (res == res_pastdest)
             {
