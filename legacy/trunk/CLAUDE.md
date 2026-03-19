@@ -111,6 +111,50 @@ The project has dual networking stacks:
 - `engine/ai_mobjinfo.cpp` - Monster definitions
 - `tests/` - Test suite (unit/ and integration/)
 
+## 2D Rendering Pipeline
+
+### Coordinate systems
+- **OGL 2D space**: `Setup2DMode()` calls `gluOrtho2D(0,1,0,1)` then applies a HUD aspect-ratio
+  transform (translate + scale for letterboxing/pillarboxing). All `Draw2DGraphic` calls take
+  coordinates in this [0,1]×[0,1] space — not screen pixels, not virtual 320×200 units.
+- **Virtual (Doom) units**: `Draw2DGraphic_Doom` accepts coords in BASEVIDWIDTH×BASEVIDHEIGHT
+  (320×200) virtual units and normalises to [0,1] internally.
+- **`consolemode` flag**: `Draw2DGraphic` asserts `consolemode == true`. It is set by
+  `Setup2DMode()`, which is called from `SetFullScreenViewport()` at the start of every frame.
+  Drawing 2D outside the normal frame (e.g. from a custom render path) requires an explicit
+  `Setup2DMode()` call first.
+
+### `Material::Draw` with `V_SSIZE` flag
+- OGL: normalises the image's `worldwidth` by `BASEVIDWIDTH` (320). A 1456-px-wide image
+  produces r = 1456/320 ≈ 4.55 — way off screen. Only use `V_SSIZE` for images authored at
+  320×200 virtual resolution.
+- SW: scales draw size by `vid.dupx`/`vid.dupy` and clips to screen. Same overflow issue for
+  large source images.
+- Use `Material::DrawStretched(x, y, w, h)` instead when you need an image to fill an arbitrary
+  pixel rectangle regardless of its native dimensions (added in `video/v_video.cpp`).
+
+### Texture formats in memory
+- `PNGTexture::GetData()` (SW path): returns **8-bit palettized, column-major** pixel data.
+- `PNGTexture::GLGetData()` (OGL path): returns **RGBA row-major** pixel data.
+- Changing which path is used requires a different `ReadData()` call — they are mutually exclusive.
+
+### Loading screen / startup console
+- The loading screen (`con.refresh == true`) runs while the game is still initialising, before
+  `vid.SetMode()` is called.
+- At this point `vid.width = BASEVIDWIDTH` (320) and `vid.height = BASEVIDHEIGHT` (200) —
+  the default values set by `I_StartupGraphics` before any SDL window is created.
+- `workinggl == false` during the loading screen; `oglrenderer->ReadyToDraw()` returns false.
+  OGL draw calls silently no-op. The SW framebuffer is used instead, even in OGL mode.
+- `con.refresh` is set to false in `d_main.cpp` just before `vid.SetMode()`, which is where the
+  real resolution is applied and `workinggl` becomes true.
+- The loading screen is also called the **loading screen** or **startup screen** in comments.
+
+### CONSBACK console background
+- Lump name `CONSBACK`, sourced from `legacy/trunk/resources/CON_background.png`, packed into
+  `legacy.wad` via `legacy.wad.inventory`.
+- In OGL mode the background is always drawn regardless of `con_backpic` cvar; in SW mode the
+  cvar `con_backpic` toggles between the picture and the translucent overlay.
+
 ## GL / BSP Rendering Notes
 
 Active development area. Key gotchas:

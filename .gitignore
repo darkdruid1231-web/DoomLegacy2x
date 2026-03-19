@@ -190,3 +190,6 @@ logs/
 # Development notes
 TODO.md
 notes.txt
+IMPLEMENTATION_PRIORITY_PLAN.md
+stderr.txt
+stdout.txt

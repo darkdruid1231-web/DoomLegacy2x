@@ -47,8 +47,8 @@ extern weapon_mnemonic_t BEX_WeaponMnemonics[];
 struct flag_mnemonic_t
 {
     const char *name;
-    int flag;
-    int flagword;
+    unsigned int flag;
+    unsigned int flagword;
 };
 
 extern flag_mnemonic_t BEX_FlagMnemonics[];

@@ -63,7 +63,7 @@ int numffloors;
 // SoM: 3/23/2000: Boom visplane hashing routine.
 inline unsigned visplane_hash(Material *pic, int lightlevel, fixed_t height)
 {
-    return unsigned(long(pic) * 3 + lightlevel + height.value() * 7) & (MAXVISPLANES - 1);
+    return unsigned(uintptr_t(pic) * 3 + lightlevel + height.value() * 7) & (MAXVISPLANES - 1);
 }
 
 // #define MAXOPENINGS     MAXVIDWIDTH*128
@@ -192,7 +192,7 @@ void R_MapPlane(int y, int x1, int x2) // t1
         int fuck = (wtofs + (distance << 6).Floor()) & 8191;
         bgofs = (finesine[fuck] / (distance >> 9)).floor();
 
-        angle = (angle + 2048) & 8191; // 90ø
+        angle = (angle + 2048) & 8191; // 90ï¿½
         ds_xfrac += bgofs * finecosine[angle];
         ds_yfrac += bgofs * finesine[angle];
 
@@ -525,7 +525,7 @@ void R_MakeSpans(int x, int t1, int b1, int t2, int b2)
 #ifdef OLDWATER
 static int waterofs;
 
-// la texture flat anim‚e de l'eau contient en fait des index
+// la texture flat animï¿½e de l'eau contient en fait des index
 // de colormaps , plutot qu'une transparence, il s'agit d'ombrer et
 // d'eclaircir pour donner l'effet de bosses de l'eau.
 #ifdef couille
@@ -599,11 +599,11 @@ void R_DrawWaterSpan_8(void)
     xfrac = ds_xfrac;
     yfrac = (ds_yfrac + waterofs) & 0x3fffff;
 
-    // methode a : le fond est d‚form‚
+    // methode a : le fond est dï¿½formï¿½
     dest = ylookup[ds_y] + columnofs[ds_x1];
     dsrc = screens[2] + ((ds_y + bgofs) * vid.width) + columnofs[ds_x1];
 
-    // m‚thode b : la surface est d‚form‚e !
+    // mï¿½thode b : la surface est dï¿½formï¿½e !
     // dest = ylookup[ds_y+bgofs] + columnofs[ds_x1];
     // dsrc = screens[2] + (ds_y*vid.width) + columnofs[ds_x1];
 
