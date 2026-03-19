@@ -118,6 +118,7 @@ extern SDL_Window* GetSDLWindow();
 #include "i_sound.h"
 #include "i_system.h"
 #include "i_video.h"
+#include "z_ascache.h"
 
 #include "g_game.h"
 #include "keys.h"
@@ -809,6 +810,7 @@ void I_Quit()
 
     M_SaveConfig(NULL);
 
+    AsyncCache_Shutdown();
     I_ShutdownSound();
     I_ShutdownCD();
     I_ShutdownJoystick();

@@ -48,6 +48,8 @@
 
 #include "s_sound.h"
 #include "sounds.h"
+#include "z_ascache.h"
+#include "r_data.h"
 
 #include "g_actor.h"
 #include "g_player.h"
@@ -306,6 +308,10 @@ void D_DoomLoop()
                 game.Display();
             }
         }
+
+        // Process async resource loading completions (single call per frame)
+        if (cv_async_loading.value)
+            AsyncCache_ProcessCompletions();
 
         // check for media change, loop music..
         I_UpdateCD();
@@ -766,6 +772,9 @@ bool D_DoomMain()
     // the file cache) to register CVars for config loading.
     extern void R_ServerInit();
     R_ServerInit();
+
+    // Start async resource loader after file cache is ready
+    AsyncCache_Init();
 
     // Now that the file cache is ready, initialize the client subsystems.
     // This was intentionally omitted from the early block above.

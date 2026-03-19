@@ -25,6 +25,7 @@
 
 #include "dictionary.h"
 #include "doomdef.h"
+#include "z_thread.h"
 #include <string.h>
 
 /// \brief BC for cache items
@@ -143,6 +144,7 @@ template <typename T> class cache_t
   protected:
     cachesource_t<T> source; ///< a simple cache has only one source
     T *default_item;         ///< the default data item
+    Mutex cacheMutex;        ///< guards Get/Find/Insert against concurrent access
 
     /// Creates a new cacheitem_t, does the actual loading and conversion of the data during a Get()
     /// operation.
@@ -166,6 +168,7 @@ template <typename T> class cache_t
     /// Inserts an item into the cache. Manual alternative to Get().
     bool Insert(T *t)
     {
+        MutexLocker lock(cacheMutex);
         return source.Insert(t);
     }
 
@@ -190,6 +193,7 @@ template <typename T> class cache_t
         if (!name)
             return NULL;
 
+        MutexLocker lock(cacheMutex);
         T *p = source.Find(name);
         if (!p)
             return NULL;
@@ -212,6 +216,7 @@ template <typename T> class cache_t
     {
         T *p;
 
+        MutexLocker lock(cacheMutex);
         if (name == NULL)
             p = default_item;
         else

@@ -234,4 +234,25 @@ extern SoundSystem S;
 extern map<int, sfxinfo_t *> SoundID; // ID-number => sound
 typedef map<int, sfxinfo_t *>::iterator soundID_iter_t;
 
+// ============================================================================
+// Async Sound Loading
+// ============================================================================
+
+/// Queue a sound for async loading
+void S_QueueSoundAsync(const char *name, int priority = 1);
+
+/// Process any completed async sound loads
+void S_ProcessAsyncSounds();
+
+// ============================================================================
+// Sound Cache Access
+// ============================================================================
+
+/// The global sound cache instance (defined in audio/s_sound.cpp)
+class soundcache_t;
+extern soundcache_t soundCache;
+
+/// Pre-cache a sound by name (safe to call from any translation unit)
+sounditem_t *S_PrecacheSound(const char *name);
+
 #endif

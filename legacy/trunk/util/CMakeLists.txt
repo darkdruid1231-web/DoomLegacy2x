@@ -17,6 +17,7 @@ tables.cpp
 vfile.cpp
 wad.cpp
 w_wad.cpp
+z_ascache.cpp
 z_cache.cpp
 z_zone.cpp
 )

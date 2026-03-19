@@ -170,7 +170,7 @@ class soundcache_t : public cache_t<sounditem_t>
 };
 
 /// The sound cache.
-static soundcache_t sc;
+soundcache_t soundCache;
 
 //===========================================================
 //  Utilities
@@ -182,7 +182,7 @@ void S_PrecacheSounds()
     CONS_Printf("Precaching sounds... ");
     soundID_iter_t i;
     for (i = SoundID.begin(); i != SoundID.end(); i++)
-        sc.Get(i->second->lumpname); // one extra reference => never released
+        soundCache.Get(i->second->lumpname); // one extra reference => never released
 
     CONS_Printf("done.\n");
 }
@@ -356,7 +356,7 @@ void SoundSystem::Startup()
         I_InitCD();
 
     ResetChannels(16);
-    sc.SetDefaultItem("DEF_SND"); // default sound
+    soundCache.SetDefaultItem("DEF_SND"); // default sound
 
     nextcleanup = game.tic + 35 * 100;
 }
@@ -611,7 +611,7 @@ void soundchannel_t::Init(sfxinfo_t *s, float vol, bool rand_pitch)
 
     b_volume = volume = vol;
 
-    si = sc.Get(s->lumpname);
+    si = soundCache.Get(s->lumpname);
 }
 
 // Starts a normal mono(stereo) sound
@@ -827,4 +827,28 @@ void SoundSystem::UpdateSounds()
             // if channel is allocated but sound has stopped, free it
             StopChannel(cnum);
     }
+}
+
+// ============================================================================
+// Async Sound Loading
+// ============================================================================
+
+#include "z_ascache.h"
+
+void S_QueueSoundAsync(const char *name, int priority)
+{
+    if (!name)
+        return;
+    
+    AsyncCacheLoader::Instance().QueueSound(name, priority);
+}
+
+void S_ProcessAsyncSounds()
+{
+    // Completions are processed once per frame from d_main.cpp via AsyncCache_ProcessCompletions()
+}
+
+sounditem_t *S_PrecacheSound(const char *name)
+{
+    return soundCache.Get(name);
 }
