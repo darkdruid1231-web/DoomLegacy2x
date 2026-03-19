@@ -144,7 +144,14 @@ void D_PageDrawer(const char *lumpname)
     vid.scaledofs = vid.centerofs; // centering the scaled picture
     Material *t = materials.Get(lumpname);
     if (t)
-        t->Draw(0, 0, V_SCALE);
+    {
+        // In OGL mode: fill the full screen bypassing the HUD 4:3 correction.
+        // In SW mode: keep V_SCALE (integer-scaled, centered) as before.
+        if (rendermode == render_opengl)
+            t->DrawFullscreen();
+        else
+            t->Draw(0, 0, V_SCALE);
+    }
 
     if (game.mode >= gm_heretic && game.demosequence == 0 && game.pagetic <= 140)
     {
@@ -411,7 +418,13 @@ void GameInfo::Drawer()
 
         PlayerInfo *p = ViewPlayers[i];
 
-        if (p->pov && p->mp)
+        // Skip rendering for players that haven't been added to a map yet
+        // This can happen during split screen game startup when not all players
+        // have been spawned into the map
+        if (!p || !p->mp)
+            continue;
+
+        if (p->pov)
         {
             if (!paused)
                 p->CalcViewHeight(); // bob the view

@@ -55,6 +55,7 @@ typedef char GLchar;
 #include "r_main.h"
 
 #include "w_wad.h"
+#include "z_ascache.h"
 #include "z_zone.h"
 
 #include "hardware/oglshaders.h"
@@ -1167,7 +1168,50 @@ Material *material_cache_t::GetMaterialOrTransmap(const char *name, int &map_num
 bool Read_NTEXTURE(int lump);
 
 /// ZDoom-compatible PK3 namespace directories.
-enum pk3_ns_t { PK3_NONE, PK3_TEXTURES, PK3_PATCHES, PK3_FLATS, PK3_SPRITES, PK3_HIRES, PK3_HIRES_SPRITES };
+enum pk3_ns_t { PK3_NONE, PK3_TEXTURES, PK3_PATCHES, PK3_FLATS, PK3_SPRITES, PK3_HIRES, PK3_HIRES_SPRITES, PK3_GRAPHICS };
+
+/// Returns the GZDoom-compatible filter name for the current IWAD.
+/// This is the dotted path that filter/ directory entries are matched against.
+static const char *GetIWADFilterName()
+{
+    switch (game.mode)
+    {
+        case gm_doom1:
+            // Registered Doom (3 episodes, no E4M1) vs Ultimate Doom (4 episodes).
+            return (fc.FindNumForName("E4M1") != -1) ? "doom.id.doom1" : "doom.id.doom1.registered";
+        case gm_doom2:
+            return "doom.id.doom2";  // TODO: detect plutonia/tnt by unique lumps
+        case gm_heretic:
+            return "heretic";
+        case gm_hexen:
+            return "hexen";
+        default:
+            return "";
+    }
+}
+
+/// GZDoom filter matching rule: a filter folder matches the current IWAD if the folder name
+/// is a prefix of the IWAD's full filter string (dot-separated components).
+/// e.g. "doom.id.doom1" is a prefix of "doom.id.doom1.registered" → matches registered doom.
+/// e.g. "doom.id.doom1.registered" is NOT a prefix of "doom.id.doom1" → no match for ultimate doom.
+static bool PK3_FilterMatchesGame(const char *gname, size_t glen)
+{
+    const char *iwad = GetIWADFilterName();
+    size_t iwad_len = strlen(iwad);
+    if (!iwad_len || glen > iwad_len) return false;
+    if (strncasecmp(gname, iwad, glen) != 0) return false;
+    // The filter folder must end at a component boundary.
+    return (glen == iwad_len || iwad[glen] == '.');
+}
+
+/// Count the number of dot-separated components in a filter name (e.g. "doom.id.doom1" = 3).
+static int PK3_FilterDepth(const char *gname, size_t glen)
+{
+    int depth = 1;
+    for (size_t k = 0; k < glen; k++)
+        if (gname[k] == '.') depth++;
+    return depth;
+}
 
 /// Given a full ZIP entry path (e.g. "textures/walls/WALL01.png"), identify its
 /// namespace and fill stem with the uppercased basename without extension.
@@ -1179,6 +1223,10 @@ static pk3_ns_t PK3_GetNamespace(const char *fullpath, char *stem, size_t stem_s
         { "patches/",        8,  PK3_PATCHES  },
         { "flats/",          6,  PK3_FLATS    },
         { "sprites/",        7,  PK3_SPRITES  },
+        // graphics/ is GZDoom's namespace for fullscreen/HUD images (TITLEPIC, HELP1, WIMAPs, etc.)
+        // lumps/ is GZDoom's generic lump-replacement namespace (same treatment here).
+        { "graphics/",       9,  PK3_GRAPHICS },
+        { "lumps/",          6,  PK3_GRAPHICS },
         // hires/sprites/ scales HD sprites to match original world dimensions.
         // All other hires/ sub-dirs fall through to the generic hires/ entry below.
         { "hires/sprites/",  14, PK3_HIRES_SPRITES },
@@ -1533,15 +1581,35 @@ int material_cache_t::ReadTextures()
         for (i = nwads - 1; i >= 0; i--)
         {
             int nlumps = fc.GetNumLumps(i);
-            int ns_count[6] = {0,0,0,0,0,0}; // per-namespace hit counts (indices 0..5 = TEXTURES..HIRES_SPRITES)
+            int ns_count[7] = {0,0,0,0,0,0,0}; // per-namespace hit counts (indices 0..6 = TEXTURES..GRAPHICS)
             int replaced = 0, created = 0, hires_ok = 0, hires_miss = 0;
 
+            // Multi-pass: pass 0 = root namespace, passes 1..MAX_DEPTH = filter entries
+            // ordered by specificity (least specific first). This ensures that a more
+            // specific filter path (e.g. filter/doom.id.doom1.registered/) always
+            // overwrites a less specific one (e.g. filter/doom.id.doom1/).
+            const int MAX_FILTER_DEPTH = 6;
+            for (int pass = 0; pass <= MAX_FILTER_DEPTH; pass++)
             for (int item = 0; item < (int)nlumps; item++)
             {
                 int lump = (i << 16) | item;
                 const char *fullname = fc.FindNameForNum(lump);
                 if (!fullname || !strchr(fullname, '/'))
                     continue; // not a path-based ZIP entry
+
+                bool is_filter = (strncasecmp(fullname, "filter/", 7) == 0);
+                if (pass == 0 && is_filter) continue;  // root pass: skip filter entries
+                if (pass >  0 && !is_filter) continue; // filter passes: skip root entries
+
+                if (is_filter)
+                {
+                    const char *gname = fullname + 7; // skip "filter/"
+                    const char *slash = strchr(gname, '/');
+                    if (!slash) continue; // bare "filter/GAME" with no further path
+                    size_t glen = slash - gname;
+                    if (!PK3_FilterMatchesGame(gname, glen)) continue;
+                    if (PK3_FilterDepth(gname, glen) != pass) continue; // wrong depth for this pass
+                }
 
                 pk3_ns_t ns = PK3_GetNamespace(fullname, stem, sizeof(stem));
                 if (ns == PK3_NONE)
@@ -1607,20 +1675,191 @@ int material_cache_t::ReadTextures()
                             hires_miss++;
                         break;
 
+                    case PK3_GRAPHICS:
+                    {
+                        // graphics/ and lumps/ namespaces: fullscreen images like TITLEPIC,
+                        // HELP1, WIMAPs, etc. Register in lod_tex so materials.Get() finds them
+                        // with the default TEX_lod mode (used by D_PageDrawer, menus, HUD).
+                        bool existed = lod_tex.Find(stem) != NULL;
+                        Material *m = BuildMaterial(tex, lod_tex);
+                        if (m) { existed ? replaced++ : created++; num_textures++; }
+                        break;
+                    }
+
                     default: break;
                 }
             }
 
-            if (ns_count[0] + ns_count[1] + ns_count[2] + ns_count[3] + ns_count[4] + ns_count[5] > 0)
+            if (ns_count[0] + ns_count[1] + ns_count[2] + ns_count[3] + ns_count[4] + ns_count[5] + ns_count[6] > 0)
             {
-                CONS_Printf(" PK3 ns scan '%s': tex=%d pat=%d flat=%d spr=%d hires=%d hspr=%d"
+                CONS_Printf(" PK3 ns scan '%s': tex=%d pat=%d flat=%d spr=%d hires=%d hspr=%d gfx=%d"
                             " -> replaced=%d new=%d hires_ok=%d hires_miss=%d\n",
                             fc.Name(i),
                             ns_count[PK3_TEXTURES-1],      ns_count[PK3_PATCHES-1],
                             ns_count[PK3_FLATS-1],         ns_count[PK3_SPRITES-1],
                             ns_count[PK3_HIRES-1],         ns_count[PK3_HIRES_SPRITES-1],
+                            ns_count[PK3_GRAPHICS-1],
                             replaced, created, hires_ok, hires_miss);
             }
+        }
+    }
+
+    // GZDoom TEXTURES lump: "graphic 'DST' { patch 'SRC', 0, 0 {} }" aliases.
+    // Scan for TEXTURES* lumps under matching filter/ paths (multi-depth ordered by specificity)
+    // and parse them to create material aliases (e.g. TITLEPIC -> TITLED1 for registered doom).
+    {
+        // Collect (filterDepth, lumpnum) pairs for matching TEXTURES lumps, sorted by depth.
+        // We'll process them in depth order so more-specific entries win.
+        struct texdef_t { int depth; int lump; };
+        std::vector<texdef_t> texlumps;
+
+        for (i = nwads - 1; i >= 0; i--)
+        {
+            int nlumps = fc.GetNumLumps(i);
+            for (int item = 0; item < nlumps; item++)
+            {
+                int lump = (i << 16) | item;
+                const char *fullname = fc.FindNameForNum(lump);
+                if (!fullname || !strchr(fullname, '/')) continue;
+                if (strncasecmp(fullname, "filter/", 7) != 0) continue;
+
+                const char *gname = fullname + 7;
+                const char *slash = strchr(gname, '/');
+                if (!slash) continue;
+                size_t glen = slash - gname;
+                if (!PK3_FilterMatchesGame(gname, glen)) continue;
+
+                // The part after "filter/GAME/" should be "TEXTURES" or "TEXTURES.*"
+                const char *rest = slash + 1;
+                if (strncasecmp(rest, "TEXTURES", 8) != 0) continue;
+                if (rest[8] != '\0' && rest[8] != '.' && rest[8] != '/') continue;
+                // Must not have a subdirectory (it's a root-level lump in the filter dir)
+                if (strchr(rest, '/')) continue;
+
+                texdef_t td;
+                td.depth = PK3_FilterDepth(gname, glen);
+                td.lump  = lump;
+                texlumps.push_back(td);
+            }
+        }
+
+        // Sort by depth so least-specific entries are processed first (most-specific wins).
+        std::sort(texlumps.begin(), texlumps.end(),
+                  [](const texdef_t &a, const texdef_t &b) { return a.depth < b.depth; });
+
+        for (const texdef_t &td : texlumps)
+        {
+            char *text = static_cast<char *>(fc.CacheLumpNum(td.lump, PU_STATIC, true));
+            if (!text) continue;
+
+            // Simple state-machine parser for the 'graphic "DST" { patch "SRC" ... }' format.
+            const char *p = text;
+            const char *end = text + strlen(text);
+
+            auto skip_ws_comments = [&]() {
+                while (p < end) {
+                    while (p < end && (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')) p++;
+                    if (p + 1 < end && p[0] == '/' && p[1] == '/') {
+                        while (p < end && *p != '\n') p++;
+                    } else break;
+                }
+            };
+
+            auto read_token = [&](char *buf, size_t bsz) -> bool {
+                skip_ws_comments();
+                if (p >= end) return false;
+                bool quoted = (*p == '"');
+                if (quoted) p++;
+                const char *s = p;
+                while (p < end) {
+                    if (quoted  && *p == '"') break;
+                    if (!quoted && (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r' ||
+                                    *p == ',' || *p == '{' || *p == '}')) break;
+                    p++;
+                }
+                size_t n = min((size_t)(p - s), bsz - 1);
+                strncpy(buf, s, n); buf[n] = '\0'; strupr(buf);
+                if (quoted && p < end) p++; // skip closing '"'
+                return n > 0;
+            };
+
+            auto skip_past_block = [&]() {
+                // skip to end of a { } block (handles nesting)
+                int depth = 0;
+                while (p < end) {
+                    if (*p == '{') { depth++; }
+                    else if (*p == '}') { if (--depth <= 0) { p++; break; } }
+                    p++;
+                }
+            };
+
+            char kw[64], dst[64], src[64];
+            while (p < end) {
+                if (!read_token(kw, sizeof(kw))) break;
+                // We only care about 'graphic' entries.
+                if (strcasecmp(kw, "graphic") != 0) {
+                    // Skip name, optional numbers, then skip the { } block.
+                    read_token(dst, sizeof(dst)); // consume name
+                    skip_ws_comments();
+                    while (p < end && *p != '{') p++; // skip to block
+                    skip_past_block();
+                    continue;
+                }
+
+                // graphic "DST", width, height { patch "SRC", x, y { } }
+                if (!read_token(dst, sizeof(dst))) continue;
+                skip_ws_comments();
+                while (p < end && *p != '{') p++; // skip width, height (we don't need them)
+                if (p >= end || *p != '{') continue;
+                p++; // skip opening '{'
+
+                // Read the first 'patch' inside the block.
+                src[0] = '\0';
+                int inner = 1;
+                while (p < end && inner > 0) {
+                    skip_ws_comments();
+                    if (p >= end) break;
+                    if (*p == '}') { inner--; p++; continue; }
+                    if (!read_token(kw, sizeof(kw))) { p++; continue; }
+                    if ((strcasecmp(kw, "patch") == 0 || strcasecmp(kw, "graphic") == 0) && src[0] == '\0') {
+                        read_token(src, sizeof(src)); // the patch name
+                        // skip x, y, and any nested { }
+                        skip_ws_comments();
+                        while (p < end && *p != '{' && *p != '}' && *p != '\n') p++;
+                        if (p < end && *p == '{') skip_past_block();
+                    } else {
+                        // skip to end of line or block
+                        while (p < end && *p != '\n' && *p != '{' && *p != '}') p++;
+                        if (p < end && *p == '{') skip_past_block();
+                    }
+                }
+
+                if (dst[0] == '\0' || src[0] == '\0') continue;
+
+                // Find the source material (patch SRC must already be in lod_tex or doom_tex).
+                Material *msrc = lod_tex.Find(src);
+                if (!msrc) msrc = doom_tex.Find(src);
+                if (!msrc || msrc->tex.empty()) continue;
+
+                // Register DST in lod_tex pointing at SRC's texture.
+                Material *mdst = lod_tex.Find(dst);
+                if (!mdst) {
+                    mdst = new Material(dst, msrc->tex[0].t);
+                    lod_tex.Insert(mdst);
+                    Register(mdst);
+                } else {
+                    Material::TextureRef &r = mdst->tex[0];
+                    if (r.t) r.t->Release();
+                    msrc->tex[0].t->AddRef();
+                    r.t = msrc->tex[0].t;
+                    r.xscale = 1; r.yscale = 1;
+                    mdst->InitializeMaterial();
+                }
+                CONS_Printf(" GZDoom TEXTURES: graphic '%s' -> patch '%s'\n", dst, src);
+                num_textures++;
+            }
+
+            Z_Free(text);
         }
     }
 
@@ -2542,110 +2781,106 @@ void R_InitTranslucencyTables()
 }
 
 //
-// TODO Preloads all relevant graphics for the Map.
-//
+// Preloads all relevant graphics for the Map asynchronously.
 void Map::PrecacheMap()
 {
-    // Precache textures.
-    //
-    // no need to precache all software textures in 3D mode
-    // (note they are still used with the reference software view)
-    // texturepresent = (char *)alloca(numtextures);
-    /*
-    char *texturepresent = (char *)Z_Malloc(numtextures, PU_STATIC, 0);
-    memset(texturepresent,0, numtextures);
+    // Skip if async loading is disabled
+    if (!cv_async_loading.value)
+        return;
 
-      for (i=0 ; i<numsides ; i++)
-      {
-          //Hurdler: huh, a potential bug here????
-          if (sides[i].toptexture < numtextures)
-              texturepresent[sides[i].toptexture] = 1;
-          if (sides[i].midtexture < numtextures)
-              texturepresent[sides[i].midtexture] = 1;
-          if (sides[i].bottomtexture < numtextures)
-              texturepresent[sides[i].bottomtexture] = 1;
-      }
+    // Use a set to avoid duplicate queueing
+    std::set<std::string> queuedTextures;
+    std::set<std::string> queuedMaterials;
 
-      // Sky texture is always present.
-      // Note that F_SKY1 is the name used to
-      //  indicate a sky floor/ceiling as a flat,
-      //  while the sky texture is stored like
-      //  a wall texture, with an episode dependend
-      //  name.
-      texturepresent[skytexture] = 1;
+    auto queueTexture = [&](const char* name) {
+        if (!name || name[0] == '-')  // Skip "no texture" markers
+            return;
+        std::string texname(name);
+        // Convert to uppercase for consistency
+        for (auto& c : texname)
+            c = toupper(c);
+        if (queuedTextures.insert(texname).second)
+        {
+            // New texture - queue it
+            AsyncCache_QueueTexture(texname.c_str(), PRIORITY_NORMAL);
+        }
+    };
 
-      //if (devparm)
-      //    CONS_Printf("Generating textures..\n");
+    auto queueMaterial = [&](Material* mat) {
+        if (!mat)
+            return;
+        const char* name = mat->GetName();
+        if (!name || name[0] == '-')
+            return;
+        std::string matname(name);
+        if (queuedMaterials.insert(matname).second)
+        {
+            // New material - queue it
+            AsyncCache_QueueMaterial(matname.c_str(), PRIORITY_NORMAL);
+        }
+    };
 
-      texturememory = 0;
-      for (i=0 ; i<numtextures ; i++)
-      {
-          if (!texturepresent[i])
-              continue;
-
-          //texture = textures[i];
-          if( material_cache[i]==NULL )
-              R_GenerateTexture (i);
-          //numgenerated++;
-
-          // note: pre-caching individual patches that compose textures became
-          //       obsolete since we now cache entire composite textures
-
-          //for (j=0 ; j<texture->patchcount ; j++)
-          //{
-          //    lump = texture->patches[j].patch;
-          //    texturememory += fc.LumpLength(lump);
-          //    fc.CacheLumpNum(lump , PU_CACHE);
-          //}
-      }
-      Z_Free(texturepresent);
-    */
-    // CONS_Printf ("total mem for %d textures: %d k\n",numgenerated,texturememory>>10);
-
-    //
-    // Precache sprites.
-    //
-    /*
-    spritepresent = (char *)alloca(numsprites);
-    spritepresent = (char *)Z_Malloc(numsprites, PU_STATIC, 0);
-    memset (spritepresent,0, numsprites);
-
-    Thinker *th;
-
-    for (th = thinkercap.next ; th != &thinkercap ; th=th->next)
+    // Precache floor/ceiling textures from sectors
+    for (int i = 0; i < numsectors; i++)
     {
-      if (th->Type() == Thinker::tt_dactor)
-        spritepresent[((DActor *)th)->sprite] = 1;
+        sector_t* sec = &sectors[i];
+        queueMaterial(sec->floorpic);
+        queueMaterial(sec->ceilingpic);
     }
 
-    spriteframe_t*      sf;
-    spritememory = 0;
-    for (i=0 ; i<numsprites ; i++)
+    // Precache wall textures from linedefs
+    for (int i = 0; i < numlines; i++)
     {
-        if (!spritepresent[i])
-            continue;
-
-        for (j=0 ; j<sprites[i].numframes ; j++)
+        line_t* line = &lines[i];
+        
+        // Precache from sidedefs
+        for (int side = 0; side < 2; side++)
         {
-            sf = &sprites[i].spriteframes[j];
-            for (k=0 ; k<8 ; k++)
+            if (line->sideptr[side])
             {
-                //Fab: see R_InitSprites for more about lumppat,lumpid
-                lump = sf->lumppat[k];
-                if(devparm)
-                   spritememory += fc.LumpLength(lump);
-                fc.CachePatchNum(lump , PU_CACHE);
+                side_t* sd = line->sideptr[side];
+                queueMaterial(sd->toptexture);
+                queueMaterial(sd->midtexture);
+                queueMaterial(sd->bottomtexture);
             }
         }
     }
-    Z_Free(spritepresent);
 
-    if (devparm)
-    {
-        CONS_Printf("Precache level done:\n"
-                    "flatmemory:    %ld k\n"
-                    "texturememory: %ld k\n"
-                    "spritememory:  %ld k\n", flatmemory>>10, texturememory>>10, spritememory>>10 );
-    }
-    */
+    // Precache sky texture
+    if (skytexture)
+        queueMaterial(skytexture);
+
+    // Queue the async processing
+    // The actual loading happens in the background thread
+    // and completed items are processed in the main loop
+    
+    CONS_Printf("Async precache queued: %d textures, %d materials\n",
+                (int)queuedTextures.size(), (int)queuedMaterials.size());
+}
+
+// ============================================================================
+// Async Texture/Material Loading
+// ============================================================================
+
+#include "z_ascache.h"
+
+void R_QueueTextureAsync(const char *name, int priority)
+{
+    if (!name)
+        return;
+    
+    AsyncCacheLoader::Instance().QueueTexture(name, priority);
+}
+
+void R_QueueMaterialAsync(const char *name, int priority)
+{
+    if (!name)
+        return;
+    
+    AsyncCacheLoader::Instance().QueueMaterial(name, priority);
+}
+
+void R_ProcessAsyncTextures()
+{
+    // Completions are processed once per frame from d_main.cpp via AsyncCache_ProcessCompletions()
 }

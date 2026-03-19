@@ -2764,18 +2764,21 @@ Menu ReadDef1(NULL, "Readme1", &MainMenuDef, ITEMS(Read1_MI), 280, 185, 0, &Menu
 //
 void Menu::DrawReadThis1()
 {
+    Material *m = NULL;
     switch (game.mode)
     {
-        case gm_doom2:
-            materials.Get("HELP")->Draw(0, 0, 0 | V_SCALE);
-            break;
+        case gm_doom2:      m = materials.Get("HELP");  break;
         case gm_doom1:
         case gm_heretic:
-        case gm_hexen:
-            materials.Get("HELP1")->Draw(0, 0, 0 | V_SCALE);
-            break;
-        default:
-            break;
+        case gm_hexen:      m = materials.Get("HELP1"); break;
+        default:            break;
+    }
+    if (m)
+    {
+        if (rendermode == render_opengl)
+            m->DrawFullscreen();
+        else
+            m->Draw(0, 0, V_SCALE);
     }
     return;
 }
@@ -2791,19 +2794,27 @@ Menu ReadDef2(NULL, "Readme2", &ReadDef1, ITEMS(Read2_MI), 330, 175, 0, &Menu::D
 // Read This Menus - optional second page.
 void Menu::DrawReadThis2()
 {
+    Material *m = NULL;
     switch (game.mode)
     {
         case gm_doom2:
             // This hack keeps us from having to change menus.
-            materials.Get("CREDIT")->Draw(0, 0, 0 | V_SCALE);
+            m = materials.Get("CREDIT");
             break;
         case gm_doom1:
         case gm_heretic:
         case gm_hexen:
-            materials.Get("HELP2")->Draw(0, 0, 0 | V_SCALE);
+            m = materials.Get("HELP2");
             break;
         default:
             break;
+    }
+    if (m)
+    {
+        if (rendermode == render_opengl)
+            m->DrawFullscreen();
+        else
+            m->Draw(0, 0, V_SCALE);
     }
     return;
 }

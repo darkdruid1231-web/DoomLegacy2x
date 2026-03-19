@@ -522,7 +522,7 @@ void Intermission::SlamBackground()
     else if (rendermode == render_soft)
         memcpy(vid.screens[0], vid.screens[1], vid.width * vid.height);
     else
-        intermission_bg->Draw(0, 0, FB);
+        intermission_bg->DrawFullscreen();
 }
 
 static void InitAnimatedBack(int episode)

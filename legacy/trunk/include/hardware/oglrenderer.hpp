@@ -240,6 +240,8 @@ public:
 		     GLfloat texleft=0.0, GLfloat texbottom=1.0, GLfloat texright=1.0, GLfloat textop=0.0);
   void Draw2DGraphic_Doom(GLfloat x, GLfloat y, Material *tex, int flags);
   void Draw2DGraphicFill_Doom(GLfloat x, GLfloat y, GLfloat width, GLfloat height, Material *tex);
+  /// Draw a graphic stretched to the full screen, bypassing the HUD aspect-ratio transform.
+  void DrawFullscreenGraphic(Material *mat, float worldwidth, float worldheight);
   void ClearAutomap();
   void DrawAutomapLine(const fline_t *line, const int color);
 

@@ -69,6 +69,7 @@
 #ifndef GL_POINT_DISTANCE_ATTENUATION
 #define GL_POINT_DISTANCE_ATTENUATION 0x8129
 #endif
+#include <algorithm>
 #include <set>
 #include <vector>
 
@@ -489,6 +490,12 @@ class Material : public cacheitem_t
     /// draw the Material flat on screen.
     void Draw(float x, float y, int scrn); // scrn may contain flags
 
+    /// draw the Material stretched to fill exactly the given screen pixel rectangle.
+    void DrawStretched(float x, float y, float w, float h);
+
+    /// Stretch to fill the full screen, bypassing HUD aspect-ratio correction (OGL only).
+    void DrawFullscreen();
+
     /// tile an area of the screen with the Texture
     void DrawFill(int x, int y, int w, int h);
 
@@ -548,6 +555,9 @@ class material_cache_t
     {
         return (id < all_materials.size()) ? all_materials[id] : NULL;
     }
+
+    /// Registers an externally-created Material so ClearGLTextures() will reset its gl_id.
+    inline void RegisterMaterial(Material *m) { Register(m); }
 
     /// creates the palette conversion colormaps
     void InitPaletteConversion();
@@ -610,6 +620,19 @@ class material_cache_t
 };
 
 extern material_cache_t materials;
+
+// ============================================================================
+// Async Texture/Material Loading
+// ============================================================================
+
+/// Queue a texture for async loading
+void R_QueueTextureAsync(const char *name, int priority = 1);
+
+/// Queue a material for async loading
+void R_QueueMaterialAsync(const char *name, int priority = 1);
+
+/// Process any completed async texture loads
+void R_ProcessAsyncTextures();
 
 /// \brief Set of 34 lightlevel colormaps from COLORMAP lump, also called a fadetable.
 ///

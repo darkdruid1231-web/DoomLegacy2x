@@ -215,6 +215,53 @@ void LumpTexture::Draw(byte *dest_tl,
     }
 }
 
+// Draw the material stretched to fill exactly the given screen pixel rectangle.
+// OGL: maps to a normalized [0,1] quad. SW: computes colfrac/rowfrac to cover the
+// full image across w x h pixels regardless of the image's native dimensions.
+void Material::DrawStretched(float x, float y, float w, float h)
+{
+    if (rendermode == render_opengl && oglrenderer && oglrenderer->ReadyToDraw())
+    {
+        float l      = x / vid.width;
+        float r      = (x + w) / vid.width;
+        float gl_top = 1.0f - y / vid.height;
+        float gl_bot = 1.0f - (y + h) / vid.height;
+        oglrenderer->Draw2DGraphic(l, gl_bot, r, gl_top, this);
+        return;
+    }
+    // Fall through to SW path when OGL is not ready (e.g. loading screen).
+
+    // SW: stretch the full image to exactly w x h screen pixels.
+    TextureRef &tr = tex[0];
+    int ix = (int)x;
+    int iy = (int)y;
+    int x2 = min(ix + (int)w, vid.width);
+    int y2 = min(iy + (int)h, vid.height);
+    if (x2 <= ix || y2 <= iy)
+        return;
+
+    // Advance one full image across the draw rectangle.
+    fixed_t colfrac = (float)tr.t->width  / (float)(x2 - ix);
+    fixed_t rowfrac = (float)tr.t->height / (float)(y2 - iy);
+
+    byte *dest_tl = vid.screens[0] + vid.scaledofs + iy * vid.width + ix;
+    byte *dest_tr = dest_tl + (x2 - ix);
+    byte *dest_bl = dest_tl + (y2 - iy) * vid.width;
+
+    tr.t->Draw(dest_tl, dest_tr, dest_bl, fixed_t(0), fixed_t(0), colfrac, rowfrac, 0);
+}
+
+void Material::DrawFullscreen()
+{
+    if (rendermode == render_opengl && oglrenderer && oglrenderer->ReadyToDraw())
+    {
+        oglrenderer->DrawFullscreenGraphic(this, worldwidth, worldheight);
+        return;
+    }
+    // SW fallback: stretch to fill the framebuffer.
+    DrawStretched(0, 0, vid.width, vid.height);
+}
+
 void Material::DrawFill(int x, int y, int w, int h)
 {
     if (rendermode == render_opengl)

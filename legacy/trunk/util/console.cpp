@@ -913,35 +913,36 @@ void Console::DrawConsole()
     // regardless of cons_backpic). In SW mode: respect cons_backpic (picture vs translucent).
     // OGL Material::Draw requires Setup2DMode() (consolemode=true); during startup refresh
     // rendermode is still render_soft, so the SW path safely handles that case.
-    float x = 0;
-    float y = con_height - vid.height; // image anchor: negative → only bottom portion shows
+
+    float x = 0; // text x indent (may be adjusted by border in translucent mode)
+    float y = 0; // reused as text loop variable below
 
     if (rendermode != render_soft)
     {
-        // OGL: always draw CONSBACK picture. Goes through Material::Draw / Setup2DMode,
-        // the same coordinate path as text, so background and text are inherently aligned.
+        // OGL: stretch CONSBACK to fill the visible console area at any resolution.
         if (con_backpic)
-            con_backpic->Draw(0, y, V_SSIZE);
+            con_backpic->DrawStretched(0, 0, vid.width, con_height);
         else if (oglrenderer)
             oglrenderer->DrawConsoleBackground((float)con_height / vid.height,
                                                cons_alpha.value / 100.0f);
     }
     else if (cons_backpic.value)
     {
-        // SW picture mode: CONSBACK image
-        con_backpic->Draw(0, y, V_SSIZE);
+        // SW picture mode: stretch CONSBACK to fill the visible console area.
+        con_backpic->DrawStretched(0, 0, vid.width, con_height);
     }
     else
     {
         // SW translucent mode: decorative left/right borders + translucent fill
+        float border_y = con_height - vid.height; // anchor borders at bottom of image
         float wl = 0;
         float x2 = (float)vid.width;
         if (con_lborder && con_rborder)
         {
             wl = con_lborder->worldwidth * vid.fdupx;
             x2 = vid.width - con_rborder->worldwidth * vid.fdupx;
-            con_lborder->Draw(0, y, V_SSIZE);
-            con_rborder->Draw(x2, y, V_SSIZE);
+            con_lborder->Draw(0, border_y, V_SSIZE);
+            con_rborder->Draw(x2, border_y, V_SSIZE);
         }
         V_DrawFadeConsBack(wl, 0, x2, con_height);
         x = wl; // indent text past the left border

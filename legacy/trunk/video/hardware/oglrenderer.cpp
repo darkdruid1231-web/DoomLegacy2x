@@ -1114,6 +1114,13 @@ void OGLRenderer::Draw2DGraphic(GLfloat left,
 
     //  printf("Drawing tex %d at (%.2f, %.2f) (%.2f, %.2f).\n", tex, top, left, bottom, right);
 
+    // Enable alpha blending and testing for transparent textures (TTF glyphs need this)
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_ALPHA_TEST);
+    glAlphaFunc(GL_GREATER, 0.0f);
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);  // Ensure white color for proper text rendering
+
     mat->GLUse();
     glBegin(GL_QUADS);
     glTexCoord2f(texleft, texbottom);
@@ -1125,6 +1132,9 @@ void OGLRenderer::Draw2DGraphic(GLfloat left,
     glTexCoord2f(texleft, textop);
     glVertex2f(left, top);
     glEnd();
+
+    glDisable(GL_ALPHA_TEST);
+    glDisable(GL_BLEND);  // restore — other 2D callers may not want blend
 }
 
 // Just like the earlier one, except the coordinates are given in Doom
@@ -1187,6 +1197,8 @@ void OGLRenderer::Draw2DGraphic_Doom(GLfloat x, GLfloat y, Material *mat, int fl
 #endif
     }
 
+    // Original call - relies on default/undefined texture coordinates
+    // This is the 5-parameter version that compiles due to -fpermissive
     Draw2DGraphic(l, 1 - b, r, 1 - t, mat);
 }
 
@@ -1238,6 +1250,76 @@ void OGLRenderer::Draw2DGraphicFill_Doom(
                   height / tr.worldheight,
                   width / tr.worldwidth,
                   0.0);
+}
+
+/// Draw a material centered and cropped to the full screen, bypassing the HUD aspect-ratio
+/// transform.  The image is placed so that it fills the screen height and is horizontally
+/// centered; edges that extend beyond the viewport are naturally clipped by OpenGL.
+/// worldwidth/worldheight are the image dimensions in Doom virtual units (e.g. 854×200).
+void OGLRenderer::DrawFullscreenGraphic(Material *mat, float worldwidth, float worldheight)
+{
+    if (!workinggl)
+        return;
+
+    // Compute the same aspect-ratio correction that Setup2DMode uses, so we can place
+    // the image in raw [0,1] screen space while accounting for the HUD safe area.
+    GLfloat extx, exty, scalex, scaley;
+    if (viewportar > hudar)
+    {
+        // Widescreen: HUD 4:3 area is centered, pillarboxed.
+        extx   = (viewportar - hudar) / (viewportar * 2.0f);
+        exty   = 0.0f;
+        scalex = hudar / viewportar;
+        scaley = 1.0f;
+    }
+    else if (viewportar < hudar)
+    {
+        // Tallscreen: HUD 4:3 area is centered, letterboxed.
+        extx   = 0.0f;
+        exty   = (hudar - viewportar) / (hudar * 2.0f);
+        scalex = 1.0f;
+        scaley = viewportar / hudar;
+    }
+    else
+    {
+        extx = exty = 0.0f;
+        scalex = scaley = 1.0f;
+    }
+
+    // Map Doom virtual coords to raw [0,1] screen space.
+    // Virtual x=0..BASEVIDWIDTH maps to [extx, extx+scalex].
+    // Center the image horizontally; let edges overflow (GL clips them).
+    float cx = BASEVIDWIDTH * 0.5f;
+    float l  = extx + (cx - worldwidth  * 0.5f) / BASEVIDWIDTH * scalex;
+    float r  = extx + (cx + worldwidth  * 0.5f) / BASEVIDWIDTH * scalex;
+    // Fill the full screen height (virtual 0..BASEVIDHEIGHT → screen y [exty, exty+scaley]).
+    float b  = exty;
+    float t  = exty + scaley;
+
+    // Push the current projection matrix and load a raw ortho (no HUD correction).
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0.0, 1.0, 0.0, 1.0);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_ALPHA_TEST);
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+    mat->GLUse();
+    glBegin(GL_QUADS);
+    // UV (0,1) = image top-left, (1,0) = image bottom-right (GL V=0 is image bottom).
+    glTexCoord2f(0.0f, 1.0f); glVertex2f(l, b); // screen bottom-left
+    glTexCoord2f(1.0f, 1.0f); glVertex2f(r, b); // screen bottom-right
+    glTexCoord2f(1.0f, 0.0f); glVertex2f(r, t); // screen top-right
+    glTexCoord2f(0.0f, 0.0f); glVertex2f(l, t); // screen top-left
+    glEnd();
+
+    glDisable(GL_BLEND);
+
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
 }
 
 /// Currently a no-op. Possibly do something in the future.
@@ -2229,10 +2311,19 @@ void OGLRenderer::DrawSpriteItem(const vec_t<fixed_t> &pos, Material *mat, int f
     if (!mat)
         return;
 
+    // Sprites always need blending enabled because they contain transparent pixels
+    // (the "holes" in sprite graphics). Enable it explicitly even though it may
+    // already be enabled from InitGLState.
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     if (alpha < 1.0)
     {
         glColor4f(1.0, 1.0, 1.0, alpha); // set material params
-        // glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); // on by default
+    }
+    else
+    {
+        glColor4f(1.0, 1.0, 1.0, 1.0); // fully opaque
     }
 
     GLfloat top, bottom, left, right;
