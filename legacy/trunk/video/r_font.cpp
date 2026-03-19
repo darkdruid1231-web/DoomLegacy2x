@@ -313,17 +313,56 @@ float rasterfont_t::StringWidth(const char *str, int n)
 //======================================================================
 
 #ifndef NO_TTF
-#include "SDL_ttf.h"
-#include <GL/glu.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
-#define SCALE 1.0f
+// Render FreeType glyphs at 2x display size so GL has enough source pixels for
+// smooth LINEAR magnification. SCALE halves the world size back to display size.
+#define SCALE 2.0f
 
-/// \brief TrueType font
+/// FreeType-based RGBA texture (owns the pixel buffer)
+class FTTexture : public LumpTexture
+{
+    byte *pixels_rgba; // owned, allocated with new byte[]
+
+    virtual void GLGetData() {}
+
+  public:
+    FTTexture(const char *n, int w, int h, byte *rgba)
+        : LumpTexture(n, -1, w, h), pixels_rgba(rgba) {}
+
+    virtual ~FTTexture()
+    {
+        delete[] pixels_rgba;
+        pixels_rgba = NULL;
+    }
+
+    virtual byte *GetData() { return pixels_rgba; }
+
+    virtual GLuint GLPrepare()
+    {
+        // Upload if not yet uploaded or if ClearGLTextures() reset gl_id to NOTEXTURE
+        // after a GL context recreation. pixels_rgba is kept alive for re-upload.
+        if (gl_id == NOTEXTURE)
+        {
+            glGenTextures(1, &gl_id);
+            glBindTexture(GL_TEXTURE_2D, gl_id);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
+                         GL_RGBA, GL_UNSIGNED_BYTE, pixels_rgba);
+        }
+        return gl_id;
+    }
+};
+
+/// \brief TrueType font using FreeType directly
 class ttfont_t : public font_t
 {
   protected:
     byte *data; ///< Raw contents of the .ttf file.
-    TTF_Font *font;
 
     int ascent; ///< max ascent of all glyphs in the font in texels
 
@@ -332,14 +371,14 @@ class ttfont_t : public font_t
         int minx, maxx, miny, maxy, advance;
         Material *mat;
 
+        glyph_t() : mat(NULL) {}
+
         ~glyph_t()
         {
-            // The glyph textures nor the materials are in the main cache, so we destroy them
-            // directly.
             if (mat)
             {
                 delete mat->tex[0].t;
-                mat->tex.clear(); // so the Material destructor won't cause trouble...
+                mat->tex.clear();
                 delete mat;
                 mat = NULL;
             }
@@ -348,20 +387,43 @@ class ttfont_t : public font_t
 
     glyph_t glyphcache[256]; ///< Prerendered glyphs for Latin-1 chars to improve efficiency.
 
-    bool BuildGlyph(glyph_t &g, int c, SDL_Color color);
+    bool BuildGlyph(glyph_t &g, int c);
 
   public:
+    FT_Library ft_library;
+    FT_Face    ft_face;
+
     ttfont_t(int lump)
     {
         data = static_cast<byte *>(fc.CacheLumpNum(lump, PU_DAVE));
-        font = TTF_OpenFontRW(SDL_RWFromConstMem(data, fc.LumpLength(lump)), true, 12);
-        // font = TTF_OpenFont("font.ttf", 16); // TEST
 
-        ascent = TTF_FontAscent(font);
-        lineskip = TTF_FontLineSkip(font) / SCALE; // monospace the font in y direction
-        int ad = 0;
-        TTF_GlyphMetrics(font, '0', NULL, NULL, NULL, NULL, &ad);
-        advance = ad / SCALE;
+        if (FT_Init_FreeType(&ft_library))
+            I_Error("FT_Init_FreeType failed\n");
+        if (FT_New_Memory_Face(ft_library, (const FT_Byte *)data,
+                               (FT_Long)fc.LumpLength(lump), 0, &ft_face))
+            I_Error("FT_New_Memory_Face failed\n");
+
+        // Explicitly select Unicode charmap so FT_Load_Char uses Unicode codepoints.
+        // Without this, FreeType may pick Symbol or Mac Roman encoding and map
+        // ASCII codes to wrong glyphs (e.g. 'D' renders as 'T').
+        if (FT_Select_Charmap(ft_face, FT_ENCODING_UNICODE) != 0)
+        {
+            // No Unicode charmap — log which encodings are available.
+            CONS_Printf("FreeType: no Unicode charmap in TTFCONSL font (%d charmaps):\n",
+                        ft_face->num_charmaps);
+            for (int i = 0; i < ft_face->num_charmaps; i++)
+                CONS_Printf("  charmap %d: platform %d encoding %d\n", i,
+                            ft_face->charmaps[i]->platform_id,
+                            ft_face->charmaps[i]->encoding_id);
+        }
+
+        FT_Set_Pixel_Sizes(ft_face, 0, 16); // render at 2x; SCALE=2 halves world size → 8px display
+
+        ascent   = ft_face->size->metrics.ascender >> 6;
+        lineskip = (ft_face->size->metrics.height  >> 6) / SCALE;
+
+        FT_Load_Char(ft_face, '0', FT_LOAD_DEFAULT);
+        advance = (ft_face->glyph->advance.x >> 6) / SCALE;
 
         for (int k = 0; k < 256; k++)
             glyphcache[k].mat = NULL;
@@ -369,210 +431,121 @@ class ttfont_t : public font_t
 
     virtual ~ttfont_t()
     {
-        TTF_CloseFont(font);
-        font = NULL;
-        Z_Free(data);
-        data = NULL;
-        // the glyph_t's destroy themselves
-    }
-
-    const char *GetFaceFamilyName()
-    {
-        return TTF_FontFaceFamilyName(font);
-    }
-    const char *GetFaceStyleName()
-    {
-        return TTF_FontFaceStyleName(font);
+        FT_Done_Face(ft_face);       ft_face    = NULL;
+        FT_Done_FreeType(ft_library); ft_library = NULL;
+        Z_Free(data);                data       = NULL;
     }
 
     virtual float StringWidth(const char *str)
     {
-        int w, h;
-        return TTF_SizeUTF8(font, str, &w, &h) ? 0 : w / SCALE;
+        int total = 0;
+        while (*str)
+        {
+            Uint16 c;
+            int skip = utf8_to_ucs2(str, &c);
+            if (!skip) break;
+            str += skip;
+            if (FT_Load_Char(ft_face, c, FT_LOAD_DEFAULT) == 0)
+                total += ft_face->glyph->advance.x >> 6;
+        }
+        return total / SCALE;
     }
 
     virtual float StringWidth(const char *str, int n)
     {
-        int len = 0;
-        Uint16 c;
-        // count how many bytes the n letters comprise
-        for (int k = 0; k < n && str[len]; k++)
+        int total = 0;
+        while (*str && n > 0)
         {
-            int skip = utf8_to_ucs2(&str[len], &c);
-            if (!skip) // bad utf8 string
-                return 0;
-            len += skip;
+            Uint16 c;
+            int skip = utf8_to_ucs2(str, &c);
+            if (!skip) break;
+            str += skip;
+            n--;
+            if (FT_Load_Char(ft_face, c, FT_LOAD_DEFAULT) == 0)
+                total += ft_face->glyph->advance.x >> 6;
         }
-
-        char temp[len + 1];
-        strncpy(temp, str, len);
-        temp[len] = 0;
-        int w, h;
-        return TTF_SizeUTF8(font, temp, &w, &h) ? 0 : w / SCALE;
+        return total / SCALE;
     }
 
     virtual float DrawCharacter(float x, float y, int c, int flags);
-
-    /*
-    virtual bool CanCompose() const { return true; }
-    /// Renders the UFT-8 string using kerning into a Material.
-    virtual class Material *ComposeString(const char *str)
-    {
-      SDL_Surface *text = TTF_RenderUTF8_Solid(font, str, c);
-      SDL_Surface *text = TTF_RenderUTF8_Blended(font, str, c);
-    }
-    */
 };
 
-/// SDL_Surface -based Texture
-class SDLTexture : public LumpTexture
+bool ttfont_t::BuildGlyph(glyph_t &g, int c)
 {
-  protected:
-    SDL_Surface *surf;
-
-    virtual void GLGetData()
-    {
-    } ///< Sets up pixels.
-
-  public:
-    virtual GLuint GLPrepare()
-    {
-        if (gl_id == NOTEXTURE)
-        {
-            glGenTextures(1, &gl_id);
-            glBindTexture(GL_TEXTURE_2D, gl_id);
-            // Use linear filtering for smoother text
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            // Create mipmaps
-            gluBuild2DMipmaps(
-                GL_TEXTURE_2D, GL_RGBA, width, height, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
-
-            //  CONS_Printf("Created GL texture %d for %s.\n", gl_id, name);
-            // do not free pixels!!
-        }
-
-        return gl_id;
-    }
-
-    SDLTexture(const char *n, SDL_Surface *s) : LumpTexture(n, -1, s->w, s->h)
-    {
-        surf = s;
-        pixels = static_cast<byte *>(surf->pixels);
-
-        // SDL_ttf renders with BGRA format (blended rendering)
-        // Using BGRA since SDL_ttf outputs BGRA surfaces
-        gl_format = GL_BGRA;
-    }
-
-    virtual ~SDLTexture()
-    {
-        SDL_FreeSurface(surf);
-        surf = NULL;
-        pixels = NULL;
-    }
-
-    virtual byte *GetData()
-    {
-        return pixels;
-    }
-    /*
-    {
-    if (!pixels)
-      {
-        Z_Malloc(width*height, PU_TEXTURE, (void **)(&pixels));
-
-        // transposed to col-major order
-        int dest = 0;
-        for (int i=0; i<len; i++)
-      {
-        pixels[dest] = temp[i];
-        dest += height;
-        if (dest >= len)
-          dest -= len - 1; // next column
-      }
-        Z_Free(temp);
-
-        // do a palette conversion if needed
-        byte *colormap = materials.GetPaletteConv(lump >> 16);
-        if (colormap)
-      for (int i=0; i<len; i++)
-        pixels[i] = colormap[pixels[i]];
-
-        // convert to high color
-        // short pix16 = ((color8to16[*data++] & 0x7bde) + ((i<<9|j<<4) & 0x7bde))>>1;
-      }
-
-    return pixels;
-  }
-  */
-};
-
-bool ttfont_t::BuildGlyph(glyph_t &g, int c, SDL_Color color)
-{
-    TTF_GlyphMetrics(font, c, &g.minx, &g.maxx, &g.miny, &g.maxy, &g.advance);
-
-    // Use blended rendering for proper alpha support
-    SDL_Surface *glyph = TTF_RenderGlyph_Blended(font, c, color);
-    if (!glyph)
-    {
-        CONS_Printf("TTF rendering error: %s\n", TTF_GetError());
+    if (FT_Load_Char(ft_face, c, FT_LOAD_RENDER))
         return false;
+
+    FT_GlyphSlot slot = ft_face->glyph;
+    FT_Bitmap   &bm   = slot->bitmap;
+
+    g.advance = slot->advance.x >> 6;
+    g.minx    = slot->bitmap_left;
+    g.maxy    = slot->bitmap_top;
+    g.miny    = g.maxy - (int)bm.rows;
+    g.maxx    = g.minx + (int)bm.width;
+
+    int w = (bm.width > 0) ? (int)bm.width : 1;
+    int h = (bm.rows  > 0) ? (int)bm.rows  : 1;
+
+    // Convert FT_PIXEL_MODE_GRAY coverage bytes to red+alpha RGBA.
+    // Red matches the Doom raster console font (STCFN* patches are red pixels).
+    // Draw2DGraphic hardcodes glColor4f(1,1,1,1) so GL color cannot tint;
+    // the pixel data must carry the desired color.
+    byte *rgba = new byte[w * h * 4]();
+    if (bm.buffer)
+    {
+        for (int row = 0; row < (int)bm.rows; row++)
+        {
+            const byte *src = bm.buffer + row * bm.pitch;
+            byte       *dst = rgba      + row * w * 4;
+            for (int col = 0; col < (int)bm.width; col++)
+            {
+                dst[col*4 + 0] = 179; // R — matches STCFN raster font average (~palette index 182)
+                dst[col*4 + 1] = 0;   // G
+                dst[col*4 + 2] = 0;   // B
+                dst[col*4 + 3] = src[col]; // A = coverage
+            }
+        }
     }
 
     string name("glyph ");
-    name += c;
+    name += (char)c;
 
-    Texture *t = new SDLTexture(name.c_str(), glyph);
-    t->topoffs = g.maxy - ascent; // clever!
-    t->leftoffs = -g.minx;
+    Texture *t = new FTTexture(name.c_str(), w, h, rgba);
+    // topoffs: pixels the glyph top sits ABOVE the draw origin.
+    // For baseline alignment: glyph top is (ascent - bitmap_top) pixels BELOW cursor.
+    // "Below" means a negative topoffs value (Draw2DGraphic subtracts topoffs from t,
+    // so negative topoffs increases t → moves image down toward the screen bottom).
+    t->topoffs  = (short)(slot->bitmap_top - ascent);
+    t->leftoffs = (short)(-slot->bitmap_left);
 
-    g.mat = new Material(name.c_str(), t, SCALE, SCALE); // create a new Material
+    g.mat = new Material(name.c_str(), t, SCALE, SCALE);
+    g.mat->tex[0].min_filter = GL_LINEAR;
+    g.mat->tex[0].mag_filter = GL_LINEAR;
+    materials.RegisterMaterial(g.mat); // ensures ClearGLTextures() resets gl_id on context recreation
     return true;
 }
 
-
-
 float ttfont_t::DrawCharacter(float x, float y, int c, int flags)
 {
-    static SDL_Color white = {255, 255, 255, 0};
-    static SDL_Color red = {255, 0, 0, 0};
-
-    if (flags & V_WHITEMAP)
-    {
-    }
-
-    float ret;
-
-    // TODO glyphcache into a std::map
-    if (c < 32) // control chars
+    if (c < 32)
         return 0;
-    else if (c < 256) // Latin-1
+    else if (c < 256)
     {
         glyph_t &g = glyphcache[c];
-        if (!g.mat)
-        {
-            // not found, render and insert into glyph cache
-            if (!BuildGlyph(g, c, red))
-                return 0;
-        }
+        if (!g.mat && !BuildGlyph(g, c))
+            return 0;
         g.mat->Draw(x, y, flags);
-        ret = g.advance / SCALE;
+        return g.advance / SCALE;
     }
     else
     {
         glyph_t temp;
-        if (!BuildGlyph(temp, c, red))
+        if (!BuildGlyph(temp, c))
             return 0;
-
         temp.mat->Draw(x, y, flags);
-        ret = temp.advance / SCALE;
-        // TODO temp is deleted, incredibly wasteful!!!
+        return temp.advance / SCALE;
     }
-
-    return ret;
 }
 
 #endif
@@ -613,50 +586,23 @@ void font_t::Init()
     }
 
 #ifndef NO_TTF
-    // Initialize SDL_ttf and load the TrueType font for console use
-    CONS_Printf("=== TTF Debug: Initializing SDL_ttf ===\n");
-    
-    if (TTF_Init() < 0)
-    {
-        CONS_Printf("TTF Debug: TTF_Init FAILED: %s\n", TTF_GetError());
-        return;
-    }
-    CONS_Printf("TTF Debug: TTF_Init OK\n");
-
     int lump = fc.FindNumForName("TTFCONSL");
-    CONS_Printf("TTF Debug: FindNumForName(\"TTFCONSL\") = %d\n", lump);
     if (lump < 0)
     {
-        CONS_Printf("TTF Debug: TrueType font 'TTFCONSL' not found in WAD, using raster fonts only\n");
+        CONS_Printf("FreeType: 'TTFCONSL' lump not found\n");
         return;
     }
-
-    CONS_Printf("TTF Debug: Creating ttfont_t with lump %d\n", lump);
     console_ttf = new ttfont_t(lump);
-    CONS_Printf("TTF Debug: ttfont_t created\n");
-
-    const char *p = console_ttf->GetFaceFamilyName();
-    if (p)
-        CONS_Printf("TTF Debug: Font face family: %s\n", p);
-    else
-        CONS_Printf("TTF Debug: Could not get font family name\n");
-
-    p = console_ttf->GetFaceStyleName();
-    if (p)
-        CONS_Printf("TTF Debug: Font style: %s\n", p);
-
-    CONS_Printf("TTF Debug: TrueType console font loaded successfully!\n");
+    CONS_Printf("FreeType: loaded %s %s\n",
+                console_ttf->ft_face->family_name,
+                console_ttf->ft_face->style_name);
 #endif
 
 }
 
 // Get the TTF font for console rendering (or NULL if not available)
-// NOTE: TTF rendering currently has issues with the OpenGL setup, returning NULL to use raster fonts
 font_t *font_t::GetConsoleFont()
 {
-    // Temporarily disabled - TTF rendering needs more work for compatibility
-    return NULL;
-    
 #ifdef NO_TTF
     return NULL;
 #else

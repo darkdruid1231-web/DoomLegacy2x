@@ -68,20 +68,20 @@ if(USE_SDL2)
             message(STATUS "SDL2_mixer not found, disabling sound")
         endif()
     endif()
-    # SDL_ttf for TrueType font support
+    # FreeType for TrueType font support
     option(USE_TTF "Enable TrueType font support" ON)
     if(USE_TTF STREQUAL "ON")
-        pkg_check_modules(SDL2TTF SDL2_ttf)
-        if(SDL2TTF_LIBRARY_DIRS)
-            link_directories(${SDL2TTF_LIBRARY_DIRS})
-        endif()
-        if(SDL2TTF_FOUND)
+        pkg_check_modules(FREETYPE freetype2)
+        if(FREETYPE_FOUND)
             set(HAVE_TTF 1)
             add_compile_definitions(HAVE_TTF)
-            include_directories(${SDL2TTF_INCLUDE_DIRS})
-            message(STATUS "SDL2_ttf found, TrueType fonts enabled")
+            include_directories(${FREETYPE_INCLUDE_DIRS})
+            if(FREETYPE_LIBRARY_DIRS)
+                link_directories(${FREETYPE_LIBRARY_DIRS})
+            endif()
+            message(STATUS "FreeType found, TrueType fonts enabled")
         else()
-            message(STATUS "SDL2_ttf not found, TrueType fonts disabled")
+            message(STATUS "FreeType not found, TrueType fonts disabled")
         endif()
     endif()
     if(SDL2_FOUND)
@@ -190,7 +190,7 @@ target_link_libraries(doomlegacy PRIVATE
     "-Wl,--end-group"
     ${SDL2_LIBRARIES}
     ${SDL2MIXER_LIBRARIES}
-    ${SDL2TTF_LIBRARIES}
+    ${FREETYPE_LIBRARIES}
     ${ZLIB_LIBRARIES}
     ${PNG_LIBRARY}
     ${JPEG_LIBRARY}
