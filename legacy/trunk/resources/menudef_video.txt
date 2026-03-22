@@ -1,0 +1,91 @@
+// MENUDEF — Post-processing and deferred rendering video options.
+// Loaded as the MENUDEF lump from legacy.wad.
+// Panels declared here are used only in -newui mode; the legacy C++ path is unaffected.
+//
+// Panel widget index alignment: each widget maps 1:1 to the corresponding
+// menuitem_t entry in the backing array (menu.cpp).  This preserves the
+// itemOn focus index used by the responder and nav code.
+//
+//   IT_HEADER item → Header widget   (non-focusable LabelWidget)
+//   flags==0 item  → Separator widget (non-focusable SpaceWidget)
+//   IT_CVAR item   → Option or Slider widget (focusable)
+
+// ---------------------------------------------------------------------------
+// Post-processing sub-menu.
+// Matches OGL_PostFX_MI (20 items) in menu.cpp:
+//   [0]  Header ANTI-ALIASING
+//   [1]  gr_fxaa
+//   [2]  Separator
+//   [3]  Header BLOOM
+//   [4]  gr_bloom
+//   [5]  gr_bloomthreshold   enabled_if gr_bloom
+//   [6]  gr_bloomstrength    enabled_if gr_bloom
+//   [7]  Separator
+//   [8]  Header AMBIENT OCCLUSION
+//   [9]  gr_ssao
+//   [10] gr_ssaostrength     enabled_if gr_ssao
+//   [11] Separator
+//   [12] Header VOLUMETRIC FOG
+//   [13] gr_volfog
+//   [14] Separator
+//   [15] Header GOD RAYS
+//   [16] gr_godrays
+//   [17] gr_godraysstrength  enabled_if gr_godrays
+//   [18] gr_sunazimuth       enabled_if gr_godrays
+//   [19] gr_sunaltitude      enabled_if gr_godrays
+// ---------------------------------------------------------------------------
+
+OptionMenu "OGL_PostFX"
+{
+    Header  "ANTI-ALIASING"
+    Option  "FXAA",                         "gr_fxaa"
+    Separator
+    Header  "BLOOM"
+    Option  "Bloom",                        "gr_bloom"
+    Option  "Bloom threshold",              "gr_bloomthreshold",    enabled_if "gr_bloom"
+    Option  "Bloom strength",               "gr_bloomstrength",     enabled_if "gr_bloom"
+    Separator
+    Header  "AMBIENT OCCLUSION"
+    Option  "SSAO",                         "gr_ssao"
+    Option  "SSAO strength",                "gr_ssaostrength",      enabled_if "gr_ssao"
+    Separator
+    Header  "VOLUMETRIC FOG"
+    Option  "Volumetric fog",               "gr_volfog"
+    Separator
+    Header  "GOD RAYS"
+    Option  "God rays",                     "gr_godrays"
+    Option  "God rays strength",            "gr_godraysstrength",   enabled_if "gr_godrays"
+    Slider  "Sun azimuth (0-359)",          "gr_sunazimuth",  0, 359, 1,  enabled_if "gr_godrays"
+    Slider  "Sun altitude (0-89)",          "gr_sunaltitude", 0, 89,  1,  enabled_if "gr_godrays"
+}
+
+// ---------------------------------------------------------------------------
+// Deferred rendering sub-menu.
+// Matches OGL_Deferred_MI (11 items) in menu.cpp:
+//   [0]  Header DEFERRED RENDERING
+//   [1]  gr_deferred
+//   [2]  gr_cubeshadows      enabled_if gr_deferred
+//   [3]  Separator
+//   [4]  Header SCREEN-SPACE REFLECTIONS
+//   [5]  gr_ssr              enabled_if gr_deferred
+//   [6]  gr_ssrstrength      enabled_if gr_ssr
+//   [7]  Separator
+//   [8]  Header SPECULAR LIGHTING
+//   [9]  gr_specular         enabled_if gr_deferred
+//   [10] gr_specularexp      enabled_if gr_deferred
+// ---------------------------------------------------------------------------
+
+OptionMenu "OGL_Deferred"
+{
+    Header  "DEFERRED RENDERING"
+    Option  "Deferred rendering",           "gr_deferred"
+    Slider  "Cube shadow maps",             "gr_cubeshadows", 0, 4, 1,  enabled_if "gr_deferred"
+    Separator
+    Header  "SCREEN-SPACE REFLECTIONS"
+    Option  "Screen-space reflections",     "gr_ssr",               enabled_if "gr_deferred"
+    Slider  "SSR strength (0-100)",         "gr_ssrstrength", 0, 100, 5, enabled_if "gr_ssr"
+    Separator
+    Header  "SPECULAR LIGHTING"
+    Option  "Specular strength",            "gr_specular",          enabled_if "gr_deferred"
+    Slider  "Specular sharpness",           "gr_specularexp", 4, 128, 4, enabled_if "gr_deferred"
+}

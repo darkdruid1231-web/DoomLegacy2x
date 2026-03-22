@@ -44,6 +44,7 @@
 
 #include "m_argv.h"
 #include "m_menu.h"
+#include "menu/menudef.h"
 #include "m_misc.h" // configfile
 
 #include "s_sound.h"
@@ -211,14 +212,21 @@ void D_ProcessEvents()
             con.Responder(ev); // dedicated server only has a console interface
         else
         {
-            // Console toggle key always wins — even over open menus
+            // Console toggle key always wins — even over open menus.
+            // Exception: KEY_BACKSPACE is bound as a fallback toggle for non-US keyboards,
+            // but when the console is already active it must reach the text-editing handler.
             if (ev->type == ev_keydown)
             {
                 int key = ev->data1;
                 if (key == commoncontrols[gk_console][0] || key == commoncontrols[gk_console][1])
                 {
-                    con.Toggle();
-                    continue;
+                    if (con.IsOpen() && key == KEY_BACKSPACE)
+                        ; // fall through — let con.Responder handle it as a delete
+                    else
+                    {
+                        con.Toggle();
+                        continue;
+                    }
                 }
             }
             // Menu input
@@ -824,6 +832,9 @@ bool D_DoomMain()
         }
 
     game.mapinfo_lump = m;
+
+    // Parse MENUDEF lumps (mod-declared menus) now that all WADs are loaded.
+    MenuDef_LoadAll();
 
     bool public_server = game.dedicated || M_CheckParm("-server");
     bool autostart = public_server; // server starts automatically

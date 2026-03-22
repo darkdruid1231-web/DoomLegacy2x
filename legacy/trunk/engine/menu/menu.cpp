@@ -35,6 +35,8 @@
 #include "doomdef.h"
 
 #include "m_menu.h"
+#include "widget.h"
+#include "menudef.h"
 
 #include "d_event.h"
 #include "dstrings.h"
@@ -82,7 +84,8 @@ extern Menu MainMenuDef, SinglePlayerDef, MultiPlayerDef, SetupPlayerDef, EpiDef
     SkillDef, OptionsDef, VidModeDef, ControlDef, SoundDef, ReadDef2, ReadDef1, SaveDef, LoadDef,
     ControlDef2, GameOptionDef, NetOptionDef, VideoOptionsDef, OpenGLOptionDef, MouseOptionsDef,
     Mouse2OptionsDef, ServerOptionsDef, QualitySettingsDef, InputSettingsDef,
-    LocalPlayDef, OnlinePlayDef, PlayerSetupDef, HostGameDef;
+    LocalPlayDef, OnlinePlayDef, PlayerSetupDef, HostGameDef,
+    OGL_PostFXDef, OGL_DeferredDef;
 
 static void M_DrawTextBox(int x, int y, int width, int height);
 
@@ -100,6 +103,17 @@ static int menu_dropdown_item = -1;
 static Material *menu_panel = NULL;
 static Material *menu_header = NULL;
 static Material *menu_focus = NULL;
+
+// Per-menu WidgetPanel cache. Built lazily on first DrawMenuModern() call for
+// each Menu object and freed when the menu system shuts down.
+#include <map>
+#include <functional>
+static std::map<Menu *, WidgetPanel *> s_widget_panels;
+
+// Optional widget factory overrides: when MenuToWidgetPanel() encounters a
+// consvar pointer that has a registered factory, it calls the factory instead
+// of creating a plain OptionWidget.  Populated during menu system startup.
+static std::map<consvar_t *, std::function<Widget *()>> s_cvar_widget_factories;
 
 struct MenuStyle
 {
@@ -833,6 +847,17 @@ void Menu::DrawMenu()
     int cursory = 0;
     int dy = y; // y for drawing
 
+    // For sub-menus draw a background panel so text is readable regardless of
+    // the game view behind it (e.g. red-heavy Doom 1 scenes).
+    if (MenuIsSubMenu(this) && window_background)
+    {
+        int panel_x = menu_style.panel_margin;
+        int panel_w = BASEVIDWIDTH - (menu_style.panel_margin * 2);
+        int panel_y = max(menu_style.panel_margin, y - menu_style.panel_padding);
+        int panel_h = numitems * LINEHEIGHT + menu_style.panel_padding * 2;
+        window_background->DrawFill(panel_x, panel_y, panel_w, panel_h);
+    }
+
     DrawTitle();
 
     for (int i = 0; i < numitems; i++)
@@ -967,8 +992,88 @@ void Menu::DrawMenu()
         hud_font->DrawCharacter(x - 10, cursory, '*', V_WHITEMAP | V_SCALE);
 }
 
+/// Build a WidgetPanel from this menu's item array.
+/// Each menuitem_t maps to exactly one Widget subclass.
+/// IT_DY items add their extra offset via Widget::extra_top_margin.
+static WidgetPanel *MenuToWidgetPanel(menuitem_t *items, int numitems)
+{
+    WidgetPanel *panel = new WidgetPanel();
+
+    for (int i = 0; i < numitems; i++)
+    {
+        menuitem_t &item = items[i];
+
+        int display = item.flags & IT_DISPLAY_MASK;
+        int type    = item.flags & IT_TYPE_MASK;
+        int utype   = item.flags & IT_UNION_MASK;
+        bool dis    = MenuItemDisabled(item);
+
+        // Extra top-margin (IT_DY) is stored on the widget so
+        // WidgetPanel::Draw() can apply it before rendering the row.
+        int extra_y = (item.flags & IT_DY) ? item.alphaKey : 0;
+
+        Widget *w = nullptr;
+
+        // --- section header -------------------------------------------------
+        if (item.flags & IT_HEADER_FLAG)
+        {
+            w = new LabelWidget(item.text, /*hdr=*/true, /*white=*/false);
+        }
+        // --- vertical spacer ------------------------------------------------
+        else if (display == IT_SPACE)
+        {
+            w = new SpaceWidget();
+        }
+        // --- consvar types --------------------------------------------------
+        else if (utype == IT_CV)
+        {
+            consvar_t *cv = item.GetCV();
+            // Check for a registered widget factory override first.
+            auto fit = s_cvar_widget_factories.find(cv);
+            if (fit != s_cvar_widget_factories.end())
+            {
+                w = fit->second();
+            }
+            else if (type == IT_CV_SLIDER || type == IT_CV_BIGSLIDER)
+            {
+                w = new SliderWidget(item.text, cv, dis);
+            }
+            else if (type == IT_CV_TEXTBOX)
+            {
+                w = new TextInputWidget(item.text, cv, &item.flags);
+            }
+            else
+            {
+                w = new OptionWidget(item.text, cv, item.flags, dis);
+            }
+        }
+        // --- submenu / action button ----------------------------------------
+        else if (type == IT_SUBMENU || type == IT_FUNC ||
+                 type == IT_CONTROL || type == IT_KEYHANDLER ||
+                 type == IT_FULL_KEYHANDLER)
+        {
+            w = new ButtonWidget(item.text, dis);
+        }
+        // --- non-interactive label (IT_NONE + display, or IT_DISABLED) ------
+        else
+        {
+            bool white = (item.flags & IT_WHITE) != 0;
+            w = new LabelWidget(item.text, /*hdr=*/false, white);
+        }
+
+        w->extra_top_margin = extra_y;
+        panel->Add(w);
+    }
+
+    return panel;
+}
+
 void Menu::DrawMenuModern()
 {
+    font_t *mf = font_t::GetConsoleFont();
+    if (!mf)
+        mf = hud_font;
+
     DrawTitle();
 
     if (!menu_panel)
@@ -980,192 +1085,57 @@ void Menu::DrawMenuModern()
 
     int panel_x = menu_style.panel_margin;
     int panel_w = BASEVIDWIDTH - (menu_style.panel_margin * 2);
-    int panel_y = max(menu_style.panel_margin, y - menu_style.panel_padding - menu_style.header_height);
+    int panel_y = max(menu_style.panel_margin,
+                      y - menu_style.panel_padding - menu_style.header_height);
 
-    int content_h = 0;
-    for (int i = 0; i < numitems; i++)
+    // Build / fetch the cached WidgetPanel before computing content_h so that
+    // variable-height widgets (e.g. ListWidget) are reflected in the panel size.
+    // A MENUDEF-declared panel takes priority over the C++ adapter.
+    WidgetPanel *&cached = s_widget_panels[this];
+    if (!cached)
     {
-        if (items[i].flags & IT_HEADER_FLAG)
-            content_h += menu_style.header_height;
-        else if ((items[i].flags & IT_DISPLAY_MASK) == IT_SPACE)
-            content_h += menu_style.row_height;
-        else
-            content_h += menu_style.row_height;
+        if (title)
+            cached = MenuDef_FindPanel(title);
+        if (!cached)
+            cached = MenuToWidgetPanel(items, numitems);
     }
+
+    int content_h = cached->ContentHeight(menu_style.row_height, menu_style.header_height);
 
     int panel_h = content_h + menu_style.panel_padding * 2 + menu_style.footer_gap + 8;
     if (panel_y + panel_h > BASEVIDHEIGHT - menu_style.panel_margin)
         panel_h = BASEVIDHEIGHT - menu_style.panel_margin - panel_y;
 
-    menu_panel->DrawFill(panel_x, panel_y, panel_w, panel_h);
+    // Determine the disabled-reason tooltip for the focused item.
+    const char *disabled_reason = NULL;
+    if (MenuItemDisabled(items[itemOn]))
+        disabled_reason = MenuDisabledReason(items[itemOn]);
 
-    int dy = panel_y + menu_style.panel_padding;
-    int dropdown_y = -1;
-    int dropdown_x = 0;
-    int dropdown_w = 0;
+    // Build the rendering context.
+    MenuDrawCtx ctx;
+    ctx.font            = mf;
+    ctx.mat_panel       = menu_panel;
+    ctx.mat_header      = menu_header;
+    ctx.mat_focus       = menu_focus;
+    ctx.panel_x         = panel_x;
+    ctx.panel_y         = panel_y;
+    ctx.panel_w         = panel_w;
+    ctx.panel_h         = panel_h;
+    ctx.panel_padding   = menu_style.panel_padding;
+    ctx.row_height      = menu_style.row_height;
+    ctx.header_height   = menu_style.header_height;
+    ctx.value_box_w     = menu_style.value_box_w;
+    ctx.slider_width    = SLIDER_WIDTH;
+    ctx.itemOn          = itemOn;
+    ctx.AnimCount       = AnimCount;
+    ctx.dropdown_open   = menu_dropdown_open;
+    ctx.dropdown_item   = menu_dropdown_item;
+    ctx.dropdown_index  = menu_dropdown_index;
+    ctx.textbox_active  = textbox.Active();
+    ctx.textbox_text    = textbox.Active() ? textbox.GetText() : NULL;
+    ctx.disabled_reason = disabled_reason;
 
-    for (int i = 0; i < numitems; i++)
-    {
-        const menuitem_t &item = items[i];
-        bool is_header = (item.flags & IT_HEADER_FLAG) != 0;
-        bool disabled = MenuItemDisabled(item);
-
-        if (item.flags & IT_DY)
-            dy += item.alphaKey;
-
-        int row_h = is_header ? menu_style.header_height : menu_style.row_height;
-
-        if (!is_header && i == itemOn && !disabled)
-            menu_focus->DrawFill(panel_x + 4, dy - 2, panel_w - 8, row_h);
-
-        if (is_header)
-        {
-            menu_header->DrawFill(panel_x + 4, dy - 1, panel_w - 8, row_h - 2);
-            if (item.text)
-                hud_font->DrawString(panel_x + menu_style.panel_padding,
-                                     dy + 2,
-                                     item.text,
-                                     V_WHITEMAP | V_SCALE);
-            dy += row_h;
-            continue;
-        }
-
-        int flags = V_SCALE;
-        if (disabled)
-            flags |= V_MAP, current_colormap = graymap;
-        else if (item.flags & IT_WHITE)
-            current_colormap = whitemap;
-
-        int x0 = panel_x + menu_style.panel_padding;
-
-        switch (item.flags & IT_DISPLAY_MASK)
-        {
-            case IT_PATCH:
-                if (item.pic && item.pic[0])
-                    materials.Get(item.pic)->Draw(x0, dy, flags);
-                else if (font && item.text)
-                    font->DrawString(x0, dy, item.text, flags);
-                break;
-
-            case IT_STRING:
-            case IT_CSTRING:
-                if (item.text)
-                    hud_font->DrawString(x0, dy, item.text, flags);
-                break;
-
-            default:
-                break;
-        }
-
-        if (const consvar_t *cv = item.GetCV())
-        {
-            int value_x = panel_x + panel_w - menu_style.panel_padding - menu_style.value_box_w;
-
-            if (item.flags & IT_DROPDOWN)
-            {
-                menu_header->DrawFill(value_x,
-                                      dy - 2,
-                                      menu_style.value_box_w,
-                                      menu_style.row_height - 2);
-                hud_font->DrawString(value_x + 6, dy, cv->str, V_WHITEMAP | V_SCALE);
-                hud_font->DrawString(value_x + menu_style.value_box_w - 10, dy, ">", V_WHITEMAP | V_SCALE);
-
-                if (menu_dropdown_open && i == menu_dropdown_item)
-                {
-                    dropdown_y = dy;
-                    dropdown_x = value_x;
-                    dropdown_w = menu_style.value_box_w;
-                }
-            }
-            else if ((item.flags & IT_TYPE_MASK) == IT_CV_SLIDER)
-            {
-                int slider_x = panel_x + panel_w - menu_style.panel_padding - SLIDER_WIDTH;
-                M_DrawSlider(slider_x,
-                             dy,
-                             ((cv->value - cv->PossibleValue[0].value) * 100 /
-                              (cv->PossibleValue[1].value - cv->PossibleValue[0].value)));
-            }
-            else if ((item.flags & IT_TYPE_MASK) == IT_CV_TEXTBOX)
-            {
-                M_DrawTextBox(x0, dy + 4, MAXSTRINGLENGTH, 1);
-                if (item.flags & IT_TEXTBOX_IN_USE)
-                {
-                    const char *t = textbox.GetText();
-                    hud_font->DrawString(x0 + 8, dy + 12, t, V_SCALE);
-                    if (AnimCount < 4)
-                        hud_font->DrawCharacter(x0 + 8 + hud_font->StringWidth(t),
-                                                dy + 12,
-                                                '_',
-                                                V_WHITEMAP | V_SCALE);
-                }
-                else
-                {
-                    hud_font->DrawString(x0 + 8, dy + 12, cv->str, V_SCALE);
-                }
-            }
-            else
-            {
-                hud_font->DrawString(value_x,
-                                     dy,
-                                     cv->str,
-                                     V_WHITEMAP | V_SCALE);
-            }
-        }
-
-        dy += row_h;
-    }
-
-    if (menu_dropdown_open && dropdown_y >= 0)
-    {
-        menuitem_t &item = items[menu_dropdown_item];
-        consvar_t *cv = item.GetCV();
-        int count = MenuPossibleValueCount(cv);
-        if (count > 0)
-        {
-            int visible = min(count, 8);
-            int start = menu_dropdown_index - visible / 2;
-            if (start < 0)
-                start = 0;
-            if (start + visible > count)
-                start = count - visible;
-
-            int list_h = visible * menu_style.row_height;
-            int list_y = dropdown_y + menu_style.row_height;
-            if (list_y + list_h > panel_y + panel_h)
-                list_y = dropdown_y - list_h;
-            if (list_y < panel_y + menu_style.panel_padding)
-                list_y = panel_y + menu_style.panel_padding;
-
-            menu_panel->DrawFill(dropdown_x, list_y, dropdown_w, list_h);
-            for (int i = 0; i < visible; i++)
-            {
-                int idx = start + i;
-                int row_y = list_y + i * menu_style.row_height;
-                if (idx == menu_dropdown_index)
-                    menu_focus->DrawFill(dropdown_x + 2,
-                                         row_y - 1,
-                                         dropdown_w - 4,
-                                         menu_style.row_height - 2);
-                if (cv->PossibleValue[idx].strvalue)
-                    hud_font->DrawString(dropdown_x + 6,
-                                         row_y + 1,
-                                         cv->PossibleValue[idx].strvalue,
-                                         V_WHITEMAP | V_SCALE);
-            }
-        }
-    }
-
-    if (!MenuItemDisabled(items[itemOn]))
-        return;
-
-    if (const char *reason = MenuDisabledReason(items[itemOn]))
-    {
-        int msg_y = panel_y + panel_h - menu_style.footer_gap;
-        hud_font->DrawString(panel_x + menu_style.panel_padding,
-                             msg_y,
-                             reason,
-                             V_WHITEMAP | V_SCALE);
-    }
+    cached->Draw(ctx);
 }
 
 //===========================================================================
@@ -1775,6 +1745,43 @@ static consvar_t cv_menu_startmap = {
     reinterpret_cast<void (*)()>(
         Startmap_Handler)}; // shameful HACK using a cvar, a dedicated menu widget would be better.
 
+/// Scrollable map-list replacement for the cv_menu_startmap cvar-handler HACK.
+/// Populated from game.mapinfo (found==true entries only).
+/// On selection writes directly to cv_menu_startmap.value and .str.
+class MapListWidget : public ListWidget
+{
+  public:
+    MapListWidget() : ListWidget(5)
+    {
+        Populate();
+    }
+
+    void Populate()
+    {
+        ClearEntries();
+        for (auto &kv : game.mapinfo)
+        {
+            MapInfo *mi = kv.second;
+            if (mi && mi->found)
+                AppendEntry(mi->nicename.c_str(), mi->mapnumber);
+        }
+        SelectByValue(cv_menu_startmap.value);
+        SetCallback(MapListWidget::OnSelect, nullptr);
+    }
+
+  private:
+    static void OnSelect(int mapnum, void * /*ud*/)
+    {
+        auto it = game.mapinfo.find(mapnum);
+        if (it == game.mapinfo.end() || !it->second)
+            return;
+        cv_menu_startmap.value = mapnum;
+        strncpy(cv_menu_startmap.str, it->second->nicename.c_str(),
+                consvar_t::CV_STRLEN - 1);
+        cv_menu_startmap.str[consvar_t::CV_STRLEN - 1] = '\0';
+    }
+};
+
 void M_StartServer(int choice)
 {
     game.SV_SpawnServer(false);   // keep mapinfo
@@ -1805,7 +1812,10 @@ void M_StartServerMenu(int choice)
 
     // cv_splitscreen is set by M_StartLocalGame/M_StartHostGame before reaching here.
 
-    // HACK, update map name
+    // Invalidate the Serverdef panel so MapListWidget is rebuilt with current
+    // game.mapinfo (WAD may have changed since last time).
+    s_widget_panels.erase(&Serverdef);
+    // Ensure cv_menu_startmap.value points to a valid found map.
     Startmap_Handler(&cv_menu_startmap, 0);
 
     Menu::SetupNextMenu(&Serverdef);
@@ -1928,7 +1938,7 @@ static consvar_t cv_menu_setupplayer = {"setupplayer",
                                         CV_HIDDEN | CV_CALL,
                                         setupplayer_cons_t,
                                         SetupPlayer_OnChange}; // TODO always call func when Set
-static consvar_t cv_menu_playername = {"name", "gorak", CV_HIDDEN, NULL};
+static consvar_t cv_menu_playername = {"name", "gorak", 0, NULL};
 // static consvar_t cv_menu_pawntype    = {"pawntype", "0",  CV_HIDDEN, CV_Unsigned};
 CV_PossibleValue_t Color_cons_t[] = {{0, "green"},
                                      {1, "gray"},
@@ -1942,9 +1952,9 @@ CV_PossibleValue_t Color_cons_t[] = {{0, "green"},
                                      {9, "yellow"},
                                      {10, "beige"},
                                      {0, NULL}};
-static consvar_t cv_menu_playercolor = {"color", "0", CV_HIDDEN, Color_cons_t};
+static consvar_t cv_menu_playercolor = {"color", "0", 0, Color_cons_t};
 // static consvar_t cv_menu_skin        = {"skin", "marine", CV_HIDDEN, NULL};
-static consvar_t cv_menu_autoaim = {"autoaim", "1", CV_HIDDEN, CV_OnOff};
+static consvar_t cv_menu_autoaim = {"autoaim", "1", 0, CV_OnOff};
 
 static consvar_t cv_menu_owswitch = {"originalweaponswitch", "0", CV_HIDDEN, CV_OnOff};
 static consvar_t cv_menu_weaponpref = {
@@ -3214,6 +3224,37 @@ bool Menu::MenuResponder(int key)
     }
 
     // menu item movement
+    // In newui mode, delegate UP/DOWN to the focused widget (if it handles its
+    // own navigation, e.g. ListWidget) or to the WidgetPanel (focus skip logic).
+    if (menu_use_newui && MenuIsSubMenu(this))
+    {
+        // Use (or build) the cached panel.
+        WidgetPanel *&wpanel_ref = s_widget_panels[this];
+        if (!wpanel_ref)
+            wpanel_ref = MenuToWidgetPanel(items, numitems);
+
+        Widget *focused_w = wpanel_ref->At(itemOn);
+
+        // Widgets that manage their own UP/DOWN (e.g. ListWidget) get first crack.
+        if (focused_w && focused_w->HandlesNavKeys())
+        {
+            bool consumed = focused_w->HandleKey(key);
+            if (consumed)
+            {
+                S_StartLocalAmbSound(sfx_menu_move);
+                return true;
+            }
+            // Widget returned false (e.g. at list boundary) — fall through
+            // to HandleNavKey so focus moves to the next widget.
+        }
+
+        if (wpanel_ref->HandleNavKey(key, itemOn, numitems))
+        {
+            S_StartLocalAmbSound(sfx_menu_move);
+            return true;
+        }
+    }
+
     switch (key)
     {
         case KEY_DOWNARROW:
@@ -3292,6 +3333,16 @@ bool Menu::MenuResponder(int key)
         case IT_CV_BIGSLIDER:
         case IT_CV_SLIDER:
         {
+            // If a custom widget (e.g. MapListWidget) owns this item in newui mode,
+            // skip the cvar-level key handling — the widget already handled it above.
+            if (menu_use_newui && MenuIsSubMenu(this))
+            {
+                WidgetPanel *wp = s_widget_panels.count(this) ? s_widget_panels[this] : nullptr;
+                Widget *fw = wp ? wp->At(itemOn) : nullptr;
+                if (fw && fw->HandlesNavKeys())
+                    break; // widget handled; don't also mutate the cvar
+            }
+
             char change = 0;
             switch (key)
             {
@@ -3572,6 +3623,12 @@ void Menu::Init()
     else
         font = hud_font;
 
+    // Register MapListWidget as the widget for cv_menu_startmap, replacing the
+    // cvar-with-handler HACK with a proper scrollable map list.
+    s_cvar_widget_factories[&cv_menu_startmap] = []() { return new MapListWidget(); };
+    // Invalidate any cached panel for Serverdef so the factory is used.
+    s_widget_panels.erase(&Serverdef);
+
     // Here we could catch other version dependencies,
     //  like HELP1/2, and four episodes.
 
@@ -3676,7 +3733,9 @@ static menuitem_t OpenGLOptions_MI[] = {
     menuitem_t(IT_LINK, NULL, "Fog...", &OGL_FogDef, 70),
     menuitem_t(IT_LINK, NULL, "Gamma...", &OGL_ColorDef, 80),
     menuitem_t(IT_LINK, NULL, "Normal maps...", &OGL_NormalMapDef, 90),
-    // menuitem_t(IT_LINK, NULL, "Development..."    , &OGL_DevDef        , 100),
+    menuitem_t(IT_LINK, NULL, "Post-Processing...", &OGL_PostFXDef, 100),
+    menuitem_t(IT_LINK, NULL, "Deferred Rendering...", &OGL_DeferredDef, 110),
+    // menuitem_t(IT_LINK, NULL, "Development..."    , &OGL_DevDef        , 120),
 };
 
 static menuitem_t OGL_Lighting_MI[] = {
@@ -3711,12 +3770,57 @@ static menuitem_t OGL_Dev_MI[] = {
     // menuitem_t(IT_CVAR, NULL, "Translucent walls", &cv_grtranswall       , 20),
 };
 
-Menu OpenGLOptionDef("M_OPTTTL", "OPTIONS", &VideoOptionsDef, ITEMS(OpenGLOptions_MI), 60, 40);
+// Post-processing sub-menu (newui: MENUDEF panel overrides with enabled_if graying;
+// legacy: simple IT_CVAR list shown without graying).
+// Widget indices must match MENUDEF "OGL_PostFX" panel 1:1 (IT_HEADER → LabelWidget,
+// IT_NONE/IT_SPACE → SpaceWidget, IT_CVAR → OptionWidget / SliderWidget).
+static menuitem_t OGL_PostFX_MI[] = {
+    menuitem_t(IT_HEADER, NULL, "ANTI-ALIASING"),
+    menuitem_t(IT_CVAR, NULL, "FXAA", &cv_grfxaa),
+    menuitem_t(0, NULL, NULL),                                               // Separator
+    menuitem_t(IT_HEADER, NULL, "BLOOM"),
+    menuitem_t(IT_CVAR, NULL, "Bloom", &cv_grbloom),
+    menuitem_t(IT_CVAR, NULL, "Bloom threshold", &cv_grbloomthreshold),
+    menuitem_t(IT_CVAR, NULL, "Bloom strength", &cv_grbloomstrength),
+    menuitem_t(0, NULL, NULL),                                               // Separator
+    menuitem_t(IT_HEADER, NULL, "AMBIENT OCCLUSION"),
+    menuitem_t(IT_CVAR, NULL, "SSAO", &cv_grssao),
+    menuitem_t(IT_CVAR, NULL, "SSAO strength", &cv_grssaostrength),
+    menuitem_t(0, NULL, NULL),                                               // Separator
+    menuitem_t(IT_HEADER, NULL, "VOLUMETRIC FOG"),
+    menuitem_t(IT_CVAR, NULL, "Volumetric fog", &cv_grvolfog),
+    menuitem_t(0, NULL, NULL),                                               // Separator
+    menuitem_t(IT_HEADER, NULL, "GOD RAYS"),
+    menuitem_t(IT_CVAR, NULL, "God rays", &cv_grgodrays),
+    menuitem_t(IT_CVAR, NULL, "God rays strength", &cv_grgodraysstrength),
+    menuitem_t(IT_CVAR | IT_CV_SLIDER, NULL, "Sun azimuth (0-359)", &cv_grsunazimuth),
+    menuitem_t(IT_CVAR | IT_CV_SLIDER, NULL, "Sun altitude (0-89)", &cv_grsunaltitude),
+};
+
+// Deferred rendering sub-menu.
+// Widget indices must match MENUDEF "OGL_Deferred" panel 1:1.
+static menuitem_t OGL_Deferred_MI[] = {
+    menuitem_t(IT_HEADER, NULL, "DEFERRED RENDERING"),
+    menuitem_t(IT_CVAR, NULL, "Deferred rendering", &cv_grdeferred),
+    menuitem_t(IT_CVAR | IT_CV_SLIDER, NULL, "Cube shadow maps", &cv_grcubeshadows),
+    menuitem_t(0, NULL, NULL),                                               // Separator
+    menuitem_t(IT_HEADER, NULL, "SCREEN-SPACE REFLECTIONS"),
+    menuitem_t(IT_CVAR, NULL, "Screen-space reflections", &cv_grssr),
+    menuitem_t(IT_CVAR | IT_CV_SLIDER, NULL, "SSR strength (0-100)", &cv_grssrstrength),
+    menuitem_t(0, NULL, NULL),                                               // Separator
+    menuitem_t(IT_HEADER, NULL, "SPECULAR LIGHTING"),
+    menuitem_t(IT_CVAR, NULL, "Specular strength", &cv_grspecular),
+    menuitem_t(IT_CVAR | IT_CV_SLIDER, NULL, "Specular sharpness", &cv_grspecularexp),
+};
+
+Menu OpenGLOptionDef("M_OPTTTL", "OPENGL OPTIONS", &VideoOptionsDef, ITEMS(OpenGLOptions_MI), 60, 40);
 Menu OGL_LightingDef("M_OPTTTL", "OPTIONS", &OpenGLOptionDef, ITEMS(OGL_Lighting_MI), 60, 40);
 Menu OGL_FogDef("M_OPTTTL", "OPTIONS", &OpenGLOptionDef, ITEMS(OGL_Fog_MI), 60, 40);
 Menu OGL_ColorDef("M_OPTTTL", "OPTIONS", &OpenGLOptionDef, ITEMS(OGL_Color_MI), 60, 40);
 Menu OGL_DevDef("M_OPTTTL", "OPTIONS", &OpenGLOptionDef, ITEMS(OGL_Dev_MI), 60, 40);
 Menu OGL_NormalMapDef("M_OPTTTL", "OPTIONS", &OpenGLOptionDef, ITEMS(OGL_NormalMap_MI), 60, 40);
+Menu OGL_PostFXDef("M_OPTTTL", "OGL_PostFX", &OpenGLOptionDef, ITEMS(OGL_PostFX_MI), 60, 40);
+Menu OGL_DeferredDef("M_OPTTTL", "OGL_Deferred", &OpenGLOptionDef, ITEMS(OGL_Deferred_MI), 60, 40);
 
 /*
 void Menu::DrawOpenGLMenu()
