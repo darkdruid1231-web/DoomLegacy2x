@@ -68,6 +68,12 @@ jobs:
         cd legacy/trunk/build-windows
         ninja -j4
 
+    - name: Run tests
+      shell: msys2 {0}
+      run: |
+        cd legacy/trunk/build-windows
+        ctest --output-on-failure
+
     - name: sccache stats
       if: always()
       shell: msys2 {0}
