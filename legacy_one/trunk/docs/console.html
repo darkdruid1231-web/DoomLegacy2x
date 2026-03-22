@@ -11,7 +11,7 @@
 
 <body>
 <h1>Doom Legacy 1.48.18 Console Reference</h1>
-<h1 class="tagline">Last updated 2025-04-23</h1>
+<h1 class="tagline">Last updated 2026-03-21</h1>
 
 <div class="floatbox">
 <h2>Contents</h2>
@@ -2458,6 +2458,47 @@ The ticrate is displayed as Frames Per Second.
 This is the Show Ticrate control in the Video menu.
 </td></tr>
 
+<tr><td>vsync</td><td>enum</td>
+<td>
+Vertical synchronization mode. Prevents screen tearing by synchronizing buffer
+swaps with the display refresh rate. Default is On.
+<table class="def">
+<tr><td>Off</td><td>0</td><td>No sync; may tear but gives the lowest latency.</td></tr>
+<tr><td>On</td><td>1</td><td>Standard vsync; waits for the next refresh.</td></tr>
+<tr><td>Adaptive</td><td>2</td><td>Syncs when the frame rate is above the refresh rate,
+runs unsynced when below it (SDL2 / OpenGL only).</td></tr>
+</table>
+</td></tr>
+
+<tr><td>msaa</td><td>enum</td>
+<td>
+Multisample anti-aliasing sample count. Higher values give smoother geometry
+edges at the cost of GPU memory and fill rate.
+Applied when the OpenGL context is created; a video restart is required after
+changing this value.
+Default is Off.
+<table class="def">
+<tr><td>Off</td><td>0</td><td>No multisampling.</td></tr>
+<tr><td>2x</td><td>2</td><td>2 samples per pixel.</td></tr>
+<tr><td>4x</td><td>4</td><td>4 samples per pixel.</td></tr>
+<tr><td>8x</td><td>8</td><td>8 samples per pixel.</td></tr>
+</table>
+</td></tr>
+
+<tr><td>fpslimit</td><td>enum</td>
+<td>
+Caps the rendered frame rate to reduce CPU/GPU load or match a fixed refresh
+rate. Default is Uncapped.
+<table class="def">
+<tr><td>Uncapped</td><td>0</td><td>No frame-rate cap.</td></tr>
+<tr><td>35</td><td>35</td><td>Classic Doom tic rate.</td></tr>
+<tr><td>60</td><td>60</td><td>60 FPS.</td></tr>
+<tr><td>120</td><td>120</td><td>120 FPS.</td></tr>
+<tr><td>144</td><td>144</td><td>144 FPS.</td></tr>
+<tr><td>240</td><td>240</td><td>240 FPS.</td></tr>
+</table>
+</td></tr>
+
 </table>
 
 
@@ -2470,12 +2511,13 @@ These options only apply in the OpenGL mode.
 
 <tr><td>
 gr_gammared | gr_gammagreen | gr_gammablue
-</td><td>int</td>
+</td><td>int&nbsp;&lt;1-20&gt;</td>
 <td>
-Set the intensities of red, green and
-blue on the scale 0-255.
+Set the intensities of red, green and blue.
+Range is 1&ndash;20; default is 10 (neutral).
+Values below 10 darken the channel; values above 10 brighten it.
 You can use them to make Legacy uniformly brighter or darker if you
-set all these variables to the same smaller or higher value.
+set all three variables to the same smaller or higher value.
 </td></tr>
 
 <tr><td>
@@ -2523,10 +2565,9 @@ Doom fog). For a grey fog, set the value to 707070 (for example).
 
 <tr><td>
 gr_fogdensity
-</td><td>float</td>
+</td><td>int</td>
 <td>
-Change the fog density. The default value is 500. I suggest you to
-try different values to see the changes.
+Change the fog density. The default value is 100. Try different values to see the changes.
 </td></tr>
 
 <tr><td>
@@ -2648,6 +2689,169 @@ Enables the polytile code that shares vertexes between poly so as to
 prevent cracks between polys from forming.  This control allows the user to disable this code easily.
 Default is enabled.
 </td></tr>
+
+<tr><td colspan="3"><b>Core rendering</b></td></tr>
+
+<tr><td>gr_rounddown</td><td>bool</td>
+<td>Round down texture sizes to the nearest power of two when uploading to the
+GPU. Useful for older hardware that requires power-of-two textures.
+Default is Off.</td></tr>
+
+<tr><td>gr_sky</td><td>bool</td>
+<td>Render the sky using the OpenGL renderer. Default is On.</td></tr>
+
+<tr><td>gr_zbuffer</td><td>bool</td>
+<td>Enable Z-buffer (depth) testing. Disabling this can cause rendering
+artifacts but may help diagnose depth-related issues. Default is On.</td></tr>
+
+<tr><td>gr_correcttricks</td><td>bool</td>
+<td>Enable OpenGL-specific renderer tricks and corrections (e.g. deep-water,
+fake floor/ceiling effects). Default is On.</td></tr>
+
+<tr><td>gr_polygonsmooth</td><td>bool</td>
+<td>Enable polygon anti-aliasing (glPolygonSmooth). May cause visual seams on
+some drivers. Default is Off.</td></tr>
+
+<tr><td>gr_md2</td><td>bool</td>
+<td>Enable rendering of MD2 model replacements for sprites. Default is Off.</td></tr>
+
+<tr><td>gr_transwall</td><td>bool</td>
+<td>Enable transparent (translucent) wall rendering. Default is Off.</td></tr>
+
+<tr><td>gr_shadows</td><td>bool</td>
+<td>Enable dynamic light shadows. Default is On.</td></tr>
+
+<tr><td colspan="3"><b>Texture and filtering</b></td></tr>
+
+<tr><td>gr_filtermode</td><td>enum</td>
+<td>
+Texture filter mode applied when sampling textures. Default is NN.
+<table class="def">
+<tr><td>NN</td><td>0</td><td>Nearest/Nearest &mdash; no filtering (pixelated).</td></tr>
+<tr><td>LN</td><td>1</td><td>Linear/Nearest &mdash; linear magnification, nearest minification.</td></tr>
+<tr><td>NL</td><td>2</td><td>Nearest/Linear &mdash; nearest magnification, linear minification.</td></tr>
+<tr><td>LL</td><td>3</td><td>Linear/Linear &mdash; fully bilinear filtering.</td></tr>
+</table>
+</td></tr>
+
+<tr><td>gr_anisotropy<br>&lt;1-16&gt;</td><td>int</td>
+<td>Anisotropic filtering level. 1 = off; 2, 4, 8, 16 are typical hardware
+steps. Requires driver support. Default is 1.</td></tr>
+
+<tr><td>gr_nearclippingplane</td><td>float</td>
+<td>Near clipping plane distance in map units. Objects closer than this
+distance are clipped. Default is 0.9.</td></tr>
+
+<tr><td>gr_farclippingplane</td><td>float</td>
+<td>Far clipping plane distance in map units. Objects beyond this distance are
+clipped. Default is 9000.0.</td></tr>
+
+<tr><td>gr_coronas</td><td>bool</td>
+<td>Enable lens-flare corona sprites on light sources. Default is On.</td></tr>
+
+<tr><td>gr_coronasize</td><td>float</td>
+<td>Scale multiplier for light corona sprites. Default is 1.0.</td></tr>
+
+<tr><td>gr_normalmapstrength<br>&lt;0-20&gt;</td><td>int</td>
+<td>Normal map intensity. The value is divided by 10 internally, so 10 = 1.0
+(neutral), 20 = 2.0 (double strength), 0 = flat normals.
+Default is 10.</td></tr>
+
+<tr><td colspan="3"><b>Quality preset</b></td></tr>
+
+<tr><td>gr_quality</td><td>enum</td>
+<td>
+Bundle preset that sets anisotropy, filter mode, shadows, and other options
+in one command. Default is Medium.
+<table class="def">
+<tr><td>Low</td><td>0</td><td>Fastest rendering; disables most effects.</td></tr>
+<tr><td>Medium</td><td>1</td><td>Balanced quality and performance.</td></tr>
+<tr><td>High</td><td>2</td><td>High quality; enables more effects.</td></tr>
+<tr><td>Ultra</td><td>3</td><td>Maximum quality.</td></tr>
+</table>
+</td></tr>
+
+<tr><td colspan="3"><b>Post-processing &mdash; Bloom</b></td></tr>
+
+<tr><td>gr_bloom</td><td>bool</td>
+<td>Enable bloom/glow post-processing effect. Default is Off.</td></tr>
+
+<tr><td>gr_bloomthreshold<br>&lt;0-1&gt;</td><td>float</td>
+<td>Luminance cutoff above which pixels contribute to bloom. Lower values
+produce more extensive bloom. Default is 0.8.</td></tr>
+
+<tr><td>gr_bloomstrength<br>&lt;0-1&gt;</td><td>float</td>
+<td>Bloom intensity multiplier. Default is 0.4.</td></tr>
+
+<tr><td colspan="3"><b>Post-processing &mdash; SSAO (Screen-Space Ambient Occlusion)</b></td></tr>
+
+<tr><td>gr_ssao</td><td>bool</td>
+<td>Enable screen-space ambient occlusion. Darkens crevices and corners for
+added depth. Default is Off.</td></tr>
+
+<tr><td>gr_ssaostrength<br>&lt;0-1&gt;</td><td>float</td>
+<td>SSAO effect intensity. Default is 0.6.</td></tr>
+
+<tr><td colspan="3"><b>Deferred rendering</b></td></tr>
+
+<tr><td>gr_deferred</td><td>bool</td>
+<td>Enable G-buffer deferred dynamic lighting pipeline. Required for specular
+highlights (gr_specular) and screen-space reflections (gr_ssr).
+Has higher GPU memory usage than forward rendering. Default is Off.</td></tr>
+
+<tr><td>gr_cubeshadows<br>&lt;0-4&gt;</td><td>int</td>
+<td>Number of dynamic lights that cast omnidirectional cube-map shadows per
+frame. 0 disables cube shadows entirely. Higher values increase shadow quality
+at the cost of rendering time. Requires gr_deferred On. Default is 1.</td></tr>
+
+<tr><td colspan="3"><b>Post-processing &mdash; SSR (Screen-Space Reflections)</b></td></tr>
+
+<tr><td>gr_ssr</td><td>bool</td>
+<td>Enable screen-space reflections on specular surfaces.
+Requires <b>gr_deferred On</b>. Default is Off.</td></tr>
+
+<tr><td>gr_ssrstrength<br>&lt;0-100&gt;</td><td>int</td>
+<td>SSR blend strength as a percentage. Default is 30.</td></tr>
+
+<tr><td colspan="3"><b>Post-processing &mdash; Volumetric fog</b></td></tr>
+
+<tr><td>gr_volfog</td><td>bool</td>
+<td>Enable PostFX exponential volumetric fog. Produces a more realistic
+atmospheric fog than the standard sector fog. Set <b>gr_fog 0</b> to avoid
+double-fogging when this is enabled. Default is Off.</td></tr>
+
+<tr><td colspan="3"><b>Post-processing &mdash; FXAA</b></td></tr>
+
+<tr><td>gr_fxaa</td><td>bool</td>
+<td>Enable Fast Approximate Anti-Aliasing (FXAA) as a post-process pass.
+Lower performance cost than MSAA. Default is Off.</td></tr>
+
+<tr><td colspan="3"><b>Post-processing &mdash; God rays (volumetric light shafts)</b></td></tr>
+
+<tr><td>gr_godrays</td><td>bool</td>
+<td>Enable volumetric light shaft (god ray) effect emanating from the sun
+direction. Default is Off.</td></tr>
+
+<tr><td>gr_godraysstrength<br>&lt;0-1&gt;</td><td>float</td>
+<td>God rays blend strength. Default is 0.5.</td></tr>
+
+<tr><td>gr_sunazimuth<br>&lt;0-359&gt;</td><td>int</td>
+<td>Sun compass direction in degrees (0 = north, 90 = east, 180 = south,
+270 = west). Affects god rays and specular sun highlight. Default is 225.</td></tr>
+
+<tr><td>gr_sunaltitude<br>&lt;0-89&gt;</td><td>int</td>
+<td>Sun elevation angle above the horizon in degrees. 0 = horizon, 89 = near
+overhead. Default is 45.</td></tr>
+
+<tr><td colspan="3"><b>Specular lighting</b></td></tr>
+
+<tr><td>gr_specular<br>&lt;0-1&gt;</td><td>float</td>
+<td>Blinn-Phong specular highlight strength. Requires <b>gr_deferred On</b>.
+0 = no specular. Default is 0.3.</td></tr>
+
+<tr><td>gr_specularexp<br>&lt;4-128&gt;</td><td>int</td>
+<td>Blinn-Phong specular exponent. Higher values produce a tighter, sharper
+highlight; lower values spread it wider. Default is 32.</td></tr>
 
 </table>
 
