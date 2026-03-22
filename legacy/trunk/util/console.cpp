@@ -30,6 +30,8 @@
 #include "w_wad.h"
 #include "z_zone.h"
 
+#include <algorithm>
+
 /// returns the number of bytes in the UTF-8 char beginning at p
 static int utf8_numbytes(const char *p)
 {
@@ -365,18 +367,19 @@ void Console::RecalcSize()
 {
     recalc = false;
 
-    // con_width is in virtual (BASEVIDWIDTH=320) units matching StringWidth() return values.
-    // vid.fdupx converts screen pixels to virtual units.
-    float virt_width = (vid.fdupx > 0) ? vid.width / vid.fdupx : (float)vid.width;
-    float cw = (cons_conwidth.value > 0 && cons_conwidth.value < virt_width)
+    // con_width is in virtual units (same as font StringWidth return values).
+    // In full-screen 2D mode (no HUD pillarboxing) the virtual width equals BASEVIDWIDTH:
+    // each virtual unit spans vid.fdupx screen pixels, and BASEVIDWIDTH * fdupx == vid.width.
+    float full_virt_width = (float)BASEVIDWIDTH; // = vid.width / vid.fdupx
+    float cw = (cons_conwidth.value > 0 && (float)cons_conwidth.value < full_virt_width)
                    ? (float)cons_conwidth.value
-                   : virt_width;
-    if (cw < 40) // minimal reasonable width in virtual units
-        cw = 40;
+                   : full_virt_width;
+    if (cw < 40.0f) // minimal reasonable width in virtual units
+        cw = 40.0f;
 
-    // check for change of video width
-    if (cw == con_width)
-        return; // didn't change
+    // Always recalculate to ensure proper width at any resolution
+    //if (cw == con_width)
+    //    return; // didn't change
 
     if (con_width == 0)
     {
@@ -536,10 +539,18 @@ bool Console::Responder(event_t *ev)
     int key = ev->data1;
 
     // check for console toggle key
+    // KEY_BACKSPACE is bound as a fallback toggle for non-US keyboards that lack the
+    // backtick key. When the console is already open, let BACKSPACE fall through to the
+    // text-editing handler instead of closing the console.
     if (key == commoncontrols[gk_console][0] || key == commoncontrols[gk_console][1])
     {
-        Toggle();
-        return true;
+        if (active && key == KEY_BACKSPACE)
+            ; // fall through to text editing
+        else
+        {
+            Toggle();
+            return true;
+        }
     }
 
     //  check other keys only if console prompt is active
@@ -908,6 +919,10 @@ void Console::DrawConsole()
     con_clearlines = con_height; // clear console draw from view borders
     con_hudupdate = true;        // always refresh while console is on
 
+    // Switch to full-screen 2D mode so the console spans the entire viewport
+    // width without the HUD 4:3 pillarboxing correction.
+    V_SetupConsoleDraw();
+
     // draw console background
     // In OGL mode: always use CONSBACK picture (legacy_one OGL always used CONSBACK,
     // regardless of cons_backpic). In SW mode: respect cons_backpic (picture vs translucent).
@@ -917,35 +932,26 @@ void Console::DrawConsole()
     float x = 0; // text x indent (may be adjusted by border in translucent mode)
     float y = 0; // reused as text loop variable below
 
-    if (rendermode != render_soft)
+    if (con_backpic)
     {
-        // OGL: stretch CONSBACK to fill the visible console area at any resolution.
-        if (con_backpic)
-            con_backpic->DrawStretched(0, 0, vid.width, con_height);
-        else if (oglrenderer)
-            oglrenderer->DrawConsoleBackground((float)con_height / vid.height,
-                                               cons_alpha.value / 100.0f);
-    }
-    else if (cons_backpic.value)
-    {
-        // SW picture mode: stretch CONSBACK to fill the visible console area.
-        con_backpic->DrawStretched(0, 0, vid.width, con_height);
+        // full_h is the height the console is when fully open.  con_destheight is set to
+        // 0 immediately when the close key is pressed (before animation), so we cache the
+        // last non-zero value and use it during the closing slide.
+        static float con_full_h = 0;
+        if (con_destheight > 0)
+            con_full_h = con_destheight;
+        float full_h = (con_full_h > 0) ? con_full_h : con_height;
+
+        // Picture mode: draw CONSBACK bottom-anchored to the console edge.  The image is
+        // always full_h tall; its bottom tracks con_height so it slides in/out as a unit.
+        // When partially open, the top of the image is above the screen and clips naturally.
+        con_backpic->DrawStretchedBottom(0, con_height, vid.width, full_h);
     }
     else
     {
-        // SW translucent mode: decorative left/right borders + translucent fill
-        float border_y = con_height - vid.height; // anchor borders at bottom of image
-        float wl = 0;
-        float x2 = (float)vid.width;
-        if (con_lborder && con_rborder)
-        {
-            wl = con_lborder->worldwidth * vid.fdupx;
-            x2 = vid.width - con_rborder->worldwidth * vid.fdupx;
-            con_lborder->Draw(0, border_y, V_SSIZE);
-            con_rborder->Draw(x2, border_y, V_SSIZE);
-        }
-        V_DrawFadeConsBack(wl, 0, x2, con_height);
-        x = wl; // indent text past the left border
+        // Translucent mode: full width translucent fill
+        V_DrawFadeConsBack(0, 0, vid.width, con_height);
+        x = 0; // text starts at left edge
     }
 
     // All text coordinates are in screen pixels.
@@ -956,7 +962,10 @@ void Console::DrawConsole()
     float minheight = 2 * lh;
 
     if (con_height < minheight)
+    {
+        V_RestoreHUDDraw(); // must restore before every return path
         return;
+    }
 
     int i = con_cy - con_scrollup;
 
@@ -993,6 +1002,9 @@ void Console::DrawConsole()
         if (con_tick < 4)
             console_font->DrawCharacter(x, y, '_', V_SSIZE);
     }
+
+    // Restore standard pillarboxed 2D mode for subsequent HUD/menu drawing.
+    V_RestoreHUDDraw();
 }
 
 //  Console refresh drawer, called each frame

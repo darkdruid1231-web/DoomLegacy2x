@@ -251,6 +251,99 @@ void Material::DrawStretched(float x, float y, float w, float h)
     tr.t->Draw(dest_tl, dest_tr, dest_bl, fixed_t(0), fixed_t(0), colfrac, rowfrac, 0);
 }
 
+// Draw the top draw_h rows of the image as if it were full_h pixels tall (no stretch).
+// The image is placed at (x,y) and scaled to w x full_h, but only the top draw_h rows
+// are visible — like sliding a curtain down over a fixed background.
+// OGL: draws the full-height quad and uses GL_SCISSOR_TEST to clip the bottom.
+// SW: advances rowfrac over full_h rows but writes only draw_h destination rows.
+void Material::DrawStretchedTop(float x, float y, float w, float draw_h, float full_h)
+{
+    if (draw_h <= 0.0f || full_h <= 0.0f)
+        return;
+    if (draw_h >= full_h)
+    {
+        DrawStretched(x, y, w, full_h);
+        return;
+    }
+
+    if (rendermode == render_opengl && oglrenderer && oglrenderer->ReadyToDraw())
+    {
+        float l      = x / vid.width;
+        float r      = (x + w) / vid.width;
+        float gl_top = 1.0f - y / vid.height;
+        float gl_bot = 1.0f - (y + full_h) / vid.height; // full-height quad bottom
+
+        // Scissor clips output to the top draw_h rows of the screen slot.
+        glEnable(GL_SCISSOR_TEST);
+        glScissor(0, (int)(vid.height - (y + draw_h)), (int)vid.width, (int)draw_h);
+        oglrenderer->Draw2DGraphic(l, gl_bot, r, gl_top, this);
+        glDisable(GL_SCISSOR_TEST);
+        return;
+    }
+
+    // SW: sample only the top draw_h/full_h fraction of the image.
+    TextureRef &tr = tex[0];
+    int ix = (int)x;
+    int iy = (int)y;
+    int x2 = min(ix + (int)w,      vid.width);
+    int y2 = min(iy + (int)draw_h, vid.height);
+    if (x2 <= ix || y2 <= iy)
+        return;
+
+    // colfrac: advance one full image width across w columns.
+    fixed_t colfrac = (float)tr.t->width  / (float)(x2 - ix);
+    // rowfrac: advance one full image height across full_h rows (not draw_h).
+    fixed_t rowfrac = (float)tr.t->height / (float)full_h;
+
+    byte *dest_tl = vid.screens[0] + vid.scaledofs + iy * vid.width + ix;
+    byte *dest_tr = dest_tl + (x2 - ix);
+    byte *dest_bl = dest_tl + (y2 - iy) * vid.width;
+
+    tr.t->Draw(dest_tl, dest_tr, dest_bl, fixed_t(0), fixed_t(0), colfrac, rowfrac, 0);
+}
+
+// Draw the image with its bottom edge at bottom_y, h pixels tall. If bottom_y < h the
+// top of the image is above the screen and is clipped (image slides in/out from above).
+// OGL: the quad extends above the screen; the clip planes handle it automatically.
+// SW: off-screen rows are skipped by offsetting into the source image.
+void Material::DrawStretchedBottom(float x, float bottom_y, float w, float h)
+{
+    if (h <= 0.0f)
+        return;
+
+    if (rendermode == render_opengl && oglrenderer && oglrenderer->ReadyToDraw())
+    {
+        float l      = x / vid.width;
+        float r      = (x + w) / vid.width;
+        float gl_bot = 1.0f - bottom_y / vid.height;
+        float gl_top = 1.0f - (bottom_y - h) / vid.height; // may be > 1.0 when top is off-screen
+        oglrenderer->Draw2DGraphic(l, gl_bot, r, gl_top, this);
+        return;
+    }
+
+    // SW: clip the top of the image to the screen edge.
+    TextureRef &tr = tex[0];
+    int ix       = (int)x;
+    int x2       = min(ix + (int)w, vid.width);
+    int img_top  = (int)(bottom_y - h);       // top of image in screen coords; may be negative
+    int dest_y   = max(0, img_top);           // first visible dest row
+    int dest_y2  = min((int)bottom_y, vid.height);
+    if (x2 <= ix || dest_y2 <= dest_y)
+        return;
+
+    fixed_t colfrac = (float)tr.t->width  / (float)(x2 - ix);
+    fixed_t rowfrac = (float)tr.t->height / h;
+
+    // Source row corresponding to the first visible dest row.
+    fixed_t row_start = (float)(dest_y - img_top) * (float)tr.t->height / h;
+
+    byte *dest_tl = vid.screens[0] + vid.scaledofs + dest_y * vid.width + ix;
+    byte *dest_tr = dest_tl + (x2 - ix);
+    byte *dest_bl = dest_tl + (dest_y2 - dest_y) * vid.width;
+
+    tr.t->Draw(dest_tl, dest_tr, dest_bl, fixed_t(0), row_start, colfrac, rowfrac, 0);
+}
+
 void Material::DrawFullscreen()
 {
     if (rendermode == render_opengl && oglrenderer && oglrenderer->ReadyToDraw())
@@ -448,6 +541,22 @@ void V_DrawFadeScreen()
         }
     }
 #endif
+}
+
+// Switch to full-screen 2D mode (no HUD aspect-ratio pillarboxing) for console rendering.
+// Call before drawing the console background and text.
+void V_SetupConsoleDraw()
+{
+    if (rendermode == render_opengl && oglrenderer && oglrenderer->ReadyToDraw())
+        oglrenderer->Setup2DMode_Full();
+}
+
+// Restore the standard pillarboxed 2D mode after console rendering so that
+// subsequent HUD/menu drawing is properly aspect-corrected.
+void V_RestoreHUDDraw()
+{
+    if (rendermode == render_opengl && oglrenderer && oglrenderer->ReadyToDraw())
+        oglrenderer->Setup2DMode();
 }
 
 /// Simple translucence with one color, coords are true LFB coords

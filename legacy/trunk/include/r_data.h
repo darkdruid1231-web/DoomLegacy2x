@@ -493,6 +493,13 @@ class Material : public cacheitem_t
     /// draw the Material stretched to fill exactly the given screen pixel rectangle.
     void DrawStretched(float x, float y, float w, float h);
 
+    /// Draw only the top draw_h rows, as if the image were full_h pixels tall (curtain effect).
+    void DrawStretchedTop(float x, float y, float w, float draw_h, float full_h);
+
+    /// Draw the image with its bottom edge at bottom_y, h pixels tall. If bottom_y < h the top
+    /// of the image is above the screen and is clipped — the image slides in/out from above.
+    void DrawStretchedBottom(float x, float bottom_y, float w, float h);
+
     /// Stretch to fill the full screen, bypassing HUD aspect-ratio correction (OGL only).
     void DrawFullscreen();
 

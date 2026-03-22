@@ -126,6 +126,10 @@ void V_DrawFadeScreen();
 // added:20-03-98: test console
 void V_DrawFadeConsBack(float x1, float y1, float x2, float y2);
 
+// Switch to/from full-screen 2D OGL mode (no HUD aspect-ratio pillarboxing) for console.
+void V_SetupConsoleDraw();
+void V_RestoreHUDDraw();
+
 // added:12-02-98:
 void V_DrawTiltView(byte *viewbuffer);
 
