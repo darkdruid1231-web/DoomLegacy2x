@@ -7,27 +7,29 @@ A source port of the classic Doom engine, extended with OpenGL rendering, multip
 Full feature list: [`docs/features.html`](legacy/trunk/docs/features.html)
 
 ### Graphics
-- OpenGL hardware-accelerated renderer with dynamic GL node generation (ZDBSP)
+- OpenGL hardware-accelerated renderer ✅
+- Dynamic GL node generation (ZDBSP) - 🚧
 - Deferred lighting with G-buffer (normals, albedo, depth)
 - Dynamic lights: per-actor light definitions (LIGHTDEFS lump), projectile lights, weapon flash
 - Corona halos with distance fade and projectile flicker
-- Blob shadows (Doom64-style), bloom, SSAO, screen-space reflections, volumetric fog
-- MD2/MD3 model support
-- Hi-res PNG/JPEG texture and sprite support
-- Software renderer fallback
+- Blob shadows (Doom64-style), bloom, SSAO, screen-space reflections, volumetric fog 🚧
+- MD2/MD3 model support ✅
+  glb modle support (future) ❌
+- Hi-res PNG/JPEG texture and sprite support (tested with DoomHDTextures.pk3 & marcelus_hd_sprites.pk3)
+- Software renderer fallback ❌ - Likely broken right now
 
 ### Gameplay
 - Doom, Heretic, and Hexen support
-- Up to 4-player splitscreen
-- Deathmatch, co-op, CTF, domination, assault
-- Level hubs (return to visited maps)
+- Up to 4-player splitscreen 🚧
+- Deathmatch, co-op, (CTF, domination, assault in future)
+- Level hubs in future (return to visited maps)
 
 ### Editing / Modding
-- WAD, PK3/ZIP, PAK, and directory resource files
-- ZDoom-style MAPINFO, partial DECORATE, SNDINFO, SNDSEQ, ANIMDEFS
-- DeHackEd / BEX support
+- WAD, PK3/ZIP, PAK, and directory resource files ✅
+- ZDoom-style MAPINFO, partial DECORATE, SNDINFO, SNDSEQ, ANIMDEFS ✅
+- DeHackEd / BEX support 🚧
 - FraggleScript scripting
-- LIGHTDEFS lump for data-driven per-actor light definitions
+- LIGHTDEFS lump for data-driven per-actor light definitions ✅
 
 ## Building
 
