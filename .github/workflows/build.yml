@@ -9,6 +9,8 @@ on:
 jobs:
   windows-build:
     runs-on: windows-latest
+    env:
+      SCCACHE_DIR: ${{ github.workspace }}/.sccache
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -16,7 +18,7 @@ jobs:
     - name: Setup sccache cache
       uses: actions/cache@v4
       with:
-        path: ~/.cache/sccache
+        path: ${{ github.workspace }}/.sccache
         key: ${{ runner.os }}-sccache-${{ hashFiles('legacy/trunk/**.[ch]pp', 'legacy/trunk/CMakeLists.txt', 'legacy/trunk/**/CMakeLists.txt') }}
         restore-keys: ${{ runner.os }}-sccache-
 
