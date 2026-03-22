@@ -110,7 +110,7 @@ legacy/trunk/
   util/         Static utility library
   include/      All public headers
   resources/    legacy.wad assets (textures, LIGHTDEFS, lumps)
-  docs/         HTML documentation
+  docs/         documentation
   tests/        Unit and integration tests
 ```
 
