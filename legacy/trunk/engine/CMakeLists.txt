@@ -66,6 +66,8 @@ scripting/t_script.cpp
 scripting/t_func.cpp
 automap/am_map.cpp
 menu/menu.cpp
+menu/widget.cpp
+menu/menudef.cpp
 finale/f_finale.cpp
 finale/wi_stuff.cpp
 hud/st_lib.cpp

@@ -25,6 +25,8 @@ hardware/oglhelpers.cpp
 hardware/hw_gbuffer.cpp
 hardware/hw_postfx.cpp
 hardware/hw_lightdefs.cpp
+hardware/hw_quadbatch.cpp
+hardware/hw_shadowmap.cpp
 )
 
 add_library(video STATIC ${SRC_FILES})
