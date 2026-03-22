@@ -36,9 +36,9 @@ jobs:
           mingw-w64-x86_64-wavpack
           mingw-w64-x86_64-zlib
           mingw-w64-x86_64-freetype
-          mingw-w64-x86_64-libenet
-          mingw-w64-x86_64-flex
-          mingw-w64-x86_64-lemon
+          mingw-w64-x86_64-enet
+          flex
+          lemon
           bison
 
     - name: Configure CMake
@@ -46,7 +46,10 @@ jobs:
       run: |
         mkdir -p legacy/trunk/build-windows
         cd legacy/trunk/build-windows
-        cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Release \
+          -DFLEX_EXECUTABLE=C:/msys64/usr/bin/flex.exe \
+          -DLEMON_EXECUTABLE=C:/msys64/usr/bin/lemon.exe \
+          ..
 
     - name: Build
       shell: msys2 {0}
