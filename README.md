@@ -14,7 +14,7 @@ Full feature list: [`docs/features.md`](legacy/trunk/docs/features.md)
 - Corona halos with distance fade and projectile flicker
 - Blob shadows (Doom64-style), bloom, SSAO, screen-space reflections, volumetric fog 🚧
 - MD2/MD3 model support ✅
-  glb modle support (future) ❌
+- glb model support (future) ❌
 - Hi-res PNG/JPEG texture and sprite support (tested with DoomHDTextures.pk3 & marcelus_hd_sprites.pk3)
 - Software renderer fallback ❌ - Likely broken right now
 
