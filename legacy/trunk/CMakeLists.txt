@@ -101,17 +101,9 @@ endif()
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
-# GLEW - use shared library version for MinGW compatibility
-set(USE_GLEW ON)
-find_path(GLEW_INCLUDE_DIR GL/glew.h)
-# Use shared GLEW library (dll.a) instead of static - works better with MinGW
-set(GLEW_LIBRARY "C:/msys64/mingw64/lib/libglew32.dll.a" CACHE FILEPATH "GLEW library")
-set(GLEW_DLL "C:/msys64/mingw64/bin/libglew32.dll" CACHE FILEPATH "GLEW DLL")
-if(NOT GLEW_INCLUDE_DIR OR NOT GLEW_LIBRARY)
-    message(FATAL_ERROR "GLEW not found!")
-endif()
-include_directories(${GLEW_INCLUDE_DIR})
-link_directories(${GLEW_LIBRARY_DIR})
+# GLEW
+find_package(GLEW REQUIRED)
+include_directories(${GLEW_INCLUDE_DIRS})
 
 # ZLIB
 find_package(ZLIB REQUIRED)
@@ -139,11 +131,13 @@ if(ENET_FOUND)
 else()
     message(FATAL_ERROR "ENet not found!")
 endif()
-# Flex/Bison needed for grammars
-# Set paths directly - skip CMake's find_package as it has issues with MSYS2 tools
-set(FLEX_EXECUTABLE "C:/msys64/mingw64/bin/flex.exe" CACHE FILEPATH "Flex executable")
-set(BISON_EXECUTABLE "C:/msys64/usr/bin/bison.exe" CACHE FILEPATH "Bison executable")
-set(LEMON_EXECUTABLE "C:/msys64/mingw64/bin/lemon.exe" CACHE FILEPATH "Lemon executable")
+# Flex/Bison/Lemon needed for grammars
+find_program(FLEX_EXECUTABLE NAMES flex flex.exe REQUIRED)
+find_program(BISON_EXECUTABLE NAMES bison bison.exe REQUIRED)
+find_program(LEMON_EXECUTABLE NAMES lemon lemon.exe REQUIRED)
+message(STATUS "Flex:  ${FLEX_EXECUTABLE}")
+message(STATUS "Bison: ${BISON_EXECUTABLE}")
+message(STATUS "Lemon: ${LEMON_EXECUTABLE}")
 
 add_subdirectory(audio)
 add_subdirectory(video)
@@ -185,7 +179,7 @@ target_link_libraries(doomlegacy PRIVATE
     video
     grammars
     net
-    ${GLEW_LIBRARY}
+    ${GLEW_LIBRARIES}
     ${OPENGL_LIBRARIES}
     "-Wl,--end-group"
     ${SDL2_LIBRARIES}
