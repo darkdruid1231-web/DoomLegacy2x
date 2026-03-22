@@ -133,6 +133,7 @@ typedef struct al_buffer_s
     ALsizei size;
     bool in_use;
     char lumpname[16];
+    const sounditem_t *si_key;  // cache key: which sound item loaded this buffer
 } al_buffer_t;
 
 static al_buffer_t al_buffers[MAX_OPENAL_BUFFERS];
@@ -155,6 +156,22 @@ static bool musicStarted = false;
 static bool soundStarted = false;
 
 static SDL_AudioSpec audio;
+
+// OpenAL debug output flag - set to true to see detailed OpenAL debug messages
+static bool openal_debug = false;
+
+// Console command to toggle OpenAL debug output
+static void openaldebug_f()
+{
+    if (COM.Argc() != 2)
+    {
+        CONS_Printf("openaldebug 0 - disable OpenAL debug output\n");
+        CONS_Printf("openaldebug 1 - enable OpenAL debug output\n");
+        return;
+    }
+    openal_debug = atoi(COM.Argv(1)) != 0;
+    CONS_Printf("OpenAL debug output %s\n", openal_debug ? "enabled" : "disabled");
+}
 
 // Forward declarations for OpenAL functions
 // These are used to call OpenAL functions from non-OpenAL code paths
@@ -288,6 +305,7 @@ static bool I_InitOpenAL()
     {
         al_buffers[i].buffer = openal_buffers[i];
         al_buffers[i].in_use = false;
+        al_buffers[i].si_key = NULL;
     }
 
     // Set distance model for 3D audio
@@ -507,7 +525,8 @@ static int I_OpenALStartSound(soundchannel_t *c)
         return -1;
     }
 
-    CONS_Printf("OpenAL: Sound: rate=%u, depth=%u, size=%zu\n", sample_rate, depth, data_size);
+    if (openal_debug)
+        CONS_Printf("OpenAL: Sound: rate=%u, depth=%u, size=%zu\n", sample_rate, depth, data_size);
 
     // Determine OpenAL format based on depth and channels
     // The sdata is already converted, typically to mono
@@ -522,72 +541,95 @@ static int I_OpenALStartSound(soundchannel_t *c)
         return -1;
     }
 
-    // Find free buffer - check if any previously used buffers are now free
+    // Pass 1: check if this sound is already cached in a buffer
     int buffer_idx = -1;
     for (int i = 0; i < MAX_OPENAL_BUFFERS; i++)
     {
-        if (!al_buffers[i].in_use)
+        if (al_buffers[i].in_use && al_buffers[i].si_key == c->si)
         {
             buffer_idx = i;
             break;
         }
-        // Check if buffer's source has stopped - then free it
-        // This is a simplified approach - in production we'd track source->buffer mapping
     }
-    
-    // If no free buffer, try to find one that's done playing
-    if (buffer_idx == -1)
+
+    bool need_upload = (buffer_idx == -1);
+    if (need_upload)
     {
-        CONS_Printf("OpenAL: All buffers in use, trying to find free one...\n");
+        // Pass 2a: find a buffer not marked in_use
         for (int i = 0; i < MAX_OPENAL_BUFFERS; i++)
         {
-            // Check if any source is using this buffer
-            bool in_use = false;
-            for (int j = 0; j < MAX_OPENAL_SOURCES; j++)
-            {
-                ALint buf;
-                alGetSourcei(openal_sources[j], AL_BUFFER, &buf);
-                if (buf == (ALint)al_buffers[i].buffer)
-                {
-                    ALint state;
-                    alGetSourcei(openal_sources[j], AL_SOURCE_STATE, &state);
-                    if (state == AL_PLAYING)
-                    {
-                        in_use = true;
-                        break;
-                    }
-                }
-            }
-            if (!in_use)
+            if (!al_buffers[i].in_use)
             {
                 buffer_idx = i;
                 break;
             }
         }
+
+        // Pass 2b: recycle a buffer whose source has stopped playing
+        if (buffer_idx == -1)
+        {
+            for (int i = 0; i < MAX_OPENAL_BUFFERS; i++)
+            {
+                bool still_playing = false;
+                for (int j = 0; j < MAX_OPENAL_SOURCES; j++)
+                {
+                    ALint buf;
+                    alGetSourcei(openal_sources[j], AL_BUFFER, &buf);
+                    if (buf == (ALint)al_buffers[i].buffer)
+                    {
+                        ALint state;
+                        alGetSourcei(openal_sources[j], AL_SOURCE_STATE, &state);
+                        if (state == AL_PLAYING)
+                        {
+                            still_playing = true;
+                            break;
+                        }
+                    }
+                }
+                if (!still_playing)
+                {
+                    // Detach from any stopped source before reuse
+                    for (int j = 0; j < MAX_OPENAL_SOURCES; j++)
+                    {
+                        ALint buf;
+                        alGetSourcei(openal_sources[j], AL_BUFFER, &buf);
+                        if (buf == (ALint)al_buffers[i].buffer)
+                            alSourcei(openal_sources[j], AL_BUFFER, 0);
+                    }
+                    al_buffers[i].in_use = false;
+                    al_buffers[i].si_key = NULL;
+                    buffer_idx = i;
+                    break;
+                }
+            }
+        }
     }
 
     if (buffer_idx == -1)
-    {
-        CONS_Printf("OpenAL: No free buffers\n");
-        return -1;
-    }
-    
-    // Pass data directly - sdata might already be in signed format
-    // or OpenAL might handle unsigned internally
-    alBufferData(al_buffers[buffer_idx].buffer, format, sound_data, data_size, sample_rate);
-
-    if (alGetError() != AL_NO_ERROR)
     {
         CONS_Printf("OpenAL: Failed to upload buffer\n");
         return -1;
     }
 
-    al_buffers[buffer_idx].format = format;
-    al_buffers[buffer_idx].freq = sample_rate;
-    al_buffers[buffer_idx].size = data_size;
-    al_buffers[buffer_idx].in_use = true;
+    if (need_upload)
+    {
+        alBufferData(al_buffers[buffer_idx].buffer, format, sound_data, data_size, sample_rate);
+
+        if (alGetError() != AL_NO_ERROR)
+        {
+            CONS_Printf("OpenAL: Failed to upload buffer\n");
+            return -1;
+        }
+
+        al_buffers[buffer_idx].format = format;
+        al_buffers[buffer_idx].freq = sample_rate;
+        al_buffers[buffer_idx].size = data_size;
+        al_buffers[buffer_idx].in_use = true;
+        al_buffers[buffer_idx].si_key = c->si;
+    }
     
-    CONS_Printf("OpenAL: Buffer loaded\n");
+    if (openal_debug)
+        CONS_Printf("OpenAL: Buffer loaded\n");
 
     // Get source
     int source_idx = I_GetFreeSource();
@@ -639,7 +681,8 @@ static int I_OpenALStartSound(soundchannel_t *c)
     }
     alSourcef(source, AL_PITCH, pitch_value);
     
-    CONS_Printf("OpenAL: volume=%.2f, pitch=%.2f\n", volume, pitch_value);
+    if (openal_debug)
+        CONS_Printf("OpenAL: volume=%.2f, pitch=%.2f\n", volume, pitch_value);
 
     // Play
     ALenum err = alGetError();
@@ -654,7 +697,8 @@ static int I_OpenALStartSound(soundchannel_t *c)
     // Verify it's playing
     ALint state;
     alGetSourcei(source, AL_SOURCE_STATE, &state);
-    CONS_Printf("OpenAL: Source state: %d\n", state);
+    if (openal_debug)
+        CONS_Printf("OpenAL: Source state: %d\n", state);
 
     c->playing = true;
 
@@ -977,6 +1021,10 @@ void I_StartupSound()
         
         soundStarted = true;
         CONS_Printf("Sound: Using OpenAL audio provider (SDL_mixer for music)\n");
+        
+        // Register OpenAL debug command
+        COM.AddCommand("openaldebug", openaldebug_f);
+        
         return;
     }
 
