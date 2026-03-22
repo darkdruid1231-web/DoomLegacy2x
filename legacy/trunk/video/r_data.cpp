@@ -284,6 +284,69 @@ Texture::~Texture()
         Z_Free(pixels);
 }
 
+// Spread opaque pixel colors into all transparent pixels (flood-fill style, multiple passes).
+// This prevents GL_LINEAR fringing at sprite edges AND mipmap bleeding: without it, sampling
+// between an opaque pixel and a transparent pixel gives the color of palette index 247
+// (TRANSPARENTPIXEL), producing a dark/colored border artifact.
+// After dilation all pixels have alpha=0 on fully-transparent regions, so they remain invisible,
+// but GL_LINEAR and mipmap averages now read the correct edge color.
+static void DilateEdgeColors(RGBA_t *rgba, int w, int h)
+{
+    int n = w * h;
+    RGBA_t *src = static_cast<RGBA_t *>(Z_Malloc(sizeof(RGBA_t) * n, PU_STATIC, NULL));
+    memcpy(src, rgba, sizeof(RGBA_t) * n);
+
+    static const int dx[] = {-1, 1,  0, 0, -1, -1, 1,  1};
+    static const int dy[] = { 0, 0, -1, 1, -1,  1, -1, 1};
+
+    // Iterate until no more transparent pixels can be filled (flood-fill from opaque edges).
+    // Worst case passes = max(w, h), but typically only a few for sprites.
+    bool changed = true;
+    while (changed)
+    {
+        changed = false;
+        for (int y = 0; y < h; y++)
+        {
+            for (int x = 0; x < w; x++)
+            {
+                if (src[y * w + x].alpha != 0)
+                    continue; // already has color — nothing to do
+
+                int r = 0, g = 0, b = 0, cnt = 0;
+                for (int d = 0; d < 8; d++)
+                {
+                    int nx = x + dx[d], ny = y + dy[d];
+                    if (nx < 0 || nx >= w || ny < 0 || ny >= h)
+                        continue;
+                    const RGBA_t &nb = src[ny * w + nx];
+                    if (nb.alpha == 0)
+                        continue; // transparent neighbor — skip
+                    r += nb.red;
+                    g += nb.green;
+                    b += nb.blue;
+                    cnt++;
+                }
+                if (cnt > 0)
+                {
+                    // Mark as filled (alpha=1) in src so subsequent pixels in this pass
+                    // can use it as a neighbor source.
+                    src[y * w + x].red   = (byte)(r / cnt);
+                    src[y * w + x].green = (byte)(g / cnt);
+                    src[y * w + x].blue  = (byte)(b / cnt);
+                    src[y * w + x].alpha = 1; // sentinel: filled this pass
+                    rgba[y * w + x].red   = src[y * w + x].red;
+                    rgba[y * w + x].green = src[y * w + x].green;
+                    rgba[y * w + x].blue  = src[y * w + x].blue;
+                    // rgba alpha stays 0 — pixel remains fully transparent
+                    changed = true;
+                }
+            }
+        }
+    }
+
+    Z_Free(src);
+}
+
 // This basic version of the virtual method is used for native indexed col-major formats.
 void Texture::GLGetData()
 {
@@ -313,6 +376,11 @@ void Texture::GLGetData()
             }
 
         Z_Free(palette);
+
+        // Spread edge colors into transparent pixels so GL_LINEAR does not produce
+        // a fringe of palette-index-247 color at the borders of masked sprites.
+        DilateEdgeColors(result, width, height);
+
         // replace pixels by the RGBA row-major version
         Z_Free(pixels);
         pixels = reinterpret_cast<byte *>(result);
@@ -330,9 +398,12 @@ GLuint Texture::GLPrepare()
 
         glGenTextures(1, &gl_id);
         glBindTexture(GL_TEXTURE_2D, gl_id);
-        // default params
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        // Sprites (masked textures) must clamp to edge: GL_REPEAT would wrap transparent
+        // border pixels around to the opposite side, creating visible seam lines.
+        // Wall/flat textures tile by UV coords so they keep GL_REPEAT.
+        GLenum wrap = Masked() ? GL_CLAMP_TO_EDGE : GL_REPEAT;
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
         gluBuild2DMipmaps(
             GL_TEXTURE_2D, GL_RGBA, width, height, gl_format, GL_UNSIGNED_BYTE, pixels);
 
@@ -415,6 +486,10 @@ void LumpTexture::GLGetData()
             }
 
         Z_Free(palette);
+
+        // Spread edge colors into transparent pixels to prevent GL_LINEAR fringing.
+        DilateEdgeColors(reinterpret_cast<RGBA_t *>(pixels), width, height);
+
         Z_Free(temp); // free indexed data
         gl_format = GL_RGBA;
     }
