@@ -50,9 +50,11 @@ std::map<GLushort *, int> Geometry::ushort_refcount;
 
 Geometry::Geometry()
     : vertex_array(0), normal_array(0), color_array(0), indices(0), primitive_length(0),
-      primitive_type(0), num_primitives(0)
+      primitive_type(0), num_primitives(0),
+      vao_id(0), vbo_vertex(0), vbo_normal(0), vbo_color(0), ebo_id(0), vbo_dirty(false)
 {
     memset(tex_coord_arrays, 0, sizeof(tex_coord_arrays));
+    memset(vbo_texcoords, 0, sizeof(vbo_texcoords));
 }
 
 Geometry::~Geometry()
@@ -67,6 +69,14 @@ Geometry::~Geometry()
     UnrefDelete(primitive_length);
     UnrefDelete(primitive_type);
     UnrefDelete(indices);
+
+    if (vao_id)    { glDeleteVertexArrays(1, &vao_id);    vao_id    = 0; }
+    if (vbo_vertex){ glDeleteBuffers(1, &vbo_vertex);      vbo_vertex= 0; }
+    if (vbo_normal){ glDeleteBuffers(1, &vbo_normal);      vbo_normal= 0; }
+    if (vbo_color) { glDeleteBuffers(1, &vbo_color);       vbo_color = 0; }
+    if (ebo_id)    { glDeleteBuffers(1, &ebo_id);          ebo_id    = 0; }
+    for (int i = 0; i < State::MAX_TEXTURE_UNITS; i++)
+        if (vbo_texcoords[i]) { glDeleteBuffers(1, &vbo_texcoords[i]); vbo_texcoords[i] = 0; }
 }
 
 void Geometry::EnableArrays()
@@ -187,6 +197,7 @@ void Geometry::SetAttributes(GeometryAttributes attr, void *array)
     {
         CONS_Printf("Error: Unknown Geometry attribute (%d)\n", attr);
     }
+    vbo_dirty = true;
 }
 
 void Geometry::SetIndices(GLushort *indices)
@@ -194,6 +205,7 @@ void Geometry::SetIndices(GLushort *indices)
     Ref(indices);
     UnrefDelete(this->indices);
     this->indices = indices;
+    vbo_dirty = true;
 }
 
 void Geometry::CreateTexturedRectangle(
@@ -247,6 +259,7 @@ void Geometry::CreateTexturedRectangle(
     vertex_array[9] = x2;
     vertex_array[10] = y2;
     vertex_array[11] = z;
+    vbo_dirty = true;
 }
 
 void Geometry::DisableArrays()
@@ -304,24 +317,101 @@ void Geometry::FreeAllBuffers()
     }
 }
 
-void Geometry::Draw()
+void Geometry::BuildOrUpdateVBOs()
 {
-    // draw using vertex array
-    // TODO: it's not the better solution, try also immediate mode and VBO.
-    //       then choose the faster method for low end cards
-    EnableArrays();
+    if (!vertex_array || !indices || num_primitives == 0)
+        return;
 
-    GLushort *indices = this->indices;
+    // Compute total index count and max vertex index
+    int total_indices = 0;
     for (int i = 0; i < num_primitives; i++)
-    {
-        glDrawElements(primitive_type ? primitive_type[i] : GL_TRIANGLE_STRIP,
-                       primitive_length[i],
-                       GL_UNSIGNED_SHORT,
-                       indices);
-        indices += primitive_length[i];
+        total_indices += primitive_length[i];
+    if (total_indices == 0) return;
+
+    int max_idx = 0;
+    for (int i = 0; i < total_indices; i++)
+        if (indices[i] > (GLushort)max_idx) max_idx = indices[i];
+    int vertex_count = max_idx + 1;
+
+    if (!vao_id) {
+        glGenVertexArrays(1, &vao_id);
+        glGenBuffers(1, &vbo_vertex);
+        glGenBuffers(1, &ebo_id);
     }
 
-    // DisableArrays();
+    glBindVertexArray(vao_id);
+
+    // Position at attrib location 0 (aliases gl_Vertex in GL 3.3 compat)
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_vertex);
+    glBufferData(GL_ARRAY_BUFFER, vertex_count * 3 * sizeof(GLfloat), vertex_array, GL_DYNAMIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // TexCoord0 at attrib location 8 (aliases gl_MultiTexCoord0 in GL 3.3 compat)
+    if (tex_coord_arrays[0]) {
+        if (!vbo_texcoords[0]) glGenBuffers(1, &vbo_texcoords[0]);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_texcoords[0]);
+        glBufferData(GL_ARRAY_BUFFER, vertex_count * 2 * sizeof(GLfloat), tex_coord_arrays[0], GL_DYNAMIC_DRAW);
+        glVertexAttribPointer(8, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+        glEnableVertexAttribArray(8);
+    }
+
+    // Normal at attrib location 2 (aliases gl_Normal in GL 3.3 compat)
+    if (normal_array) {
+        if (!vbo_normal) glGenBuffers(1, &vbo_normal);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_normal);
+        glBufferData(GL_ARRAY_BUFFER, vertex_count * 3 * sizeof(GLfloat), normal_array, GL_DYNAMIC_DRAW);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+        glEnableVertexAttribArray(2);
+    }
+
+    // Color at attrib location 3 (aliases gl_Color in GL 3.3 compat)
+    if (color_array) {
+        if (!vbo_color) glGenBuffers(1, &vbo_color);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_color);
+        glBufferData(GL_ARRAY_BUFFER, vertex_count * sizeof(GLuint), color_array, GL_DYNAMIC_DRAW);
+        glVertexAttribPointer(3, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, (void*)0);
+        glEnableVertexAttribArray(3);
+    }
+
+    // Element buffer (stored in VAO state)
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, total_indices * sizeof(GLushort), indices, GL_DYNAMIC_DRAW);
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    vbo_dirty = false;
+}
+
+void Geometry::Draw()
+{
+    if (!vao_id || vbo_dirty)
+        BuildOrUpdateVBOs();
+
+    if (vao_id) {
+        glBindVertexArray(vao_id);
+        size_t byte_offset = 0;
+        for (int i = 0; i < num_primitives; i++) {
+            glDrawElements(primitive_type ? primitive_type[i] : GL_TRIANGLE_STRIP,
+                           primitive_length[i], GL_UNSIGNED_SHORT, (void*)byte_offset);
+            byte_offset += primitive_length[i] * sizeof(GLushort);
+        }
+        glBindVertexArray(0);
+        // Clear static tracking (VAO path doesn't use legacy client arrays)
+        last_vertex_array = 0;
+        for (int i = 0; i < State::MAX_TEXTURE_UNITS; i++) last_tex_coord_arrays[i] = 0;
+        last_normal_array = 0;
+        last_color_array = 0;
+    } else {
+        // Fallback: legacy client-state path
+        EnableArrays();
+        GLushort *indices_ptr = this->indices;
+        for (int i = 0; i < num_primitives; i++) {
+            glDrawElements(primitive_type ? primitive_type[i] : GL_TRIANGLE_STRIP,
+                           primitive_length[i], GL_UNSIGNED_SHORT, indices_ptr);
+            indices_ptr += primitive_length[i];
+        }
+    }
 }
 
 #endif // NO_OPENGL

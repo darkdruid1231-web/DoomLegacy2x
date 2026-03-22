@@ -63,6 +63,17 @@ class Geometry
     static GLfloat *last_normal_array;
     static GLuint *last_color_array;
 
+    // VAO/VBO support (GL 3.3)
+    GLuint vao_id;
+    GLuint vbo_vertex;
+    GLuint vbo_texcoords[State::MAX_TEXTURE_UNITS];
+    GLuint vbo_normal;
+    GLuint vbo_color;
+    GLuint ebo_id;
+    bool vbo_dirty;
+
+    void BuildOrUpdateVBOs();
+
     // kind of garbage collector (TODO: should be an hash_map instead of a map)
     static std::map<GLfloat *, int>
         float_refcount;                           // keep a reference count for all GLfloat pointers
