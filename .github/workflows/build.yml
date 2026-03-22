@@ -7,65 +7,57 @@ on:
     branches: [main]
 
 jobs:
-  # Linux build with container for consistency
-  linux-build:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Build Linux binaries
-      run: make ci-linux
-
-    - name: Upload Linux executables and tools
-      uses: actions/upload-artifact@v4
-      with:
-        name: doomlegacy-linux-executables
-        path: |
-          legacy/trunk/build-linux/doomlegacy
-          legacy/trunk/build-linux/d2h
-          legacy/trunk/build-linux/wadtool
-        retention-days: 30
-        if-no-files-found: warn
-
-  # Windows cross-compilation using container
   windows-build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Build Windows binaries
-      run: make ci-windows
+    - name: Set up MSYS2 MinGW64
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        update: true
+        install: >-
+          mingw-w64-x86_64-gcc
+          mingw-w64-x86_64-ninja
+          mingw-w64-x86_64-cmake
+          mingw-w64-x86_64-pkg-config
+          mingw-w64-x86_64-glew
+          mingw-w64-x86_64-SDL2
+          mingw-w64-x86_64-SDL2_mixer
+          mingw-w64-x86_64-libpng
+          mingw-w64-x86_64-libjpeg-turbo
+          mingw-w64-x86_64-openal
+          mingw-w64-x86_64-libvorbis
+          mingw-w64-x86_64-flac
+          mingw-w64-x86_64-mpg123
+          mingw-w64-x86_64-opus
+          mingw-w64-x86_64-wavpack
+          mingw-w64-x86_64-zlib
+          mingw-w64-x86_64-freetype
+          mingw-w64-x86_64-libenet
+          mingw-w64-x86_64-flex
+          mingw-w64-x86_64-lemon
+          bison
 
-    - name: Upload Windows executables and tools
+    - name: Configure CMake
+      shell: msys2 {0}
+      run: |
+        mkdir -p legacy/trunk/build-windows
+        cd legacy/trunk/build-windows
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..
+
+    - name: Build
+      shell: msys2 {0}
+      run: |
+        cd legacy/trunk/build-windows
+        ninja -j4
+
+    - name: Upload Windows executables
       uses: actions/upload-artifact@v4
       with:
         name: doomlegacy-windows-executables
-        path: |
-          legacy/trunk/build-windows/doomlegacy.exe
-          legacy/trunk/build-windows/d2h.exe
-          legacy/trunk/build-windows/wadtool.exe
-        retention-days: 30
-        if-no-files-found: warn
-
-  # Clang build for additional compiler validation
-  clang-build:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Build with Clang
-      run: make ci-clang
-
-    - name: Upload Clang executables and tools
-      uses: actions/upload-artifact@v4
-      with:
-        name: doomlegacy-clang-executables
-        path: |
-          legacy/trunk/build-clang/doomlegacy
-          legacy/trunk/build-clang/d2h
-          legacy/trunk/build-clang/wadtool
+        path: legacy/trunk/build-windows/doomlegacy.exe
         retention-days: 30
         if-no-files-found: warn
