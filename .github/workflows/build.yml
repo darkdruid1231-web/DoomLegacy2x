@@ -13,6 +13,13 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Setup sccache cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/sccache
+        key: ${{ runner.os }}-sccache-${{ hashFiles('legacy/trunk/**.[ch]pp', 'legacy/trunk/CMakeLists.txt', 'legacy/trunk/**/CMakeLists.txt') }}
+        restore-keys: ${{ runner.os }}-sccache-
+
     - name: Set up MSYS2 MinGW64
       uses: msys2/setup-msys2@v2
       with:
@@ -23,6 +30,7 @@ jobs:
           mingw-w64-x86_64-ninja
           mingw-w64-x86_64-cmake
           mingw-w64-x86_64-pkg-config
+          mingw-w64-x86_64-sccache
           mingw-w64-x86_64-glew
           mingw-w64-x86_64-SDL2
           mingw-w64-x86_64-SDL2_mixer
@@ -46,7 +54,12 @@ jobs:
       run: |
         mkdir -p legacy/trunk/build-windows
         cd legacy/trunk/build-windows
-        cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..
+        cmake -G Ninja \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_C_COMPILER_LAUNCHER=sccache \
+          -DCMAKE_CXX_COMPILER_LAUNCHER=sccache \
+          -DCMAKE_LINKER_TYPE=LLD \
+          ..
 
     - name: Build
       shell: msys2 {0}
@@ -54,19 +67,24 @@ jobs:
         cd legacy/trunk/build-windows
         ninja -j4
 
+    - name: sccache stats
+      if: always()
+      shell: msys2 {0}
+      run: sccache --show-stats
+
     - name: Gather release files
       shell: msys2 {0}
       run: |
-        cd legacy/trunk/build-windows
-        # Copy all MinGW64 DLLs the exe depends on
+        mkdir -p legacy/trunk/release
+        cd legacy/trunk/release
+        cp ../build-windows/doomlegacy.exe .
         ldd doomlegacy.exe | grep '/mingw64/' | awk '{print $3}' | xargs -I{} cp {} .
-        # Copy legacy.wad
         cp ../resources/legacy.wad .
 
     - name: Upload Windows release
       uses: actions/upload-artifact@v4
       with:
         name: doomlegacy-windows
-        path: legacy/trunk/build-windows/
+        path: legacy/trunk/release/
         retention-days: 30
         if-no-files-found: error
