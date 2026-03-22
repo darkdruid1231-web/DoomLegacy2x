@@ -98,6 +98,12 @@ class ShaderProg : public cacheitem_t
         GLint uDynLightPos;   ///< base of vec4 uDynLightPos[MAX_SHADER_LIGHTS] (eye-space xyz + radius w)
         GLint uDynLightColor; ///< base of vec3 uDynLightColor[MAX_SHADER_LIGHTS]
         GLint uDynLightCount; ///< int uniform — number of active lights (<= MAX_SHADER_LIGHTS)
+        GLint uFogColor;   ///< vec3 fog color
+        GLint uFogStart;   ///< float fog start distance
+        GLint uFogEnd;     ///< float fog end distance
+        GLint uShadowMap;    ///< sampler2DShadow for shadow map
+        GLint uShadowMatrix; ///< mat4 world → shadow texture coords
+        GLint uShadowActive; ///< int: 1 when shadow map is active
     } loc;
 
   public:
@@ -121,6 +127,12 @@ class ShaderProg : public cacheitem_t
     /// eyePositions4: array of count vec4s (xyz=eye-space pos, w=radius).
     /// colors3: array of count vec3s (rgb in [0,1]).
     void SetDynamicLights(const float *eyePositions4, const float *colors3, int count);
+
+    /// Upload per-sector fog parameters to the shader.
+    void SetFog(const float *color3, float start, float end);
+
+    /// Upload shadow map sampler and matrix. shadowActive=0 disables shadow.
+    void SetShadow(GLuint shadow_tex_unit, const float *shadowMatrix16, int shadowActive);
 
     void PrintInfoLog();
 };
@@ -164,6 +176,8 @@ class ShaderProg : public cacheitem_t
     void SetDynamicLights(const float *, const float *, int)
     {
     }
+    void SetFog(const float *, float, float) {}
+    void SetShadow(GLuint, const float *, int) {}
 };
 
 #endif // GL_VERSION_2_0

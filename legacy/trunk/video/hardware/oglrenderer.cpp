@@ -66,6 +66,8 @@ inline int SDL_GetWindowHeight_wrapper(SDL_Window *w) { int width, height; SDL_G
 #include "hardware/oglrenderer.hpp"
 #include "hardware/oglshaders.h"
 #include "hardware/hw_postfx.h"
+#include "hardware/hw_gbuffer.h"
+#include "hardware/hw_shadowmap.h"
 #include "hardware/hw_lightdefs.h"
 
 #include "am_map.h"
@@ -80,7 +82,9 @@ inline int SDL_GetWindowHeight_wrapper(SDL_Window *w) { int width, height; SDL_G
 #include "w_wad.h" // Need file cache to get playpal.
 #include "z_zone.h"
 
+#include <algorithm>  // std::partial_sort
 #include <cmath>
+#include <cstdio>  // snprintf
 
 extern trace_t trace;
 
@@ -230,6 +234,16 @@ void OGLRenderer::AccumDynLight(float px, float py, float pz,
 /// Called once per surface when a GLSL shader is active — replaces CPU AccumDynLight.
 void OGLRenderer::SetShaderDynamicLights(ShaderProg *prog) const
 {
+    // Phase 3.1: when the deferred light pass is active, dynamic lights are
+    // accumulated in a separate screen-space pass after the geometry pass.
+    // Zero out the forward shader's dynamic light count to avoid double-counting.
+    if (cv_grdeferred.value && g_deferredRenderer &&
+        g_deferredRenderer->IsDeferredLightReady())
+    {
+        prog->SetDynamicLights(NULL, NULL, 0);
+        return;
+    }
+
     int count = (int)framelights.size();
     if (count > MAX_SHADER_LIGHTS) count = MAX_SHADER_LIGHTS;
     if (count == 0)
@@ -238,9 +252,8 @@ void OGLRenderer::SetShaderDynamicLights(ShaderProg *prog) const
         return;
     }
 
-    // Read current ModelView matrix to transform world → eye space.
-    GLfloat mv[16];
-    glGetFloatv(GL_MODELVIEW_MATRIX, mv);
+    // Use cached MV instead of glGetFloatv (eliminates per-surface GPU stall)
+    const GLfloat *mv = cached_mv;
 
     float eyePos[MAX_SHADER_LIGHTS * 4];
     float colors[MAX_SHADER_LIGHTS * 3];
@@ -298,6 +311,27 @@ void OGLRenderer::InitShadowTexture()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+}
+
+void OGLRenderer::UploadMatrixUBO()
+{
+    if (!matrix_ubo) return;
+
+    // Compute MVP = proj * mv (column-major matrix multiply)
+    GLfloat mvp[16];
+    for (int col = 0; col < 4; col++)
+        for (int row = 0; row < 4; row++) {
+            float sum = 0.0f;
+            for (int k = 0; k < 4; k++)
+                sum += cached_proj[k*4+row] * cached_mv[col*4+k];
+            mvp[col*4+row] = sum;
+        }
+
+    glBindBuffer(GL_UNIFORM_BUFFER, matrix_ubo);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0,   64, cached_mv);
+    glBufferSubData(GL_UNIFORM_BUFFER, 64,  64, cached_proj);
+    glBufferSubData(GL_UNIFORM_BUFFER, 128, 64, mvp);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 /// Draw a blob shadow on the floor under `thing`.
@@ -396,7 +430,16 @@ void OGLRenderer::DrawAllBlobShadows() const
         return;
 
     // Set up shadow state once for the whole pass.
-    glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    GLboolean was_blend, was_depth, was_tex2d, was_alpha, was_depth_mask;
+    GLint saved_depth_func, saved_blend_src, saved_blend_dst;
+    glGetBooleanv(GL_BLEND,            &was_blend);
+    glGetBooleanv(GL_DEPTH_TEST,       &was_depth);
+    glGetBooleanv(GL_TEXTURE_2D,       &was_tex2d);
+    glGetBooleanv(GL_ALPHA_TEST,       &was_alpha);
+    glGetBooleanv(GL_DEPTH_WRITEMASK,  &was_depth_mask);
+    glGetIntegerv(GL_DEPTH_FUNC,       &saved_depth_func);
+    glGetIntegerv(GL_BLEND_SRC,        &saved_blend_src);
+    glGetIntegerv(GL_BLEND_DST,        &saved_blend_dst);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
@@ -410,7 +453,20 @@ void OGLRenderer::DrawAllBlobShadows() const
                 DrawBlobShadow(th);
     }
 
-    glPopAttrib();
+    if (!was_blend)      glDisable(GL_BLEND); else glEnable(GL_BLEND);
+    if (!was_depth)      glDisable(GL_DEPTH_TEST);
+    if (!was_tex2d)      glDisable(GL_TEXTURE_2D);
+    if (was_alpha)       glEnable(GL_ALPHA_TEST); else glDisable(GL_ALPHA_TEST);
+    // Restore depth mask — DrawBlobShadow sets GL_FALSE and relies on DrawAllCoronas
+    // to restore it, but coronas bail early when framelights is empty.  Without this
+    // restore, glClear(GL_DEPTH_BUFFER_BIT) silently does nothing on subsequent frames,
+    // leaving a stale depth buffer that causes surfaces to fail the depth test as the
+    // camera moves — manifesting as black walls/floors after ~30 seconds of play.
+    glDepthMask(was_depth_mask);
+    glDepthFunc(saved_depth_func);
+    // Restore blend function — DrawBlobShadow sets GL_ZERO/GL_ONE_MINUS_SRC_ALPHA
+    // which blackens all subsequent opaque geometry if blend stays enabled.
+    glBlendFunc(saved_blend_src, saved_blend_dst);
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
@@ -427,8 +483,7 @@ void OGLRenderer::DrawAllCoronas() const
     // In OpenGL's column-major layout the first row of the 3x3 rotation
     // sub-matrix lives at mv[0], mv[4], mv[8] (right) and
     // mv[1], mv[5], mv[9] (up).
-    GLfloat mv[16];
-    glGetFloatv(GL_MODELVIEW_MATRIX, mv);
+    const GLfloat *mv = cached_mv;
     float rx = mv[0], ry = mv[4], rz = mv[8];
     float ux = mv[1], uy = mv[5], uz = mv[9];
 
@@ -436,7 +491,16 @@ void OGLRenderer::DrawAllCoronas() const
     float coronaScale = (float)cv_grcoronasize.value;
     if (coronaScale <= 0.0f) coronaScale = 1.0f;
 
-    glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    GLboolean c_was_blend, c_was_depth, c_was_tex2d, c_was_alpha, c_was_depth_mask;
+    GLint c_saved_depth_func, c_saved_blend_src, c_saved_blend_dst;
+    glGetBooleanv(GL_BLEND,            &c_was_blend);
+    glGetBooleanv(GL_DEPTH_TEST,       &c_was_depth);
+    glGetBooleanv(GL_TEXTURE_2D,       &c_was_tex2d);
+    glGetBooleanv(GL_ALPHA_TEST,       &c_was_alpha);
+    glGetBooleanv(GL_DEPTH_WRITEMASK,  &c_was_depth_mask);
+    glGetIntegerv(GL_DEPTH_FUNC,       &c_saved_depth_func);
+    glGetIntegerv(GL_BLEND_SRC,        &c_saved_blend_src);
+    glGetIntegerv(GL_BLEND_DST,        &c_saved_blend_dst);
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, shadowTex);
     glEnable(GL_BLEND);
@@ -464,7 +528,13 @@ void OGLRenderer::DrawAllCoronas() const
         glEnd();
     }
 
-    glPopAttrib();
+    glDepthMask(c_was_depth_mask);
+    if (c_was_blend)   glEnable(GL_BLEND);  else glDisable(GL_BLEND);
+    if (!c_was_depth)  glDisable(GL_DEPTH_TEST);
+    if (!c_was_tex2d)  glDisable(GL_TEXTURE_2D);
+    if (c_was_alpha)   glEnable(GL_ALPHA_TEST); else glDisable(GL_ALPHA_TEST);
+    glDepthFunc(c_saved_depth_func);
+    glBlendFunc(c_saved_blend_src, c_saved_blend_dst);
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
@@ -517,6 +587,17 @@ OGLRenderer::OGLRenderer()
 #endif
     curssec = NULL;
     shadowTex = 0;
+    matrix_ubo = 0;
+    memset(cached_mv,   0, sizeof(cached_mv));
+    memset(cached_proj, 0, sizeof(cached_proj));
+    shadow_active = false;
+    shadow_caster_idx = -1;
+    fog_color[0] = fog_color[1] = fog_color[2] = 0.0f;
+    fog_start = 0.0f;
+    fog_end   = 0.0f;
+    // Identity matrices for safety
+    cached_mv[0]   = cached_mv[5]   = cached_mv[10]  = cached_mv[15]  = 1.0f;
+    cached_proj[0] = cached_proj[5] = cached_proj[10] = cached_proj[15] = 1.0f;
 
     palette = static_cast<RGB_t *>(fc.CacheLumpName("PLAYPAL", PU_STATIC));
 
@@ -605,13 +686,32 @@ void OGLRenderer::InitGLState()
 
     // Build the blob shadow texture.
     InitShadowTexture();
+
+    // Create and bind the MatrixUBO at binding point 0
+    glGenBuffers(1, &matrix_ubo);
+    glBindBuffer(GL_UNIFORM_BUFFER, matrix_ubo);
+    glBufferData(GL_UNIFORM_BUFFER, 192, NULL, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, matrix_ubo);
+    // Shadow map is initialised in InitVideoMode() after postfx.Init(),
+    // not here — InitGLState() is called from InitVideoMode() before postfx,
+    // so doing it here would just create resources that are immediately
+    // destroyed and recreated.
 }
+
+// Frame counter used for log throttling.  Incremented once per rendered frame.
+static int s_ogl_frame = 0;
 
 /// Clean up stuffage so we can start drawing a new frame.
 void OGLRenderer::StartFrame()
 {
+    ++s_ogl_frame;
     if (postfx.IsActive())
         postfx.BindSceneFBO();
+    // When G-buffer deferred mode is active, override the single-attachment
+    // scene FBO with the MRT G-buffer FBO (attachment 0 = scene color, 1 = normals).
+    if (cv_grdeferred.value && g_deferredRenderer && g_deferredRenderer->IsGBufferReady())
+        g_deferredRenderer->BindGBuffer();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     ClearDrawColorAndLights();
 }
@@ -737,6 +837,9 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const int displaymode)
     materials.ClearGLTextures();
 
     // Destroy shader programs and GL resources while the old context is still current.
+    for (int i = 0; i < CubeShadowMap::MAX_INSTANCES; i++)
+        cube_shadow_pool[i].Destroy();
+    shadowmap.Destroy();
     postfx.Destroy();
     materials.ClearAllShaders();
     ClearFpShaders();
@@ -817,6 +920,12 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const int displaymode)
             SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
         }
     }
+
+    // Request OpenGL 3.3 compatibility profile (unlocks modern features while
+    // keeping legacy fixed-function calls working during the transition)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 
     // In SDL2, we just try to create the window - no need for SDL_VideoModeOK
     screen = SDL_CreateWindow("Doom Legacy",
@@ -969,9 +1078,38 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const int displaymode)
     if (normalmap_shaderprog)
         materials.AssignNormalMapShader(normalmap_shaderprog);
 
-    // Post-processing framework (bloom, SSAO).
+    // Deferred renderer (G-buffer MRT for Phase 2.2+).
+    if (!g_deferredRenderer)
+        g_deferredRenderer = new DeferredRenderer();
+    g_deferredRenderer->Init(w, h);
+
+    // Post-processing framework (bloom, SSAO). InitGBuffer called inside Init().
     postfx.Destroy();
     postfx.Init(w, h);
+
+    // Shadow map — reinit for new GL context / resolution change.
+    shadowmap.Destroy();
+    shadowmap.Init();
+
+    // Cube shadow pool (Phase 3.2) — one map per potential shadow caster.
+    for (int i = 0; i < CubeShadowMap::MAX_INSTANCES; i++)
+    {
+        cube_shadow_pool[i].Destroy();
+        cube_shadow_pool[i].Init();
+    }
+
+    // Report any GL errors accumulated during initialization.
+    {
+        GLenum err;
+        int errcnt = 0;
+        while ((err = glGetError()) != GL_NO_ERROR)
+        {
+            CONS_Printf(" GL init error 0x%x\n", err);
+            errcnt++;
+        }
+        if (errcnt == 0)
+            CONS_Printf(" GL init: no errors.\n");
+    }
 
     if (GLExtAvailable("GL_ARB_multitexture"))
         CONS_Printf(" GL multitexturing supported.\n");
@@ -1061,6 +1199,41 @@ void OGLRenderer::Setup2DMode()
     glTranslatef(extraoffx, extraoffy, 0.0);
     glScalef(extrascalex, extrascaley, 1.0);
 
+    glGetFloatv(GL_PROJECTION_MATRIX, cached_proj);
+    // 2D mode: modelview is identity
+    cached_mv[0] = cached_mv[5] = cached_mv[10] = cached_mv[15] = 1.0f;
+    cached_mv[1] = cached_mv[2] = cached_mv[3] = cached_mv[4] = 0.0f;
+    cached_mv[6] = cached_mv[7] = cached_mv[8] = cached_mv[9] = 0.0f;
+    cached_mv[11]= cached_mv[12]= cached_mv[13]= cached_mv[14]= 0.0f;
+    UploadMatrixUBO();
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+}
+
+/// Like Setup2DMode but WITHOUT the HUD aspect-ratio correction.
+/// Used for the console so it spans the full screen width rather than being
+/// confined to the 4:3 pillarboxed content area.
+void OGLRenderer::Setup2DMode_Full()
+{
+    consolemode = true;
+    ClearDrawColorAndLights();
+
+    glDisable(GL_LIGHTING);
+    glDisable(GL_FOG);
+    glDisable(GL_DEPTH_TEST);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0.0, 1.0, 0.0, 1.0);
+    // No translate/scale — full viewport used (no pillarboxing/letterboxing)
+
+    glGetFloatv(GL_PROJECTION_MATRIX, cached_proj);
+    cached_mv[0] = cached_mv[5] = cached_mv[10] = cached_mv[15] = 1.0f;
+    cached_mv[1] = cached_mv[2] = cached_mv[3] = cached_mv[4] = 0.0f;
+    cached_mv[6] = cached_mv[7] = cached_mv[8] = cached_mv[9] = 0.0f;
+    cached_mv[11]= cached_mv[12]= cached_mv[13]= cached_mv[14]= 0.0f;
+    UploadMatrixUBO();
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
@@ -1084,6 +1257,8 @@ void OGLRenderer::Setup3DMode()
                    viewportar,
                    cv_grnearclippingplane.Get().Float(),
                    cv_grfarclippingplane.Get().Float());
+
+    glGetFloatv(GL_PROJECTION_MATRIX, cached_proj);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -1490,10 +1665,95 @@ void OGLRenderer::Render3DView(Actor *pov)
     glRotatef(90.0 - phi, 0.0, 0.0, 1.0);
     glTranslatef(-x, -y, -z);
 
+    glGetFloatv(GL_MODELVIEW_MATRIX, cached_mv);
+    UploadMatrixUBO();
+
     curssec = pov->subsector;
 
     // Collect dynamic lights for this frame (weapon flash + decorative emitters).
     CollectDynamicLights(pov);
+
+    // --- Shadow pass (Phase 2.3) ---
+    shadow_active = false;
+    shadow_caster_idx = -1;
+    if (cv_grshadows.value && shadowmap.IsReady() && !framelights.empty())
+    {
+        // Pick the nearest light to the camera as shadow caster
+        float bestDist2 = 1e30f;
+        for (int li = 0; li < (int)framelights.size(); li++)
+        {
+            const FrameLight &fl = framelights[li];
+            float dx = fl.x - x, dy = fl.y - y;
+            if (dx*dx + dy*dy < bestDist2)
+            {
+                bestDist2 = dx*dx + dy*dy;
+                shadow_caster_idx = li;
+            }
+        }
+        if (shadow_caster_idx >= 0)
+        {
+            const FrameLight &caster = framelights[shadow_caster_idx];
+            // Determine the current scene FBO to restore after shadow pass
+            GLint cur_fbo = 0;
+            glGetIntegerv(GL_FRAMEBUFFER_BINDING, &cur_fbo);
+            shadowmap.BeginPass(caster.x, caster.y, caster.z + 32.0f,
+                                x, y, z,
+                                caster.radius);
+            RenderShadowBSPNode(mp->numnodes - 1);
+            shadowmap.EndPass((GLuint)cur_fbo, viewportw, viewporth);
+            shadow_active = true;
+        }
+    }
+
+    // --- Cube shadow passes (Phase 3.2) ---
+    // Build one omnidirectional R32F cube shadow map per deferred light (nearest N).
+    // Rendered BEFORE geometry so depth values are ready for the deferred pass.
+    // cv_grcubeshadows controls the shadow caster count; 0 = disabled.
+    //
+    // framelight_shadow_tex[i]: cube map tex for framelights[i], or 0 if unshadowed.
+    std::vector<GLuint> framelight_shadow_tex(framelights.size(), 0);
+    if (cv_grdeferred.value && cv_grshadows.value && cv_grcubeshadows.value
+        && !framelights.empty())
+    {
+        int max_cube = (int)cv_grcubeshadows.value;
+        if (max_cube > CubeShadowMap::MAX_INSTANCES)
+            max_cube = CubeShadowMap::MAX_INSTANCES;
+        if (max_cube > (int)framelights.size())
+            max_cube = (int)framelights.size();
+
+        // Find the indices of the nearest max_cube lights (by XY distance).
+        struct LightDist { float dist2; int idx; };
+        std::vector<LightDist> dists;
+        dists.reserve(framelights.size());
+        for (int li = 0; li < (int)framelights.size(); li++)
+        {
+            float dx = framelights[li].x - x, dy = framelights[li].y - y;
+            LightDist ld = { dx*dx + dy*dy, li };
+            dists.push_back(ld);
+        }
+        std::partial_sort(dists.begin(), dists.begin() + max_cube, dists.end(),
+            [](const LightDist &a, const LightDist &b) { return a.dist2 < b.dist2; });
+
+        GLint cur_fbo = 0;
+        glGetIntegerv(GL_FRAMEBUFFER_BINDING, &cur_fbo);
+
+        for (int si = 0; si < max_cube; si++)
+        {
+            const FrameLight &fl = framelights[dists[si].idx];
+            CubeShadowMap &csm = cube_shadow_pool[si];
+            if (!csm.IsReady()) continue;
+
+            csm.BeginCube(fl.x, fl.y, fl.z + 32.0f, fl.radius);
+            for (int f = 0; f < 6; f++)
+            {
+                csm.BeginFacePass(f);
+                RenderShadowBSPNode(mp->numnodes - 1);
+            }
+            csm.EndCube((GLuint)cur_fbo, viewportw, viewporth);
+
+            framelight_shadow_tex[dists[si].idx] = csm.GetCubeTex();
+        }
+    }
 
     // Build frustum and we are ready to render.
     CalculateFrustum();
@@ -1521,6 +1781,128 @@ void OGLRenderer::Render3DView(Actor *pov)
     // Draw corona halos at dynamic light positions (additive glow over geometry).
     if (cv_grcoronas.value && cv_grdynamiclighting.value)
         DrawAllCoronas();
+
+    // --- Phase 3.1: deferred dynamic light accumulation ---
+    // After all geometry has been written to the G-buffer, accumulate each
+    // dynamic light's contribution via a fullscreen-triangle pass.  The scene
+    // FBO (single-attachment) is re-bound so additive blending writes only to
+    // the scene color texture, leaving the G-buffer normal attachment intact.
+    if (cv_grdeferred.value && cv_grdynamiclighting.value &&
+        g_deferredRenderer && g_deferredRenderer->IsDeferredPassSafe() &&
+        !framelights.empty())
+    {
+        // BeginLightingPass() binds the colour-only deferred_pass_fbo internally,
+        // eliminating the scene_depth_tex feedback loop (GL spec §9.3.1).
+        // No explicit FBO switch needed here.
+
+        // Projection reconstruction parameters (column-major GL matrix).
+        const GLfloat projA  = cached_proj[10]; // (f+n)/(n-f)
+        const GLfloat projB  = cached_proj[14]; // 2fn/(n-f)
+        const GLfloat projSX = cached_proj[0];  // f/aspect
+        const GLfloat projSY = cached_proj[5];  // f
+
+        // Inverse view rotation: for a pure rotation matrix, inv(R) = R^T.
+        // cached_mv is column-major, so cached_mv[r*4 + c] = M[r][c].
+        // invView is column-major mat3: invView[c*3 + r] = M[r][c] = cached_mv[r*4 + c].
+        GLfloat invView[9];
+        for (int c = 0; c < 3; c++)
+            for (int r = 0; r < 3; r++)
+                invView[c*3 + r] = cached_mv[r*4 + c];
+
+        g_deferredRenderer->BeginLightingPass(
+            postfx.GetSceneDepthTex(),
+            g_deferredRenderer->GetNormalTex(),
+            projA, projB, projSX, projSY, invView);
+
+        // Transform each world-space light to eye space and render.
+        const GLfloat *mv = cached_mv;
+        for (int li = 0; li < (int)framelights.size(); li++)
+        {
+            const FrameLight &fl = framelights[li];
+            // Column-major MV multiply: eye = MV * [wx wy wz 1]
+            float ex = mv[0]*fl.x + mv[4]*fl.y + mv[8] *fl.z + mv[12];
+            float ey = mv[1]*fl.x + mv[5]*fl.y + mv[9] *fl.z + mv[13];
+            float ez = mv[2]*fl.x + mv[6]*fl.y + mv[10]*fl.z + mv[14];
+            GLuint shadow_cube = framelight_shadow_tex[li];
+            g_deferredRenderer->RenderLight(ex, ey, ez, fl.radius, fl.r, fl.g, fl.b, shadow_cube);
+        }
+
+        g_deferredRenderer->EndLightingPass();
+    }
+
+    // Phase 3.1 clean-up: reset scene_fbo draw buffers to attachment 0 only.
+    // BindGBuffer() enabled [0,1] for MRT; if the deferred light pass ran,
+    // BeginLightingPass() already reset to [0] and rebound scene_fbo via
+    // EndLightingPass().  This call handles the no-lights-this-frame case.
+    if (cv_grdeferred.value && g_deferredRenderer && g_deferredRenderer->IsGBufferReady()
+        && postfx.IsActive())
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, postfx.GetSceneFBO());
+        GLenum buf0 = GL_COLOR_ATTACHMENT0;
+        glDrawBuffers(1, &buf0);
+    }
+
+    // --- Deferred pass diagnostics ---
+    {
+        bool pfx_active    = postfx.IsActive();
+        bool gbuf_ready    = g_deferredRenderer && g_deferredRenderer->IsGBufferReady();
+        bool pass_safe     = g_deferredRenderer && g_deferredRenderer->IsDeferredPassSafe();
+        bool pass_ran      = cv_grdeferred.value && cv_grdynamiclighting.value &&
+                             pass_safe && !framelights.empty();
+        int  nLights       = (int)framelights.size();
+
+        // Detect the first frame the pass stops (or starts) running.
+        static bool s_last_pass_ran = false;
+        if (pass_ran != s_last_pass_ran)
+        {
+            CONS_Printf("[frame %05d] deferred pass %s"
+                        " (pfx=%d gbuf=%d safe=%d lights=%d"
+                        " cv_def=%d cv_dynlit=%d)\n",
+                        s_ogl_frame,
+                        pass_ran ? "STARTED" : "STOPPED",
+                        (int)pfx_active, (int)gbuf_ready, (int)pass_safe, nLights,
+                        (int)cv_grdeferred.value, (int)cv_grdynamiclighting.value);
+            if (g_deferredRenderer)
+                g_deferredRenderer->LogStatus();
+            s_last_pass_ran = pass_ran;
+        }
+
+        // Periodic one-liner every 300 frames (~5 s at 60 fps).
+        static const int LOG_INTERVAL = 300;
+        if (s_ogl_frame % LOG_INTERVAL == 0)
+        {
+            // Check the current FBO binding so we can detect if we're on the
+            // wrong FBO at end-of-frame (e.g. stuck on light_accum_fbo).
+            GLint cur_fbo = 0;
+            glGetIntegerv(GL_FRAMEBUFFER_BINDING, &cur_fbo);
+
+            // Drain any GL errors accumulated during this frame.
+            GLenum err;
+            int nerr = 0;
+            char errbuf[64] = "none";
+            while ((err = glGetError()) != GL_NO_ERROR)
+            {
+                if (!nerr)
+                    snprintf(errbuf, sizeof(errbuf), "0x%04x", err);
+                ++nerr;
+            }
+
+            CONS_Printf("[frame %05d] pfx=%d gbuf=%d safe=%d"
+                        " lights=%d passRan=%d cur_fbo=%d glerr=%s(%d)\n",
+                        s_ogl_frame,
+                        (int)pfx_active, (int)gbuf_ready, (int)pass_safe,
+                        nLights, (int)pass_ran, cur_fbo,
+                        errbuf, nerr);
+        }
+        else
+        {
+            // Always drain GL errors even in non-log frames so they don't
+            // accumulate silently; print them immediately.
+            GLenum err;
+            while ((err = glGetError()) != GL_NO_ERROR)
+                CONS_Printf("[frame %05d] GL error: 0x%04x\n", s_ogl_frame, err);
+        }
+    }
 }
 
 void OGLRenderer::DrawPSprites(PlayerPawn *p)
@@ -1749,10 +2131,33 @@ void OGLRenderer::RenderGlSsecPolygon(
 
     // Base static light for this sector (same for every vertex).
     float base = cv_grstaticlighting.value ? LightLevelToFloat(lightlevel) : 1.0f;
+    // In deferred mode all forward dynamic lights are suppressed (they are
+    // accumulated in the screen-space pass instead).  LightLevelToFloat returns
+    // exactly 0.0 for lightlevel <= 89 due to its aggressive non-linear curve,
+    // so sectors with low light levels go pitch-black between frames when no
+    // deferred pass runs (framelights empty).  Apply a minimum ambient floor so
+    // geometry remains at least faintly visible while deferred lights add on top.
+    if (cv_grdeferred.value && g_deferredRenderer && g_deferredRenderer->IsDeferredLightReady())
+        if (base < 0.1f) base = 0.1f;
     bool dynActive = cv_grdynamiclighting.value && !framelights.empty();
     // Shaded flat: upload dynamic lights as uniforms, skip CPU per-vertex accum.
     if (flatShaderActive && dynActive)
         SetShaderDynamicLights(mat->shader);
+    if (flatShaderActive)
+        mat->shader->SetFog(fog_color, fog_start, fog_end);
+    if (flatShaderActive && shadowmap.IsReady())
+    {
+        // Always bind to unit 8 to keep sampler2DShadow on a comparison texture
+        glActiveTexture(GL_TEXTURE8);
+        glBindTexture(GL_TEXTURE_2D, shadowmap.GetDepthTex());
+        glActiveTexture(GL_TEXTURE0);
+        mat->shader->SetShadow(8, shadow_active ? shadowmap.GetLightVP() : NULL,
+                               shadow_active ? 1 : 0);
+    }
+    else if (flatShaderActive)
+    {
+        mat->shader->SetShadow(8, NULL, 0);
+    }
 
     // Sector colormap tint (Boom/Hexen per-sector colored lighting).
     // The rgba field is packed as R+(G<<8)+(B<<16)+(alpha<<24) where alpha
@@ -1896,10 +2301,16 @@ void OGLRenderer::RenderGLSubsector(int num)
         float fogEnd   = fogStart + 800.0f;
         glFogf(GL_FOG_START, fogStart);
         glFogf(GL_FOG_END,   fogEnd);
+        fog_color[0] = fogColor[0];
+        fog_color[1] = fogColor[1];
+        fog_color[2] = fogColor[2];
+        fog_start = fogStart;
+        fog_end   = fogEnd;
     }
     else
     {
         glDisable(GL_FOG);
+        fog_start = fog_end = 0.0f;  // disable in-shader fog too
     }
 
     // Draw ceiling texture, skip sky flats.
@@ -2271,6 +2682,9 @@ void OGLRenderer::DrawSingleQuad(Material *m,
 
     // Per-vertex lighting so dynamic lights blend smoothly at face boundaries.
     float base = cv_grstaticlighting.value ? LightLevelToFloat(lightlevel) : 1.0f;
+    // Deferred mode minimum ambient — same rationale as flat rendering above.
+    if (cv_grdeferred.value && g_deferredRenderer && g_deferredRenderer->IsDeferredLightReady())
+        if (base < 0.1f) base = 0.1f;
     bool dynActive = cv_grdynamiclighting.value && !framelights.empty();
     // When a GLSL shader is active the dynamic lights are passed as uniforms
     // (per-pixel, normal-map aware).  Skip CPU vertex-color accumulation for
@@ -2278,6 +2692,25 @@ void OGLRenderer::DrawSingleQuad(Material *m,
     bool shaderActive = (m->shader != NULL);
     if (shaderActive && dynActive)
         SetShaderDynamicLights(m->shader);
+    if (shaderActive)
+        m->shader->SetFog(fog_color, fog_start, fog_end);
+    if (shaderActive && shadowmap.IsReady())
+    {
+        // Always bind shadow map depth texture to unit 8 so that the
+        // sampler2DShadow uniform always refers to a depth-comparison
+        // texture.  Binding a non-comparison texture to the same unit as
+        // a sampler2DShadow is undefined behaviour and crashes some
+        // Windows drivers even when the shadow branch is not taken.
+        glActiveTexture(GL_TEXTURE8);
+        glBindTexture(GL_TEXTURE_2D, shadowmap.GetDepthTex());
+        glActiveTexture(GL_TEXTURE0);
+        m->shader->SetShadow(8, shadow_active ? shadowmap.GetLightVP() : NULL,
+                             shadow_active ? 1 : 0);
+    }
+    else if (shaderActive)
+    {
+        m->shader->SetShadow(8, NULL, 0);
+    }
     float x1 = v1->x.Float(), y1 = v1->y.Float();
     float x2 = v2->x.Float(), y2 = v2->y.Float();
 
@@ -2356,11 +2789,16 @@ void OGLRenderer::DrawSpriteItem(const vec_t<fixed_t> &pos, Material *mat, int f
     top += zoffset;
     bottom = 0.0f;
 
+    GLfloat saved_mv[16];
+    memcpy(saved_mv, cached_mv, 64);
+
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
 
     glTranslatef(pos.x.Float(), pos.y.Float(), pos.z.Float());
     glRotatef(phi, 0.0, 0.0, 1.0);
+    glGetFloatv(GL_MODELVIEW_MATRIX, cached_mv);
+    UploadMatrixUBO();
     glNormal3f(-1.0, 0.0, 0.0);
 
     mat->GLUse();
@@ -2392,6 +2830,8 @@ void OGLRenderer::DrawSpriteItem(const vec_t<fixed_t> &pos, Material *mat, int f
 
     // Leave the matrix stack as it was.
     glPopMatrix();
+    memcpy(cached_mv, saved_mv, 64);
+    UploadMatrixUBO();
 
     glColor4f(1.0, 1.0, 1.0, 1.0); // back to normal material params
 }
@@ -2458,4 +2898,58 @@ void OGLRenderer::DrawSimpleSky()
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
+}
+
+/// Shadow BSP traversal: render depth-only geometry for shadow map generation.
+/// Traverses the whole BSP without frustum culling (light sees everything within radius).
+void OGLRenderer::RenderShadowBSPNode(int nodenum)
+{
+    if (nodenum & NF_SUBSECTOR)
+    {
+        RenderShadowSubsector(nodenum & ~NF_SUBSECTOR);
+        return;
+    }
+    node_t *node = &mp->nodes[nodenum];
+    RenderShadowBSPNode(node->children[0]);
+    RenderShadowBSPNode(node->children[1]);
+}
+
+/// Render wall geometry for one subsector into the depth buffer.
+/// No materials, no textures — only vertex positions.
+/// Uses glsegs[] directly so the indices match the subsector's first_seg/num_segs.
+void OGLRenderer::RenderShadowSubsector(int num)
+{
+    if (num < 0 || num >= mp->numglsubsectors)
+        return;
+
+    subsector_t *ss = &mp->glsubsectors[num];
+
+    for (int i = ss->first_seg; i < ss->first_seg + ss->num_segs; i++)
+    {
+        if (i < 0 || i >= mp->numglsegs)
+            continue;
+
+        seg_t *seg = &mp->glsegs[i];
+
+        // Skip minisegs (no linedef) and degenerate segs.
+        if (!seg->linedef || !seg->v1 || !seg->v2)
+            continue;
+        if (!seg->frontsector)
+            continue;
+
+        float x1 = seg->v1->x.Float(), y1 = seg->v1->y.Float();
+        float x2 = seg->v2->x.Float(), y2 = seg->v2->y.Float();
+        float floor_z = seg->frontsector->floorheight.Float();
+        float ceil_z  = seg->frontsector->ceilingheight.Float();
+
+        if (ceil_z <= floor_z)
+            continue;
+
+        glBegin(GL_QUADS);
+        glVertex3f(x1, y1, floor_z);
+        glVertex3f(x2, y2, floor_z);
+        glVertex3f(x2, y2, ceil_z);
+        glVertex3f(x1, y1, ceil_z);
+        glEnd();
+    }
 }

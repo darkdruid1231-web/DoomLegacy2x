@@ -195,12 +195,29 @@ private:
   // Blob shadow system.
   GLuint shadowTex;         ///< Circular gradient texture for blob shadows.
   void InitShadowTexture();
+
+  // Matrix UBO (GL 3.1+) — eliminates per-surface glGetFloatv stalls
+  GLuint matrix_ubo;
+  GLfloat cached_mv[16];    ///< Cached modelview matrix (column-major)
+  GLfloat cached_proj[16];  ///< Cached projection matrix (column-major)
+
+  // Shadow map state (Phase 2.3)
+  bool  shadow_active;          ///< True when a shadow caster was found this frame.
+  int   shadow_caster_idx;      ///< Index into framelights[] of the shadow caster (-1 = none).
+
+  // Per-subsector fog parameters cached for shader use
+  GLfloat fog_color[3];
+  GLfloat fog_start, fog_end;
+
+  void UploadMatrixUBO();
   void DrawBlobShadow(class Actor *thing) const;
   void DrawAllBlobShadows() const;
   void DrawAllCoronas() const;  ///< Draw additive corona halos at dynamic light positions.
 
   void RenderBSPNode(int nodenum); ///< Render level using BSP.
   void RenderGLSubsector(int num);
+  void RenderShadowBSPNode(int nodenum);
+  void RenderShadowSubsector(int num);
   void RenderGlSsecPolygon(subsector_t *ss, GLfloat height, Material *tex, bool isFloor, GLfloat xoff=0.0, GLfloat yoff=0.0, int lightlevel=255);
   void RenderGLSeg(int num);
   void GetSegQuads(int num, quad &u, quad &m, quad &l) const;
@@ -236,6 +253,7 @@ public:
   void SetFullScreenViewport();
   void SetViewport(unsigned vp);
   void Setup2DMode();
+  void Setup2DMode_Full(); ///< Like Setup2DMode but without HUD aspect-ratio pillarboxing (full screen width).
   void Draw2DGraphic(GLfloat left, GLfloat bottom, GLfloat right, GLfloat top, Material *mat,
 		     GLfloat texleft=0.0, GLfloat texbottom=1.0, GLfloat texright=1.0, GLfloat textop=0.0);
   void Draw2DGraphic_Doom(GLfloat x, GLfloat y, Material *tex, int flags);

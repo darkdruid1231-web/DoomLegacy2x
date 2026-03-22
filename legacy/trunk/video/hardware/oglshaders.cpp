@@ -179,6 +179,12 @@ void ShaderProg::Link()
         {&loc.uDynLightPos,       "uDynLightPos"},
         {&loc.uDynLightColor,     "uDynLightColor"},
         {&loc.uDynLightCount,     "uDynLightCount"},
+        {&loc.uFogColor,          "uFogColor"},
+        {&loc.uFogStart,          "uFogStart"},
+        {&loc.uFogEnd,            "uFogEnd"},
+        {&loc.uShadowMap,         "uShadowMap"},
+        {&loc.uShadowMatrix,      "uShadowMatrix"},
+        {&loc.uShadowActive,      "uShadowActive"},
     };
     const int num_uniforms = (int)(sizeof(uniforms) / sizeof(uniforms[0]));
 
@@ -193,6 +199,11 @@ void ShaderProg::Link()
     for (int k = 0; k < 1; k++)
         *attribs[k].location = glGetAttribLocation(prog_id, attribs[k].name);
     // Note: loc.tangent == -1 is fine; shaders using derivative TBN don't need it.
+
+    // Bind MatrixBlock uniform block to binding point 0
+    GLuint block_idx = glGetUniformBlockIndex(prog_id, "MatrixBlock");
+    if (block_idx != GL_INVALID_INDEX)
+        glUniformBlockBinding(prog_id, block_idx, 0);
 }
 
 void ShaderProg::Use()
@@ -238,6 +249,29 @@ void ShaderProg::SetDynamicLights(const float *eyePositions4, const float *color
     }
 }
 
+void ShaderProg::SetFog(const float *color3, float start, float end)
+{
+    if (loc.uFogColor >= 0 && color3)
+        glUniform3fv(loc.uFogColor, 1, color3);
+    if (loc.uFogStart >= 0)
+        glUniform1f(loc.uFogStart, start);
+    if (loc.uFogEnd >= 0)
+        glUniform1f(loc.uFogEnd, end);
+}
+
+void ShaderProg::SetShadow(GLuint shadow_tex_unit, const float *shadowMatrix16, int shadowActive)
+{
+    if (loc.uShadowActive >= 0)
+        glUniform1i(loc.uShadowActive, shadowActive);
+    if (shadowActive && shadowMatrix16)
+    {
+        if (loc.uShadowMatrix >= 0)
+            glUniformMatrix4fv(loc.uShadowMatrix, 1, GL_FALSE, shadowMatrix16);
+        if (loc.uShadowMap >= 0)
+            glUniform1i(loc.uShadowMap, (GLint)shadow_tex_unit);
+    }
+}
+
 void ShaderProg::SetSamplerUniforms()
 {
     // Wire sampler uniforms to texture units. Safe to call before a map is loaded
@@ -251,6 +285,13 @@ void ShaderProg::SetSamplerUniforms()
     glUniform1i(loc.tex5, 5);
     glUniform1i(loc.tex6, 6);
     glUniform1i(loc.tex7, 7);
+    // Shadow sampler must always be wired to unit 8 so sampler2DShadow
+    // never aliases the same unit as a sampler2D (tex0-tex7 on units 0-7).
+    // Some Windows drivers crash or produce UB when two different sampler
+    // types refer to the same texture image unit, even if the shadow branch
+    // is not executed.
+    if (loc.uShadowMap >= 0)
+        glUniform1i(loc.uShadowMap, 8);
 }
 
 void ShaderProg::SetFpSamplerUniforms()
@@ -302,23 +343,42 @@ void ShaderProg::PrintInfoLog()
 // ---------------------------------------------------------------------------
 
 static const char *normalmap_vert_src =
-    "#version 130\n"
+    "#version 330 compatibility\n"
+    // Use GLSL compat built-ins directly instead of generic layout attributes:
+    // gl_Vertex, gl_Normal, gl_Color, gl_MultiTexCoord0 are guaranteed to be
+    // populated by glVertex3f / glNormal3f / glColor4f / glTexCoord2f in
+    // immediate mode, avoiding driver attribute-aliasing bugs.
+    // MatrixUBO (binding point 0) — provides matrices without glGetFloatv stalls
+    "layout(std140) uniform MatrixBlock {\n"
+    "    mat4 uModelView;\n"
+    "    mat4 uProjection;\n"
+    "    mat4 uMVP;\n"
+    "};\n"
     "out vec3 v_eyedir;\n"
     "out vec2 v_texcoord;\n"
     "out vec4 v_color;\n"
     "out vec3 v_fragpos;\n"
+    "out vec3 v_worldpos;\n"
     "void main()\n"
     "{\n"
-    "    vec3 eyepos = (gl_ModelViewMatrix * gl_Vertex).xyz;\n"
+    "    vec3 eyepos = (uModelView * gl_Vertex).xyz;\n"
     "    v_eyedir    = normalize(-eyepos);\n"
     "    v_fragpos   = eyepos;\n"
+    "    v_worldpos  = gl_Vertex.xyz;\n"
     "    v_texcoord  = gl_MultiTexCoord0.xy;\n"
     "    v_color     = gl_Color;\n"
-    "    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
+    "    gl_Position = uMVP * gl_Vertex;\n"
     "}\n";
 
 static const char *normalmap_frag_src =
-    "#version 130\n"
+    "#version 330 compatibility\n"
+    "layout(location=0) out vec4 fragColor;\n"
+    // G-buffer MRT outputs (silently discarded when the corresponding attachment
+    // is not bound, per the OpenGL spec — safe on the forward-only path).
+    // Phase 3.1:  attachment 1 = view-space normal (packed [0,1])
+    // Phase 3.1b: attachment 2 = pre-fog diffuse albedo (used by deferred shader)
+    "layout(location=1) out vec4 gNormal;\n"
+    "layout(location=2) out vec4 gAlbedo;\n"
     "uniform sampler2D tex0;\n"  // diffuse
     "uniform sampler2D tex1;\n"  // normal map
     "uniform sampler2D tex2;\n"  // metallic   (neutral: black=0)
@@ -334,10 +394,17 @@ static const char *normalmap_frag_src =
     "uniform vec4 uDynLightPos[MAX_SHADER_LIGHTS];\n"   // xyz=eye-space pos, w=radius
     "uniform vec3 uDynLightColor[MAX_SHADER_LIGHTS];\n"
     "uniform int  uDynLightCount;\n"
+    "uniform vec3  uFogColor;\n"
+    "uniform float uFogStart;\n"
+    "uniform float uFogEnd;\n"
+    "uniform sampler2DShadow uShadowMap;\n"
+    "uniform mat4 uShadowMatrix;\n"
+    "uniform int  uShadowActive;\n"
     "in vec3 v_eyedir;\n"
     "in vec2 v_texcoord;\n"
     "in vec4 v_color;\n"
     "in vec3 v_fragpos;\n"
+    "in vec3 v_worldpos;\n"
     "void main()\n"
     "{\n"
     "    vec2 uv = v_texcoord;\n"
@@ -360,6 +427,14 @@ static const char *normalmap_frag_src =
     "    vec3 tN = texture(tex1, uv).rgb * 2.0 - 1.0;\n"
     "    tN.xy *= normalmap_strength;\n"
     "    vec3 N = normalize(TBN * tN);\n"
+    // Write packed view-space normal to G-buffer attachment 1 (Phase 3.1).
+    // Packed as [0,1] from [-1,1] so it fits RGBA16F without sign issues.
+    "    gNormal = vec4(N * 0.5 + 0.5, 1.0);\n"
+    // Write pre-fog diffuse to G-buffer attachment 2 (Phase 3.1b).
+    // diffuse.rgb only — v_color (sector brightness) is excluded so that
+    // lights in dark sectors are still visible in the deferred pass.
+    // Must be written BEFORE the fog mix below; discarded when attachment 2 absent.
+    "    gAlbedo = vec4(diffuse.rgb, 1.0);\n"
     // PBR map samples (neutrals bound when slot is empty)
     "    float metallic  = texture(tex2, uv).r;\n"
     "    float roughness = texture(tex3, uv).r;\n"
@@ -391,7 +466,32 @@ static const char *normalmap_frag_src =
     "        color += specColor * uDynLightColor[i] * dynspec * atten;\n"
     "    }\n"
     "    color += bright.rgb * bright.a;\n"
-    "    gl_FragColor = vec4(color, diffuse.a * v_color.a);\n"
+    "    vec4 finalColor = vec4(color, diffuse.a * v_color.a);\n"
+    // Shadow map sampling (PCF 2×2)
+    "    if (uShadowActive != 0) {\n"
+    "        vec4 sc = uShadowMatrix * vec4(v_worldpos, 1.0);\n"
+    "        // Perspective divide + small depth bias to prevent self-shadowing\n"
+    "        sc.z -= 0.005 * sc.w;\n"
+    "        float shadow = 0.0;\n"
+    "        vec2 texelSize = vec2(1.0 / 1024.0);\n"
+    "        for (int sx = -1; sx <= 1; sx++) {\n"
+    "            for (int sy = -1; sy <= 1; sy++) {\n"
+    "                vec4 offset = vec4(float(sx) * texelSize.x * sc.w,\n"
+    "                                  float(sy) * texelSize.y * sc.w, 0.0, 0.0);\n"
+    "                shadow += textureProj(uShadowMap, sc + offset);\n"
+    "            }\n"
+    "        }\n"
+    "        shadow /= 9.0;\n"
+    "        // Darken shadowed areas — preserve a 30% ambient so shadows aren't pitch black\n"
+    "        float shadowFactor = mix(0.3, 1.0, shadow);\n"
+    "        finalColor.rgb *= shadowFactor;\n"
+    "    }\n"
+    "    if (uFogEnd > uFogStart) {\n"
+    "        float dist = length(v_fragpos);\n"
+    "        float fogFactor = clamp((uFogEnd - dist) / (uFogEnd - uFogStart), 0.0, 1.0);\n"
+    "        finalColor.rgb = mix(uFogColor, finalColor.rgb, fogFactor);\n"
+    "    }\n"
+    "    fragColor = finalColor;\n"
     "}\n";
 
 // ---------------------------------------------------------------------------
@@ -485,21 +585,27 @@ void InitNormalMapShader()
 
 // Vertex shader: outputs the varyings the .fp files expect.
 static const char *fp_host_vert_src =
-    "#version 130\n"
+    "#version 330 compatibility\n"
+    // Use GLSL compat built-ins — same rationale as normalmap_vert_src.
+    "layout(std140) uniform MatrixBlock {\n"
+    "    mat4 uModelView;\n"
+    "    mat4 uProjection;\n"
+    "    mat4 uMVP;\n"
+    "};\n"
     "out vec3 pixelpos;\n"
     "out vec2 vTexCoord;\n"
     "out vec4 vColor;\n"
     "void main()\n"
     "{\n"
-    "    pixelpos    = (gl_ModelViewMatrix * gl_Vertex).xyz;\n"
+    "    pixelpos    = (uModelView * gl_Vertex).xyz;\n"
     "    vTexCoord   = gl_MultiTexCoord0.xy;\n"
     "    vColor      = gl_Color;\n"
-    "    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
+    "    gl_Position = uMVP * gl_Vertex;\n"
     "}\n";
 
 // Fragment preamble: everything the .fp snippet expects from the host.
 static const char *fp_host_frag_preamble =
-    "#version 130\n"
+    "#version 330 compatibility\n"
     // GZDoom-named samplers wired to our texture units
     "uniform sampler2D tex0;\n"             // unit 0: diffuse
     "uniform sampler2D normaltexture;\n"    // unit 1
@@ -517,7 +623,14 @@ static const char *fp_host_frag_preamble =
     "uniform vec4 uDynLightPos[MAX_SHADER_LIGHTS];\n"
     "uniform vec3 uDynLightColor[MAX_SHADER_LIGHTS];\n"
     "uniform int  uDynLightCount;\n"
+    "uniform vec3  uFogColor;\n"
+    "uniform float uFogStart;\n"
+    "uniform float uFogEnd;\n"
     // Varyings (no vWorldNormal from vertex — computed analytically below)
+    // MRT outputs (silently discarded when attachment absent — same as normalmap shader)
+    "layout(location=0) out vec4 fragColor;\n"
+    "layout(location=1) out vec4 gNormal;\n"   // view-space normal packed [0,1] (Phase 3.3)
+    "layout(location=2) out vec4 gAlbedo;\n"   // pre-fog albedo (Phase 3.1b)
     "in vec3 pixelpos;\n"
     "in vec2 vTexCoord;\n"
     "in vec4 vColor;\n"
@@ -602,7 +715,20 @@ static const char *fp_host_frag_epilogue =
     "    // Brightmap: additive emissive, unaffected by sector light or normals.\n"
     "    color += mat.Bright.rgb * mat.Bright.a;\n"
     "\n"
-    "    gl_FragColor = vec4(color, mat.Base.a * vColor.a);\n"
+    "    vec4 finalColor = vec4(color, mat.Base.a * vColor.a);\n"
+    // Write view-space normal to G-buffer attachment 1 (Phase 3.3).
+    // N is already computed above (normalize(mat.Normal), which is a view-space derivative
+    // normal for the host shader path). Pack into [0,1] to match the normalmap shader.
+    "    gNormal = vec4(N * 0.5 + 0.5, 1.0);\n"
+    // Write pre-fog albedo to G-buffer attachment 2 (Phase 3.1b).
+    // mat.Base.rgb is the raw diffuse texture color before fog or lighting tint.
+    "    gAlbedo = vec4(mat.Base.rgb, 1.0);\n"
+    "    if (uFogEnd > uFogStart) {\n"
+    "        float dist = length(pixelpos);\n"
+    "        float fogFactor = clamp((uFogEnd - dist) / (uFogEnd - uFogStart), 0.0, 1.0);\n"
+    "        finalColor.rgb = mix(uFogColor, finalColor.rgb, fogFactor);\n"
+    "    }\n"
+    "    fragColor = finalColor;\n"
     "}\n";
 
 // Cache: fp_lump_path -> compiled ShaderProg
