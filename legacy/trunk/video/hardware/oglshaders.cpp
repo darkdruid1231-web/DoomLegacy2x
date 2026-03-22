@@ -141,17 +141,10 @@ void ShaderProg::Link()
 {
     glLinkProgram(prog_id);
     PrintError();
-    if (true)
-    {
-        // for debugging shaders
-        glValidateProgram(prog_id);
-        PrintError();
-        PrintInfoLog();
-        PrintError();
-    }
 
     GLint status = 0;
     glGetProgramiv(prog_id, GL_LINK_STATUS, &status);
+    PrintError();
     if (status == GL_FALSE)
         CONS_Printf("Shader program '%s' could not be linked.\n", name);
 
@@ -195,15 +188,39 @@ void ShaderProg::Link()
     // find locations for shader variables (-1 is fine for unused uniforms)
     for (int k = 0; k < num_uniforms; k++)
         *uniforms[k].location = glGetUniformLocation(prog_id, uniforms[k].name);
+    PrintError(); // after glGetUniformLocation loop
 
     for (int k = 0; k < 1; k++)
         *attribs[k].location = glGetAttribLocation(prog_id, attribs[k].name);
+    PrintError(); // after glGetAttribLocation
     // Note: loc.tangent == -1 is fine; shaders using derivative TBN don't need it.
 
     // Bind MatrixBlock uniform block to binding point 0
     GLuint block_idx = glGetUniformBlockIndex(prog_id, "MatrixBlock");
+    PrintError(); // after glGetUniformBlockIndex
     if (block_idx != GL_INVALID_INDEX)
+    {
         glUniformBlockBinding(prog_id, block_idx, 0);
+        PrintError(); // after glUniformBlockBinding
+    }
+
+    // Validate after binding all samplers to their intended units so the driver
+    // does not see a false sampler-type collision at unit 0.  glValidateProgram
+    // inspects the current uniform state, so samplers must be wired first.
+    // Intel's driver is strict: a type conflict generates GL_INVALID_VALUE in
+    // the error queue (in addition to the info log), which then propagates to
+    // the next drain point.  Only validate on successfully linked programs.
+    if (status == GL_TRUE)
+    {
+        glUseProgram(prog_id);
+        SetSamplerUniforms();
+        PrintError(); // drain any errors from SetSamplerUniforms
+        glValidateProgram(prog_id);
+        PrintError(); // drain any GL error glValidateProgram placed in the queue
+        PrintInfoLog();
+        PrintError();
+        glUseProgram(0);
+    }
 }
 
 void ShaderProg::Use()

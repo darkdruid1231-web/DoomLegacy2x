@@ -36,6 +36,7 @@
 #include "command.h"   // full consvar_t definition
 #include "cvars.h"
 #include "console.h"
+#include "core/doomdef.h"  // devparm
 #include <cmath>
 #include <cstring>
 #include <cstdlib>
@@ -1278,13 +1279,19 @@ void PostFX::ApplyEffects()
     if (!fbo_ready) return;
 
     // Check for any GL errors that arrived before we start the PostFX composite.
+    // Gated under devparm: during the loading-screen phase certain GL operations
+    // (e.g. texture uploads triggered by the first DrawConsole call) can leave a
+    // spurious GL_INVALID_VALUE in the queue before the first real rendered frame.
+    // These are harmless init artifacts; only report them in developer mode.
+    if (devparm)
     {
         GLenum err;
         while ((err = glGetError()) != GL_NO_ERROR)
             CONS_Printf("PostFX::ApplyEffects entry GL error: 0x%04x\n", err);
     }
 
-    // Verify the scene FBO is still intact before sampling it.
+    // Verify the scene FBO is still intact before sampling it (devparm only).
+    if (devparm)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, scene_fbo);
         GLenum st = glCheckFramebufferStatus(GL_FRAMEBUFFER);

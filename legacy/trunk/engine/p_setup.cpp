@@ -71,6 +71,7 @@
 #include "t_parse.h"
 
 #include "i_video.h" //rendermode
+#include "hardware/hwr_render.h" // for glGetError diagnostics
 
 void ConvertLineDef(line_t *ld);
 
@@ -1601,6 +1602,11 @@ bool Map::Setup(tic_t start, bool spawnthings)
 
     CONS_Printf("Loading map %s...\n", lumpname.c_str());
     con.Drawer();     // let the user know what we are going to do
+    if (devparm && rendermode == render_opengl) {
+        GLenum err;
+        while ((err = glGetError()) != GL_NO_ERROR)
+            CONS_Printf("GL error after con.Drawer() in Map::Setup: 0x%04x\n", err);
+    }
     I_FinishUpdate(); // page flip or blit buffer
 
     maptic = 0;

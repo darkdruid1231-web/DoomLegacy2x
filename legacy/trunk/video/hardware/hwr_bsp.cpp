@@ -43,6 +43,11 @@ HWBsp::HWBsp(int size, int bspnum) : num_planepolys(size)
     CONS_Printf("HWBsp::HWBsp: R.numvertexes=%d, R.numsubsectors=%d\n", R.numvertexes, R.numsubsectors);
     CONS_Printf("Generating subsector polygons... %d subsectors\n", size);
     con.Drawer();     // let the user know what we are doing
+    if (devparm) {
+        GLenum err;
+        while ((err = glGetError()) != GL_NO_ERROR)
+            CONS_Printf("GL error after con.Drawer() in HWBsp ctor: 0x%04x\n", err);
+    }
     I_FinishUpdate(); // page flip or blit buffer
 
     subsectors.resize(size, 0);
@@ -78,6 +83,11 @@ HWBsp::HWBsp(int size, int bspnum) : num_planepolys(size)
     {
         CONS_Printf("Solving T-joins. This may take a while. Please wait...\n");
         con.Drawer();     // let the user know what we are doing
+        if (devparm) {
+            GLenum err;
+            while ((err = glGetError()) != GL_NO_ERROR)
+                CONS_Printf("GL error after con.Drawer() in HWBsp T-join: 0x%04x\n", err);
+        }
         I_FinishUpdate(); // page flip or blit buffer
         SolveTProblem();
     }

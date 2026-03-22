@@ -323,7 +323,17 @@ void GameInfo::Display()
 
                 Drawer(); // render 3D view
             }
+            if (devparm && rendermode == render_opengl) {
+                GLenum err;
+                while ((err = glGetError()) != GL_NO_ERROR)
+                    CONS_Printf("GL error after Drawer(): 0x%04x\n", err);
+            }
             hud.DrawCommon();
+            if (devparm && rendermode == render_opengl) {
+                GLenum err;
+                while ((err = glGetError()) != GL_NO_ERROR)
+                    CONS_Printf("GL error after hud.DrawCommon(): 0x%04x\n", err);
+            }
             break;
 
         case GS_INTERMISSION:
@@ -343,6 +353,11 @@ void GameInfo::Display()
     }
 
     Menu::Drawer(); // menu (or console) is drawn on top of everything else
+    if (devparm && rendermode == render_opengl) {
+        GLenum err;
+        while ((err = glGetError()) != GL_NO_ERROR)
+            CONS_Printf("GL error after Menu::Drawer(): 0x%04x\n", err);
+    }
 
     switch (screenwipe)
     {
@@ -436,11 +451,23 @@ void GameInfo::Drawer()
         }
 
         hud.Draw(p, i); // draw hud on top anyway (uses Texture::Draw funcs)
+        if (devparm && rendermode == render_opengl) {
+            GLenum err;
+            while ((err = glGetError()) != GL_NO_ERROR)
+                CONS_Printf("GL error after hud.Draw(%d): 0x%04x\n", i, err);
+        }
     }
 
     // back to fullscreen rendering for menu, automap, console etc.
     if (rendermode == render_opengl)
+    {
         oglrenderer->SetFullScreenViewport();
+        if (devparm) {
+            GLenum err;
+            while ((err = glGetError()) != GL_NO_ERROR)
+                CONS_Printf("GL error after SetFullScreenViewport(): 0x%04x\n", err);
+        }
+    }
     else
         vid.scaledofs = 0;
 

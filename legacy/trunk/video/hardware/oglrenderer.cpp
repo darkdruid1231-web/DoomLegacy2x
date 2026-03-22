@@ -908,6 +908,8 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const int displaymode)
         cube_shadow_pool[i].Destroy();
     shadowmap.Destroy();
     postfx.Destroy();
+    if (g_deferredRenderer)
+        g_deferredRenderer->Destroy();
     materials.ClearAllShaders();
     ClearFpShaders();
     DeletePBRNeutralTextures();
