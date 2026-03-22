@@ -4,7 +4,7 @@ A source port of the classic Doom engine, extended with OpenGL rendering, multip
 
 ## Features
 
-Full feature list: [`docs/features.html`](legacy/trunk/docs/features.html)
+Full feature list: [`docs/features.md`](legacy/trunk/docs/features.md)
 
 ### Graphics
 - OpenGL hardware-accelerated renderer ✅
@@ -33,7 +33,7 @@ Full feature list: [`docs/features.html`](legacy/trunk/docs/features.html)
 
 ## Building
 
-Full compile instructions: [`docs/compiling.html`](legacy/trunk/docs/compiling.html)
+Full compile instructions: [`docs/compiling.md`](legacy/trunk/docs/compiling.md)
 
 The CI pipeline builds Windows only using MSYS2 MinGW64 with Ninja — this is the supported and tested build path.
 
@@ -84,7 +84,7 @@ A Doom IWAD is required (`doom.wad`, `doom2.wad`, `doom1.wad`, etc.).
 
 ### In-game console
 
-Press the key below **Esc** to open the console. Full command reference: [`docs/console.html`](legacy/trunk/docs/console.html)
+Press the key below **Esc** to open the console. Full command reference: [`docs/console.md`](legacy/trunk/docs/console.md)
 
 Useful OpenGL cvars:
 
@@ -146,17 +146,17 @@ Validates the binary exists and responds to `--help`.
 
 ## Documentation
 
-All HTML docs are in [`legacy/trunk/docs/`](legacy/trunk/docs/):
+All docs are in [`legacy/trunk/docs/`](legacy/trunk/docs/):
 
 | File | Contents |
 |---|---|
-| `features.html` | Full feature list and implementation status |
-| `compiling.html` | Detailed build instructions for all platforms |
-| `console.html` | All console commands and cvars |
-| `editing.html` | WAD/mod editing reference |
-| `legacy.html` | General gameplay manual |
-| `TODO.html` | Known issues and planned work |
-| `BUGS.html` | Known bugs |
+| `features.md` | Full feature list and implementation status |
+| `compiling.md` | Detailed build instructions for all platforms |
+| `console.md` | All console commands and cvars |
+| `editing.md` | WAD/mod editing reference |
+| `legacy.md` | General gameplay manual |
+| `TODO.md` | Known issues and planned work |
+| `BUGS.md` | Known bugs |
 
 ## License
 
