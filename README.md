@@ -1,173 +1,167 @@
 # Doom Legacy
 
-A modern, enhanced port of the classic Doom engine with advanced features, automated testing, and cross-platform support.
+A source port of the classic Doom engine, extended with OpenGL rendering, multiplayer, splitscreen, and mod support. The codebase is a mix of C and C++ targeting the `legacy/trunk/` directory.
 
 ## Features
 
-### Core Engine Enhancements
-- **Dynamic GL Node Generation**: Automatically generates OpenGL-optimized BSP data for enhanced rendering performance
-- **Enhanced Testability**: Comprehensive testing framework with performance monitoring and visual regression detection
-- **Cross-Platform Support**: Runs on Linux, Windows, and macOS with consistent behavior
-- **Object-Oriented Architecture**: Modern C++ design with proper encapsulation and memory management
+Full feature list: [`docs/features.html`](legacy/trunk/docs/features.html)
 
-### Rendering & Graphics
-- **OpenGL Support**: Hardware-accelerated rendering with dynamic node generation
-- **Software Rendering**: Classic software renderer for compatibility
-- **Enhanced Assets**: Improved textures, sprites, and UI elements via legacy.wad
-- **Visual Quality**: Better lighting, textures, and particle effects
+### Graphics
+- OpenGL hardware-accelerated renderer with dynamic GL node generation (ZDBSP)
+- Deferred lighting with G-buffer (normals, albedo, depth)
+- Dynamic lights: per-actor light definitions (LIGHTDEFS lump), projectile lights, weapon flash
+- Corona halos with distance fade and projectile flicker
+- Blob shadows (Doom64-style), bloom, SSAO, screen-space reflections, volumetric fog
+- MD2/MD3 model support
+- Hi-res PNG/JPEG texture and sprite support
+- Software renderer fallback
 
-### Testing & Quality Assurance
-- **Automated E2E Testing**: Map loading, actor spawning, demo playback verification
-- **Performance Monitoring**: FPS tracking, memory usage, load time measurement
-- **Visual Regression Testing**: Screenshot comparison with perceptual hashing
-- **CI/CD Pipeline**: Automated builds and tests on every commit
+### Gameplay
+- Doom, Heretic, and Hexen support
+- Up to 4-player splitscreen
+- Deathmatch, co-op, CTF, domination, assault
+- Level hubs (return to visited maps)
+
+### Editing / Modding
+- WAD, PK3/ZIP, PAK, and directory resource files
+- ZDoom-style MAPINFO, partial DECORATE, SNDINFO, SNDSEQ, ANIMDEFS
+- DeHackEd / BEX support
+- FraggleScript scripting
+- LIGHTDEFS lump for data-driven per-actor light definitions
 
 ## Building
 
-### Prerequisites
-- **CMake** (3.16+)
-- **C++ Compiler** (GCC 9+, Clang 10+, MSVC 2019+)
-- **SDL2 Development Libraries**
-- **Git**
+Full compile instructions: [`docs/compiling.html`](legacy/trunk/docs/compiling.html)
 
-### Quick Start
+The CI pipeline builds Windows only using MSYS2 MinGW64 with Ninja — this is the supported and tested build path.
 
-#### Linux
-```bash
-# Install dependencies
-sudo apt-get update
-sudo apt-get install build-essential cmake libsdl2-dev git
+### Windows (MSYS2/MinGW64)
 
-# Clone and build
-git clone <repository-url>
-cd doomlegacy-legacy2/legacy/trunk
-./build.sh
-```
+1. Install [MSYS2](https://www.msys2.org/) and open the **MSYS2 MinGW 64-bit** shell.
+2. Install dependencies:
+   ```bash
+   pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-ninja mingw-w64-x86_64-cmake \
+             mingw-w64-x86_64-pkg-config mingw-w64-x86_64-glew \
+             mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_mixer \
+             mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg-turbo \
+             mingw-w64-x86_64-openal mingw-w64-x86_64-libvorbis \
+             mingw-w64-x86_64-flac mingw-w64-x86_64-mpg123 \
+             mingw-w64-x86_64-opus mingw-w64-x86_64-wavpack \
+             mingw-w64-x86_64-zlib mingw-w64-x86_64-freetype \
+             mingw-w64-x86_64-enet flex lemon bison
+   ```
+3. Build:
+   ```bash
+   cd legacy/trunk
+   mkdir -p build && cd build
+   cmake -G Ninja ..
+   ninja
+   ```
 
-#### Windows
-```cmd
-REM Install Visual Studio 2022 with C++ workload
-REM Install CMake and SDL2
+> **Important:** Always use the Ninja generator. Do **not** use `-G "MinGW Makefiles"` — its incremental dependency tracker is broken on Windows and will silently skip recompilation of changed files.
 
-git clone <repository-url>
-cd doomlegacy-legacy2\legacy\trunk
-build.bat
-```
-
-#### macOS
-```bash
-# Install Xcode and Homebrew
-brew install cmake sdl2
-
-git clone <repository-url>
-cd doomlegacy-legacy2/legacy/trunk
-mkdir build && cd build
-cmake ..
-make
-```
+Incremental builds: just run `ninja` again from the `build/` directory.
 
 ## Running
 
-### Basic Usage
 ```bash
-# Software rendering
-./doomlegacy -iwad doom1.wad
+# OpenGL mode (recommended)
+./doomlegacy -opengl -iwad doom.wad
 
-# OpenGL rendering
-./doomlegacy -opengl -iwad doom1.wad
+# Software mode
+./doomlegacy -iwad doom.wad
 
-# Test mode (for development)
-./doomlegacy -testmode -iwad doom1.wad -warp 1 1
+# Jump straight to a level
+./doomlegacy -opengl -iwad doom.wad -warp 1 1
+
+# Play back a demo
+./doomlegacy -iwad doom.wad -playdemo demo1
 ```
 
-### Command Line Options
-- `-iwad <file>`: Specify IWAD file (doom1.wad, doom.wad, etc.)
-- `-opengl`: Enable OpenGL rendering
-- `-testmode`: Enable test features and verbose logging
-- `-warp <episode> <level>`: Jump directly to a level
-- `-playdemo <demo>`: Play back a demo file
+A Doom IWAD is required (`doom.wad`, `doom2.wad`, `doom1.wad`, etc.).
+
+### In-game console
+
+Press the key below **Esc** to open the console. Full command reference: [`docs/console.html`](legacy/trunk/docs/console.html)
+
+Useful OpenGL cvars:
+
+| CVar | Default | Description |
+|---|---|---|
+| `gr_dynamiclighting` | On | Enable per-actor dynamic lights |
+| `gr_coronas` | On | Enable corona halos on light sources |
+| `gr_coronasize` | 1 | Corona scale (1–10) |
+| `gr_shadows` | On | Enable blob shadows |
+| `gr_staticlighting` | On | Enable static light emitters |
+| `gr_deferred` | Off | Deferred G-buffer lighting pass |
+
+## Project Structure
+
+```
+legacy/trunk/
+  engine/       Game logic: AI, actors, physics, map loading
+  audio/        SDL_mixer sound and music
+  video/        Rendering: OpenGL renderer, software renderer, hardware/
+    hardware/   GL-specific: oglrenderer, shaders, G-buffer, shadow maps, post-FX
+  net/          Networking (TNL + LNet)
+  interface/    SDL input/video abstraction
+  util/         Static utility library
+  include/      All public headers
+  resources/    legacy.wad assets (textures, LIGHTDEFS, lumps)
+  docs/         HTML documentation
+  tests/        Unit and integration tests
+```
+
+Key headers:
+- `include/doomdef.h` — core constants and enums
+- `include/doomtype.h` — core types (`fixed_t`, `angle_t`)
+- `include/hardware/oglrenderer.hpp` — OpenGL renderer class
+- `include/hardware/hw_gbuffer.h` — deferred G-buffer
+- `include/hardware/hw_lightdefs.h` — LIGHTDEFS data-driven lights
+- `include/g_actor.h` — base actor class
 
 ## Testing
 
-### Automated Testing
-The project includes a comprehensive testing framework:
-
 ```bash
-# Run all tests
-python3 test/test_runner.py
-
-# Run with visual validation
-python3 test/test_runner.py --visual
-
-# Run performance tests
-python3 test/test_runner.py --performance
+cd legacy/trunk/build
+ctest              # run all registered tests
+./test_fixed_t     # fixed-point arithmetic
+./test_actor       # actor/mobj system
+./test_console     # console output
+./test_mapinfo     # MAPINFO parsing
+./test_serialization  # save/load serialization
 ```
 
-### Test Coverage
-- **Map Loading**: BSP verification, geometry validation
-- **Actor Systems**: Monster spawning, AI behavior
-- **Rendering**: OpenGL and software mode compatibility
-- **Performance**: FPS, memory usage, load times
-- **Visual Regression**: Screenshot comparison with baselines
+Some tests require a WAD file in the build directory — copy or symlink `doom.wad` or `doom2.wad` there first.
 
-### CI/CD
-Automated testing runs on every push via GitHub Actions:
-- Multi-platform builds (Linux/Windows/macOS)
-- Full test suite execution
-- Performance regression detection
-- Visual diff reporting
+### Smoke test
 
-## Development
+```bash
+./scripts/smoke_test.sh
+```
 
-### Architecture
-- **Object-Oriented Design**: Map, Actor, and rendering classes
-- **Modular Components**: Separate modules for input, audio, video
-- **Memory Management**: Zone-based allocation system
-- **Extensibility**: Plugin architecture for custom features
+Validates the binary exists and responds to `--help`.
 
-### Key Components
-- `engine/`: Core game logic and systems
-- `interface/`: SDL input/output handling
-- `video/`: Rendering pipeline and graphics
-- `test/`: Testing framework and utilities
+## Documentation
 
-### Contributing
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes with tests
-4. Run the full test suite
-5. Submit a pull request
+All HTML docs are in [`legacy/trunk/docs/`](legacy/trunk/docs/):
 
-## Requirements
-
-### System Requirements
-- **OS**: Linux, Windows 10+, macOS 10.14+
-- **CPU**: x86_64 compatible
-- **RAM**: 256MB minimum, 512MB recommended
-- **GPU**: OpenGL 2.0+ support (optional)
-
-### Game Data
-Requires original Doom WAD files:
-- **Shareware**: `doom1.wad` (free)
-- **Registered**: `doom.wad`
-- **Ultimate Doom**: `doomu.wad`
+| File | Contents |
+|---|---|
+| `features.html` | Full feature list and implementation status |
+| `compiling.html` | Detailed build instructions for all platforms |
+| `console.html` | All console commands and cvars |
+| `editing.html` | WAD/mod editing reference |
+| `legacy.html` | General gameplay manual |
+| `TODO.html` | Known issues and planned work |
+| `BUGS.html` | Known bugs |
 
 ## License
 
-This project is based on the Doom Legacy engine and includes enhancements under compatible open-source licenses.
+Based on the Doom Legacy engine. Licensed under the GNU General Public License v2 or later. See source file headers for details.
 
 ## Credits
 
-- Original Doom engine by id Software
+- Original Doom engine: id Software
 - Doom Legacy development team
-- Enhanced features and testing framework by current maintainers
-
-## Support
-
-- **Issues**: Report bugs on GitHub
-- **Discussions**: Join the community Discord
-- **Documentation**: See `docs/` directory for detailed guides
-
----
-
-*Built with modern C++ and SDL2 for cross-platform compatibility*
+- See [`docs/legacy.html`](legacy/trunk/docs/legacy.html) for full credits
