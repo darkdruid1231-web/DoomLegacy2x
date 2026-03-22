@@ -71,6 +71,7 @@ inline int SDL_GetWindowHeight_wrapper(SDL_Window *w) { int width, height; SDL_G
 #include "hardware/hw_lightdefs.h"
 
 #include "am_map.h"
+#include "m_random.h"
 #include "r_data.h"
 #include "r_draw.h"
 #include "r_main.h"
@@ -161,6 +162,7 @@ void OGLRenderer::CollectDynamicLights(Actor *pov)
         fl.x = x;  fl.y = y;  fl.z = z;
         fl.r = 1.0f;  fl.g = 1.0f;  fl.b = 1.0f;
         fl.radius = ppawn->extralight * 96.0f;
+        fl.isProjectile = false;
         framelights.push_back(fl);
     }
 
@@ -178,6 +180,7 @@ void OGLRenderer::CollectDynamicLights(Actor *pov)
             FrameLight fl;
             if (GetActorLight(da, fl))
             {
+                fl.isProjectile = false;
                 framelights.push_back(fl);
                 continue;
             }
@@ -203,6 +206,7 @@ void OGLRenderer::CollectDynamicLights(Actor *pov)
                     fl.g = spriteLightTable[j].g;
                     fl.b = spriteLightTable[j].b;
                     fl.radius = spriteLightTable[j].radius;
+                    fl.isProjectile = true;
                     framelights.push_back(fl);
                     break;
                 }
@@ -306,6 +310,40 @@ void OGLRenderer::InitShadowTexture()
 
     glGenTextures(1, &shadowTex);
     glBindTexture(GL_TEXTURE_2D, shadowTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, SIZE, SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+}
+
+/// Build a 64×64 Gaussian glow texture used for corona halos.
+/// Wider and softer than the blob shadow (true Gaussian vs. quadratic),
+/// with full alpha at the centre to give a bright point-light appearance.
+void OGLRenderer::InitCoronaTexture()
+{
+    const int SIZE = 64;
+    unsigned char data[SIZE * SIZE * 4];
+    const float cx = SIZE * 0.5f, cy = SIZE * 0.5f;
+    const float sigma = SIZE * 0.22f;  // controls glow width (~1.5× softer than shadow)
+    const float inv2s2 = 1.0f / (2.0f * sigma * sigma);
+
+    for (int y = 0; y < SIZE; y++)
+    {
+        for (int x = 0; x < SIZE; x++)
+        {
+            float dx = x - cx, dy = y - cy;
+            float a = expf(-(dx*dx + dy*dy) * inv2s2);  // Gaussian falloff
+            int i = (y * SIZE + x) * 4;
+            data[i+0] = 255;
+            data[i+1] = 255;
+            data[i+2] = 255;
+            data[i+3] = (unsigned char)(a * 255);
+        }
+    }
+
+    glGenTextures(1, &coronaTex);
+    glBindTexture(GL_TEXTURE_2D, coronaTex);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, SIZE, SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -471,16 +509,16 @@ void OGLRenderer::DrawAllBlobShadows() const
 }
 
 /// Draw additive corona halos at each dynamic light position.
-/// Coronas use the same circular gradient texture as blob shadows but are
-/// rendered with additive blending so they glow on top of the scene.
+/// Matches legacy 1.42 behaviour: Gaussian glow texture, distance-based alpha
+/// fade, and per-frame flicker on projectile lights (rockets, plasma, etc.).
 /// Camera-aligned billboard quads are built from the modelview matrix.
 void OGLRenderer::DrawAllCoronas() const
 {
-    if (framelights.empty() || !shadowTex)
+    if (framelights.empty() || !coronaTex)
         return;
 
     // Extract camera right and up vectors from the current modelview matrix.
-    // In OpenGL's column-major layout the first row of the 3x3 rotation
+    // In OpenGL's column-major layout the first row of the 3×3 rotation
     // sub-matrix lives at mv[0], mv[4], mv[8] (right) and
     // mv[1], mv[5], mv[9] (up).
     const GLfloat *mv = cached_mv;
@@ -502,24 +540,51 @@ void OGLRenderer::DrawAllCoronas() const
     glGetIntegerv(GL_BLEND_SRC,        &c_saved_blend_src);
     glGetIntegerv(GL_BLEND_DST,        &c_saved_blend_dst);
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, shadowTex);
+    glBindTexture(GL_TEXTURE_2D, coronaTex);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);   // additive — glow on top of geometry
     glDepthMask(GL_FALSE);               // don't write to depth buffer
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
+    glDisable(GL_DEPTH_TEST);            // always visible — coronas are at the light source;
+                                         // depth-testing a billboard gives partial-clip artefacts
     glDisable(GL_ALPHA_TEST);
+
+    // Distance fade constants matching legacy 1.42: full alpha within 512 units,
+    // linear fade to zero at 2048 units.
+    const float FADE_START = 512.0f;
+    const float FADE_END   = 2048.0f;
 
     for (size_t i = 0; i < framelights.size(); i++)
     {
         const FrameLight &fl = framelights[i];
-        // Corona size is proportional to light radius, scaled by the CVar.
+
+        // World-space distance from camera to light.
+        float dx = fl.x - x, dy = fl.y - y, dz = fl.z - z;
+        float dist = sqrtf(dx*dx + dy*dy + dz*dz);
+
+        // Skip coronas that are too far away.
+        if (dist >= FADE_END)
+            continue;
+
+        // Distance-based alpha fade (full → 0 over [FADE_START, FADE_END]).
+        float alpha = 0.6f;
+        if (dist > FADE_START)
+            alpha *= 1.0f - (dist - FADE_START) / (FADE_END - FADE_START);
+
+        // Projectile lights (rockets, plasma balls, etc.) flicker each frame
+        // by randomising alpha — matches 1.42's rocket corona behaviour.
+        if (fl.isProjectile)
+            alpha = (M_Random() >> 1) * (1.0f / 255.0f);  // random [0, 0.5]
+
+        if (alpha <= 0.0f)
+            continue;
+
+        // Corona size: proportional to light radius, scaled by the CVar.
         float size = fl.radius * 0.15f * coronaScale;
 
         float lx = fl.x, ly = fl.y, lz = fl.z;
 
         // Build a camera-facing quad centered at the light position.
-        glColor4f(fl.r, fl.g, fl.b, 0.5f);
+        glColor4f(fl.r, fl.g, fl.b, alpha);
         glBegin(GL_QUADS);
         glTexCoord2f(0,0); glVertex3f(lx - rx*size - ux*size, ly - ry*size - uy*size, lz - rz*size - uz*size);
         glTexCoord2f(1,0); glVertex3f(lx + rx*size - ux*size, ly + ry*size - uy*size, lz + rz*size - uz*size);
@@ -530,7 +595,7 @@ void OGLRenderer::DrawAllCoronas() const
 
     glDepthMask(c_was_depth_mask);
     if (c_was_blend)   glEnable(GL_BLEND);  else glDisable(GL_BLEND);
-    if (!c_was_depth)  glDisable(GL_DEPTH_TEST);
+    if (c_was_depth)   glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
     if (!c_was_tex2d)  glDisable(GL_TEXTURE_2D);
     if (c_was_alpha)   glEnable(GL_ALPHA_TEST); else glDisable(GL_ALPHA_TEST);
     glDepthFunc(c_saved_depth_func);
@@ -587,6 +652,7 @@ OGLRenderer::OGLRenderer()
 #endif
     curssec = NULL;
     shadowTex = 0;
+    coronaTex = 0;
     matrix_ubo = 0;
     memset(cached_mv,   0, sizeof(cached_mv));
     memset(cached_proj, 0, sizeof(cached_proj));
@@ -684,8 +750,9 @@ void OGLRenderer::InitGLState()
     // Populate the data-driven light emitter table with hardcoded defaults.
     InitLightDefs();
 
-    // Build the blob shadow texture.
+    // Build the blob shadow and corona glow textures.
     InitShadowTexture();
+    InitCoronaTexture();
 
     // Create and bind the MatrixUBO at binding point 0
     glGenBuffers(1, &matrix_ubo);

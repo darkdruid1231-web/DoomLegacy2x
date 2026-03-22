@@ -129,9 +129,10 @@ struct quad {
 
 /// A single dynamic light valid for one rendered frame.
 struct FrameLight {
-  float x, y, z;     ///< World position
-  float r, g, b;     ///< Light color (0-1)
-  float radius;      ///< Attenuation radius in world units
+  float x, y, z;        ///< World position
+  float r, g, b;        ///< Light color (0-1)
+  float radius;         ///< Attenuation radius in world units
+  bool  isProjectile;   ///< True for missile/explosion sprites — enables corona flicker
 };
 
 /// \brief OpenGL renderer.
@@ -195,6 +196,10 @@ private:
   // Blob shadow system.
   GLuint shadowTex;         ///< Circular gradient texture for blob shadows.
   void InitShadowTexture();
+
+  // Corona system.
+  GLuint coronaTex;         ///< Wide Gaussian glow texture for corona halos.
+  void InitCoronaTexture();
 
   // Matrix UBO (GL 3.1+) — eliminates per-surface glGetFloatv stalls
   GLuint matrix_ubo;
