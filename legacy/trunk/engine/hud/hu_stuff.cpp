@@ -63,6 +63,7 @@ void ST_Overlay_OnChange()
 }
 
 consvar_t cv_stbaroverlay = {"hud_overlay", "kahmf", CV_SAVE | CV_CALL, NULL, ST_Overlay_OnChange};
+consvar_t cv_framerate    = {"framerate", "0", CV_SAVE, CV_OnOff};
 consvar_t *chat_macros[10];
 
 //======================================================================
@@ -104,6 +105,7 @@ void HUD::Startup()
 
     // client hud
     cv_stbaroverlay.Reg();
+    cv_framerate.Reg();
 
     // first initialization
     Init();

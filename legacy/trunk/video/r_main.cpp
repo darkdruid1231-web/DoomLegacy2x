@@ -123,6 +123,11 @@ consvar_t cv_scalestatusbar = {"scalestatusbar", "0", CV_SAVE | CV_CALL, CV_YesN
 CV_PossibleValue_t fov_cons_t[] = {{1, "MIN"}, {179, "MAX"}, {0, NULL}};
 consvar_t cv_fov = {"fov", "90", CV_SAVE | CV_CALL | CV_NOINIT, fov_cons_t, R_ExecuteSetViewSize};
 
+// gr_fov is the doc-specified alias for fov; setting it forwards to cv_fov.
+extern consvar_t cv_gr_fov;
+static void GrFov_OnChange() { cv_fov.Set(cv_gr_fov.str); }
+consvar_t cv_gr_fov = {"gr_fov", "90", CV_CALL | CV_NOINIT, fov_cons_t, GrFov_OnChange};
+
 void Translucency_OnChange();
 void BloodTime_OnChange();
 CV_PossibleValue_t bloodtime_cons_t[] = {{1, "MIN"}, {3600, "MAX"}, {0, NULL}};

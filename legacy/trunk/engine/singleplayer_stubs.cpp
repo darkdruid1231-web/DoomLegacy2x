@@ -43,7 +43,7 @@ consvar_t cv_timelimit = {"timelimit", "0", 0};
 consvar_t cv_nomonsters = {"nomonsters", "0", 0};
 consvar_t cv_fastmonsters = {"fastmonsters", "0", 0};
 consvar_t cv_respawnmonsters = {"respawnmonsters", "0", 0};
-consvar_t cv_allowmlook = {"allowmlook", "1", 0};
+consvar_t cv_allowmlook = {"allowfreelook", "1", 0};
 consvar_t cv_exitmode = {"exitmode", "0", 0};
 consvar_t cv_itemrespawntime = {"itemrespawntime", "0", 0};
 consvar_t cv_bodyqueue_size = {"bodyqueue_size", "8", 0};
@@ -177,6 +177,7 @@ void CL_Init()
     cv_viewsize.Reg();
     cv_scalestatusbar.Reg();
     cv_fov.Reg();
+    cv_gr_fov.Reg();
     cv_splitscreen.Reg();
 }
 

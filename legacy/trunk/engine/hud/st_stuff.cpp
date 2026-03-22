@@ -49,6 +49,7 @@
 
 #include "w_wad.h"
 #include "z_zone.h"
+#include "i_system.h"
 
 #include "hardware/oglhelpers.hpp"
 #include "hardware/oglrenderer.hpp"
@@ -1271,6 +1272,27 @@ void HUD::ST_Drawer(int vp)
         if (!drawscore || cv_splitscreen.value)
             for (i = overlay.size() - 1; i >= 0; i--)
                 overlay[i]->Update(true);
+    }
+
+    // Framerate display (toggled by cv_framerate).
+    if (cv_framerate.value)
+    {
+        static unsigned int fps_last_ms  = 0;
+        static int          fps_frames   = 0;
+        static int          fps_display  = 0;
+
+        unsigned int now = I_GetTime();
+        fps_frames++;
+        if (now - fps_last_ms >= 1000)
+        {
+            fps_display  = fps_frames;
+            fps_frames   = 0;
+            fps_last_ms  = now;
+        }
+
+        char buf[16];
+        sprintf(buf, "%d FPS", fps_display);
+        hud_font->DrawString(2, 4, buf, V_SCALE);
     }
 }
 

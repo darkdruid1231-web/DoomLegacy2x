@@ -105,6 +105,7 @@ extern consvar_t cons_logfile;
 
 // client hud (hu_stuff.cpp)
 extern consvar_t cv_stbaroverlay;
+extern consvar_t cv_framerate;
 
 // client chat (hu_stuff.cpp)
 extern consvar_t cv_chatmacro1;
@@ -141,6 +142,7 @@ extern consvar_t cv_viewsize;
 extern consvar_t cv_detaillevel;
 extern consvar_t cv_scalestatusbar;
 extern consvar_t cv_fov;
+extern consvar_t cv_gr_fov; ///< doc-specified alias for cv_fov
 
 extern consvar_t cv_screenslink;
 extern consvar_t cv_translucency;

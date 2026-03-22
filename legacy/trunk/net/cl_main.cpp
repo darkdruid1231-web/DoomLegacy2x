@@ -232,6 +232,7 @@ void CL_Init()
     cv_viewsize.Reg();
     cv_scalestatusbar.Reg();
     cv_fov.Reg();
+    cv_gr_fov.Reg();
     cv_splitscreen.Reg();
 
     cv_screenslink.Reg();
