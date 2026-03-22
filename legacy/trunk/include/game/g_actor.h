@@ -409,6 +409,9 @@ class Actor : public Thinker, public NetObject
 
   protected:
     void CheckLineImpact(vector<struct line_t *> &spechit); ///< only used with TryMove
+    pair<bool, Actor*> CheckXYMovement(position_check_t* ccc, const vec_t<fixed_t>& newpos);
+    bool CheckZClipping(position_check_t* ccc, bool allowdropoff, Actor* floor_thing);
+    void FinalizePosition(const vec_t<fixed_t>& newpos, position_check_t* ccc, Actor* floor_thing, fixed_t oldx, fixed_t oldy);
     void SlideMove(fixed_t nx, fixed_t ny);
     void BounceWall(fixed_t nx, fixed_t ny);
 

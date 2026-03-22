@@ -200,6 +200,11 @@ svalue_t svariable_t::getvalue()
         returnvar.type = svt_actor;
         returnvar.value.mobj = *value.pMobj;
     }
+    else if (type == svt_actor)
+    {
+        returnvar.type = svt_actor;
+        returnvar.value.mobj = value.mobj; // must copy full 64-bit pointer, not just value.i
+    }
     else
     {
         returnvar.type = type;

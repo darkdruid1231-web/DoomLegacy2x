@@ -121,21 +121,10 @@ void Map::Ticker()
         if (!respawnqueue.empty())
             i = RespawnPlayers();
 
-        // CONS_Printf("think..");
-        // RunThinkers();
-
-        // CONS_Printf("specials..");
         UpdateSpecials();
-
-        // CONS_Printf("respawnspecials..");
         RespawnSpecials();
-
-        // CONS_Printf("sound sequences..");
         UpdateSoundSequences();
-
-        // CONS_Printf("FS..");
         FS_DelayedScripts();
-
         HandlePlayers();
     }
     else

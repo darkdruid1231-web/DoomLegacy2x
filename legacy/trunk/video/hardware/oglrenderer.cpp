@@ -1593,6 +1593,12 @@ void OGLRenderer::RenderPlayerView(PlayerInfo *player)
 {
     validcount++;
 
+    if (devparm)
+        CONS_Printf("[RenderPlayerView] player=%p pov=%p mp=%p\n",
+                    (void*)player,
+                    player ? (void*)player->pov : (void*)0,
+                    player ? (void*)player->mp : (void*)0);
+
     // Set up the Map to be rendered. Needs to be done separately for each viewport, since the
     // engine can run several Maps at once.
     mp = player->mp;

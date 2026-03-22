@@ -1141,9 +1141,81 @@ void Map::GroupLines()
 
         // Every gl subsector should have at least one non-miniseg.
         if (!ss->sector)
-            CONS_Printf("GL subsector %d (first_seg=%d, num_segs=%d) has no sector — "
-                        "consists entirely of minisegs or has invalid seg refs.\n",
-                        i, ss->first_seg, ss->num_segs);
+            if (devparm)
+                CONS_Printf("GL subsector %d (first_seg=%d, num_segs=%d) has no sector — "
+                            "will propagate from partner segs.\n",
+                            i, ss->first_seg, ss->num_segs);
+    }
+
+    // Second pass: propagate sectors to miniseg-only subsectors via partner_seg links.
+    // A GL subsector consisting entirely of minisegs (no linedef segs) cannot get its
+    // sector assigned in the first pass. We walk partner_seg links — each miniseg has a
+    // partner in an adjacent subsector — and propagate from any adjacent subsector that
+    // already has a sector. We repeat until no more propagations are possible.
+    {
+        // Build reverse mapping: seg index -> subsector index.
+        vector<int> seg_to_ss(numsegs, -1);
+        for (int si = 0; si < numsubsectors; si++)
+        {
+            int segend = subsectors[si].first_seg + subsectors[si].num_segs;
+            if (segend > numsegs) segend = numsegs;
+            for (int sj = subsectors[si].first_seg; sj < segend; sj++)
+                seg_to_ss[sj] = si;
+        }
+
+        bool changed = true;
+        while (changed)
+        {
+            changed = false;
+            for (int si = 0; si < numsubsectors; si++)
+            {
+                if (subsectors[si].sector)
+                    continue; // already assigned
+
+                int segend = subsectors[si].first_seg + subsectors[si].num_segs;
+                if (segend > numsegs) segend = numsegs;
+
+                for (int sj = subsectors[si].first_seg; sj < segend; sj++)
+                {
+                    seg_t *seg = &segs[sj];
+                    if (!seg->partner_seg)
+                        continue;
+
+                    int partner_idx = (int)(seg->partner_seg - segs);
+                    if (partner_idx < 0 || partner_idx >= numsegs)
+                        continue;
+
+                    int partner_ss = seg_to_ss[partner_idx];
+                    if (partner_ss < 0 || partner_ss >= numsubsectors)
+                        continue;
+
+                    if (subsectors[partner_ss].sector)
+                    {
+                        subsectors[si].sector = subsectors[partner_ss].sector;
+                        changed = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        int still_null = 0;
+        for (int si = 0; si < numsubsectors; si++)
+            if (!subsectors[si].sector)
+                still_null++;
+        if (still_null > 0)
+            CONS_Printf("  WARNING: %d GL subsectors have no sector after propagation"
+                        " (degenerate BSP). Actors spawning there will use sector 0.\n",
+                        still_null);
+
+        // Final fallback: assign sector 0 to any remaining null-sector subsectors so
+        // Actor::SetPosition() can never crash on a null sector pointer.
+        if (still_null > 0 && numsectors > 0)
+        {
+            for (int si = 0; si < numsubsectors; si++)
+                if (!subsectors[si].sector)
+                    subsectors[si].sector = &sectors[0];
+        }
     }
 
     // count number of lines in each sector
