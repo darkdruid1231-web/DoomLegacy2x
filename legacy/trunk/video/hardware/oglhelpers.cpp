@@ -141,6 +141,56 @@ consvar_t cv_grbloomthreshold  = {"gr_bloomthreshold",  "0.8", CV_SAVE | CV_FLOA
 consvar_t cv_grbloomstrength   = {"gr_bloomstrength",   "0.4", CV_SAVE | CV_FLOAT, NULL, NULL, 0};
 consvar_t cv_grssao            = {"gr_ssao",            "Off", CV_SAVE, CV_OnOff, NULL, 0};
 consvar_t cv_grssaostrength    = {"gr_ssaostrength",    "0.6", CV_SAVE | CV_FLOAT, NULL, NULL, 0};
+consvar_t cv_grdeferred        = {"gr_deferred",        "Off", CV_SAVE, CV_OnOff, NULL, 0};
+
+// Number of deferred lights that receive cube shadow maps (Phase 3.2). 0 = off, 1-4.
+CV_PossibleValue_t cubeshadows_cons_t[] = {{0, "MIN"}, {4, "MAX"}, {0, NULL}};
+consvar_t cv_grcubeshadows     = {"gr_cubeshadows",     "1",   CV_SAVE, cubeshadows_cons_t, NULL, 0};
+
+// Screen-space reflections (Phase 4.1).
+static void CV_GrSSR_OnChange(); // forward-declared so cv_grssr can reference it
+extern consvar_t cv_grssr;       // forward-declared so the callback can reference it
+static void CV_GrSSR_OnChange()
+{
+    if (cv_grssr.value && !cv_grdeferred.value)
+    {
+        cv_grssr.Set(0);
+        CONS_Printf("gr_ssr requires gr_deferred On\n");
+    }
+}
+consvar_t cv_grssr             = {"gr_ssr",             "Off", CV_SAVE | CV_CALL, CV_OnOff, CV_GrSSR_OnChange, 0};
+static CV_PossibleValue_t ssrstrength_cons_t[] = {{0, "MIN"}, {100, "MAX"}, {0, NULL}};
+consvar_t cv_grssrstrength     = {"gr_ssrstrength",     "30",  CV_SAVE, ssrstrength_cons_t, NULL, 0};
+
+// Volumetric fog PostFX pass (Phase 4.2).
+// Use gr_fog 0 when enabling this to avoid double-fogging.
+consvar_t cv_grvolfog          = {"gr_volfog",          "Off", CV_SAVE, CV_OnOff, NULL, 0};
+
+// FXAA anti-aliasing (Phase 5.2).
+consvar_t cv_grfxaa            = {"gr_fxaa",            "Off", CV_SAVE, CV_OnOff, NULL, 0};
+
+// God rays — screen-space volumetric light shafts (Phase 5.3).
+consvar_t cv_grgodrays         = {"gr_godrays",         "Off", CV_SAVE, CV_OnOff, NULL, 0};
+consvar_t cv_grgodraysstrength = {"gr_godraysstrength", "0.5", CV_SAVE | CV_FLOAT, NULL, NULL, 0};
+static CV_PossibleValue_t sunazimuth_cons_t[]  = {{0, "MIN"}, {359, "MAX"}, {0, NULL}};
+static CV_PossibleValue_t sunaltitude_cons_t[] = {{0, "MIN"}, {89,  "MAX"}, {0, NULL}};
+consvar_t cv_grsunazimuth      = {"gr_sunazimuth",      "225", CV_SAVE, sunazimuth_cons_t,  NULL, 0};
+consvar_t cv_grsunaltitude     = {"gr_sunaltitude",     "45",  CV_SAVE, sunaltitude_cons_t, NULL, 0};
+
+// Deferred Blinn-Phong specular (Phase 5.1). Only visible when gr_deferred is on.
+static void CV_GrSpecular_OnChange(); // forward-declared so cv_grspecular can reference it
+extern consvar_t cv_grspecular;       // forward-declared so the callback can reference it
+static void CV_GrSpecular_OnChange()
+{
+    if (cv_grspecular.value && !cv_grdeferred.value)
+    {
+        cv_grspecular.Set(0);
+        CONS_Printf("gr_specular requires gr_deferred On\n");
+    }
+}
+consvar_t cv_grspecular        = {"gr_specular",        "0.3", CV_SAVE | CV_FLOAT | CV_CALL, NULL, CV_GrSpecular_OnChange, 0};
+static CV_PossibleValue_t specexp_cons_t[] = {{4, "MIN"}, {128, "MAX"}, {0, NULL}};
+consvar_t cv_grspecularexp     = {"gr_specularexp",     "32",  CV_SAVE, specexp_cons_t, NULL, 0};
 
 void OGL_AddCommands()
 {
@@ -171,6 +221,18 @@ void OGL_AddCommands()
     cv_grbloomstrength.Reg();
     cv_grssao.Reg();
     cv_grssaostrength.Reg();
+    cv_grdeferred.Reg();
+    cv_grcubeshadows.Reg();
+    cv_grssr.Reg();
+    cv_grssrstrength.Reg();
+    cv_grvolfog.Reg();
+    cv_grfxaa.Reg();
+    cv_grgodrays.Reg();
+    cv_grgodraysstrength.Reg();
+    cv_grsunazimuth.Reg();
+    cv_grsunaltitude.Reg();
+    cv_grspecular.Reg();
+    cv_grspecularexp.Reg();
 }
 
 // Converts Doom sector light values to suitable background pixel

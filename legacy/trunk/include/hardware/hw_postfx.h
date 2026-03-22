@@ -56,13 +56,22 @@ public:
     /// True when at least one effect is enabled and FBOs are ready.
     bool IsActive() const;
 
+    // Accessors for G-buffer initialization (shares textures with scene FBO).
+    GLuint GetSceneFBO()      const { return scene_fbo; }
+    GLuint GetSceneColorTex() const { return scene_color_tex; }
+    GLuint GetSceneDepthTex() const { return scene_depth_tex; }
+    int GetWidth()  const { return width; }
+    int GetHeight() const { return height; }
+
 private:
     bool fbo_ready;         ///< Init succeeded (FBOs allocated).
 
-    // Scene FBO (full resolution)
+    // Scene FBO (full resolution, MRT: attachment 0 = color, attachment 1 = G-buffer normals)
     GLuint scene_fbo;
     GLuint scene_color_tex;
     GLuint scene_depth_tex;
+    GLuint gbuf_norm_tex;     ///< View-space normal texture (attachment 1 of scene_fbo; owned here)
+    GLuint gbuf_albedo_tex;   ///< Pre-fog diffuse RGB texture (attachment 2 of scene_fbo; Phase 3.1b)
 
     // Bloom ping-pong FBOs (half resolution)
     GLuint bloom_fbo[2];
@@ -74,14 +83,42 @@ private:
     GLuint ssao_blur_fbo;
     GLuint ssao_blur_tex;
 
+    // SSR FBO (Phase 4.1)
+    GLuint ssr_fbo;
+    GLuint ssr_tex;
+
+    // Volumetric fog FBO (Phase 4.2)
+    GLuint volfog_fbo;
+    GLuint volfog_tex;
+
+    // LDR intermediate FBO — tonemapping/bloom write here when FXAA is active (Phase 5.2)
+    GLuint ldr_fbo;
+    GLuint ldr_tex;
+
+    // God rays FBO (Phase 5.3) — radial-blur light shaft accumulation
+    GLuint godrays_fbo;
+    GLuint godrays_tex;
+
+    // Screen-quad VAO for fullscreen passes (Phase 1.2)
+    GLuint screenquad_vao;
+    GLuint screenquad_vbo;
+
+    // Tone-mapping shader (Phase 2.1 HDR)
+    ShaderProg *prog_tonemapping;
+
     // Post-processing shaders
     ShaderProg *prog_brightpass;
     ShaderProg *prog_blur_h;
     ShaderProg *prog_blur_v;
     ShaderProg *prog_composite;
     ShaderProg *prog_ssao;
+    ShaderProg *prog_ssao_gbuf;     ///< SSAO variant that reads normals from G-buffer (Phase 2.2)
     ShaderProg *prog_ssao_blur;
     ShaderProg *prog_ssao_composite;
+    ShaderProg *prog_ssr;           ///< Screen-space reflection ray-march (Phase 4.1)
+    ShaderProg *prog_vol_fog;       ///< Volumetric fog analytical pass (Phase 4.2)
+    ShaderProg *prog_fxaa;          ///< FXAA anti-aliasing final pass (Phase 5.2)
+    ShaderProg *prog_godrays;       ///< Volumetric light shafts radial blur (Phase 5.3)
 
     int width, height;
 
@@ -98,6 +135,10 @@ private:
 
     void BloomPass();
     void SSAOPass();
+    void SSRPass();
+    void VolFogPass();
+    void FXAAPass();
+    void GodRaysPass();
     void CompileShaders();
     void DeleteShaders();
 };

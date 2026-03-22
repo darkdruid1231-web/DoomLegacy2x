@@ -190,4 +190,16 @@ extern consvar_t cv_grbloomthreshold;
 extern consvar_t cv_grbloomstrength;
 extern consvar_t cv_grssao;
 extern consvar_t cv_grssaostrength;
+extern consvar_t cv_grdeferred; ///< Enable G-buffer MRT + deferred dynamic light accumulation (Phase 3.1).
+extern consvar_t cv_grcubeshadows; ///< Number of deferred lights that receive omnidirectional cube shadow maps (Phase 3.2). 0 = off, 1-4.
+extern consvar_t cv_grssr;         ///< Enable screen-space reflections (Phase 4.1). Requires deferred mode.
+extern consvar_t cv_grssrstrength; ///< SSR blend strength [0,1] (Phase 4.1).
+extern consvar_t cv_grvolfog;      ///< Enable PostFX exponential volumetric fog (Phase 4.2).
+extern consvar_t cv_grfxaa;        ///< FXAA anti-aliasing (Phase 5.2).
+extern consvar_t cv_grgodrays;         ///< Volumetric light shafts (Phase 5.3).
+extern consvar_t cv_grgodraysstrength; ///< God rays blend strength [0,1] (Phase 5.3).
+extern consvar_t cv_grsunazimuth;      ///< Sun compass direction in degrees 0–359 (Phase 5.3).
+extern consvar_t cv_grsunaltitude;     ///< Sun elevation in degrees 0–89 (Phase 5.3).
+extern consvar_t cv_grspecular;    ///< Blinn-Phong specular strength [0,1] (Phase 5.1).
+extern consvar_t cv_grspecularexp; ///< Blinn-Phong specular exponent [4,128] (Phase 5.1).
 #endif
