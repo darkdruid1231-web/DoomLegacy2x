@@ -42,6 +42,10 @@
 #include "w_wad.h"
 #include "z_zone.h"
 
+#include "command.h"
+#include "cvars.h"
+#include "g_mapinfo.h"
+
 dehacked_t DEH; // one global instance
 
 extern char orig_sprnames[NUMSPRITES][5];
@@ -313,6 +317,11 @@ dehacked_t::dehacked_t()
     max_health = 200;
     max_soul_health = 200;
     initial_bullets = 50;
+
+    memset(deh_pars, 0, sizeof(deh_pars));
+    memset(deh_cpars, 0, sizeof(deh_cpars));
+    has_pars = false;
+    helper_MT = -1;
 }
 
 void dehacked_t::error(const char *first, ...)
@@ -1010,7 +1019,13 @@ void dehacked_t::Read_Misc()
             wpnlev1info[wp_bfg].ammopershoot = value;
         else if (!strcasecmp(word1, "Monsters"))
         {
-        } // TODO
+            // Boom/PrBoom/MBF values: 0=off, 1=on, 3=coop, 221=full infight
+            // Map to cv_infighting: 0=off, 1=on
+            if (value == 1 || value == 3 || value == 221)
+                cv_infighting.Set(1);
+            else
+                cv_infighting.Set(0);
+        }
         else
             error("Misc : unknown command '%s'\n", word1);
     }
@@ -1169,6 +1184,178 @@ void dehacked_t::Read_STRINGS()
     }
 }
 
+// Parses MAPINFO defaultmap section
+void dehacked_t::Read_DEFAULTMAP()
+{
+    // For now, just skip the section to avoid "Unknown command" errors
+    // TODO: Implement full MAPINFO defaultmap parsing
+    while (p.NewLine(false))
+    {
+        p.PassWS();
+        if (!p.LineLen())
+            break; // a whitespace-only line ends the record
+        // Skip the line
+        p.GetToken("\0");
+    }
+}
+
+// Parses MAPINFO map section
+void dehacked_t::Read_MAP()
+{
+    // For now, just skip the section to avoid "Unknown command" errors
+    // TODO: Implement full MAPINFO map parsing
+    while (p.NewLine(false))
+    {
+        p.PassWS();
+        if (!p.LineLen())
+            break; // a whitespace-only line ends the record
+        // Skip the line
+        p.GetToken("\0");
+    }
+}
+
+// Parses MAPINFO clusterdef section
+void dehacked_t::Read_CLUSTERDEF()
+{
+    // For now, just skip the section to avoid "Unknown command" errors
+    // TODO: Implement full MAPINFO clusterdef parsing
+    while (p.NewLine(false))
+    {
+        p.PassWS();
+        if (!p.LineLen())
+            break; // a whitespace-only line ends the record
+        // Skip the line
+        p.GetToken("\0");
+    }
+}
+
+// Parses MAPINFO episode section
+void dehacked_t::Read_EPISODE()
+{
+    // For now, just skip the section to avoid "Unknown command" errors
+    // TODO: Implement full MAPINFO episode parsing
+    while (p.NewLine(false))
+    {
+        p.PassWS();
+        if (!p.LineLen())
+            break; // a whitespace-only line ends the record
+        // Skip the line
+        p.GetToken("\0");
+    }
+}
+
+// BEX [PARS] section parser
+// Supports: par <episode> <level> <seconds>  (Doom1)
+//           par <mapnum> <seconds>           (Doom2)
+void dehacked_t::Read_PARS()
+{
+    while (p.NewLine(false))
+    {
+        p.PassWS();
+        if (!p.LineLen())
+            break; // blank line ends section
+
+        char *word = p.GetToken(" \t");
+        if (!word)
+            break;
+
+        if (strcasecmp(word, "par") != 0)
+            break; // not a par line, section is done
+
+        char *s1 = p.GetToken(" \t");
+        char *s2 = p.GetToken(" \t");
+        char *s3 = p.GetToken(" \t");
+
+        if (s1 && s2 && s3)
+        {
+            // Doom1 format: par episode level seconds
+            int ep = atoi(s1), lv = atoi(s2), sec = atoi(s3);
+            if (ep < 1 || ep > 3 || lv < 1 || lv > 9)
+                error("BEX [PARS]: bad par E%dM%d\n", ep, lv);
+            else
+            {
+                deh_pars[ep][lv] = sec;
+                has_pars = true;
+            }
+        }
+        else if (s1 && s2)
+        {
+            // Doom2 format: par mapnum seconds
+            int mapnum = atoi(s1), sec = atoi(s2);
+            if (mapnum < 1 || mapnum > 32)
+                error("BEX [PARS]: bad par MAP%d\n", mapnum);
+            else
+            {
+                deh_cpars[mapnum - 1] = sec;
+                has_pars = true;
+            }
+        }
+        else
+            error("BEX [PARS]: invalid par format\n");
+    }
+}
+
+// Apply stored BEX [PARS] overrides to MapInfo objects.
+// Must be called after GameInfo::Read_MAPINFO() has populated the map table.
+void dehacked_t::ApplyPars()
+{
+    if (!has_pars)
+        return;
+
+    // Doom1 maps: lumpname = "E<ep>M<lv>"
+    for (int ep = 1; ep <= 3; ep++)
+        for (int lv = 1; lv <= 9; lv++)
+            if (deh_pars[ep][lv])
+            {
+                char name[8];
+                snprintf(name, sizeof(name), "E%dM%d", ep, lv);
+                MapInfo *mi = game.FindMapInfo(name);
+                if (mi)
+                    mi->partime = deh_pars[ep][lv];
+            }
+
+    // Doom2 maps: find by number (MAP01 = 1, etc.)
+    for (int i = 0; i < 32; i++)
+        if (deh_cpars[i])
+        {
+            MapInfo *mi = game.FindMapInfo(i + 1);
+            if (mi)
+                mi->partime = deh_cpars[i];
+        }
+}
+
+// BEX [HELPER] section parser — stores the substitute helper thing type.
+// Note: MT_DOGS (MBF helper dogs) is not yet implemented in the engine.
+void dehacked_t::Read_HELPER()
+{
+    while (p.NewLine(false))
+    {
+        p.PassWS();
+        if (!p.LineLen())
+            break;
+
+        char *word = p.GetToken(" \t=");
+        if (!word)
+            break;
+
+        if (strcasecmp(word, "helper") != 0)
+            break; // unknown keyword, done
+
+        char *numstr = p.GetToken(" \t=");
+        if (numstr)
+        {
+            int val = atoi(numstr);
+            if (val > 0 && val < 1000)
+            {
+                // DEH thing numbers are 1-based; store as 0-based mobj type index
+                helper_MT = val - 1;
+                CONS_Printf("DEH: [HELPER] thing %d stored (MBF helper dogs not yet implemented)\n", val);
+                break;
+            }
+        }
+    }
+}
+
 // dehacked command parser
 enum DEH_cmd_t
 {
@@ -1186,7 +1373,27 @@ enum DEH_cmd_t
     DEH_Patch,
     DEH_CODEPTR,
     DEH_PARS,
+    DEH_HELPER,
     DEH_STRINGS,
+    DEH_DEFAULTMAP,
+    DEH_MAP,
+    DEH_CLUSTERDEF,
+    DEH_EPISODE,
+    DEH_CLUSTER,
+    DEH_NEXTLEVEL,
+    DEH_SKY1,
+    DEH_INTERPIC,
+    DEH_INTERMUSIC,
+    DEH_PAR,
+    DEH_MUSIC,
+    DEH_PICNAME,
+    DEH_BOSSDEATH,
+    DEH_FLAT,
+    DEH_EXITTEXT,
+    DEH_ENTERTEXT,
+    DEH_ENGINE,   // WhackEd2 metadata: "Engine config"
+    DEH_DATAWAD,  // WhackEd2 metadata: "Data WAD"
+    DEH_IWAD,     // WhackEd2 metadata: "IWAD"
     DEH_NUM
 };
 
@@ -1204,7 +1411,27 @@ static const char *DEH_cmds[DEH_NUM + 1] = {"thing",
                                             "patch",
                                             "[CODEPTR]",
                                             "[PARS]",
+                                            "[HELPER]",
                                             "[STRINGS]",
+                                            "defaultmap",
+                                            "map",
+                                            "clusterdef",
+                                            "episode",
+                                            "cluster",
+                                            "nextlevel",
+                                            "sky1",
+                                            "interpic",
+                                            "intermusic",
+                                            "par",
+                                            "music",
+                                            "picname",
+                                            "bossdeath",
+                                            "flat",
+                                            "exittext",
+                                            "entertext",
+                                            "engine",   // WhackEd2: "Engine config"
+                                            "data",     // WhackEd2: "Data WAD"
+                                            "iwad",     // WhackEd2: "IWAD"
                                             NULL};
 
 // Parse a DeHackEd lump
@@ -1233,6 +1460,7 @@ bool dehacked_t::LoadDehackedLump(int lump)
     memcpy(save_sprnames, orig_sprnames, sizeof(save_sprnames));
 
     p.RemoveComments('#', true);
+    p.RemoveComments(';', true); // MAPINFO uses ; for line comments
     while (p.NewLine())
     {
         char *word1, *word2;
@@ -1348,13 +1576,50 @@ bool dehacked_t::LoadDehackedLump(int lump)
                     Read_CODEPTR();
                     break;
                 case DEH_PARS:
-                    // TODO support PARS?
-                    error("BEX [PARS] block currently unsupported.\n");
+                    Read_PARS();
+                    break;
+                case DEH_HELPER:
+                    Read_HELPER();
                     break;
                 case DEH_STRINGS:
                     Read_STRINGS();
                     break;
+
+                    // MAPINFO sections
+                case DEH_DEFAULTMAP:
+                    Read_DEFAULTMAP();
+                    break;
+                case DEH_MAP:
+                    Read_MAP();
+                    break;
+                case DEH_CLUSTERDEF:
+                    Read_CLUSTERDEF();
+                    break;
+                case DEH_EPISODE:
+                    Read_EPISODE();
+                    break;
+
+                    // Individual MAPINFO commands (skip for now)
+                case DEH_CLUSTER:
+                case DEH_NEXTLEVEL:
+                case DEH_SKY1:
+                case DEH_INTERPIC:
+                case DEH_INTERMUSIC:
+                case DEH_PAR:
+                case DEH_MUSIC:
+                case DEH_PICNAME:
+                case DEH_BOSSDEATH:
+                case DEH_FLAT:
+                case DEH_EXITTEXT:
+                case DEH_ENTERTEXT:
+                case DEH_ENGINE:
+                case DEH_DATAWAD:
+                case DEH_IWAD:
+                    // Skip these lines silently (MAPINFO sub-commands / WhackEd2 metadata)
+                    break;
                 default:
+                    if (word1[0] == ';')
+                        break; // MAPINFO-style comment, silently skip
                     error("Unknown command : %s\n", word1);
             }
         }

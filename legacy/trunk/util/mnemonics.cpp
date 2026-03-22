@@ -119,7 +119,14 @@ flag_mnemonic_t BEX_FlagMnemonics[] = {
     {"CANPUSHWALLS", MF2_PUSHWALL, 2},               // Can activate SPAC_PUSH
     {"ACTIVATEMCROSS", MF2_MCROSS, 2},               // Can activate SPAC_MCROSS
     {"ACTIVATEPCROSS", MF2_PCROSS, 2},               // Can activate SPAC_PCROSS
-    {NULL, 0, 0}                                     // terminator
+
+    // Boom/MBF compatibility flag names
+    {"TRANSLUCENT", MF_SHADOW, 1},       // Boom: translucent sprite (maps to spectre effect)
+    {"FRIEND", MF2_NOTARGET, 2},         // MBF: friendly monster (won't be targeted by others)
+    {"BOUNCES", MF2_FLOORBOUNCE, 2},     // MBF: projectile bounces off floor
+    {"TOUCHY", MF_MISSILE, 1},           // MBF: explodes on contact (missile is closest match)
+    {"STEALTH", MF2_DONTDRAW, 2},        // Stealth monster (invisible)
+    {NULL, 0, 0}                         // terminator
 };
 
 #define BEX_STR(x) {#x, TXT_##x},

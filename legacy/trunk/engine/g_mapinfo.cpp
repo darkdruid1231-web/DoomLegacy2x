@@ -47,6 +47,8 @@
 #include "w_wad.h"
 #include "z_zone.h"
 
+#include "dehacked.h"
+
 //=================================
 //    MapInfo class methods
 //=================================
@@ -736,6 +738,10 @@ int GameInfo::Read_MAPINFO()
 
     n = mapinfo.size();
     CONS_Printf(" %d maps found.\n", n);
+
+    // Apply any BEX [PARS] overrides now that MapInfo is populated
+    DEH.ApplyPars();
+
     return n;
 }
 

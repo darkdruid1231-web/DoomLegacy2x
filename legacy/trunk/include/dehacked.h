@@ -32,6 +32,10 @@ class dehacked_t
     Parser p;
     int num_errors;
 
+    int deh_pars[4][10];  // BEX [PARS] overrides: pars[episode][level] for Doom1 (1-indexed)
+    int deh_cpars[33];    // BEX [PARS] overrides: cpars[mapnum-1] for Doom2 (MAP01-MAP32)
+    bool has_pars;        // true if any par overrides were set
+
     int FindValue();
     int FindState();
     bool ReadFlags(struct mobjinfo_t *m);
@@ -46,13 +50,21 @@ class dehacked_t
     void Read_Cheat();
     void Read_CODEPTR();
     void Read_STRINGS();
+    void Read_PARS();
+    void Read_HELPER();
+    void Read_DEFAULTMAP();
+    void Read_MAP();
+    void Read_CLUSTERDEF();
+    void Read_EPISODE();
 
   public:
     bool loaded;
+    int helper_MT;  // [HELPER] substitute thing type (-1 = none)
 
     dehacked_t();
     bool LoadDehackedLump(int lump);
     void error(const char *first, ...);
+    void ApplyPars();  // apply stored [PARS] overrides to MapInfo objects (call after Read_MAPINFO)
 
     int idfa_armor;
     float idfa_armorfactor;
