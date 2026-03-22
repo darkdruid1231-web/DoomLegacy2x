@@ -942,7 +942,8 @@ blockmap_t::blockmap_t(Map *mp)
     height = BlockY(mp->root_bbox[BOXTOP]) + 1;
 
     int numcells = width * height;
-    CONS_Printf("Generating blockmap (%dx%d blocks)...", width, height);
+    if (devparm)
+        CONS_Printf("Generating blockmap (%dx%d blocks)...", width, height);
 
     vector<Uint16> xxx[numcells];
 
@@ -1074,7 +1075,8 @@ blockmap_t::blockmap_t(Map *mp)
     if (idx != list_size)
         I_Error("FUCK!\n");
 
-    CONS_Printf("done. %d entries, %d bytes.\n", list_size, 2 * (4 + numcells + list_size));
+    if (devparm)
+        CONS_Printf("done. %d entries, %d bytes.\n", list_size, 2 * (4 + numcells + list_size));
 }
 
 void Map::LoadBlockMap(int lump)
@@ -1758,8 +1760,9 @@ bool Map::Setup(tic_t start, bool spawnthings)
         // For prebuilt GL nodes: don't copy to main variables - keep them separate
         // The renderer should use gl* versions directly
         CONS_Printf(" Using GL nodes from WAD for rendering.\n");
-        CONS_Printf("  GL data: %d subsectors, %d segs, %d nodes, %d glvertexes\n",
-                    numglsubsectors, numsegs, numnodes, numglvertexes);
+        if (devparm)
+            CONS_Printf("  GL data: %d subsectors, %d segs, %d nodes, %d glvertexes\n",
+                        numglsubsectors, numsegs, numnodes, numglvertexes);
 
         // Validate subsector seg references against the loaded seg count.
         int oob_ssecs = 0;
@@ -1869,23 +1872,28 @@ bool Map::Setup(tic_t start, bool spawnthings)
         {
             minisegs++;
             if (!seg->partner_seg)
-                CONS_Printf("miniseg %d w/o partner seg\n", i);
+            {
+                if (devparm)
+                    CONS_Printf("miniseg %d w/o partner seg\n", i);
+            }
             else if (seg->partner_seg->linedef)
             {
-                CONS_Printf("miniseg %d partner (%d-sided) not a miniseg\n",
-                            i,
-                            seg->partner_seg->linedef->flags & ML_TWOSIDED ? 2 : 1);
+                if (devparm)
+                    CONS_Printf("miniseg %d partner (%d-sided) not a miniseg\n",
+                                i,
+                                seg->partner_seg->linedef->flags & ML_TWOSIDED ? 2 : 1);
             }
         }
         else if (seg->linedef->flags & ML_TWOSIDED)
             botnodes2++;
     }
-    CONS_Printf(" %d vertices, %d subsectors, %d segs, %d + %d botnodes\n",
-                numvertexes,
-                numsubsectors,
-                numsegs,
-                minisegs,
-                botnodes2);
+    if (devparm)
+        CONS_Printf(" %d vertices, %d subsectors, %d segs, %d + %d botnodes\n",
+                    numvertexes,
+                    numsubsectors,
+                    numsegs,
+                    minisegs,
+                    botnodes2);
 
     return true;
 }

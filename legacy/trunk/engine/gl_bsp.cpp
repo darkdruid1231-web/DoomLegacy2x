@@ -278,7 +278,8 @@ void FNodeBuilder::BuildFromScratch()
     // Step 5: Generate minisegs for gaps
     // Step 6: Create GL vertices, segs, subsectors
 
-    CONS_Printf("FNodeBuilder: BuildFromScratch not yet implemented, using existing BSP\n");
+    if (devparm)
+        CONS_Printf("FNodeBuilder: BuildFromScratch not yet implemented, using existing BSP\n");
 }
 
 // Create minisegs for gaps between wall vertices in a subsector
@@ -454,7 +455,7 @@ static void BuildGLSegsWithCheckLoop(
     // The renderer will handle best it can with wall segs only
 
     // Debug output
-    if (subsectorIndex < 5) {
+    if (devparm && subsectorIndex < 5) {
         CONS_Printf("  Debug subsector %d: %d verts, %d wall, %d minisegs needed\n",
             subsectorIndex, (int)vertices.size(), wallCount, minisegCount);
     }
@@ -514,7 +515,8 @@ static int AddGLVertex(Map* map, float x, float y)
 // Build proper GL nodes with minisegs
 void BuildGLNodes(Map* map)
 {
-    CONS_Printf("Building GL nodes with minisegs...\n");
+    if (devparm)
+        CONS_Printf("Building GL nodes with minisegs...\n");
 
     // Initialize vertex hash map for fast lookups
     InitVertexMap();
@@ -558,14 +560,16 @@ void BuildGLNodes(Map* map)
 
         // Skip subsectors with no segs at all
         if (numSegs <= 0) {
-            CONS_Printf("  Warning: Subsector %d has no segs\n", s);
+            if (devparm)
+                CONS_Printf("  Warning: Subsector %d has no segs\n", s);
             subsectorSegs[s] = std::vector<GLSeg>();
             continue;
         }
 
         // Safety check for valid seg indices
         if (firstSeg < 0 || firstSeg >= map->numsegs) {
-            CONS_Printf("  Warning: Subsector %d has invalid first_seg (%d)\n", s, firstSeg);
+            if (devparm)
+                CONS_Printf("  Warning: Subsector %d has invalid first_seg (%d)\n", s, firstSeg);
             subsectorSegs[s] = std::vector<GLSeg>();
             continue;
         }
@@ -693,10 +697,13 @@ void BuildGLNodes(Map* map)
     }
 
     // Print statistics
-    CONS_Printf("GL nodes built: %d vertices, %d segs, %d subsectors\n",
-        map->numglvertexes, map->numglsegs, map->numglsubsectors);
-    CONS_Printf("  Subsector stats: %d valid, %d degenerate\n",
-        map->numsubsectors - degenerateCount, degenerateCount);
+    if (devparm)
+    {
+        CONS_Printf("GL nodes built: %d vertices, %d segs, %d subsectors\n",
+            map->numglvertexes, map->numglsegs, map->numglsubsectors);
+        CONS_Printf("  Subsector stats: %d valid, %d degenerate\n",
+            map->numsubsectors - degenerateCount, degenerateCount);
+    }
 
     // Clean up vertex hash map
     DeleteVertexMap();
@@ -775,21 +782,25 @@ void BuildGLData(Map *map)
     // Try zdbsp first if available - it provides better GL nodes
     if (ZDBSPIntegration::IsZDBSPAvailable())
     {
-        CONS_Printf("zdbsp available - generating GL nodes...\n");
+        if (devparm)
+            CONS_Printf("zdbsp available - generating GL nodes...\n");
 
         // Run zdbsp to generate GL nodes and modify the WAD
         // zdbsp -g -x -m MAP01 -o output.wad input.wad
         if (ZDBSPIntegration::GenerateGLNodes(map->lumpname))
         {
-            CONS_Printf("zdbsp generated GL nodes. Re-load to use them.\n");
+            if (devparm)
+                CONS_Printf("zdbsp generated GL nodes. Re-load to use them.\n");
             // For now, fall back to built-in - full reload would need WAD re-initialization
             // TODO: Implement WAD reload after zdbsp modification
         }
     }
 
     // Use built-in GL node generation (fallback or if zdbsp not available)
-    CONS_Printf("Building GL data with minisegs...\n");
+    if (devparm)
+        CONS_Printf("Building GL data with minisegs...\n");
     BuildGLVertexes(map);
     BuildGLNodes(map);
-    CONS_Printf("GL data complete.\n");
+    if (devparm)
+        CONS_Printf("GL data complete.\n");
 }

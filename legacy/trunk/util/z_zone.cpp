@@ -230,7 +230,8 @@ int memzone_t::mb_increment = 6; // This value is a guesstimate.
 //
 void Z_Init()
 {
-  CONS_Printf("Z_Init: Init zone memory allocation daemon.\n");
+  if (devparm)
+    CONS_Printf("Z_Init: Init zone memory allocation daemon.\n");
 
 #ifndef MEMDEBUG
   Uint32 free, total;
@@ -247,7 +248,8 @@ void Z_Init()
     {
       free = I_GetFreeMem(&total) >> 20;
       total >>= 20; // Megabytes
-      CONS_Printf("System memory %d MB free %d MB\n", total, free);
+      if (devparm)
+        CONS_Printf("System memory %d MB free %d MB\n", total, free);
       // we assume that system uses a lot of memory for disk cache
       if (free < 6)
         free = total / 2;
@@ -269,7 +271,8 @@ void Z_Init()
 memzone_t *memzone_t::NewZone(int size)
 {
   int size_mb = size >> 20;
-  CONS_Printf("%d MB requested for a new memory zone.\n", size_mb);
+  if (devparm)
+    CONS_Printf("%d MB requested for a new memory zone.\n", size_mb);
 
   memzone_t *newzone = (memzone_t *)calloc(1, size);
   if (!newzone)

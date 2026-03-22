@@ -205,7 +205,8 @@ bool VDir::Open(const char *fname)
     memset(cache, 0, numitems * sizeof(lumpcache_t));
 
     // ListItems();
-    CONS_Printf(" Added directory %s (%i lumps)\n", fname, numitems);
+    if (devparm)
+        CONS_Printf(" Added directory %s (%i lumps)\n", fname, numitems);
     return true;
 }
 

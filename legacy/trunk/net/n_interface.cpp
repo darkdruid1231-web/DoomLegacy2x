@@ -177,7 +177,8 @@ void LNetInterface::CL_StartPinging(bool connectany)
 /// send out a server ping
 void LNetInterface::SendPing(const Address &a, const Nonce &cn)
 {
-    CONS_Printf("Sending out server ping to %s...\n", a.toString());
+    if (devparm)
+        CONS_Printf("Sending out server ping to %s...\n", a.toString());
 
     PacketStream out;
 
@@ -194,7 +195,8 @@ void LNetInterface::SendPing(const Address &a, const Nonce &cn)
 // send out server query
 void LNetInterface::SendQuery(serverinfo_t *s)
 {
-    CONS_Printf("Querying server %s...\n", s->addr.toString());
+    if (devparm)
+        CONS_Printf("Querying server %s...\n", s->addr.toString());
 
     PacketStream out;
 
@@ -216,7 +218,8 @@ void LNetInterface::handleInfoPacket(const Address &address, U8 packetType, BitS
             // ping packet only contains a client nonce and the Legacy ID string(s)
             if (game.server && mAllowConnections)
             {
-                CONS_Printf("received ping from %s\n", address.toString());
+                if (devparm)
+                    CONS_Printf("received ping from %s\n", address.toString());
 
                 // read nonce
                 Nonce cn;
@@ -233,7 +236,8 @@ void LNetInterface::handleInfoPacket(const Address &address, U8 packetType, BitS
                 char temp[256];
                 stream->readString(temp);
                 // if (strcmp(temp, LEGACY_VERSIONSTRING)) break;
-                CONS_Printf(" versionstring '%s'\n", temp);
+                if (devparm)
+                    CONS_Printf(" versionstring '%s'\n", temp);
 
                 // local sending time
                 unsigned time;
@@ -257,7 +261,8 @@ void LNetInterface::handleInfoPacket(const Address &address, U8 packetType, BitS
         case PT_PingResponse:
             if (netstate == CL_PingingServers)
             {
-                CONS_Printf("received ping response from %s\n", address.toString());
+                if (devparm)
+                    CONS_Printf("received ping response from %s\n", address.toString());
 
                 Nonce cn;
                 cn.read(stream);
@@ -278,7 +283,8 @@ void LNetInterface::handleInfoPacket(const Address &address, U8 packetType, BitS
                 unsigned time;
                 stream->read(&time);
                 s->ping = nowtime - time;
-                CONS_Printf("ping: %d ms\n", s->ping);
+                if (devparm)
+                    CONS_Printf("ping: %d ms\n", s->ping);
 
                 SendQuery(s);
             }
@@ -288,7 +294,8 @@ void LNetInterface::handleInfoPacket(const Address &address, U8 packetType, BitS
             // packet contains the client nonce and the id token
             if (game.server && mAllowConnections)
             {
-                CONS_Printf("Got server query from %s\n", address.toString());
+                if (devparm)
+                    CONS_Printf("Got server query from %s\n", address.toString());
 
                 Nonce cn;
                 cn.read(stream);
@@ -312,7 +319,8 @@ void LNetInterface::handleInfoPacket(const Address &address, U8 packetType, BitS
         case PT_QueryResponse:
             if (netstate == CL_PingingServers) // netstate == CL_QueryingServer
             {
-                CONS_Printf("Got query response from %s\n", address.toString());
+                if (devparm)
+                    CONS_Printf("Got query response from %s\n", address.toString());
 
                 serverinfo_t *s = SL_FindServer(address);
                 if (!s)
@@ -331,7 +339,8 @@ void LNetInterface::handleInfoPacket(const Address &address, U8 packetType, BitS
             break;
 
         default:
-            CONS_Printf("unknown packet %d from %s", packetType, address.toString());
+            if (devparm)
+                CONS_Printf("unknown packet %d from %s", packetType, address.toString());
             break;
     }
 }

@@ -115,7 +115,8 @@ bool FileCache::InitMultipleFiles(const char *const *filenames)
             }
         }
 
-        CONS_Printf(" Added GL information from file %s.\n", gwafile.c_str());
+        if (devparm)
+            CONS_Printf(" Added GL information from file %s.\n", gwafile.c_str());
     }
 
     if (vfiles.size() == 0)
