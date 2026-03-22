@@ -54,10 +54,19 @@ jobs:
         cd legacy/trunk/build-windows
         ninja -j4
 
-    - name: Upload Windows executables
+    - name: Gather release files
+      shell: msys2 {0}
+      run: |
+        cd legacy/trunk/build-windows
+        # Copy all MinGW64 DLLs the exe depends on
+        ldd doomlegacy.exe | grep '/mingw64/' | awk '{print $3}' | xargs -I{} cp {} .
+        # Copy legacy.wad
+        cp ../resources/legacy.wad .
+
+    - name: Upload Windows release
       uses: actions/upload-artifact@v4
       with:
-        name: doomlegacy-windows-executables
-        path: legacy/trunk/build-windows/doomlegacy.exe
+        name: doomlegacy-windows
+        path: legacy/trunk/build-windows/
         retention-days: 30
-        if-no-files-found: warn
+        if-no-files-found: error
