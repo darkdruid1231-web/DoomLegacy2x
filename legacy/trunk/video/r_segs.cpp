@@ -143,6 +143,11 @@ static void R_DrawSplatColumn(column_t *column)
         if (dc_yl <= last_ceilingclip[dc_x])
             dc_yl = last_ceilingclip[dc_x] + 1;
 #endif
+
+        // [WDJ] phobiata.wad has many views that need clipping
+        if (dc_yl < 0) dc_yl = 0;
+        if (dc_yh >= vid.height) dc_yh = vid.height - 1;
+
         if (dc_yl <= dc_yh)
         {
             dc_source = (byte *)column + 3;
@@ -339,6 +344,10 @@ void R_Render2sidedMultiPatchColumn(column_t *column)
         if (dc_yl <= mceilingclip[dc_x])
             dc_yl = mceilingclip[dc_x] + 1;
     }
+
+    // [WDJ] phobiata.wad has many views that need clipping
+    if (dc_yl < 0) dc_yl = 0;
+    if (dc_yh >= vid.height) dc_yh = vid.height - 1;
 
     if (dc_yl >= vid.height || dc_yh < 0)
         return;
@@ -1335,6 +1344,11 @@ void Rend::R_RenderSegLoop()
         rw_scale += rw_scalestep;
         topfrac += topstep;
         bottomfrac += bottomstep;
+        // [WDJ] Overflow protection. Overflow and underflow of topfrac and
+        // bottomfrac cause off-screen textures to be drawn as large bars.
+        // See phobiata.wad map07, which has a floor at -20000.
+        if (bottomfrac < topfrac)
+            break;
     }
 }
 

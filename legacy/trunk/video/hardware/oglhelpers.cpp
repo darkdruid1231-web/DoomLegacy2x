@@ -59,7 +59,7 @@ CV_PossibleValue_t granisotropy_cons_t[] = {{1, "MIN"}, {16, "MAX"}, {0, NULL}};
 consvar_t cv_granisotropy = {"gr_anisotropy", "1", CV_SAVE, granisotropy_cons_t, NULL};
 
 consvar_t cv_grnearclippingplane = {"gr_nearclippingplane", "0.9", CV_SAVE | CV_FLOAT, NULL};
-consvar_t cv_grfarclippingplane = {"gr_farclippingplane", "9000.0", CV_SAVE | CV_FLOAT, NULL};
+consvar_t cv_grfarclippingplane = {"gr_farclippingplane", "16384.0", CV_SAVE | CV_FLOAT, NULL};
 
 consvar_t cv_grdynamiclighting = {"gr_dynamiclighting", "On", CV_SAVE, CV_OnOff};
 consvar_t cv_grcoronas = {"gr_coronas", "On", CV_SAVE, CV_OnOff};

@@ -370,8 +370,19 @@ class FTTexture : public LumpTexture
 };
 
 // FTTexture::Draw — composites RGBA glyph onto the software renderer framebuffer.
-// The glyph's R channel is fixed at 179 (palette index for STCFN average red).
-// The A channel is the FreeType coverage (0-255). G and B are 0.
+//
+// In the TTF glyph data, the R channel stores the STCFN palette index (179 = average
+// red), G and B are 0, and A is the FreeType coverage value. The base
+// LumpTexture::Draw would misread R as a palette index — but that happens to work
+// for the 8-bit indexed surface case since the palette lookup in I_FinishUpdate
+// maps index 179 → red. For 16-bit RGB565 we must encode the correct color here.
+//
+// cv_scr_depth determines the surface type:
+//   <= 8  → 8-bit indexed surface (SDL_PIXELFORMAT_INDEX8)
+//   > 8   → 16-bit RGB565 surface (SDL_PIXELFORMAT_RGB565)
+//
+// Palette index 179 in the standard Doom PLAYPAL is approximately RGB(166, 16, 16).
+// Encoded to RGB565: R=(166>>3)=20, G=(16>>2)=4, B=(16>>3)=2 → 0xA082.
 void FTTexture::Draw(byte *dest_tl,
                      byte *dest_tr,
                      byte *dest_bl,
@@ -381,55 +392,27 @@ void FTTexture::Draw(byte *dest_tl,
                      fixed_t rowfrac,
                      int flags)
 {
-    byte *base = pixels_rgba; // row-major RGBA
+    const byte *base = pixels_rgba; // row-major RGBA
+    const byte palette_idx = 179;   // STCFN average red palette index
 
-    // 8-bit: indexed palette. 16-bit: RGB565.
-    bool is16bit = (vid.BytesPerPixel > 1);
+    // True color (16-bit RGB565): encode palette[179] ≈ RGB(166,16,16) as RGB565.
+    // 0xA082 = R:20 G:4 B:2 — a dark red matching the STCFN raster font color.
+    const Uint16 rgb565_red = 0xA082;
 
-    if (is16bit)
+    for (; dest_tl < dest_tr; col += colfrac, dest_tl++, dest_bl++)
     {
-        // RGB565: 5 bits R, 6 bits G, 5 bits B.
-        // Precompute the palette-179 color in RGB565.
-        // Palette[179] ≈ (179*64/256, 0, 179*32/256) for standard STCFN.
-        // We treat R=179, G=0, B=0 → RGB565: R=(179>>3)=22, G=0, B=0 → 0xB000.
-        const Uint16 src16 = 0xB000; // solid red in RGB565
-
-        for (; dest_tl < dest_tr; col += colfrac, dest_tl++, dest_bl++)
+        const byte *source = base + (size_t)col.floor() * height * 4;
+        fixed_t row = startrow;
+        for (byte *dest = dest_tl; dest < dest_bl; row += rowfrac, dest += vid.width)
         {
-            const byte *source = base + ((int)col.floor() * height) * 4;
-            fixed_t row = startrow;
-            for (byte *dest = dest_tl; dest < dest_bl; row += rowfrac, dest += vid.width)
-            {
-                Uint8 alpha = source[(int)row.floor() * 4 + 3];
-                if (alpha < 128)
-                    continue; // transparent
-                if (alpha >= 128)
-                    *((Uint16 *)dest) = src16;
-            }
-        }
-    }
-    else
-    {
-        // 8-bit palette: use palette index 179 (TTF glyphs are red).
-        // TTF glyphs: R=179 (palette index), G=0, B=0, A=coverage.
-        // We interpret A as coverage. For opaque pixels (A>=128), write 179.
-        const byte idx = 179;
+            Uint8 alpha = source[(size_t)row.floor() * 4 + 3];
+            if (alpha < 16)
+                continue; // transparent
 
-        for (; dest_tl < dest_tr; col += colfrac, dest_tl++, dest_bl++)
-        {
-            const byte *source = base + ((int)col.floor() * height) * 4;
-            fixed_t row = startrow;
-            for (byte *dest = dest_tl; dest < dest_bl; row += rowfrac, dest += vid.width)
-            {
-                Uint8 alpha = source[(int)row.floor() * 4 + 3];
-                if (alpha < 128)
-                    continue; // transparent
-                // Apply V_TL translucency if set (approximate for TTF fonts)
-                if (flags & V_TL)
-                    *dest = transtables[0][(idx << 8) | *dest];
-                else
-                    *dest = idx;
-            }
+            if (vid.BytesPerPixel > 1)
+                *((Uint16 *)dest) = rgb565_red; // 16-bit RGB565
+            else
+                *dest = palette_idx; // 8-bit palette index
         }
     }
 }
@@ -570,16 +553,17 @@ bool ttfont_t::BuildGlyph(glyph_t &g, int c)
     byte *rgba = new byte[w * h * 4]();
     if (bm.buffer)
     {
-        for (int row = 0; row < (int)bm.rows; row++)
+        // Fill column-by-column to match FTTexture::Draw's column-major read pattern.
+        // Draw reads: source[col * height + row] — must match our layout here.
+        for (int col = 0; col < (int)bm.width; col++)
         {
-            const byte *src = bm.buffer + row * bm.pitch;
-            byte       *dst = rgba      + row * w * 4;
-            for (int col = 0; col < (int)bm.width; col++)
+            for (int row = 0; row < (int)bm.rows; row++)
             {
-                dst[col*4 + 0] = 179; // R — matches STCFN raster font average (~palette index 182)
-                dst[col*4 + 1] = 0;   // G
-                dst[col*4 + 2] = 0;   // B
-                dst[col*4 + 3] = src[col]; // A = coverage
+                byte *dst = rgba + ((size_t)col * h + row) * 4;
+                dst[0] = 179; // R — matches STCFN raster font average (~palette index 182)
+                dst[1] = 0;   // G
+                dst[2] = 0;   // B
+                dst[3] = bm.buffer[row * bm.pitch + col]; // A = coverage
             }
         }
     }

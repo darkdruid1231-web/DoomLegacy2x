@@ -45,9 +45,13 @@ enum svartype_t
     svt_function, // functions are stored as variables
     svt_label,    // labels for goto calls are variables
     svt_const,    // temporary value type: adapts when first set
+    svt_array,    // FS array type
 };
 
 #define FIXED_TO_FLOAT(x) (float(x) / 65536.0f)
+
+// Forward declaration for circular dependency
+struct fs_array_t;
 
 /// \brief Value of an FS variable
 struct svalue_t
@@ -59,7 +63,17 @@ struct svalue_t
         int i; // also fixed
         class Actor *mobj;
         char *labelptr; // goto() label
+        fs_array_t *array; // FS array
     } value;
+};
+
+/// \brief FS array structure - defined after svalue_t to resolve circular dependency
+struct fs_array_t
+{
+    fs_array_t *next;    // next array in save list
+    int saveindex;       // index for saving
+    unsigned int length; // number of values currently initialized
+    svalue_t *values;    // array of contained values
 };
 
 extern svalue_t nullvar;
@@ -69,6 +83,7 @@ inline int intvalue(svalue_t v)
     return (v.type == svt_string)  ? atoi(v.value.s)
            : (v.type == svt_fixed) ? (v.value.i >> fixed_t::FBITS)
            : (v.type == svt_actor) ? (v.value.mobj ? 1 : 0)
+           : (v.type == svt_array) ? -1
                                    : v.value.i;
 }
 
@@ -82,6 +97,8 @@ inline fixed_t fixedvalue(svalue_t v)
         res = float(atof(v.value.s));
     else if (v.type == svt_actor)
         res = v.value.mobj ? 1 : 0;
+    else if (v.type == svt_array)
+        res = -1;
     else
         res = v.value.i;
 
