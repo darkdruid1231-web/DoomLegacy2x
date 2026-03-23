@@ -633,10 +633,14 @@ void R_Init()
     }
     // Compile normal map GLSL shader and assign to materials that had tex[1] attached
     // in ReadTextures(). GL context is guaranteed to exist at this point.
-    CONS_Printf("R_Init: InitNormalMapShader\n");
-    InitNormalMapShader();
-    if (normalmap_shaderprog)
-        materials.AssignNormalMapShader(normalmap_shaderprog);
+    // NOTE: InitNormalMapShader() calls GL functions — only call in OpenGL mode.
+    if (rendermode == render_opengl)
+    {
+        CONS_Printf("R_Init: InitNormalMapShader\n");
+        InitNormalMapShader();
+        if (normalmap_shaderprog)
+            materials.AssignNormalMapShader(normalmap_shaderprog);
+    }
 
     CONS_Printf("R_Init: done\n");
 }
