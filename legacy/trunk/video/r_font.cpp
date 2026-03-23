@@ -356,7 +356,83 @@ class FTTexture : public LumpTexture
         }
         return gl_id;
     }
+
+    /// Software renderer: composite RGBA glyph onto screen.
+    /// The glyph alpha is the coverage value. Pixel color is fixed red (palette 179).
+    virtual void Draw(byte *dest_tl,
+                      byte *dest_tr,
+                      byte *dest_bl,
+                      fixed_t col,
+                      fixed_t startrow,
+                      fixed_t colfrac,
+                      fixed_t rowfrac,
+                      int flags) override;
 };
+
+// FTTexture::Draw — composites RGBA glyph onto the software renderer framebuffer.
+// The glyph's R channel is fixed at 179 (palette index for STCFN average red).
+// The A channel is the FreeType coverage (0-255). G and B are 0.
+void FTTexture::Draw(byte *dest_tl,
+                     byte *dest_tr,
+                     byte *dest_bl,
+                     fixed_t col,
+                     fixed_t startrow,
+                     fixed_t colfrac,
+                     fixed_t rowfrac,
+                     int flags)
+{
+    byte *base = pixels_rgba; // row-major RGBA
+
+    // 8-bit: indexed palette. 16-bit: RGB565.
+    bool is16bit = (vid.BytesPerPixel > 1);
+
+    if (is16bit)
+    {
+        // RGB565: 5 bits R, 6 bits G, 5 bits B.
+        // Precompute the palette-179 color in RGB565.
+        // Palette[179] ≈ (179*64/256, 0, 179*32/256) for standard STCFN.
+        // We treat R=179, G=0, B=0 → RGB565: R=(179>>3)=22, G=0, B=0 → 0xB000.
+        const Uint16 src16 = 0xB000; // solid red in RGB565
+
+        for (; dest_tl < dest_tr; col += colfrac, dest_tl++, dest_bl++)
+        {
+            const byte *source = base + ((int)col.floor() * height) * 4;
+            fixed_t row = startrow;
+            for (byte *dest = dest_tl; dest < dest_bl; row += rowfrac, dest += vid.width)
+            {
+                Uint8 alpha = source[(int)row.floor() * 4 + 3];
+                if (alpha < 128)
+                    continue; // transparent
+                if (alpha >= 128)
+                    *((Uint16 *)dest) = src16;
+            }
+        }
+    }
+    else
+    {
+        // 8-bit palette: use palette index 179 (TTF glyphs are red).
+        // TTF glyphs: R=179 (palette index), G=0, B=0, A=coverage.
+        // We interpret A as coverage. For opaque pixels (A>=128), write 179.
+        const byte idx = 179;
+
+        for (; dest_tl < dest_tr; col += colfrac, dest_tl++, dest_bl++)
+        {
+            const byte *source = base + ((int)col.floor() * height) * 4;
+            fixed_t row = startrow;
+            for (byte *dest = dest_tl; dest < dest_bl; row += rowfrac, dest += vid.width)
+            {
+                Uint8 alpha = source[(int)row.floor() * 4 + 3];
+                if (alpha < 128)
+                    continue; // transparent
+                // Apply V_TL translucency if set (approximate for TTF fonts)
+                if (flags & V_TL)
+                    *dest = transtables[0][(idx << 8) | *dest];
+                else
+                    *dest = idx;
+            }
+        }
+    }
+}
 
 /// \brief TrueType font using FreeType directly
 class ttfont_t : public font_t
