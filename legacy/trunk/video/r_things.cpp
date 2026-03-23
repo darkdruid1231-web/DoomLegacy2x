@@ -190,11 +190,12 @@ void R_ClearSprites()
 }
 
 // sprite rendering hacks
-static fixed_t proj_tz, proj_tx;
+fixed_t proj_tz, proj_tx;
 
 /// this does the actual work of drawing the sprite in the SW renderer
 void spritepres_t::Project(Actor *p)
 {
+
     int frame = state->frame & TFF_FRAMEMASK;
 
     if (frame >= spr->numframes)
@@ -272,7 +273,8 @@ void spritepres_t::Project(Actor *p)
 
     int heightsec = sec->heightsec;
 
-    if (heightsec != -1) // only clip things which are in special sectors
+    // SoM: 3/17/2000: only clip things which are in water sectors.
+    if (heightsec != -1)
     {
         int phs = R.viewplayer->subsector->sector->heightsec;
         if (phs != -1 && R.viewz < R.sectors[phs].floorheight
@@ -419,6 +421,41 @@ fixed_t sprbotscreen;
 fixed_t windowtop;
 fixed_t windowbottom;
 
+// Draw a full unmasked sprite column (for PNG/JPEG/TGA sprites without alpha masking)
+void R_DrawUnmaskedColumn(byte *coldata, int columnheight)
+{
+    fixed_t basetexturemid = dc_texturemid;
+
+    // Full column has topdelta = 0, so topscreen = sprtopscreen
+    fixed_t topscreen = sprtopscreen;
+    fixed_t bottomscreen =
+        sprbotscreen == fixed_t::FMAX ? topscreen + columnheight / dc_iscale :
+                                        sprbotscreen;
+
+    dc_yl = 1 + (topscreen - fixed_epsilon).floor();
+    dc_yh = (bottomscreen - fixed_epsilon).floor();
+
+    if (windowtop != fixed_t::FMAX && windowbottom != fixed_t::FMAX)
+    {
+        if (windowtop > topscreen)
+            dc_yl = 1 + (windowtop - fixed_epsilon).floor();
+        if (windowbottom < bottomscreen)
+            dc_yh = (windowbottom - fixed_epsilon).floor();
+    }
+
+    if (dc_yh >= mfloorclip[dc_x])
+        dc_yh = mfloorclip[dc_x] - 1;
+    if (dc_yl <= mceilingclip[dc_x])
+        dc_yl = mceilingclip[dc_x] + 1;
+
+    if (dc_yl <= dc_yh && dc_yl < vid.height && dc_yh > 0)
+    {
+        dc_texturemid = basetexturemid;
+        dc_source = coldata;
+        colfunc();
+    }
+}
+
 void R_DrawMaskedColumn(column_t *column)
 {
     fixed_t basetexturemid = dc_texturemid;
@@ -453,17 +490,9 @@ void R_DrawMaskedColumn(column_t *column)
             dc_source = column->data;
             dc_texturemid = basetexturemid - column->topdelta;
 
-            // Drawn by either R_DrawColumn
-            //  or (SHADOW) R_DrawFuzzColumn.
-            // FIXME a quick fix
-            if (!ylookup[dc_yl] && colfunc == R_DrawColumn_8)
+            if (!ylookup[dc_yl])
             {
-                static int first = 1;
-                if (first)
-                {
-                    CONS_Printf("WARNING: avoiding a crash in %s %d\n", __FILE__, __LINE__);
-                    first = 0;
-                }
+                //HACK: avoid crash
             }
             else
                 colfunc();
@@ -478,6 +507,11 @@ void R_DrawMaskedColumn(column_t *column)
 //  mfloorclip and mceilingclip should also be set.
 void vissprite_t::DrawVisSprite()
 {
+    // Guard against empty/dummy materials — same check as Material::Draw() in v_video.cpp.
+    // Without this, accessing mat->tex[0].t or mat->tex[0].yscale is undefined for invalid materials.
+    if (!mat || mat->tex.empty() || !mat->tex[0].t)
+        return;
+
     if (transmap == VIS_SMOKESHADE)
         // shadecolfunc uses 'colormaps'
         colfunc = shadecolfunc;
@@ -615,6 +649,10 @@ vissprite_t *vissprite_t::SplitSprite(Actor *thing, int cut_y, lightlist_t *ll)
 //
 void Rend::R_AddSprites(sector_t *sec, int lightlevel)
 {
+    static int bsp_sectors = 0;
+    // Debug: track sector processing
+    // CONS_Printf("R_AddSprites: sec=%p validcount=%d global=%d\n", (void*)sec, sec->validcount, validcount);
+
     // BSP is traversed by subsector.
     // A sector might have been split into several
     //  subsectors during BSP building.
@@ -997,6 +1035,7 @@ void Rend::R_CreateDrawNodes()
         return;
 
     R_SortVisSprites();
+
     for (vissprite_t *rover = vsprsortedhead.prev; rover != &vsprsortedhead; rover = rover->prev)
     {
         if (rover->yt > vid.height || rover->yb < 0)
@@ -1032,7 +1071,9 @@ void Rend::R_CreateDrawNodes()
 
                     for (i = x1; i <= x2; i++)
                     {
-                        if (r2->seg->frontscale[i] > rover->yscale)
+                        // Only check if frontscale was set (not FMAX, which means no seg covered this column)
+                        if (r2->seg->frontscale[i] != fixed_t::FMAX &&
+                            r2->seg->frontscale[i] > rover->yscale)
                             break;
                     }
                     if (i > x2)
@@ -1173,6 +1214,11 @@ void Rend::R_DrawSprite(vissprite_t *spr)
     short cliptop[MAXVIDWIDTH];
     int x;
 
+    // Initialize ALL columns to defaults first
+    for (x = 0; x < MAXVIDWIDTH; x++)
+        clipbot[x] = viewheight, cliptop[x] = con_clipviewtop;
+
+    // Then set sprite-specific sentinel for columns in range
     for (x = spr->x1; x <= spr->x2; x++)
         clipbot[x] = cliptop[x] = -2;
 
@@ -1256,7 +1302,8 @@ void Rend::R_DrawSprite(vissprite_t *spr)
         }
     }
     // SoM: 3/17/2000: Clip sprites in water.
-    if (spr->heightsec != -1) // only things in specially marked sectors
+    // SoM: 3/17/2000: Clip sprites in water.
+    if (spr->heightsec != -1)
     {
         fixed_t mh, temp;
         int h;

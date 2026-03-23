@@ -822,9 +822,8 @@ void Menu::DrawTitle()
     else if (titlepic)
     {
         Material *p = materials.Get(titlepic);
-
-        // int xtitle = 94;
-        // int ytitle = 2;
+        if (!p || p->tex.empty() || !p->tex[0].t)
+            return;
         int xtitle = int((BASEVIDWIDTH - p->worldwidth) / 2);
         int ytitle = int((y - p->worldheight) / 2);
 
@@ -892,7 +891,13 @@ void Menu::DrawMenu()
             case IT_PATCH:
                 if (items[i].pic && items[i].pic[0])
                 {
-                    materials.Get(items[i].pic)->Draw(x, dy, flags);
+                    Material *m = materials.Get(items[i].pic);
+                    if (!m || m->tex.empty() || !m->tex[0].t)
+                    {
+                        // Material invalid, skip drawing
+                    }
+                    else
+                        m->Draw(x, dy, flags);
                     h = FONTBHEIGHT;
                 }
                 else if (font && items[i].text)
@@ -2236,6 +2241,8 @@ void Menu::DrawSetupPlayer()
     // skin 0 is default player sprite
     // spritedef_t *sprdef = &skins[R_SkinAvailable(setupm_cvskin->str)].spritedef;
     spriteframe_t *sprframe = multi_pres->GetFrame();
+    if (!sprframe)
+        return;
 
     int color = cv_menu_playercolor.value;
     current_colormap = translationtables[color];

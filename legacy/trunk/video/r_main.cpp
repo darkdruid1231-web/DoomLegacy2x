@@ -45,6 +45,7 @@
 #include "r_render.h"
 #include "r_segs.h"
 #include "r_sky.h"
+#include "r_presentation.h"
 #include "r_things.h"
 #include "v_video.h"
 
@@ -822,6 +823,40 @@ void Rend::R_RenderPlayerView(PlayerInfo *player)
 #endif
 
     R_RenderBSPNode(numnodes - 1);
+
+    // Add all actors via thinker list. This is more reliable than
+    // per-subsector sector-thinglist traversal, which misses actors in
+    // sectors that the BSP renderer doesn't visit (e.g. live moving monsters).
+    // This mirrors the fix applied to the OpenGL renderer in commit 758dce0.
+    for (Thinker *th = player->mp->thinkercap.Next(); th != &player->mp->thinkercap; th = th->Next())
+    {
+        Actor *a = th->Inherits<Actor>();
+        if (!a || !a->pres) continue;
+        if (a->flags2 & MF2_DONTDRAW) continue;
+        // Only process monsters and items (not projectiles, players, etc.)
+        if (!(a->flags & (MF_MONSTER | MF_SPECIAL))) continue;
+        sector_t *sec = a->subsector ? a->subsector->sector : NULL;
+        if (sec && sec->validcount == validcount)
+            continue; // Skip if already processed by R_AddSprites
+
+        // Compute projection (same as R_AddSprites sector-thinglist traversal)
+        // Note: proj_tz and proj_tx are static globals used by spritepres_t::Project()
+        fixed_t tr_x = a->pos.x - viewx;
+        fixed_t tr_y = a->pos.y - viewy;
+        proj_tz = (tr_x * viewcos) + (tr_y * viewsin);
+
+        // Behind view plane?
+        if (proj_tz < 4) // MINZ
+            continue;
+
+        proj_tx = (tr_x * viewsin) - (tr_y * viewcos);
+
+        // Too far off the side?
+        if (abs(proj_tx) > (proj_tz << 2))
+            continue;
+
+        a->pres->Project(a);
+    }
 
 #ifdef TIMING
     RDMSR(0x10, &mycount);

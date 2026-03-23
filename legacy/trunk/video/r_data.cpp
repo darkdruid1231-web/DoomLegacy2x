@@ -1174,9 +1174,11 @@ Material *material_cache_t::Get(const char *name, material_class_t mode)
     {
         // a "link" to default_item
         if (default_item)
+        {
             default_item->AddRef();
-        // CONS_Printf("Def. material used for '%s'\n", name);
-        return default_item;
+            return default_item;
+        }
+        return NULL;
     }
     else
         return t;

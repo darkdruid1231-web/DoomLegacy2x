@@ -45,6 +45,10 @@ extern fixed_t pspritescale;
 extern fixed_t pspriteiscale;
 extern fixed_t pspriteyscale; // added:02-02-98:for aspect ratio
 
+// sprite projection globals (used by r_main.cpp thinker loop)
+extern fixed_t proj_tz;
+extern fixed_t proj_tx;
+
 extern const int PSpriteSY[];
 
 typedef struct post_t column_t;
