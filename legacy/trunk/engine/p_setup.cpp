@@ -1779,54 +1779,59 @@ bool Map::Setup(tic_t start, bool spawnthings)
         LoadNodes(lumpnum + LUMP_NODES);         // loads nodes
         LoadSegs(lumpnum + LUMP_SEGS);           // points to v, l, si, se, uses l
 
-        // Now build GL nodes dynamically (requires segs/nodes/subsectors to be loaded first)
-        if (!testmode)
+        // In software mode, skip GL node building entirely — the software renderer
+        // uses the regular nodes/segs/subsectors loaded above.
+        if (rendermode == render_opengl)
         {
-            CONS_Printf(" Building GL nodes dynamically...\n");
-            BuildGLData(this);
-            CONS_Printf(" Finished building GL nodes.\n");
-        }
-
-        // Copy GL data to main fields for renderer
-        if (glvertexes)
-        {
-            // Update linedef vertex pointers to point to new glvertexes
-            // before freeing the old vertexes
-            for (int i = 0; i < numlines; i++)
+            // Now build GL nodes dynamically (requires segs/nodes/subsectors to be loaded first)
+            if (!testmode)
             {
-                if (lines[i].v1)
-                    lines[i].v1 = &glvertexes[lines[i].v1 - vertexes];
-                if (lines[i].v2)
-                    lines[i].v2 = &glvertexes[lines[i].v2 - vertexes];
+                CONS_Printf(" Building GL nodes dynamically...\n");
+                BuildGLData(this);
+                CONS_Printf(" Finished building GL nodes.\n");
             }
 
-            if (vertexes)
-                Z_Free(vertexes);
-            vertexes = glvertexes;
-            numvertexes = numglvertexes;
+            // Copy GL data to main fields for renderer
+            if (glvertexes)
+            {
+                // Update linedef vertex pointers to point to new glvertexes
+                // before freeing the old vertexes
+                for (int i = 0; i < numlines; i++)
+                {
+                    if (lines[i].v1)
+                        lines[i].v1 = &glvertexes[lines[i].v1 - vertexes];
+                    if (lines[i].v2)
+                        lines[i].v2 = &glvertexes[lines[i].v2 - vertexes];
+                }
+
+                if (vertexes)
+                    Z_Free(vertexes);
+                vertexes = glvertexes;
+                numvertexes = numglvertexes;
+            }
+            if (glsegs)
+            {
+                if (segs)
+                    Z_Free(segs);
+                segs = glsegs;
+                numsegs = numglsegs;
+            }
+            if (glsubsectors)
+            {
+                if (subsectors)
+                    Z_Free(subsectors);
+                subsectors = glsubsectors;
+                numsubsectors = numglsubsectors;
+            }
+            if (glnodes)
+            {
+                if (nodes)
+                    Z_Free(nodes);
+                nodes = glnodes;
+                numnodes = numglnodes;
+            }
+            CONS_Printf(" Using dynamically built GL nodes.\n");
         }
-        if (glsegs)
-        {
-            if (segs)
-                Z_Free(segs);
-            segs = glsegs;
-            numsegs = numglsegs;
-        }
-        if (glsubsectors)
-        {
-            if (subsectors)
-                Z_Free(subsectors);
-            subsectors = glsubsectors;
-            numsubsectors = numglsubsectors;
-        }
-        if (glnodes)
-        {
-            if (nodes)
-                Z_Free(nodes);
-            nodes = glnodes;
-            numnodes = numglnodes;
-        }
-        CONS_Printf(" Using dynamically built GL nodes.\n");
     }
     else if (gllump != -1)
     {
