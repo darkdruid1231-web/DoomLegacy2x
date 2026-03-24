@@ -151,3 +151,22 @@ target_link_libraries(test_wad_lump_gtest PRIVATE
 )
 target_compile_definitions(test_wad_lump_gtest PRIVATE SDL_MAIN_HANDLED)
 add_test(NAME wad_lump_gtest COMMAND test_wad_lump_gtest)
+
+# ---------------------------------------------------------------------------
+# test_wad_lump_reader — WadLumpReader component tests with MockWadRepository.
+# Demonstrates full DI pattern: WadLumpReader -> IWadRepository -> MockWadRepository.
+# ---------------------------------------------------------------------------
+add_executable(test_wad_lump_reader unit/test_wad_lump_reader.cpp)
+target_include_directories(test_wad_lump_reader PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/util
+)
+target_link_libraries(test_wad_lump_reader PRIVATE
+    MockWad
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_wad_lump_reader PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME wad_lump_reader COMMAND test_wad_lump_reader)
