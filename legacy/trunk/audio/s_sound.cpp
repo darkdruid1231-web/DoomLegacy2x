@@ -42,6 +42,8 @@
 #include "sounds.h"
 #include "tables.h"
 
+#include "g_actor.h"  // for Actor
+
 #include "w_wad.h"
 #include "z_cache.h"
 #include "z_zone.h"
@@ -61,6 +63,67 @@ consvar_t cv_precachesound = {"precachesound", "0", CV_SAVE, CV_OnOff};
 bool nomusic = false, nosound = false;
 
 SoundSystem S;
+
+//====================================================================
+// ISoundSystem adapter - delegates to the global SoundSystem
+//====================================================================
+
+/// \brief Adapter that implements ISoundSystem by delegating to the global S.
+/// \details This allows production code to use ISoundSystem pointers while
+///         still accessing the real SoundSystem. In tests, MockSoundSystem
+///         can be injected instead.
+class SoundSystemAdapter : public ISoundSystem {
+public:
+    int startSound(mobj_t* mobj, int sfx_id, float vol) override {
+        // Cast mobj_t* to Actor* - they are the same type in this codebase
+        return S_StartSound(static_cast<Actor*>(mobj), sfx_id, vol);
+    }
+
+    void stopSound(mobj_t* mobj) override {
+        S.Stop3DSound(static_cast<Actor*>(mobj));
+    }
+
+    void setListenerPosition(float x, float y, float z) override {
+        // SoundSystem derives listener position from ViewPlayers automatically.
+        // This method is a no-op for compatibility with the interface.
+    }
+
+    bool isChannelPlaying(int channel) const override {
+        return S.ChannelPlaying(channel);
+    }
+
+    void setChannelVolume(int channel, float vol) override {
+        if (channel < 0 || channel >= static_cast<int>(S.channels.size()))
+            return;
+        S.channels[channel].b_volume = vol;
+    }
+
+    int getActiveChannelCount() const override {
+        int count = 0;
+        for (const auto& ch : S.channels) {
+            if (ch.playing)
+                ++count;
+        }
+        return count;
+    }
+
+    void precacheSound(int sfx_id) override {
+        soundID_iter_t i = SoundID.find(sfx_id);
+        if (i != SoundID.end()) {
+            S_PrecacheSound(i->second->lumpname);
+        }
+    }
+};
+
+// Global adapter instance
+static SoundSystemAdapter s_soundAdapter;
+
+/// \brief Get the global ISoundSystem instance.
+/// \details Returns an adapter pointing to the global SoundSystem.
+///         Production code should use this instead of directly accessing S.
+ISoundSystem* GetGlobalSoundSystem() {
+    return &s_soundAdapter;
+}
 
 /// \brief RIFF/WAVE file header
 struct WAV_t
