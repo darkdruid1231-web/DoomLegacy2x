@@ -73,3 +73,22 @@ target_link_libraries(MockSound PRIVATE
     TestInterfaces
 )
 target_compile_definitions(MockSound PRIVATE SDL_MAIN_HANDLED)
+
+# ---------------------------------------------------------------------------
+# Game mock implementation
+# ---------------------------------------------------------------------------
+add_library(MockGame STATIC
+    mock_game.cpp
+)
+target_include_directories(MockGame PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include/game
+    ${SDL2_INCLUDE_DIRS}
+)
+target_link_libraries(MockGame PRIVATE
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(MockGame PRIVATE SDL_MAIN_HANDLED)

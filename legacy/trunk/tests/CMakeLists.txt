@@ -170,3 +170,21 @@ target_link_libraries(test_wad_lump_reader PRIVATE
 )
 target_compile_definitions(test_wad_lump_reader PRIVATE SDL_MAIN_HANDLED)
 add_test(NAME wad_lump_reader COMMAND test_wad_lump_reader)
+
+# ---------------------------------------------------------------------------
+# test_game_state_gtest — IGameStateProvider DI pattern demonstration.
+# ---------------------------------------------------------------------------
+add_executable(test_game_state_gtest unit/test_game_state_gtest.cpp)
+target_include_directories(test_game_state_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include/game
+)
+target_link_libraries(test_game_state_gtest PRIVATE
+    MockGame
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_game_state_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME game_state_gtest COMMAND test_game_state_gtest)
