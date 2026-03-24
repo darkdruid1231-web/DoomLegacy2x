@@ -36,6 +36,9 @@
 
 #include "m_menu.h"
 #include "widget.h"
+#include "backends/SoftwareRenderBackend.h"
+#include "backends/IMenuBackend.h"
+#include "backends/ProductionMenuBackend.h"
 #include "menudef.h"
 
 #include "d_event.h"
@@ -67,6 +70,7 @@
 #include "z_zone.h"
 
 #include "n_interface.h"
+#include "menu_helpers.h"  // M_DrawSlider, M_DrawTextBox, M_DrawThermo
 
 /// This is a shorthand macro for constructing menus.
 #define ITEMS(x) (sizeof(x) / sizeof(menuitem_t)), (x)
@@ -86,8 +90,6 @@ extern Menu MainMenuDef, SinglePlayerDef, MultiPlayerDef, SetupPlayerDef, EpiDef
     Mouse2OptionsDef, ServerOptionsDef, QualitySettingsDef, InputSettingsDef,
     LocalPlayDef, OnlinePlayDef, PlayerSetupDef, HostGameDef,
     OGL_PostFXDef, OGL_DeferredDef;
-
-static void M_DrawTextBox(int x, int y, int width, int height);
 
 static short (*setup_gc)[2] =
     commoncontrols; // pointer to the gamecontrols of the player being edited
@@ -629,7 +631,7 @@ static int vidm_column_size;
 //===========================================================================
 
 /// Draws a menu slider (thermometer? thermostat?)
-static void M_DrawThermo(int x, int y, consvar_t *cv)
+void M_DrawThermo(int x, int y, consvar_t *cv)
 {
     const char *leftlump, *rightlump, *centerlump[2], *cursorlump;
     bool raven = (game.mode >= gm_heretic);
@@ -670,7 +672,7 @@ static void M_DrawThermo(int x, int y, consvar_t *cv)
 }
 
 ///  A smaller 'Thermo', with range given as percents (0-100)
-static void M_DrawSlider(int x, int y, int range)
+void M_DrawSlider(int x, int y, int range)
 {
     if (range < 0)
         range = 0;
@@ -703,7 +705,7 @@ void M_DrawSelCell(Menu *menu, int item)
 
 ///  Draw a textbox, like Quake does, because sometimes it's difficult
 ///  to read the text with all the stuff in the background...
-static void M_DrawTextBox(int x, int y, int width, int height)
+void M_DrawTextBox(int x, int y, int width, int height)
 {
     // the parameters give the position and size of the text area, the borders are drawn around it
     int step, boff;
@@ -810,14 +812,16 @@ void Menu::DrawTitle()
 {
     if (font && title)
     {
-        float xtitle = (BASEVIDWIDTH - font->StringWidth(title)) / 2;
-        float ytitle = (y - font->Height()) / 2;
+        float w = s_menuBackend->MenuFontStringWidth(title);
+        int   h = s_menuBackend->MenuFontHeight();
+        float xtitle = (BASEVIDWIDTH - w) / 2;
+        float ytitle = (y - h) / 2;
         if (xtitle < 0)
             xtitle = 0;
         if (ytitle < 0)
             ytitle = 0;
 
-        font->DrawString(xtitle, ytitle, title, V_SCALE);
+        s_menuBackend->DrawMenuFontString(static_cast<int>(xtitle), static_cast<int>(ytitle), title, V_SCALE);
     }
     else if (titlepic)
     {
@@ -831,7 +835,7 @@ void Menu::DrawTitle()
             xtitle = 0;
         if (ytitle < 0)
             ytitle = 0;
-        p->Draw(xtitle, ytitle, V_SCALE);
+        s_menuBackend->DrawPatch(titlepic, xtitle, ytitle, V_SCALE);
     }
 }
 
@@ -854,7 +858,7 @@ void Menu::DrawMenu()
         int panel_w = BASEVIDWIDTH - (menu_style.panel_margin * 2);
         int panel_y = max(menu_style.panel_margin, y - menu_style.panel_padding);
         int panel_h = numitems * LINEHEIGHT + menu_style.panel_padding * 2;
-        window_background->DrawFill(panel_x, panel_y, panel_w, panel_h);
+        s_menuBackend->DrawBackgroundFill(panel_x, panel_y, panel_w, panel_h);
     }
 
     DrawTitle();
@@ -871,11 +875,13 @@ void Menu::DrawMenu()
         if ((items[i].flags & IT_COLORMAP_MASK) || disabled)
             flags |= V_MAP;
         if (disabled)
-            current_colormap = graymap;
+            s_menuBackend->SetColormap(2);  // gray
         else if (items[i].flags & IT_WHITE)
-            current_colormap = whitemap;
+            s_menuBackend->SetColormap(1);  // white
         else if (items[i].flags & IT_GRAY)
-            current_colormap = graymap;
+            s_menuBackend->SetColormap(2);  // gray
+        else
+            s_menuBackend->SetColormap(0); // none
 
         if (i == itemOn)
             cursory = dy;
@@ -897,24 +903,24 @@ void Menu::DrawMenu()
                         // Material invalid, skip drawing
                     }
                     else
-                        m->Draw(x, dy, flags);
+                        s_menuBackend->DrawPatch(items[i].pic, x, dy, flags);
                     h = FONTBHEIGHT;
                 }
                 else if (font && items[i].text)
                 {
-                    font->DrawString(x, dy, items[i].text, flags);
+                    s_menuBackend->DrawMenuFontString(x, dy, items[i].text, flags);
                     h = FONTBHEIGHT;
                 }
                 break;
 
                 // then the "short" ones:
             case IT_STRING:
-                hud_font->DrawString(x, dy, items[i].text, flags);
+                s_menuBackend->DrawHudFontString(x, dy, items[i].text, flags);
                 h = STRINGHEIGHT;
                 break;
 
             case IT_CSTRING:
-                hud_font->DrawString(x, dy, items[i].text, flags);
+                s_menuBackend->DrawHudFontString(x, dy, items[i].text, flags);
                 h = SMALLLINEHEIGHT;
                 break;
         }
@@ -925,40 +931,42 @@ void Menu::DrawMenu()
             switch (items[i].flags & IT_TYPE_MASK)
             {
                 case IT_CV_SLIDER:
-                    M_DrawSlider(BASEVIDWIDTH - x - SLIDER_WIDTH,
-                                 dy,
-                                 ((cv->value - cv->PossibleValue[0].value) * 100 /
-                                  (cv->PossibleValue[1].value - cv->PossibleValue[0].value)));
+                    s_menuBackend->DrawSlider(BASEVIDWIDTH - x - SLIDER_WIDTH,
+                                              dy,
+                                              ((cv->value - cv->PossibleValue[0].value) * 100 /
+                                               (cv->PossibleValue[1].value - cv->PossibleValue[0].value)));
                     break;
 
                 case IT_CV_TEXTBOX:
-                    M_DrawTextBox(x, dy + 4, MAXSTRINGLENGTH, 1);
+                    s_menuBackend->DrawTextBox(x, dy + 4, MAXSTRINGLENGTH, 1);
                     if (items[i].flags & IT_TEXTBOX_IN_USE)
                     {
                         const char *t = textbox.GetText();
-                        hud_font->DrawString(x + 8, dy + 12, t, V_SCALE);
+                        s_menuBackend->DrawHudFontString(x + 8, dy + 12, t, V_SCALE);
                         if (AnimCount < 4)
-                            hud_font->DrawCharacter(x + 8 + hud_font->StringWidth(t),
-                                                    dy + 12,
-                                                    '_',
-                                                    V_WHITEMAP | V_SCALE);
+                        {
+                            float tw = s_menuBackend->HudFontStringWidth(t);
+                            s_menuBackend->DrawHudFontCharacter(
+                                static_cast<int>(x + 8 + tw), dy + 12, '_', V_WHITEMAP | V_SCALE);
+                        }
                     }
                     else
-                        hud_font->DrawString(x + 8, dy + 12, cv->str, V_SCALE);
+                        s_menuBackend->DrawHudFontString(x + 8, dy + 12, cv->str, V_SCALE);
                     h = 26;
                     break;
 
                 case IT_CV_BIGSLIDER:
-                    M_DrawThermo(x, dy + h, items[i].GetCV());
+                    s_menuBackend->DrawThermo(x, dy + h, items[i].GetCV());
                     dy += LINEHEIGHT;
                     break;
 
                 default:
-                    hud_font->DrawString(BASEVIDWIDTH - x - hud_font->StringWidth(cv->str),
-                                         dy,
-                                         cv->str,
-                                         V_WHITEMAP | V_SCALE);
+                {
+                    float strw = s_menuBackend->HudFontStringWidth(cv->str);
+                    s_menuBackend->DrawHudFontString(
+                        BASEVIDWIDTH - x - static_cast<int>(strw), dy, cv->str, V_WHITEMAP | V_SCALE);
                     break;
+                }
             }
         }
         else if ((items[i].flags & IT_TYPE_MASK) == IT_CONTROL)
@@ -983,8 +991,9 @@ void Menu::DrawMenu()
                 if (keys[1] != KEY_NULL)
                     strcat(tmp, G_KeynumToString(keys[1]));
             }
-            hud_font->DrawString(
-                BASEVIDWIDTH - x - hud_font->StringWidth(tmp), dy, tmp, V_WHITEMAP | V_SCALE);
+            float strw = s_menuBackend->HudFontStringWidth(tmp);
+            s_menuBackend->DrawHudFontString(
+                BASEVIDWIDTH - x - static_cast<int>(strw), dy, tmp, V_WHITEMAP | V_SCALE);
         }
 
         dy += h;
@@ -992,9 +1001,9 @@ void Menu::DrawMenu()
 
     // draw the skull cursor (or a blinking star)
     if ((items[itemOn].flags & IT_DISPLAY_MASK) < IT_STRING)
-        pointer[which_pointer]->Draw(x - 32, cursory - 5, V_SCALE);
+        s_menuBackend->DrawCursor(x - 32, cursory - 5, which_pointer);
     else if (AnimCount < 4) // blink cursor
-        hud_font->DrawCharacter(x - 10, cursory, '*', V_WHITEMAP | V_SCALE);
+        s_menuBackend->DrawHudFontCharacter(x - 10, cursory, '*', V_WHITEMAP | V_SCALE);
 }
 
 /// Build a WidgetPanel from this menu's item array.
@@ -1079,6 +1088,9 @@ void Menu::DrawMenuModern()
     if (!mf)
         mf = hud_font;
 
+    static SoftwareRenderBackend sw_backend;
+    sw_backend.SetFont(mf);
+
     DrawTitle();
 
     if (!menu_panel)
@@ -1118,6 +1130,7 @@ void Menu::DrawMenuModern()
 
     // Build the rendering context.
     MenuDrawCtx ctx;
+    ctx.backend        = &sw_backend;
     ctx.font            = mf;
     ctx.mat_panel       = menu_panel;
     ctx.mat_header      = menu_header;
@@ -2915,6 +2928,10 @@ tic_t Menu::NowTic;
 Menu *Menu::currentMenu;
 short Menu::itemOn;
 bool Menu::active;
+IMenuBackend *Menu::s_menuBackend;
+
+/// Static production backend instance (lifetime: whole program).
+static ProductionMenuBackend s_productionBackend;
 
 /// constructor
 Menu::Menu(const char *tpic,
@@ -3591,6 +3608,11 @@ bool Menu::UsingNewUI()
     return menu_use_newui;
 }
 
+void Menu::SetMenuBackend(IMenuBackend *backend)
+{
+    s_menuBackend = backend;
+}
+
 // resets the menu system according to current game.mode
 // changes menu font, structure etc.
 void Menu::Init()
@@ -3629,6 +3651,9 @@ void Menu::Init()
         font = big_font;
     else
         font = hud_font;
+
+    // Use the production backend for classic menu rendering.
+    s_menuBackend = &s_productionBackend;
 
     // Register MapListWidget as the widget for cv_menu_startmap, replacing the
     // cvar-with-handler HACK with a proper scrollable map list.

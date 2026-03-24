@@ -30,6 +30,7 @@
 class Menu
 {
     friend class MsgBox;
+    friend class ProductionMenuBackend;
 
   private:
     // video and audio resources
@@ -43,6 +44,9 @@ class Menu
 
     static Menu *currentMenu; ///< currently active menu
     static short itemOn;      ///< currently highlighted menu item
+
+    /// Rendering backend used by DrawMenu() ( injectable for testing ).
+    static class IMenuBackend *s_menuBackend;
 
     typedef void (Menu::*drawfunc_t)();
     typedef bool (*quitfunc_t)();
@@ -95,6 +99,10 @@ class Menu
 
     /// resets the menu system according to current game.mode
     static void Init();
+
+    /// Sets the rendering backend used by DrawMenu() (for testing injection).
+    /// Should be called before DrawMenu() in test code.
+    static void SetMenuBackend(class IMenuBackend *backend);
 
     /// draws the menus directly into the screen buffer.
     static void Drawer();

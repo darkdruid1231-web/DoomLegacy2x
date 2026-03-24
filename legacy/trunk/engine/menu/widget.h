@@ -24,6 +24,8 @@
 #include <string>
 #include <vector>
 
+#include "backends/IRenderBackend.h"
+
 // Forward declarations — widget.h is self-contained; widget.cpp pulls in the
 // concrete headers it needs.
 class  font_t;
@@ -40,6 +42,7 @@ struct consvar_t;
 struct MenuDrawCtx
 {
     // --- resources ----------------------------------------------------------
+    IRenderBackend *backend;  ///< all menu drawing is routed through this backend
     font_t   *font;         ///< console font (may fall back to hud_font)
     Material *mat_panel;    ///< panel background material
     Material *mat_header;   ///< section-header background material

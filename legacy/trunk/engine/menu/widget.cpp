@@ -18,6 +18,7 @@
 
 #include "widget.h"
 
+#include "backends/IRenderBackend.h"
 #include "command.h"    // consvar_t, CV_FLOAT
 #include "console.h"    // whitemap, graymap
 #include "doomdef.h"    // BASEVIDWIDTH / BASEVIDHEIGHT
@@ -43,24 +44,25 @@ static const int W_MAXSTRINGLENGTH = 32;
 //  Internal drawing helpers (equivalents of M_DrawSlider / M_DrawTextBox)
 //===========================================================================
 
-static void Widget_DrawSlider(int x, int y, int range)
+static void Widget_DrawSlider(IRenderBackend *backend, int x, int y, int range)
 {
     if (range < 0)   range = 0;
     if (range > 100) range = 100;
 
-    materials.Get("M_SLIDEL")->Draw(x - 8, y, 0 | V_SCALE);
+    backend->DrawMaterial(x - 8, y, materials.Get("M_SLIDEL"), 0 | V_SCALE);
     for (int i = 0; i < W_SLIDER_RANGE; i++)
-        materials.Get("M_SLIDEM")->Draw(x + i * 8, y, 0 | V_SCALE);
-    materials.Get("M_SLIDER")->Draw(x + W_SLIDER_RANGE * 8, y, 0 | V_SCALE);
+        backend->DrawMaterial(x + i * 8, y, materials.Get("M_SLIDEM"), 0 | V_SCALE);
+    backend->DrawMaterial(x + W_SLIDER_RANGE * 8, y, materials.Get("M_SLIDER"), 0 | V_SCALE);
 
-    current_colormap = whitemap;
-    materials.Get("M_SLIDEC")->Draw(
-        x + ((W_SLIDER_RANGE - 1) * 8 * range) / 100, y, V_SCALE | V_MAP);
+    backend->SetColormap(1);  // white
+    backend->DrawMaterial(
+        x + ((W_SLIDER_RANGE - 1) * 8 * range) / 100, y,
+        materials.Get("M_SLIDEC"), V_SCALE | V_MAP);
 }
 
 // Exact replica of M_DrawTextBox from menu.cpp.
 // width = number of character cells, height = number of text rows.
-static void Widget_DrawTextBox(int x, int y, int width, int height)
+static void Widget_DrawTextBox(IRenderBackend *backend, int x, int y, int width, int height)
 {
     int step, boff;
     if (game.mode >= gm_heretic)
@@ -76,22 +78,22 @@ static void Widget_DrawTextBox(int x, int y, int width, int height)
 
     int cx = x - boff;
     int cy = y - boff;
-    window_border[BRDR_TL]->Draw(cx, cy, V_SCALE);
+    backend->DrawMaterial(cx, cy, window_border[BRDR_TL], V_SCALE);
     for (cy = y; cy < y + height; cy += step)
-        window_border[BRDR_L]->Draw(cx, cy, V_SCALE);
-    window_border[BRDR_BL]->Draw(cx, cy, V_SCALE);
+        backend->DrawMaterial(cx, cy, window_border[BRDR_L], V_SCALE);
+    backend->DrawMaterial(cx, cy, window_border[BRDR_BL], V_SCALE);
 
-    window_background->DrawFill(x, y, width, height);
+    backend->DrawMaterialFill(x, y, width, height, window_background);
     for (cx = x; cx < x + width; cx += step)
     {
-        window_border[BRDR_T]->Draw(cx, y - boff, V_SCALE);
-        window_border[BRDR_B]->Draw(cx, cy, V_SCALE);
+        backend->DrawMaterial(cx, y - boff, window_border[BRDR_T], V_SCALE);
+        backend->DrawMaterial(cx, cy, window_border[BRDR_B], V_SCALE);
     }
 
-    window_border[BRDR_TR]->Draw(cx, y - boff, V_SCALE);
+    backend->DrawMaterial(cx, y - boff, window_border[BRDR_TR], V_SCALE);
     for (cy = y; cy < y + height; cy += step)
-        window_border[BRDR_R]->Draw(cx, cy, V_SCALE);
-    window_border[BRDR_BR]->Draw(cx, cy, V_SCALE);
+        backend->DrawMaterial(cx, cy, window_border[BRDR_R], V_SCALE);
+    backend->DrawMaterial(cx, cy, window_border[BRDR_BR], V_SCALE);
 }
 
 //===========================================================================
@@ -106,20 +108,20 @@ void LabelWidget::Draw(const MenuDrawCtx &ctx, int dy, bool /*focused*/)
     if (is_header)
     {
         // Header background chrome is drawn by WidgetPanel; just draw text.
-        ctx.font->DrawString(ctx.panel_x + ctx.panel_padding,
+        ctx.backend->DrawString(ctx.panel_x + ctx.panel_padding,
                              dy + 2,
                              text,
                              V_WHITEMAP | V_SCALE);
     }
     else if (is_white)
     {
-        current_colormap = whitemap;
-        ctx.font->DrawString(ctx.panel_x + ctx.panel_padding, dy, text,
+        ctx.backend->SetColormap(1);
+        ctx.backend->DrawString(ctx.panel_x + ctx.panel_padding, dy, text,
                              V_MAP | V_SCALE);
     }
     else
     {
-        ctx.font->DrawString(ctx.panel_x + ctx.panel_padding, dy, text, V_SCALE);
+        ctx.backend->DrawString(ctx.panel_x + ctx.panel_padding, dy, text, V_SCALE);
     }
 }
 
@@ -137,9 +139,9 @@ void ButtonWidget::Draw(const MenuDrawCtx &ctx, int dy, bool /*focused*/)
     if (eff_disabled)
     {
         flags |= V_MAP;
-        current_colormap = graymap;
+        ctx.backend->SetColormap(2);
     }
-    ctx.font->DrawString(ctx.panel_x + ctx.panel_padding, dy, text, flags);
+    ctx.backend->DrawString(ctx.panel_x + ctx.panel_padding, dy, text, flags);
 }
 
 //===========================================================================
@@ -157,24 +159,24 @@ void OptionWidget::Draw(const MenuDrawCtx &ctx, int dy, bool /*focused*/)
     if (text)
     {
         int flags = V_SCALE;
-        if (eff_disabled) { flags |= V_MAP; current_colormap = graymap; }
-        ctx.font->DrawString(ctx.panel_x + ctx.panel_padding, dy, text, flags);
+        if (eff_disabled) { flags |= V_MAP; ctx.backend->SetColormap(2); }
+        ctx.backend->DrawString(ctx.panel_x + ctx.panel_padding, dy, text, flags);
     }
 
     int value_x = ctx.panel_x + ctx.panel_w - ctx.panel_padding - ctx.value_box_w;
 
     if (item_flags & 0x4000 /*IT_DROPDOWN*/)
     {
-        ctx.mat_header->DrawFill(value_x, dy - 2, ctx.value_box_w, ctx.row_height - 2);
-        ctx.font->DrawString(value_x + 6, dy, cv->str, V_WHITEMAP | V_SCALE);
-        ctx.font->DrawString(value_x + ctx.value_box_w - 10, dy, ">",
+        ctx.backend->DrawMaterialFill(value_x, dy - 2, ctx.value_box_w, ctx.row_height - 2, ctx.mat_header);
+        ctx.backend->DrawString(value_x + 6, dy, cv->str, V_WHITEMAP | V_SCALE);
+        ctx.backend->DrawString(value_x + ctx.value_box_w - 10, dy, ">",
                              V_WHITEMAP | V_SCALE);
     }
     else
     {
         int val_flags = V_WHITEMAP | V_SCALE;
-        if (eff_disabled) { val_flags = V_MAP | V_SCALE; current_colormap = graymap; }
-        ctx.font->DrawString(value_x, dy, cv->str, val_flags);
+        if (eff_disabled) { val_flags = V_MAP | V_SCALE; ctx.backend->SetColormap(2); }
+        ctx.backend->DrawString(value_x, dy, cv->str, val_flags);
     }
 }
 
@@ -192,8 +194,8 @@ void SliderWidget::Draw(const MenuDrawCtx &ctx, int dy, bool /*focused*/)
     if (text)
     {
         int flags = V_SCALE;
-        if (eff_disabled) { flags |= V_MAP; current_colormap = graymap; }
-        ctx.font->DrawString(ctx.panel_x + ctx.panel_padding, dy, text, flags);
+        if (eff_disabled) { flags |= V_MAP; ctx.backend->SetColormap(2); }
+        ctx.backend->DrawString(ctx.panel_x + ctx.panel_padding, dy, text, flags);
     }
 
     if (!eff_disabled && cv->PossibleValue &&
@@ -202,7 +204,7 @@ void SliderWidget::Draw(const MenuDrawCtx &ctx, int dy, bool /*focused*/)
         int slider_x = ctx.panel_x + ctx.panel_w - ctx.panel_padding - ctx.slider_width;
         int range = ((cv->value - cv->PossibleValue[0].value) * 100 /
                      (cv->PossibleValue[1].value - cv->PossibleValue[0].value));
-        Widget_DrawSlider(slider_x, dy, range);
+        Widget_DrawSlider(ctx.backend, slider_x, dy, range);
     }
 }
 
@@ -218,25 +220,25 @@ void TextInputWidget::Draw(const MenuDrawCtx &ctx, int dy, bool /*focused*/)
     int x0 = ctx.panel_x + ctx.panel_padding;
 
     if (text)
-        ctx.font->DrawString(x0, dy, text, V_SCALE);
+        ctx.backend->DrawString(x0, dy, text, V_SCALE);
 
-    Widget_DrawTextBox(x0, dy + 4, W_MAXSTRINGLENGTH, 1);
+    Widget_DrawTextBox(ctx.backend, x0, dy + 4, W_MAXSTRINGLENGTH, 1);
 
     bool in_use = item_flags_ptr && (*item_flags_ptr & W_IT_TEXTBOX_IN_USE);
 
     if (in_use && ctx.textbox_active && ctx.textbox_text)
     {
-        ctx.font->DrawString(x0 + 8, dy + 12, ctx.textbox_text, V_SCALE);
+        ctx.backend->DrawString(x0 + 8, dy + 12, ctx.textbox_text, V_SCALE);
         if (ctx.AnimCount < 4)
         {
-            ctx.font->DrawCharacter(
-                x0 + 8 + ctx.font->StringWidth(ctx.textbox_text),
+            ctx.backend->DrawCharacter(
+                x0 + 8 + ctx.backend->StringWidth(ctx.textbox_text),
                 dy + 12, '_', V_WHITEMAP | V_SCALE);
         }
     }
     else
     {
-        ctx.font->DrawString(x0 + 8, dy + 12, cv->str, V_SCALE);
+        ctx.backend->DrawString(x0 + 8, dy + 12, cv->str, V_SCALE);
     }
 }
 
@@ -283,10 +285,10 @@ void WidgetPanel::EnsureVisible(int idx, int row_height, int header_height, int 
 
 void WidgetPanel::Draw(const MenuDrawCtx &ctx)
 {
-    if (!ctx.mat_panel || !ctx.mat_header || !ctx.mat_focus || !ctx.font)
+    if (!ctx.backend || !ctx.mat_panel || !ctx.mat_header || !ctx.mat_focus || !ctx.font)
         return;
 
-    ctx.mat_panel->DrawFill(ctx.panel_x, ctx.panel_y, ctx.panel_w, ctx.panel_h);
+    ctx.backend->DrawMaterialFill(ctx.panel_x, ctx.panel_y, ctx.panel_w, ctx.panel_h, ctx.mat_panel);
 
     // Visible content rect (inside padding).
     int clip_top    = ctx.panel_y + ctx.panel_padding;
@@ -338,17 +340,17 @@ void WidgetPanel::Draw(const MenuDrawCtx &ctx)
         // Per-row chrome (background / highlight).
         if (is_hdr)
         {
-            ctx.mat_header->DrawFill(ctx.panel_x + 4,
+            ctx.backend->DrawMaterialFill(ctx.panel_x + 4,
                                      dy - 1,
                                      ctx.panel_w - 8,
-                                     row_h - 2);
+                                     row_h - 2, ctx.mat_header);
         }
         else if (focused && w->CanFocus())
         {
-            ctx.mat_focus->DrawFill(ctx.panel_x + 4,
+            ctx.backend->DrawMaterialFill(ctx.panel_x + 4,
                                     dy - 2,
                                     ctx.panel_w - 8,
-                                    row_h);
+                                    row_h, ctx.mat_focus);
         }
 
         w->Draw(ctx, dy, focused);
@@ -391,18 +393,18 @@ void WidgetPanel::Draw(const MenuDrawCtx &ctx)
             if (list_y < ctx.panel_y + ctx.panel_padding)
                 list_y = ctx.panel_y + ctx.panel_padding;
 
-            ctx.mat_panel->DrawFill(dropdown_x, list_y, dropdown_w, list_h);
+            ctx.backend->DrawMaterialFill(dropdown_x, list_y, dropdown_w, list_h, ctx.mat_panel);
             for (int i = 0; i < visible; i++)
             {
                 int idx   = start + i;
                 int row_y = list_y + i * ctx.row_height;
                 if (idx == ctx.dropdown_index)
-                    ctx.mat_focus->DrawFill(dropdown_x + 2,
+                    ctx.backend->DrawMaterialFill(dropdown_x + 2,
                                             row_y - 1,
                                             dropdown_w - 4,
-                                            ctx.row_height - 2);
+                                            ctx.row_height - 2, ctx.mat_focus);
                 if (dropdown_cv->PossibleValue[idx].strvalue)
-                    ctx.font->DrawString(dropdown_x + 6,
+                    ctx.backend->DrawString(dropdown_x + 6,
                                         row_y + 1,
                                         dropdown_cv->PossibleValue[idx].strvalue,
                                         V_WHITEMAP | V_SCALE);
@@ -414,7 +416,7 @@ void WidgetPanel::Draw(const MenuDrawCtx &ctx)
     if (ctx.disabled_reason)
     {
         int msg_y = ctx.panel_y + ctx.panel_h - 10; // footer_gap
-        ctx.font->DrawString(ctx.panel_x + ctx.panel_padding,
+        ctx.backend->DrawString(ctx.panel_x + ctx.panel_padding,
                              msg_y,
                              ctx.disabled_reason,
                              V_WHITEMAP | V_SCALE);
@@ -430,19 +432,24 @@ bool WidgetPanel::HandleNavKey(int key, short &itemOn, int numitems)
     if (n == 0 || numitems == 0)
         return false;
 
+    short start = itemOn;
+    bool found = false;
+
     if (key == KEY_DOWNARROW)
     {
-        int start = itemOn;
         do
         {
             itemOn = (itemOn + 1 >= numitems) ? 0 : static_cast<short>(itemOn + 1);
         } while (itemOn != start &&
                  (itemOn >= n || !widgets[itemOn] ||
                   !widgets[itemOn]->CanFocus()));
+        if (itemOn != start)
+            found = true;
+        else if (start < n && widgets[start] && widgets[start]->CanFocus())
+            found = true;  // single focusable item, wraps to itself
     }
     else // KEY_UPARROW
     {
-        int start = itemOn;
         do
         {
             itemOn = (itemOn == 0) ? static_cast<short>(numitems - 1)
@@ -450,9 +457,13 @@ bool WidgetPanel::HandleNavKey(int key, short &itemOn, int numitems)
         } while (itemOn != start &&
                  (itemOn >= n || !widgets[itemOn] ||
                   !widgets[itemOn]->CanFocus()));
+        if (itemOn != start)
+            found = true;
+        else if (start < n && widgets[start] && widgets[start]->CanFocus())
+            found = true;  // single focusable item, wraps to itself
     }
 
-    return true;
+    return found;
 }
 
 int WidgetPanel::ContentHeight(int row_height, int header_height) const
@@ -477,15 +488,15 @@ void SeparatorWidget::Draw(const MenuDrawCtx &ctx, int dy, bool /*focused*/)
     int cy = dy + ctx.row_height / 2 - 1;
 
     // Draw a simple two-pixel horizontal rule using the header material.
-    ctx.mat_header->DrawFill(cx, cy, cw, 2);
+    ctx.backend->DrawMaterialFill(cx, cy, cw, 2, ctx.mat_header);
 
     if (label)
     {
-        float lw = ctx.font->StringWidth(label);
+        float lw = ctx.backend->StringWidth(label);
         float lx = ctx.panel_x + (ctx.panel_w - lw) / 2.0f;
         // Overdraw the centre of the rule with panel background, then text.
-        ctx.mat_panel->DrawFill(static_cast<int>(lx) - 4, cy, static_cast<int>(lw) + 8, 2);
-        ctx.font->DrawString(lx, dy + ctx.row_height / 2 - ctx.row_height / 4,
+        ctx.backend->DrawMaterialFill(static_cast<int>(lx) - 4, cy, static_cast<int>(lw) + 8, 2, ctx.mat_panel);
+        ctx.backend->DrawString(lx, dy + ctx.row_height / 2 - ctx.row_height / 4,
                              label, V_WHITEMAP | V_SCALE);
     }
 }
@@ -505,9 +516,9 @@ void ImageWidget::Draw(const MenuDrawCtx &ctx, int dy, bool /*focused*/)
 
     int x0 = ctx.panel_x + ctx.panel_padding;
     if (img_w > 0 && img_h > 0)
-        mat->DrawFill(x0, dy, img_w, img_h);
+        ctx.backend->DrawMaterialFill(x0, dy, img_w, img_h, mat);
     else
-        mat->Draw(x0, dy, V_SCALE);
+        ctx.backend->DrawMaterial(x0, dy, mat, V_SCALE);
 }
 
 //===========================================================================
@@ -562,20 +573,20 @@ void ListWidget::Draw(const MenuDrawCtx &ctx, int dy, bool focused)
         {
             // Focused+selected: bright highlight. Unfocused+selected: dim.
             if (focused)
-                ctx.mat_focus->DrawFill(x0 - 2, row_y - 1,
+                ctx.backend->DrawMaterialFill(x0 - 2, row_y - 1,
                                         ctx.panel_w - ctx.panel_padding * 2 + 4,
-                                        ctx.row_height - 1);
+                                        ctx.row_height - 1, ctx.mat_focus);
             else
-                ctx.mat_header->DrawFill(x0 - 2, row_y - 1,
+                ctx.backend->DrawMaterialFill(x0 - 2, row_y - 1,
                                          ctx.panel_w - ctx.panel_padding * 2 + 4,
-                                         ctx.row_height - 1);
+                                         ctx.row_height - 1, ctx.mat_header);
         }
 
         int flags = row_sel ? (V_WHITEMAP | V_SCALE) : V_SCALE;
         if (row_sel && focused)
-            current_colormap = whitemap;
+            ctx.backend->SetColormap(1);
 
-        ctx.font->DrawString(x0, row_y, entries[idx].label.c_str(), flags);
+        ctx.backend->DrawString(x0, row_y, entries[idx].label.c_str(), flags);
     }
 
     // Scroll indicator on the right edge.
@@ -586,8 +597,8 @@ void ListWidget::Draw(const MenuDrawCtx &ctx, int dy, bool focused)
         int thumb_h = bar_h * visible_rows / total;
         if (thumb_h < 4) thumb_h = 4;
         int thumb_y = dy + bar_h * scroll_top / total;
-        ctx.mat_header->DrawFill(bar_x, dy, 3, bar_h);
-        ctx.mat_focus->DrawFill(bar_x, thumb_y, 3, thumb_h);
+        ctx.backend->DrawMaterialFill(bar_x, dy, 3, bar_h, ctx.mat_header);
+        ctx.backend->DrawMaterialFill(bar_x, thumb_y, 3, thumb_h, ctx.mat_focus);
     }
 }
 
