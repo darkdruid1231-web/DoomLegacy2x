@@ -205,3 +205,21 @@ target_link_libraries(test_cvar_gtest PRIVATE
 )
 target_compile_definitions(test_cvar_gtest PRIVATE SDL_MAIN_HANDLED)
 add_test(NAME cvar_gtest COMMAND test_cvar_gtest)
+
+# ---------------------------------------------------------------------------
+# test_render_backend_gtest — IRenderBackend DI pattern demonstration.
+# ---------------------------------------------------------------------------
+add_executable(test_render_backend_gtest unit/test_render_backend_gtest.cpp)
+target_include_directories(test_render_backend_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include/game
+)
+target_link_libraries(test_render_backend_gtest PRIVATE
+    MockRender
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_render_backend_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME render_backend_gtest COMMAND test_render_backend_gtest)

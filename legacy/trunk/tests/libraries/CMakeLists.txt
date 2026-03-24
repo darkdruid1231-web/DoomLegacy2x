@@ -109,3 +109,21 @@ target_link_libraries(MockCVar PRIVATE
     TestInterfaces
 )
 target_compile_definitions(MockCVar PRIVATE SDL_MAIN_HANDLED)
+
+# ---------------------------------------------------------------------------
+# Render mock implementation
+# ---------------------------------------------------------------------------
+add_library(MockRender STATIC
+    mock_render.cpp
+)
+target_include_directories(MockRender PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include/game
+)
+target_link_libraries(MockRender PRIVATE
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(MockRender PRIVATE SDL_MAIN_HANDLED)
