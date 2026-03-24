@@ -3,6 +3,16 @@
 #
 # Tests are standalone executables with no game library linkage unless
 # explicitly noted.  Run with: ctest --output-on-failure
+#
+# Google Test/Mock infrastructure:
+# - GTest/GMock are fetched via FetchContent in tests/libraries/CMakeLists.txt
+# - Mock objects (MockWad, MockSound) live in tests/libraries/
+# - Interface headers live in include/interfaces/
+
+# ---------------------------------------------------------------------------
+# Test support libraries (GTest/GMock + mock objects)
+# ---------------------------------------------------------------------------
+add_subdirectory(libraries)
 
 # ---------------------------------------------------------------------------
 # test_sprite_logic — pure-math replicas of sprite rendering formulas.
@@ -33,19 +43,39 @@ add_test(NAME actor COMMAND test_actor)
 
 # ---------------------------------------------------------------------------
 # test_fixed_t — fixed_t arithmetic (add, sub, mul, div, precision, negative).
+# Links against util_base (no interface deps needed).
 # ---------------------------------------------------------------------------
 add_executable(test_fixed_t unit/test_fixed_t.cpp)
 target_include_directories(test_fixed_t PRIVATE ${SDL2_INCLUDE_DIRS})
-target_link_libraries(test_fixed_t util)
+target_link_libraries(test_fixed_t util_base)
 target_compile_definitions(test_fixed_t PRIVATE SDL_MAIN_HANDLED)
 add_test(NAME fixed_t COMMAND test_fixed_t)
 
 # ---------------------------------------------------------------------------
+# test_fixed_t_gtest — Google Test version of fixed-point arithmetic tests.
+# Demonstrates parameterized testing with GTest.
+# ---------------------------------------------------------------------------
+add_executable(test_fixed_t_gtest unit/test_fixed_t_gtest.cpp)
+target_include_directories(test_fixed_t_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${SDL2_INCLUDE_DIRS}
+)
+target_link_libraries(test_fixed_t_gtest PRIVATE
+    util_base
+    gtest
+    TestInterfaces
+)
+target_compile_definitions(test_fixed_t_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME fixed_t_gtest COMMAND test_fixed_t_gtest)
+
+# ---------------------------------------------------------------------------
 # test_vector — vec_t<fixed_t> operations.
+# Links against util_base (no interface deps needed).
 # ---------------------------------------------------------------------------
 add_executable(test_vector unit/test_vector.cpp)
 target_include_directories(test_vector PRIVATE ${SDL2_INCLUDE_DIRS})
-target_link_libraries(test_vector util)
+target_link_libraries(test_vector util_base)
 target_compile_definitions(test_vector PRIVATE SDL_MAIN_HANDLED)
 add_test(NAME vector COMMAND test_vector)
 
@@ -103,3 +133,21 @@ target_include_directories(test_acs PRIVATE ${SDL2_INCLUDE_DIRS})
 target_link_libraries(test_acs util)
 target_compile_definitions(test_acs PRIVATE SDL_MAIN_HANDLED)
 add_test(NAME acs COMMAND test_acs)
+
+# ---------------------------------------------------------------------------
+# test_wad_lump_gtest — Google Test version of WAD lump lookup tests.
+# Demonstrates GTest/Mock infrastructure with MockWadRepository.
+# ---------------------------------------------------------------------------
+add_executable(test_wad_lump_gtest unit/test_wad_lump_gtest.cpp)
+target_include_directories(test_wad_lump_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+)
+target_link_libraries(test_wad_lump_gtest PRIVATE
+    MockWad
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_wad_lump_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME wad_lump_gtest COMMAND test_wad_lump_gtest)
