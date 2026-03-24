@@ -92,3 +92,20 @@ target_link_libraries(MockGame PRIVATE
     TestInterfaces
 )
 target_compile_definitions(MockGame PRIVATE SDL_MAIN_HANDLED)
+
+# ---------------------------------------------------------------------------
+# CVar mock implementation
+# ---------------------------------------------------------------------------
+add_library(MockCVar STATIC
+    mock_cvar.cpp
+)
+target_include_directories(MockCVar PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+)
+target_link_libraries(MockCVar PRIVATE
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(MockCVar PRIVATE SDL_MAIN_HANDLED)

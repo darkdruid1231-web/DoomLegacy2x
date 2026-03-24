@@ -188,3 +188,20 @@ target_link_libraries(test_game_state_gtest PRIVATE
 )
 target_compile_definitions(test_game_state_gtest PRIVATE SDL_MAIN_HANDLED)
 add_test(NAME game_state_gtest COMMAND test_game_state_gtest)
+
+# ---------------------------------------------------------------------------
+# test_cvar_gtest — ICVarProvider DI pattern demonstration.
+# ---------------------------------------------------------------------------
+add_executable(test_cvar_gtest unit/test_cvar_gtest.cpp)
+target_include_directories(test_cvar_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+)
+target_link_libraries(test_cvar_gtest PRIVATE
+    MockCVar
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_cvar_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME cvar_gtest COMMAND test_cvar_gtest)
