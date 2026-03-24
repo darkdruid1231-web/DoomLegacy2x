@@ -71,6 +71,7 @@ class ActorInfo
     float mass;       ///< Just take a guess.
     Uint32 flags;     ///< mobjflag_t flags.
     Uint32 flags2;    ///< mobjflag2_t flags.
+    Uint32 flags3;    ///< mobjflag3_t flags (MBF21/Hexen).
 
     // DActor part of mobjinfo_t members.
     int painchance; ///< Probability of going into painstate when hurt.

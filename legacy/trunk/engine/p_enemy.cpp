@@ -274,7 +274,10 @@ bool DActor::CheckMeleeRange()
 
     fixed_t dist = P_XYdist(pl->pos, pos);
 
-    if (dist >= MELEERANGE - 20 + pl->radius)
+    // MBF21 LONGMELEE: double melee range
+    fixed_t melee_range = (flags3 & MF3_LONGMELEE) ? (MELEERANGE * 2) : MELEERANGE;
+
+    if (dist >= melee_range - 20 + pl->radius)
         return false;
 
     // added:19-03-98: check height now, so that damn imps cant attack
@@ -335,6 +338,10 @@ bool DActor::CheckMissileRange()
 
     if (dist > 200)
         dist = 200;
+
+    // MBF21 SHORTMRANGE: shorter missile attack range
+    if (flags3 & MF3_SHORTMRANGE && dist > 64)
+        dist = 64;
 
     if (type == MT_CYBORG && dist > 160)
         dist = 160;

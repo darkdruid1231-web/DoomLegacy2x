@@ -1722,6 +1722,10 @@ static bool PIT_RadiusAttack(Actor *thing)
 
     if (thing->mp->CheckSight(thing, Bomb.b))
     {
+        // MBF21 NORADIUSDMG: some monsters don't take radius damage
+        if (thing->flags3 & MF3_NORADIUSDMG)
+            return true;
+
         int damage = (Bomb.damage * ((Bomb.radius - dist) / Bomb.radius)).floor() + 1;
 
         // TODO Hexen: if(thing->player) damage >>= 2;

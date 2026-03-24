@@ -126,6 +126,25 @@ flag_mnemonic_t BEX_FlagMnemonics[] = {
     {"BOUNCES", MF2_FLOORBOUNCE, 2},     // MBF: projectile bounces off floor
     {"TOUCHY", MF_MISSILE, 1},           // MBF: explodes on contact (missile is closest match)
     {"STEALTH", MF2_DONTDRAW, 2},        // Stealth monster (invisible)
+
+    // MBF21 Extensions
+    {"SHORTMRANGE", MF3_SHORTMRANGE, 3},
+    {"DMGIGNORED", MF3_DMGIGNORED, 3},
+    {"NORADIUSDMG", MF3_NORADIUSDMG, 3},
+    {"FORCERADIUSDMG", MF3_FORCERADIUSDMG, 3},
+    {"HIGHERMPROB", MF3_HIGHERMPROB, 3},
+    {"RANGEHALF", MF3_RANGEHALF, 3},
+    {"NOTHRESHOLD", MF3_NOTHRESHOLD, 3},
+    {"LONGMELEE", MF3_LONGMELEE, 3},
+    {"MAP07BOSS1", MF3_MAP07_BOSS1, 3},
+    {"MAP07BOSS2", MF3_MAP07_BOSS2, 3},
+    {"E1M8BOSS", MF3_E1M8_BOSS, 3},
+    {"E2M8BOSS", MF3_E2M8_BOSS, 3},
+    {"E3M8BOSS", MF3_E3M8_BOSS, 3},
+    {"E4M6BOSS", MF3_E4M6_BOSS, 3},
+    {"E4M8BOSS", MF3_E4M8_BOSS, 3},
+    {"FULLVOLSOUNDS", MF3_FULLVOLSOUNDS, 3},
+
     {NULL, 0, 0}                         // terminator
 };
 

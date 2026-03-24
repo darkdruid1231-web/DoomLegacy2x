@@ -206,8 +206,15 @@ void ActorInfo::SetFlag(const char *flagname, bool on)
                     break;
 
                 case 2:
-                default:
                     on ? (flags2 |= p->flag) : (flags2 &= ~p->flag);
+                    break;
+
+                case 3:
+                    on ? (flags3 |= p->flag) : (flags3 &= ~p->flag);
+                    break;
+
+                default:
+                    Error("Unknown flag word %d for '%s'\n", p->flagword, p->name);
                     break;
             }
 

@@ -151,6 +151,40 @@ enum mobjflag2_t
     MF2_PCROSS = 0x80000000,   ///< Can activate SPAC_PCROSS
 };
 
+/// \brief MBF21 and Hexen actor flags (mobjflag3_t)
+/// \ingroup g_actor
+enum mobjflag3_t : unsigned int
+{
+    // MBF21 Extensions (lower 16 bits)
+    MF3_SHORTMRANGE = 0x00000001,  ///< Short missile range (like Arch-Vile)
+    MF3_DMGIGNORED = 0x00000002,   ///< Others ignore its attacks (like Arch-Vile)
+    MF3_NORADIUSDMG = 0x00000004,  ///< Does not take damage from blast radius
+    MF3_FORCERADIUSDMG = 0x00000008,  ///< Force damage from blast radius
+    MF3_HIGHERMPROB = 0x00000010,  ///< Missile attack prob min 37.5% (norm 22%)
+    MF3_RANGEHALF = 0x00000020,    ///< Missile attack prob uses half distance
+    MF3_NOTHRESHOLD = 0x00000040,  ///< No target threshold
+    MF3_LONGMELEE = 0x00000080,    ///< Long melee range (like Revenant)
+    MF3_MAP07_BOSS1 = 0x00000100, ///< MAP07 boss1 type (TAG 666)
+    MF3_MAP07_BOSS2 = 0x00000200, ///< MAP07 boss2 type (TAG 667)
+    MF3_E1M8_BOSS = 0x00000400,   ///< E1M8 boss type
+    MF3_E2M8_BOSS = 0x00000800,   ///< E2M8 boss type
+    MF3_E3M8_BOSS = 0x00001000,   ///< E3M8 boss type
+    MF3_E4M6_BOSS = 0x00002000,   ///< E4M6 boss type
+    MF3_E4M8_BOSS = 0x00004000,   ///< E4M8 boss type
+    MF3_FULLVOLSOUNDS = 0x00008000,  ///< Full volume sounds (see, death)
+    // Upper bits used by Hexen (same values)
+    MF3_IMPACT = 0x00010000,      ///< Can activate SPAC_IMPACT (Hexen)
+    MF3_PUSHWALL = 0x00020000,     ///< Can activate SPAC_PUSH (Hexen)
+    MF3_MCROSS = 0x00040000,       ///< Can activate SPAC_MCROSS (Hexen)
+    MF3_PCROSS = 0x00080000,       ///< Can activate SPAC_PCROSS (Hexen)
+    MF3_CANTLEAVEFLOORPIC = 0x00100000,  ///< Stays within certain floor texture (Hexen)
+    MF3_NONSHOOTABLE = 0x00200000,  ///< Transparent to missiles (Hexen)
+    MF3_INVULNERABLE = 0x00400000,  ///< Does not take damage (Hexen)
+    MF3_DORMANT = 0x00800000,       ///< Cannot be damaged, not noticed by seekers (Hexen)
+    MF3_SEEKERMISSILE = 0x01000000,  ///< Is a seeker (Hexen)
+    MF3_REFLECTIVE = 0x02000000,     ///< Reflects missiles (Hexen)
+};
+
 /// Extra flags. They describe the transient state of the Actor.
 enum mobjeflag_t
 {
@@ -316,6 +350,7 @@ class Actor : public Thinker, public NetObject
 
     Uint32 flags;
     Uint32 flags2;
+    Uint32 flags3;  ///< MBF21/Hexen extended flags.
     Uint32 eflags;
 
     /// \name Hexen fields
