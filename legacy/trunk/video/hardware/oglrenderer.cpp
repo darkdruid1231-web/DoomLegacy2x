@@ -107,7 +107,7 @@ static float LightLevelToFloat(int lightlevel)
     if (lightlevel > 255) lightlevel = 255;
     float f = lightlevel / 255.0f;
     if (lightlevel < 192)
-        f = (192.0f - (192.0f - lightlevel) * 1.87f) / 255.0f;
+        f = (192.0f - (192.0f - lightlevel) * 1.95f) / 255.0f;
     if (f < 0.0f) f = 0.0f;
     if (f > 1.0f) f = 1.0f;
     return f;
@@ -2212,8 +2212,6 @@ void OGLRenderer::RenderGlSsecPolygon(
     // so sectors with low light levels go pitch-black between frames when no
     // deferred pass runs (framelights empty).  Apply a minimum ambient floor so
     // geometry remains at least faintly visible while deferred lights add on top.
-    if (cv_grdeferred.value && g_deferredRenderer && g_deferredRenderer->IsDeferredLightReady())
-        if (base < 0.1f) base = 0.1f;
     bool dynActive = cv_grdynamiclighting.value && !framelights.empty();
     // Shaded flat: upload dynamic lights as uniforms, skip CPU per-vertex accum.
     if (flatShaderActive && dynActive)
@@ -2247,9 +2245,11 @@ void OGLRenderer::RenderGlSsecPolygon(
             float tb = ((ec->rgba >> 16) & 0xff) / 255.0f;
             float ta = ((ec->rgba >> 24) & 0xff) / 25.0f;
             if (ta > 1.0f) ta = 1.0f;
-            cmr = 1.0f + ta * (tr - 1.0f);
-            cmg = 1.0f + ta * (tg - 1.0f);
-            cmb = 1.0f + ta * (tb - 1.0f);
+            // True lerp: (1-ta)*white + ta*tint_color — matches legacy_one's Extracolormap_to_Surf
+            float invAlpha = 1.0f - ta;
+            cmr = invAlpha + ta * tr;
+            cmg = invAlpha + ta * tg;
+            cmb = invAlpha + ta * tb;
         }
     }
 
@@ -2545,9 +2545,11 @@ void OGLRenderer::GetSegQuads(int num, quad &u, quad &m, quad &l) const
             float tb = ((ec->rgba >> 16) & 0xff) / 255.0f;
             float ta = ((ec->rgba >> 24) & 0xff) / 25.0f;
             if (ta > 1.0f) ta = 1.0f;
-            u.cmr = m.cmr = l.cmr = 1.0f + ta * (tr - 1.0f);
-            u.cmg = m.cmg = l.cmg = 1.0f + ta * (tg - 1.0f);
-            u.cmb = m.cmb = l.cmb = 1.0f + ta * (tb - 1.0f);
+            // True lerp: (1-ta)*white + ta*tint_color — matches legacy_one's Extracolormap_to_Surf
+            float invAlpha = 1.0f - ta;
+            u.cmr = m.cmr = l.cmr = invAlpha + ta * tr;
+            u.cmg = m.cmg = l.cmg = invAlpha + ta * tg;
+            u.cmb = m.cmb = l.cmb = invAlpha + ta * tb;
         }
     }
 
@@ -2757,9 +2759,6 @@ void OGLRenderer::DrawSingleQuad(Material *m,
 
     // Per-vertex lighting so dynamic lights blend smoothly at face boundaries.
     float base = cv_grstaticlighting.value ? LightLevelToFloat(lightlevel) : 1.0f;
-    // Deferred mode minimum ambient — same rationale as flat rendering above.
-    if (cv_grdeferred.value && g_deferredRenderer && g_deferredRenderer->IsDeferredLightReady())
-        if (base < 0.1f) base = 0.1f;
     bool dynActive = cv_grdynamiclighting.value && !framelights.empty();
     // When a GLSL shader is active the dynamic lights are passed as uniforms
     // (per-pixel, normal-map aware).  Skip CPU vertex-color accumulation for
