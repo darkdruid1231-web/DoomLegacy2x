@@ -42,8 +42,7 @@
 // For now we redeclare it here since the mock is in the same test library.
 class MockWadRepository : public IWadRepository {
 public:
-    MOCK_METHOD(int, findLump, (const char* name, int start), (const override));
-    MOCK_METHOD(const lumpinfo_t*, getLumpInfo, (int lumpnum), (const override));
+    MOCK_METHOD(int, findLump, (const char* name), (const override));
     MOCK_METHOD(bool, readLump, (int lumpnum, void* dest), (const override));
     MOCK_METHOD(int, getLumpSize, (int lumpnum), (const override));
     MOCK_METHOD(bool, lumpExists, (const char* name), (const override));
@@ -52,7 +51,6 @@ public:
 using ::testing::_;
 using ::testing::Return;
 using ::testing::StrEq;
-using ::testing::Eq;
 
 //============================================================================
 // Tests for MockWadRepository expectations
@@ -62,11 +60,11 @@ TEST(MockWadRepository, findLumpReturnsCorrectEncoding)
 {
     MockWadRepository mock;
 
-    // Set up expectation: findLump("PLAYPAL", -1) returns file 1, lump 5
-    EXPECT_CALL(mock, findLump(StrEq("PLAYPAL"), Eq(-1)))
+    // Set up expectation: findLump("PLAYPAL") returns file 1, lump 5
+    EXPECT_CALL(mock, findLump(StrEq("PLAYPAL")))
         .WillOnce(Return((1 << 16) | 5));
 
-    int result = mock.findLump("PLAYPAL", -1);
+    int result = mock.findLump("PLAYPAL");
     EXPECT_EQ(result, (1 << 16) | 5);
 }
 
@@ -150,7 +148,7 @@ public:
 
     // Load a texture from a WAD lump
     bool loadTexture(const char* name, void* dest, int maxSize) {
-        int lump = wad_->findLump(name, -1);
+        int lump = wad_->findLump(name);
         if (lump < 0) {
             return false;
         }
@@ -173,7 +171,7 @@ TEST(TextureLoader, loadsExistingTexture)
     char buffer[kTextureSize];
 
     // Set up expectations for a successful load
-    EXPECT_CALL(mock, findLump(StrEq("WALL001"), Eq(-1)))
+    EXPECT_CALL(mock, findLump(StrEq("WALL001")))
         .WillOnce(Return(7));  // lump 7 in file 0
     EXPECT_CALL(mock, getLumpSize(7))
         .WillOnce(Return(512));
@@ -193,7 +191,7 @@ TEST(TextureLoader, failsForNonexistentTexture)
     char buffer[1024];
 
     // Set up: texture not found
-    EXPECT_CALL(mock, findLump(StrEq("NOTEXIST"), Eq(-1)))
+    EXPECT_CALL(mock, findLump(StrEq("NOTEXIST")))
         .WillOnce(Return(-1));
 
     TextureLoader loader(&mock);
@@ -208,7 +206,7 @@ TEST(TextureLoader, failsWhenTextureTooLarge)
 
     char buffer[256];  // max size is 256
 
-    EXPECT_CALL(mock, findLump(StrEq("HUGETEX"), Eq(-1)))
+    EXPECT_CALL(mock, findLump(StrEq("HUGETEX")))
         .WillOnce(Return(3));
     EXPECT_CALL(mock, getLumpSize(3))
         .WillOnce(Return(1024));  // Too big for our buffer

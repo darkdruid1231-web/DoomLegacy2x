@@ -43,25 +43,14 @@
 
 #include <string>
 
-// Forward declarations from w_wad.h / vfile.h
-struct lumpinfo_t;
-struct VFile;
-
 class IWadRepository {
 public:
     virtual ~IWadRepository() = default;
 
-    /// Find a lump by name, starting search from a given lump number.
-    /// Used by code that needs to locate WAD entries (e.g., textures, sprites).
+    /// Find a lump by name.
     /// \param name 8-char uppercase lump name (e.g., "PLAYPAL", "T_START")
-    /// \param start Starting lump number, or -1 to search from beginning
     /// \return Lump number (filenum<<16 | lumpindex), or -1 if not found
-    virtual int findLump(const char* name, int start = -1) const = 0;
-
-    /// Get lump info struct for a given lump number.
-    /// \param lumpnum Lump number (filenum<<16 | lumpindex)
-    /// \return Pointer to lumpinfo_t, or nullptr if invalid
-    virtual const lumpinfo_t* getLumpInfo(int lumpnum) const = 0;
+    virtual int findLump(const char* name) const = 0;
 
     /// Read entire lump contents into buffer.
     /// \param lumpnum Lump number

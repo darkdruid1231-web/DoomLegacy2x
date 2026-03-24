@@ -28,7 +28,6 @@
 ///   SomeComponent component(&mockWad);
 
 #include "interfaces/i_wad.h"
-#include "w_wad.h"        // For lumpinfo_t definition
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -41,8 +40,7 @@
 class MockWadRepository : public IWadRepository {
 public:
     // Google Mock method declarations
-    MOCK_METHOD(int, findLump, (const char* name, int start), (const override));
-    MOCK_METHOD(const lumpinfo_t*, getLumpInfo, (int lumpnum), (const override));
+    MOCK_METHOD(int, findLump, (const char* name), (const override));
     MOCK_METHOD(bool, readLump, (int lumpnum, void* dest), (const override));
     MOCK_METHOD(int, getLumpSize, (int lumpnum), (const override));
     MOCK_METHOD(bool, lumpExists, (const char* name), (const override));
