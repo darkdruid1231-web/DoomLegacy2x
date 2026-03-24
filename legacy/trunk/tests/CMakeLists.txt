@@ -33,19 +33,21 @@ add_test(NAME actor COMMAND test_actor)
 
 # ---------------------------------------------------------------------------
 # test_fixed_t — fixed_t arithmetic (add, sub, mul, div, precision, negative).
+# Links against util_base (no interface deps needed).
 # ---------------------------------------------------------------------------
 add_executable(test_fixed_t unit/test_fixed_t.cpp)
 target_include_directories(test_fixed_t PRIVATE ${SDL2_INCLUDE_DIRS})
-target_link_libraries(test_fixed_t util)
+target_link_libraries(test_fixed_t util_base)
 target_compile_definitions(test_fixed_t PRIVATE SDL_MAIN_HANDLED)
 add_test(NAME fixed_t COMMAND test_fixed_t)
 
 # ---------------------------------------------------------------------------
 # test_vector — vec_t<fixed_t> operations.
+# Links against util_base (no interface deps needed).
 # ---------------------------------------------------------------------------
 add_executable(test_vector unit/test_vector.cpp)
 target_include_directories(test_vector PRIVATE ${SDL2_INCLUDE_DIRS})
-target_link_libraries(test_vector util)
+target_link_libraries(test_vector util_base)
 target_compile_definitions(test_vector PRIVATE SDL_MAIN_HANDLED)
 add_test(NAME vector COMMAND test_vector)
 

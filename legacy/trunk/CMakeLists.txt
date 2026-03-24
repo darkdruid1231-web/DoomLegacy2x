@@ -142,6 +142,7 @@ message(STATUS "Lemon: ${LEMON_EXECUTABLE}")
 add_subdirectory(audio)
 add_subdirectory(video)
 add_subdirectory(util)
+add_subdirectory(util_base)
 add_subdirectory(net)
 add_subdirectory(engine)
 add_subdirectory(grammars)
@@ -174,6 +175,7 @@ add_executable(doomlegacy WIN32 ${INTERFACE_SOURCES})
 target_link_libraries(doomlegacy PRIVATE
     audio
     "-Wl,--start-group"
+    util_base
     util
     doomengine
     video

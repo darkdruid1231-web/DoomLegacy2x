@@ -7,13 +7,13 @@ m_argv.cpp
 m_archive.cpp
 m_bbox.cpp
 m_dll.cpp
-m_fixed.cpp
+# m_fixed.cpp, m_swap.cpp, tables.cpp moved to util_base/
 m_misc.cpp
 m_random.cpp
-m_swap.cpp
+# m_swap.cpp moved to util_base/
 md5.cpp
 parser.cpp
-tables.cpp
+# tables.cpp moved to util_base/
 vfile.cpp
 wad.cpp
 w_wad.cpp
