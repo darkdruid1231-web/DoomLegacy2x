@@ -32,16 +32,21 @@
 // Forward declare PlayerInfo — included via g_player.h in adapter
 class PlayerInfo;
 
+// Forward declare R_SetViewport — not in r_render.h, defined in r_main.cpp
+void R_SetViewport(int viewport);
+
 class RendererProviderAdapter : public IRenderer {
 public:
     void beginFrame() override
     {
-        I_StartFrame();
+        if (rendermode == render_opengl)
+            oglrenderer->StartFrame();
     }
 
     void endFrame() override
     {
-        I_FinishUpdate();
+        if (rendermode == render_opengl)
+            oglrenderer->FinishFrame();
     }
 
     void renderPlayerView(PlayerInfo* player) override
@@ -64,16 +69,19 @@ public:
             oglrenderer->Setup2DMode_Full();
     }
 
+    void setViewport(int viewport) override
+    {
+        if (rendermode == render_opengl)
+            oglrenderer->SetViewport(viewport);
+        else
+            R_SetViewport(viewport);
+    }
+
     void setPalette(uint8_t* palette) override
     {
-        // palette is 256 RGB_t entries; vid.SetPalette takes palettenum index
-        // The caller should have loaded the palette already; we just activate it
-        if (rendermode == render_opengl && oglrenderer)
-        {
-            oglrenderer->palette = reinterpret_cast<RGB_t*>(palette);
-        }
-        // For software mode, palette is managed through vid.SetPalette(num)
-        // which is handled at game level via D_PaletteChanged event
+        // Palette is managed through vid.SetPalette(num) at game level.
+        // This method exists for interface completeness but the actual
+        // palette activation is handled by Video::SetPalette() called elsewhere.
         (void)palette;
     }
 

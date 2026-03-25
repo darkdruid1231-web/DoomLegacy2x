@@ -33,6 +33,7 @@ public:
     MOCK_METHOD(void, renderPlayerView, (PlayerInfo* player), (override));
     MOCK_METHOD(void, setup2DMode, (), (override));
     MOCK_METHOD(void, setupFullScreen2D, (), (override));
+    MOCK_METHOD(void, setViewport, (int viewport), (override));
     MOCK_METHOD(void, setPalette, (uint8_t* palette), (override));
     MOCK_METHOD(void, changeResolution, (int width, int height), (override));
     MOCK_METHOD(bool, isReady, (), (const override));

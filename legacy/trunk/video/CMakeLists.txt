@@ -18,6 +18,7 @@ r_splats.cpp
 r_sprite.cpp
 r_things.cpp
 r_anim.cpp
+renderer_provider_adapter.cpp
 hardware/oglrenderer.cpp
 hardware/md3.cpp
 hardware/oglshaders.cpp

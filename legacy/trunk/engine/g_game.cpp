@@ -54,6 +54,8 @@
 #include "r_render.h"
 #include "v_video.h"
 
+#include "interfaces/i_renderer.h"
+
 #include "s_sound.h"
 #include "sounds.h"
 
@@ -422,7 +424,13 @@ void GameInfo::Display()
                         hud.HU_Erase();
                 }
 
+                if (rendermode == render_opengl && GetGlobalRenderer())
+                    GetGlobalRenderer()->beginFrame();
+
                 Drawer(); // render 3D view
+
+                if (rendermode == render_opengl && GetGlobalRenderer())
+                    GetGlobalRenderer()->endFrame();
             }
             if (devparm && rendermode == render_opengl) {
                 GLenum err;
@@ -524,11 +532,13 @@ void GameInfo::Drawer()
 
     R_Update(tic); // tell the renderer that some time has passed
 
+    IRenderer* renderer = GetGlobalRenderer();
+
     for (int i = 0; i < n; i++)
     {
         // select correct viewport
-        if (rendermode == render_opengl)
-            oglrenderer->SetViewport(i);
+        if (renderer)
+            renderer->setViewport(i);
         else
             R_SetViewport(i);
 
@@ -545,8 +555,8 @@ void GameInfo::Drawer()
             if (!paused)
                 p->CalcViewHeight(); // bob the view
 
-            if (rendermode == render_opengl)
-                oglrenderer->RenderPlayerView(p);
+            if (renderer)
+                renderer->renderPlayerView(p);
             else
                 R.R_RenderPlayerView(p);
         }
@@ -560,17 +570,16 @@ void GameInfo::Drawer()
     }
 
     // back to fullscreen rendering for menu, automap, console etc.
-    if (rendermode == render_opengl)
-    {
-        oglrenderer->SetFullScreenViewport();
-        if (devparm) {
-            GLenum err;
-            while ((err = glGetError()) != GL_NO_ERROR)
-                CONS_Printf("GL error after SetFullScreenViewport(): 0x%04x\n", err);
-        }
-    }
+    if (renderer)
+        renderer->setupFullScreen2D();
     else
         vid.scaledofs = 0;
+
+    if (rendermode == render_opengl && devparm) {
+        GLenum err;
+        while ((err = glGetError()) != GL_NO_ERROR)
+            CONS_Printf("GL error after setupFullScreen2D(): 0x%04x\n", err);
+    }
 
     // CONS_Printf("GI::Draw done\n");
 }

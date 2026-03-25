@@ -49,6 +49,9 @@ public:
     /// Switch to full-screen 2D mode (no pillarboxing).
     virtual void setupFullScreen2D() = 0;
 
+    /// Set the viewport for split-screen rendering (index 0 = first player).
+    virtual void setViewport(int viewport) = 0;
+
     /// Set the palette (256-entry RGB array).
     virtual void setPalette(uint8_t* palette) = 0;
 

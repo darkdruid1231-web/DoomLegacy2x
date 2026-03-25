@@ -375,10 +375,7 @@ void I_StartFrame()
                 return;
         }
     }
-    else
-    {
-        oglrenderer->StartFrame();
-    }
+    // OGL StartFrame moved to IRenderer::beginFrame() — called from GameInfo::Display()
 }
 
 //
@@ -485,8 +482,7 @@ void I_FinishUpdate()
             SDL_UnlockSurface(vidSurface);
 #endif
     }
-    else if (oglrenderer != NULL)
-        oglrenderer->FinishFrame();
+    // OGL FinishFrame moved to IRenderer::endFrame() — called from GameInfo::Display()
 
     I_GetEvent();
 }
