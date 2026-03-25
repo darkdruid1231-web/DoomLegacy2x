@@ -31,7 +31,7 @@ hardware/hw_shadowmap.cpp
 
 add_library(video STATIC ${SRC_FILES})
 
-target_link_libraries(video PUBLIC ${GLEW_LIBRARY} ${OPENGL_LIBRARIES} stdc++)
+target_link_libraries(video PUBLIC ${GLEW_LIBRARY} ${OPENGL_LIBRARIES} stdc++ util_base)
 
 target_include_directories(video PRIVATE
     ${CMAKE_SOURCE_DIR}/include
