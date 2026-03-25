@@ -141,148 +141,7 @@ static const MenuStyle menu_style = {
 //===========================================================================
 //  Menu item class
 //===========================================================================
-
-/// flags for the menu items
-enum menuflag_t
-{
-    // 2+2 bits, union type + action subtype (what's stored in the union, what to do when a key is
-    // pressed)
-    IT_NONE = 0x0, ///< union is not used (also, no action)
-    IT_CONTROL, ///< <enter>, <backspace>: call specific functions with menuitem alphaKey as param
-
-    IT_SUBMENU = 0x4, ///< union is a submenu (also, <enter>: go to submenu)
-
-    IT_FUNC = 0x8, ///< union is a menufunction (also, <enter>: call func with menuitem number as
-                   ///< param (usually a complex submenu))
-    IT_KEYHANDLER, ///< <key>: call func with <key> as param (except menu navigation keys)
-    IT_FULL_KEYHANDLER, ///< <key>: call func with <key> as param (except <esc>, which always exits)
-
-    IT_CV = 0xC,  ///< union is a consvar (also, cv->str is printed next to name, <left>, <right>,
-                  ///< <enter> to change)
-    IT_CV_SLIDER, ///< as above, instead of string value a slider is drawn next to name
-    IT_CV_BIGSLIDER, ///< as above, but a big slider is drawn under the item
-    IT_CV_TEXTBOX,   ///< <enter>: opens a textbox
-
-    IT_UNION_MASK = 0xC,
-    IT_TYPE_MASK = 0xF,
-
-    // 4 bits: display type (order matters here!)
-    IT_SPACE = 0x00,   ///< big space (a hack, really...)
-    IT_PATCH = 0x10,   ///< a patch or a string with big font
-    IT_STRING = 0x20,  ///< little string (spaced with 10)
-    IT_CSTRING = 0x30, ///< very little string (spaced with 8)
-    IT_DISPLAY_MASK = 0xF0,
-
-    // misc. flags
-    IT_DY = 0x0100,             ///< alphakey is a y offset
-    IT_TEXTBOX_IN_USE = 0x0200, // HACK
-    IT_DISABLED = 0x0400,       ///< cannot be chosen
-    IT_WHITE = 0x0800,          ///< use white colormap
-    IT_GRAY = 0x1000,           ///< use gray colormap
-    IT_COLORMAP_MASK = IT_WHITE | IT_GRAY,
-    IT_HEADER_FLAG = 0x2000,    ///< section header (modern sub-menus)
-    IT_DROPDOWN = 0x4000,       ///< render a dropdown/select for the cvar
-
-    // shorthand for some common uses
-    IT_OFF_BIG = IT_NONE | IT_PATCH | IT_DISABLED | IT_GRAY,
-    IT_OFF = IT_NONE | IT_CSTRING | IT_DISABLED | IT_GRAY,
-    IT_CONTROLSTR = IT_CONTROL | IT_CSTRING,
-    IT_LINK = IT_SUBMENU | IT_STRING | IT_WHITE,
-    IT_ACT = IT_FUNC | IT_PATCH,
-    IT_CALL = IT_FUNC | IT_STRING,
-    IT_CVAR = IT_CV | IT_STRING,
-    IT_TEXTBOX = IT_CV_TEXTBOX | IT_STRING,
-    IT_CVAR_DROPDOWN = IT_CV | IT_STRING | IT_DROPDOWN,
-    IT_HEADER = IT_NONE | IT_CSTRING | IT_DISABLED | IT_WHITE | IT_HEADER_FLAG,
-};
-
-typedef void (*menufunc_t)(int choice);
-
-/// \brief Describes a single menu item
-struct menuitem_t
-{
-    friend class TextBox;
-
-  public:
-    short flags; ///< bit flags
-
-    const char *pic;  ///< Texture name or NULL
-    const char *text; ///< plain text, used when we have a valid font (e.g. FONTBxx lumps)
-
-    /// hotkey in menu OR y offset of the item
-    byte alphaKey;
-
-  private:
-    union
-    {
-        Menu *submenu;   // IT_SUBMENU
-        menufunc_t func; // IT_FUNC
-        consvar_t *cvar; // IT_CV
-    };
-
-  public:
-    menuitem_t() : flags(0), pic(NULL), text(NULL), alphaKey(0), submenu(NULL)
-    {
-    }
-
-    menuitem_t(short f, const char *p, const char *t, byte a = 0)
-        : flags(f), pic(p), text(t), alphaKey(a), submenu(NULL)
-    {
-    }
-
-    menuitem_t(short f, const char *p, const char *t, Menu *sm, byte a = 0)
-        : flags(f), pic(p), text(t), alphaKey(a), submenu(sm)
-    {
-        if ((flags & IT_UNION_MASK) != IT_SUBMENU || !submenu)
-            I_Error("Bad submenu: %s!\n", text);
-    }
-
-    menuitem_t(short f, const char *p, const char *t, menufunc_t r, byte a = 0)
-        : flags(f), pic(p), text(t), alphaKey(a), func(r)
-    {
-        int x = (flags & IT_UNION_MASK);
-        if ((x != IT_FUNC && x != IT_NONE) || !func)
-            I_Error("Bad menufunc: %s!\n", text);
-    }
-
-    menuitem_t(short f, const char *p, const char *t, consvar_t *cv, byte a = 0)
-        : flags(f), pic(p), text(t), alphaKey(a), cvar(cv)
-    {
-        if ((flags & IT_UNION_MASK) != IT_CV || !cvar)
-            I_Error("Bad menu cvar: %s!\n", text);
-    }
-
-    Menu *GetMenu()
-    {
-        return ((flags & IT_UNION_MASK) == IT_SUBMENU) ? submenu : NULL;
-    }
-    menufunc_t GetFunc()
-    {
-        return ((flags & IT_UNION_MASK) == IT_FUNC) ? func : NULL;
-    }
-    consvar_t *GetCV()
-    {
-        return ((flags & IT_UNION_MASK) == IT_CV) ? cvar : NULL;
-    }
-    const consvar_t *GetCV() const
-    {
-        return ((flags & IT_UNION_MASK) == IT_CV) ? cvar : NULL;
-    }
-
-    void SetFunc(menufunc_t f)
-    {
-        func = f;
-        flags &= ~IT_TYPE_MASK;
-        flags |= IT_FUNC;
-    }
-
-    void SetMenu(Menu *m)
-    {
-        submenu = m;
-        flags &= ~IT_TYPE_MASK;
-        flags |= IT_SUBMENU;
-    }
-};
+// menuitem_t and its validating constructors are now defined in m_menu.h.
 
 //==========================================================================
 //        Message box
@@ -3613,6 +3472,36 @@ void Menu::SetMenuBackend(IMenuBackend *backend)
     s_menuBackend = backend;
 }
 
+void Menu::SetFontForTesting(font_t *f)
+{
+    // No-op when passed nullptr: preserves whatever font is currently set.
+    // This allows DrawMenuWithBackend to call SetFontForTesting(nullptr) without
+    // overriding a font value that a specific test has set.
+    if (f)
+        font = f;
+}
+
+void Menu::SetNewUIForTesting(bool enabled)
+{
+    menu_use_newui = enabled;
+}
+
+void Menu::SetAnimCountForTesting(short ac)
+{
+    AnimCount = ac;
+}
+
+void Menu::DrawMenuForTesting()
+{
+    // Override state so DrawMenu() exercises the classic path without crashing.
+    // Note: font is intentionally NOT set to null here — DrawTitle() is already a
+    // no-op when title/titlepic are null (the test passes both as nullptr), and
+    // IT_PATCH items with text need font != nullptr to reach DrawMenuFontString.
+    menu_use_newui = false;
+    AnimCount = 0;  // ensures cursor blink is off (AnimCount < 4)
+    DrawMenu();
+}
+
 // resets the menu system according to current game.mode
 // changes menu font, structure etc.
 void Menu::Init()
@@ -3853,6 +3742,37 @@ Menu OGL_DevDef("M_OPTTTL", "OPTIONS", &OpenGLOptionDef, ITEMS(OGL_Dev_MI), 60, 
 Menu OGL_NormalMapDef("M_OPTTTL", "OPTIONS", &OpenGLOptionDef, ITEMS(OGL_NormalMap_MI), 60, 40);
 Menu OGL_PostFXDef("M_OPTTTL", "OGL_PostFX", &OpenGLOptionDef, ITEMS(OGL_PostFX_MI), 60, 40);
 Menu OGL_DeferredDef("M_OPTTTL", "OGL_Deferred", &OpenGLOptionDef, ITEMS(OGL_Deferred_MI), 60, 40);
+
+//===========================================================================
+//  menuitem_t validating constructors (out-of-line, access I_Error)
+//===========================================================================
+
+menuitem_t::menuitem_t(short f, const char *p, const char *t, byte a)
+    : flags(f), pic(p), text(t), alphaKey(a), submenu(NULL)
+{
+}
+
+menuitem_t::menuitem_t(short f, const char *p, const char *t, Menu *sm, byte a)
+    : flags(f), pic(p), text(t), alphaKey(a), submenu(sm)
+{
+    if ((flags & IT_UNION_MASK) != IT_SUBMENU || !submenu)
+        I_Error("Bad submenu: %s!\n", text);
+}
+
+menuitem_t::menuitem_t(short f, const char *p, const char *t, menufunc_t r, byte a)
+    : flags(f), pic(p), text(t), alphaKey(a), func(r)
+{
+    int x = (flags & IT_UNION_MASK);
+    if ((x != IT_FUNC && x != IT_NONE) || !func)
+        I_Error("Bad menufunc: %s!\n", text);
+}
+
+menuitem_t::menuitem_t(short f, const char *p, const char *t, consvar_t *cv, byte a)
+    : flags(f), pic(p), text(t), alphaKey(a), cvar(cv)
+{
+    if ((flags & IT_UNION_MASK) != IT_CV || !cvar)
+        I_Error("Bad menu cvar: %s!\n", text);
+}
 
 /*
 void Menu::DrawOpenGLMenu()

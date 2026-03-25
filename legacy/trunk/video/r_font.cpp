@@ -351,8 +351,27 @@ class FTTexture : public LumpTexture
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+            // pixels_rgba is stored column-major by BuildGlyph (pixel[row,col] at rgba[col*h+row]).
+            // glTexImage2D expects row-major, so transpose: column-major → row-major.
+            byte *rgba_rowmajor = new byte[(size_t)width * height * 4];
+            for (int row = 0; row < height; row++)
+            {
+                for (int col = 0; col < width; col++)
+                {
+                    // Source: column-major pixel(row,col) at [col*h+row]
+                    const byte *src = pixels_rgba + ((size_t)col * height + row) * 4;
+                    // Dest: row-major pixel(row,col) at [row*w+col]
+                    byte *dst = rgba_rowmajor + ((size_t)row * width + col) * 4;
+                    dst[0] = src[0]; // R
+                    dst[1] = src[1]; // G
+                    dst[2] = src[2]; // B
+                    dst[3] = src[3]; // A
+                }
+            }
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
-                         GL_RGBA, GL_UNSIGNED_BYTE, pixels_rgba);
+                         GL_RGBA, GL_UNSIGNED_BYTE, rgba_rowmajor);
+            delete[] rgba_rowmajor;
         }
         return gl_id;
     }

@@ -195,6 +195,101 @@ target_link_libraries(doomlegacy PRIVATE
 # The Shader/ShaderProg classes are compiled in both video and grammars with NO_SHADERS
 target_link_options(doomlegacy PRIVATE "-Wl,--allow-multiple-definition")
 
+# ---------------------------------------------------------------------------
+# test_menu_navigation — WidgetPanel navigation logic (HandleNavKey).
+# Compiled with interface sources so I_Error and other interface symbols are
+# available. Links against doomlegacy to get all engine symbols.
+# ---------------------------------------------------------------------------
+add_executable(test_menu_navigation tests/unit/test_menu_navigation.cpp ${INTERFACE_SOURCES})
+target_include_directories(test_menu_navigation PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/engine
+)
+target_link_libraries(test_menu_navigation PRIVATE
+    audio
+    "-Wl,--start-group"
+    util
+    doomengine
+    video
+    grammars
+    net
+    ${GLEW_LIBRARIES}
+    ${OPENGL_LIBRARIES}
+    "-Wl,--end-group"
+    ${SDL2_LIBRARIES}
+    ${SDL2MIXER_LIBRARIES}
+    ${FREETYPE_LIBRARIES}
+    ${ZLIB_LIBRARIES}
+    ${PNG_LIBRARY}
+    ${JPEG_LIBRARY}
+    ${ENET_LIBRARIES}
+)
+target_link_options(test_menu_navigation PRIVATE "-Wl,--allow-multiple-definition")
+target_compile_definitions(test_menu_navigation PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME menu_navigation COMMAND test_menu_navigation)
+
+# ---------------------------------------------------------------------------
+# test_menu_widget — Widget draw call verification via FakeRenderBackend.
+# ---------------------------------------------------------------------------
+add_executable(test_menu_widget tests/unit/test_menu_widget.cpp ${INTERFACE_SOURCES})
+target_include_directories(test_menu_widget PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/engine
+)
+target_link_libraries(test_menu_widget PRIVATE
+    audio
+    "-Wl,--start-group"
+    util
+    doomengine
+    video
+    grammars
+    net
+    ${GLEW_LIBRARIES}
+    ${OPENGL_LIBRARIES}
+    "-Wl,--end-group"
+    ${SDL2_LIBRARIES}
+    ${SDL2MIXER_LIBRARIES}
+    ${FREETYPE_LIBRARIES}
+    ${ZLIB_LIBRARIES}
+    ${PNG_LIBRARY}
+    ${JPEG_LIBRARY}
+    ${ENET_LIBRARIES}
+)
+target_link_options(test_menu_widget PRIVATE "-Wl,--allow-multiple-definition")
+target_compile_definitions(test_menu_widget PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME menu_widget COMMAND test_menu_widget)
+
+# ---------------------------------------------------------------------------
+# test_menu_draw — classic Menu::DrawMenu() draw-call sequence via FakeMenuBackend.
+# Links against doomengine for Menu, IMenuBackend, FakeMenuBackend, menuitem_t.
+# Uses i_error_stub.cpp to provide I_Error without full interface layer.
+# ---------------------------------------------------------------------------
+add_executable(test_menu_draw tests/unit/test_menu_draw.cpp tests/unit/i_error_stub.cpp ${INTERFACE_SOURCES})
+target_include_directories(test_menu_draw PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/engine)
+target_link_libraries(test_menu_draw PRIVATE
+    audio
+    "-Wl,--start-group"
+    util
+    doomengine
+    video
+    grammars
+    net
+    ${GLEW_LIBRARIES}
+    ${OPENGL_LIBRARIES}
+    "-Wl,--end-group"
+    ${SDL2_LIBRARIES}
+    ${SDL2MIXER_LIBRARIES}
+    ${FREETYPE_LIBRARIES}
+    ${ZLIB_LIBRARIES}
+    ${PNG_LIBRARY}
+    ${JPEG_LIBRARY}
+    ${ENET_LIBRARIES})
+target_compile_definitions(test_menu_draw PRIVATE SDL_MAIN_HANDLED)
+target_link_options(test_menu_draw PRIVATE "-Wl,--allow-multiple-definition")
+add_test(NAME menu_draw COMMAND test_menu_draw)
+
 # Tests — added after all include dirs and libraries are resolved.
 if(BUILD_TESTING)
     enable_testing()
