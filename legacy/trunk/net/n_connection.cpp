@@ -480,35 +480,35 @@ void LConnection::handlePacket(PacketType type, lnet::BitStream *stream)
                     if (lp->predicted_valid && hasMobj)
                     {
                         // Compute prediction error
-                        int32_t dx = Abs(lp->predicted_x - server_x);
-                        int32_t dy = Abs(lp->predicted_y - server_y);
-                        int32_t dz = Abs(lp->predicted_z - server_z);
+                        fixed_t dx = abs(lp->predicted_x - server_x);
+                        fixed_t dy = abs(lp->predicted_y - server_y);
+                        fixed_t dz = abs(lp->predicted_z - server_z);
                         // Use predicted position if error is small (< 8 pixels = 8 << FRACBITS)
-                        fixed_t ERROR_THRESHOLD = FRACUNIT * 8; // 8 pixel threshold
+                        fixed_t ERROR_THRESHOLD = fixed_t::UNIT * 8; // 8 pixel threshold
                         if (dx < ERROR_THRESHOLD && dy < ERROR_THRESHOLD && dz < ERROR_THRESHOLD)
                         {
                             // Prediction was good - use predicted position
-                            lp->info->pawn->x = lp->predicted_x;
-                            lp->info->pawn->y = lp->predicted_y;
-                            lp->info->pawn->z = lp->predicted_z;
-                            lp->info->pawn->angle = lp->predicted_angle;
+                            lp->info->pawn->pos.x = lp->predicted_x;
+                            lp->info->pawn->pos.y = lp->predicted_y;
+                            lp->info->pawn->pos.z = lp->predicted_z;
+                            lp->info->pawn->yaw = lp->predicted_angle;
                         }
                         else
                         {
                             // Prediction was wrong - snap to server
-                            lp->info->pawn->x = server_x;
-                            lp->info->pawn->y = server_y;
-                            lp->info->pawn->z = server_z;
-                            lp->info->pawn->angle = server_angle;
+                            lp->info->pawn->pos.x = server_x;
+                            lp->info->pawn->pos.y = server_y;
+                            lp->info->pawn->pos.z = server_z;
+                            lp->info->pawn->yaw = server_angle;
                         }
                     }
                     else if (hasMobj)
                     {
                         // No prediction yet: snap to server
-                        lp->info->pawn->x = server_x;
-                        lp->info->pawn->y = server_y;
-                        lp->info->pawn->z = server_z;
-                        lp->info->pawn->angle = server_angle;
+                        lp->info->pawn->pos.x = server_x;
+                        lp->info->pawn->pos.y = server_y;
+                        lp->info->pawn->pos.z = server_z;
+                        lp->info->pawn->yaw = server_angle;
                     }
                     // Update predicted state from server for next prediction
                     if (hasMobj)
@@ -536,10 +536,10 @@ void LConnection::handlePacket(PacketType type, lnet::BitStream *stream)
                     {
                         // Set up interpolation from current position to server position
                         // Save current position as start of interpolation
-                        remotePlayer->interp_x = remotePlayer->pawn->x;
-                        remotePlayer->interp_y = remotePlayer->pawn->y;
-                        remotePlayer->interp_z = remotePlayer->pawn->z;
-                        remotePlayer->interp_angle = remotePlayer->pawn->angle;
+                        remotePlayer->interp_x = remotePlayer->pawn->pos.x;
+                        remotePlayer->interp_y = remotePlayer->pawn->pos.y;
+                        remotePlayer->interp_z = remotePlayer->pawn->pos.z;
+                        remotePlayer->interp_angle = remotePlayer->pawn->yaw;
 
                         // Set target position
                         remotePlayer->target_x = server_x;
