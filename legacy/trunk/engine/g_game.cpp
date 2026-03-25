@@ -48,6 +48,7 @@
 #include "m_random.h"
 
 #include "r_data.h"
+#include "t_parse.h"
 #include "r_draw.h"
 #include "r_main.h"
 #include "r_render.h"
@@ -146,9 +147,9 @@ public:
 
     void getPlayerPosition(const PlayerInfo* p, int& x, int& y, int& z) const override {
         if (p && p->pawn) {
-            x = p->pawn->pos.x;
-            y = p->pawn->pos.y;
-            z = p->pawn->pos.z;
+            x = static_cast<int>(p->pawn->pos.x.value() >> 16);
+            y = static_cast<int>(p->pawn->pos.y.value() >> 16);
+            z = static_cast<int>(p->pawn->pos.z.value() >> 16);
         } else {
             x = y = z = 0;
         }

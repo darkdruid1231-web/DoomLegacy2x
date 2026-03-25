@@ -40,7 +40,7 @@
 #define INCLUDED_INTERFACES_I_SOUND_H
 
 // Forward declarations
-struct mobj_t;
+class Actor;
 
 class ISoundSystem {
 public:
@@ -51,11 +51,11 @@ public:
     /// \param sfx_id Sound effect ID (sfx_* enum value)
     /// \param vol Volume 0.0-1.0
     /// \return Channel assigned, or -1 if failed
-    virtual int startSound(mobj_t* mobj, int sfx_id, float vol) = 0;
+    virtual int startSound(Actor* mobj, int sfx_id, float vol) = 0;
 
     /// Stop a sound effect on an object.
     /// \param mobj Object whose sound to stop
-    virtual void stopSound(mobj_t* mobj) = 0;
+    virtual void stopSound(Actor* mobj) = 0;
 
     /// Set listener (player) position for 3D audio spatialization.
     /// \param x,y,z Position in fixed-point units

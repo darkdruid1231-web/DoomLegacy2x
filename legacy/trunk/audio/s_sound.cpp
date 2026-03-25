@@ -37,12 +37,13 @@
 #include "m_argv.h"
 #include "r_defs.h"
 
-#include "i_sound.h"
 #include "s_sound.h"
+#include "i_sound.h"            // SDL audio callbacks: I_StartSound, etc.
 #include "sounds.h"
 #include "tables.h"
 
-#include "g_actor.h"  // for Actor
+#include "g_actor.h"  // for Actor (mobj_t definition)
+#include "interfaces/i_sound.h" // ISoundSystem interface
 
 #include "w_wad.h"
 #include "z_cache.h"
@@ -74,13 +75,12 @@ SoundSystem S;
 ///         can be injected instead.
 class SoundSystemAdapter : public ISoundSystem {
 public:
-    int startSound(mobj_t* mobj, int sfx_id, float vol) override {
-        // Cast mobj_t* to Actor* - they are the same type in this codebase
-        return S_StartSound(static_cast<Actor*>(mobj), sfx_id, vol);
+    int startSound(Actor* mobj, int sfx_id, float vol) override {
+        return S_StartSound(mobj, sfx_id, vol);
     }
 
-    void stopSound(mobj_t* mobj) override {
-        S.Stop3DSound(static_cast<Actor*>(mobj));
+    void stopSound(Actor* mobj) override {
+        S.Stop3DSound(mobj);
     }
 
     void setListenerPosition(float x, float y, float z) override {

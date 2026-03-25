@@ -28,7 +28,7 @@
 ///   MonsterAI monster(&mockSound);
 
 #include "interfaces/i_sound.h"
-#include "g_actor.h"      // For mobj_t definition
+#include "g_actor.h"      // For Actor definition
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -41,8 +41,8 @@
 class MockSoundSystem : public ISoundSystem {
 public:
     // Google Mock method declarations
-    MOCK_METHOD(int, startSound, (mobj_t* mobj, int sfx_id, float vol), (override));
-    MOCK_METHOD(void, stopSound, (mobj_t* mobj), (override));
+    MOCK_METHOD(int, startSound, (Actor* mobj, int sfx_id, float vol), (override));
+    MOCK_METHOD(void, stopSound, (Actor* mobj), (override));
     MOCK_METHOD(void, setListenerPosition, (float x, float y, float z), (override));
     MOCK_METHOD(bool, isChannelPlaying, (int channel), (const override));
     MOCK_METHOD(void, setChannelVolume, (int channel, float vol), (override));
