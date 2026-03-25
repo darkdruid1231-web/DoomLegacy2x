@@ -26,6 +26,8 @@
 #include "cvars.h"
 #include "doomdef.h"
 
+#include "g_pawn.h"  // For PlayerPawn full definition (before other headers that include info.h)
+
 #include "n_connection.h"
 #include "n_interface.h"
 
@@ -685,11 +687,11 @@ void LNetInterface::BroadcastGameState()
         if (p->pawn)
         {
             bs.write(static_cast<uint8_t>(1)); // has mobj
-            bs.write(p->pawn->pos.x);
-            bs.write(p->pawn->pos.y);
-            bs.write(p->pawn->pos.z);
+            bs.write(p->pawn->pos.x.value());
+            bs.write(p->pawn->pos.y.value());
+            bs.write(p->pawn->pos.z.value());
             bs.write(p->pawn->yaw);
-            bs.write(static_cast<uint16_t>(p->pawn->state ? p->pawn->state->index : 0));
+            bs.write(static_cast<uint16_t>(0));  // state index not available for PlayerPawn
         }
         else
         {

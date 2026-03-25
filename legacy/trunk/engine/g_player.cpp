@@ -235,10 +235,10 @@ void LocalPlayerInfo::ApplyPrediction(const ticcmd_t *cmd)
     // Get current position as starting point
     if (!predicted_valid)
     {
-        predicted_x = info->pawn->x;
-        predicted_y = info->pawn->y;
-        predicted_z = info->pawn->z;
-        predicted_angle = info->pawn->angle;
+        predicted_x = info->pawn->pos.x;
+        predicted_y = info->pawn->pos.y;
+        predicted_z = info->pawn->pos.z;
+        predicted_angle = info->pawn->yaw;
     }
 
     // Update angle from cmd
@@ -249,22 +249,22 @@ void LocalPlayerInfo::ApplyPrediction(const ticcmd_t *cmd)
     //   forward > 0 = forward, forward < 0 = backward
     //   side > 0 = left strafe, side < 0 = right strafe
     // Scale: each unit of cmd value = this many FRACUNIT of movement per tic
-    const int MOVE_SCALE = FRACUNIT / 16; // ~0.06 FRACUNIT per unit
+    const int MOVE_SCALE = fixed_t::UNIT / 16; // ~0.06 FRACUNIT per unit
 
     if (cmd->forward)
     {
         // Forward/backward movement
         fixed_t move = cmd->forward * MOVE_SCALE;
-        predicted_x += (Cos(predicted_angle) >> 1) * move / (FRACUNIT >> 1);
-        predicted_y += (Sin(predicted_angle) >> 1) * move / (FRACUNIT >> 1);
+        predicted_x += (Cos(predicted_angle) >> 1) * move / (fixed_t::UNIT >> 1);
+        predicted_y += (Sin(predicted_angle) >> 1) * move / (fixed_t::UNIT >> 1);
     }
 
     if (cmd->side)
     {
         // Strafe movement (perpendicular to facing)
         fixed_t move = cmd->side * MOVE_SCALE;
-        predicted_x += (Cos(predicted_angle - ANG90) >> 1) * move / (FRACUNIT >> 1);
-        predicted_y += (Sin(predicted_angle - ANG90) >> 1) * move / (FRACUNIT >> 1);
+        predicted_x += (Cos(predicted_angle - ANG90) >> 1) * move / (fixed_t::UNIT >> 1);
+        predicted_y += (Sin(predicted_angle - ANG90) >> 1) * move / (fixed_t::UNIT >> 1);
     }
 
     predicted_valid = true;
@@ -672,26 +672,26 @@ void PlayerInfo::AdvanceInterpolation()
     if (interp_elapsed >= interp_tics)
     {
         // Interpolation complete - snap to target
-        pawn->x = target_x;
-        pawn->y = target_y;
-        pawn->z = target_z;
-        pawn->angle = target_angle;
+        pawn->pos.x = target_x;
+        pawn->pos.y = target_y;
+        pawn->pos.z = target_z;
+        pawn->yaw = target_angle;
         interp_tics = 0; // Disable further interpolation
     }
     else
     {
         // Linear interpolation
-        fixed_t f = (FRACUNIT * interp_elapsed) / interp_tics;
-        pawn->x = interp_x + FixedMul(target_x - interp_x, f);
-        pawn->y = interp_y + FixedMul(target_y - interp_y, f);
-        pawn->z = interp_z + FixedMul(target_z - interp_z, f);
+        fixed_t f = (fixed_t::UNIT * interp_elapsed) / interp_tics;
+        pawn->pos.x = interp_x + (target_x - interp_x) * f;
+        pawn->pos.y = interp_y + (target_y - interp_y) * f;
+        pawn->pos.z = interp_z + (target_z - interp_z) * f;
         // Angle interpolation needs special handling for wrapping
         angle_t delta = target_angle - interp_angle;
         if (delta > ANG180)
             delta -= ANGLE_MAX;
         else if (delta < -ANG180)
             delta += ANGLE_MAX;
-        pawn->angle = interp_angle + (delta * f / FRACUNIT);
+        pawn->yaw = static_cast<angle_t>((fixed_t(static_cast<int>(interp_angle)) + fixed_t(static_cast<int>(delta)) * f / fixed_t::UNIT).value());
     }
 }
 
