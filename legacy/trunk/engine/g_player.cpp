@@ -198,6 +198,15 @@ LocalPlayerInfo::LocalPlayerInfo(const string &n, int keyset) : PlayerOptions(n)
 
     info = NULL;
     ai = NULL;
+
+    // Prediction state
+    predicted_x = predicted_y = predicted_z = 0;
+    predicted_angle = 0;
+    predicted_valid = false;
+
+    // Sequence numbers for reliable ticcmd delivery
+    ticcmd_seq = 0;
+    last_acked_seq = 0;
 }
 
 /// Builds the control struct (ticcmd) based on human input or AI decisions
@@ -214,6 +223,58 @@ void LocalPlayerInfo::GetInput(int elapsed)
         ai->BuildInput(info, elapsed);
     else
         info->cmd.Build(this, elapsed);
+}
+
+/// Apply ticcmd locally to generate predicted position
+/// This is a simple kinematic prediction - does not handle collision, friction, etc.
+void LocalPlayerInfo::ApplyPrediction(const ticcmd_t *cmd)
+{
+    if (!info || !info->pawn)
+        return;
+
+    // Get current position as starting point
+    if (!predicted_valid)
+    {
+        predicted_x = info->pawn->x;
+        predicted_y = info->pawn->y;
+        predicted_z = info->pawn->z;
+        predicted_angle = info->pawn->angle;
+    }
+
+    // Update angle from cmd
+    predicted_angle = (cmd->yaw << 16);
+
+    // Simple movement prediction (ignores friction, collision, etc.)
+    // cmd->forward and cmd->side are int8_t representing direction:
+    //   forward > 0 = forward, forward < 0 = backward
+    //   side > 0 = left strafe, side < 0 = right strafe
+    // Scale: each unit of cmd value = this many FRACUNIT of movement per tic
+    const int MOVE_SCALE = FRACUNIT / 16; // ~0.06 FRACUNIT per unit
+
+    if (cmd->forward)
+    {
+        // Forward/backward movement
+        fixed_t move = cmd->forward * MOVE_SCALE;
+        predicted_x += (Cos(predicted_angle) >> 1) * move / (FRACUNIT >> 1);
+        predicted_y += (Sin(predicted_angle) >> 1) * move / (FRACUNIT >> 1);
+    }
+
+    if (cmd->side)
+    {
+        // Strafe movement (perpendicular to facing)
+        fixed_t move = cmd->side * MOVE_SCALE;
+        predicted_x += (Cos(predicted_angle - ANG90) >> 1) * move / (FRACUNIT >> 1);
+        predicted_y += (Sin(predicted_angle - ANG90) >> 1) * move / (FRACUNIT >> 1);
+    }
+
+    predicted_valid = true;
+}
+
+/// Get and increment the sequence number for next ticcmd
+uint16_t LocalPlayerInfo::NextTiccmdSeq()
+{
+    ticcmd_seq++;
+    return ticcmd_seq;
 }
 
 // Propagates the preferences to the PlayerInfo or sends them to the server.
@@ -271,6 +332,8 @@ PlayerInfo::PlayerInfo(const LocalPlayerInfo *p)
 
     cmd.Clear();
     invTics = invSlot = invPos = 0;
+    hasPendingCmd = false;
+    last_seq = 0;
 
     // net stuff
     mNetFlags.set(Ghostable);
@@ -591,6 +654,45 @@ void PlayerInfo::Ticker()
     // inventory
     if (itemuse > 0)
         itemuse--;
+}
+
+/// Advance interpolation toward target position (for remote players on client)
+void PlayerInfo::AdvanceInterpolation()
+{
+    // Check if interpolation is needed
+    if (interp_tics <= 0)
+        return;
+    if (!pawn)
+        return;
+
+    // Increment elapsed tics
+    interp_elapsed++;
+
+    // Calculate interpolation fraction (0 to 1)
+    if (interp_elapsed >= interp_tics)
+    {
+        // Interpolation complete - snap to target
+        pawn->x = target_x;
+        pawn->y = target_y;
+        pawn->z = target_z;
+        pawn->angle = target_angle;
+        interp_tics = 0; // Disable further interpolation
+    }
+    else
+    {
+        // Linear interpolation
+        fixed_t f = (FRACUNIT * interp_elapsed) / interp_tics;
+        pawn->x = interp_x + FixedMul(target_x - interp_x, f);
+        pawn->y = interp_y + FixedMul(target_y - interp_y, f);
+        pawn->z = interp_z + FixedMul(target_z - interp_z, f);
+        // Angle interpolation needs special handling for wrapping
+        angle_t delta = target_angle - interp_angle;
+        if (delta > ANG180)
+            delta -= ANGLE_MAX;
+        else if (delta < -ANG180)
+            delta += ANGLE_MAX;
+        pawn->angle = interp_angle + (delta * f / FRACUNIT);
+    }
 }
 
 // send a message to the player

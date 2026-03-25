@@ -235,6 +235,9 @@ class Map
     // in p_tick.cpp
     void Ticker();
 
+    /// Apply pending network ticcmds to players before running thinkers
+    void ApplyPendingTiccmds();
+
     void InitThinkers();
     void AddThinker(Thinker *thinker);
     void DetachThinker(Thinker *thinker);

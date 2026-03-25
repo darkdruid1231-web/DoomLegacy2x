@@ -18,8 +18,8 @@
 //
 //
 //
-// DESCRIPTION:
-//      network interface
+// Description:
+//      network interface using ENet
 //
 //-----------------------------------------------------------------------------
 
@@ -31,42 +31,36 @@
 #include "i_system.h"
 #include "m_argv.h"
 
-// #include "doomstat.h"
-
 #include "i_net.h"
 
 #include "z_zone.h"
 
-#if 0
-int I_InitTcpNetwork(void);
-//
-// NETWORKING
-//
-
-void Internal_Get(void)
-{
-     I_Error("Get without netgame\n");
-}
-
-void Internal_Send(void)
-{
-     I_Error("Send without netgame\n");
-}
-
-void Internal_FreeNodenum(int nodenum)
-{}
-#endif
+#include <enet/enet.h>
 
 //
 // I_InitNetwork
-// Only required for DOS, so this is more a dummy
+// Initializes ENet networking
 //
 bool I_InitNetwork(void)
 {
+    // Check for legacy -net option
     if (M_CheckParm("-net"))
     {
         I_Error("-net not supported, use -server and -connect\n"
                 "see docs for more\n");
     }
-    return false;
+
+    // Initialize ENet library
+    if (enet_initialize() != 0)
+    {
+        CONS_Printf("Failed to initialize ENet\n");
+        return false;
+    }
+
+    CONS_Printf("ENet networking initialized\n");
+
+    // TODO: Process -server and -connect command line options here
+    // This would typically be done in d_main.c or similar
+
+    return true;
 }

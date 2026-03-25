@@ -16,31 +16,36 @@
 // GNU General Public License for more details.
 //
 //-----------------------------------------------------------------------------
-
-/// \file
-/// \brief Legacy Network Interface
+//
+// Description:
+//   Legacy Network Interface using ENet
+//
+//-----------------------------------------------------------------------------
 
 #ifndef n_interface_h
 #define n_interface_h 1
 
-#include "tnl/tnlAssert.h"
-#include "tnl/tnlNetInterface.h"
+#include "tnl_stub.h"
+#include "net/EnetNetworkAdapter.h"
+#include "data/d_ticcmd.h"
 #include <string>
 #include <vector>
 
 using namespace std;
-// using namespace TNL;  // Commented out to avoid std namespace conflicts
 
-/// \brief TNL NetInterface class for Legacy
+// Forward declarations
+class LConnection;
+class serverinfo_t;
+
 ///
-/// Wrapper for a socket and more.
-/// Takes care of server pinging, server lists, connections,
-/// authenthication and basic network housekeeping.
-
-class LNetInterface : public NetInterface
+/// \brief LNetInterface - Network interface for Legacy using ENet
+///
+/// Handles server pinging, server lists, connections, and basic network housekeeping.
+/// Replaces the TNL-based NetInterface with ENet-based networking.
+///
+class LNetInterface
 {
     friend class LConnection;
-    typedef NetInterface Parent;
 
   public:
     enum netstate_t
@@ -64,10 +69,10 @@ class LNetInterface : public NetInterface
         QueryDelay = 8000, ///< ms to wait between sending server queries
 
         /// Different types of info packets
-        PT_ServerPing = FirstValidInfoPacketId, ///< Client pinging for servers
-        PT_PingResponse,                        ///< Server answering a ping
-        PT_ServerQuery,                         ///< Client querying server info
-        PT_QueryResponse,                       ///< Server answering a query
+        PT_ServerPing = 1,
+        PT_PingResponse,
+        PT_ServerQuery,
+        PT_QueryResponse
     };
 
     U32 nowtime; ///< time of current/last update in ms
@@ -81,7 +86,7 @@ class LNetInterface : public NetInterface
     bool autoconnect;
 
     /// information about currently known servers
-    vector<class serverinfo_t *> serverlist;
+    vector<serverinfo_t *> serverlist;
 
   protected:
     /// server list manipulation
@@ -90,8 +95,8 @@ class LNetInterface : public NetInterface
     void SL_Update();
     void SL_Clear();
 
-    /// overrides the method in the NetInterface class to handle ping and info packets
-    virtual void handleInfoPacket(const Address &a, U8 packetType, BitStream *stream);
+    /// Handle ping and info packets
+    void handleInfoPacket(const Address &a, U8 packetType, BitStream *stream);
 
     /// Sends out a server ping
     void SendPing(const Address &a, const Nonce &cn);
@@ -102,14 +107,20 @@ class LNetInterface : public NetInterface
   public:
     // active connections
     class MasterConnection *master_con; ///< connection to master server
-    class LConnection *server_con;      ///< Current connection to the server, if this is a client.
+    LConnection *server_con;      ///< Current connection to the server, if this is a client.
     std::vector<LConnection *> client_con; ///< Current client connections, if this is a server.
 
     bool nodownload; ///< CheckParm of -nodownload
 
+    /// ENet network adapter
+    EnetNetworkAdapter *adapter;
+
   public:
     /// The constructor initializes and binds the network interface
     LNetInterface(const Address &bind);
+
+    /// Destructor
+    ~LNetInterface();
 
     /// Checks for incoming packets, sends out packets if needed, processes connections.
     void Update();
@@ -133,17 +144,34 @@ class LNetInterface : public NetInterface
     void SV_Reset();
 
     //================================================
-    //  RPC callers
+    //  RPC callers (simplified - direct packet sending)
     //================================================
 
-    void SendChat(int from, int to, const char *msg) {}
-    void Pause(int pnum, bool on) {}
-    void SendNetVar(U16 netid, const char *str) {}
-    void SendPlayerOptions(int pnum, class LocalPlayerInfo &p) {}
-    void RequestSuicide(int pnum) {}
-    void Kick(class PlayerInfo *p) {}
+    void SendChat(int from, int to, const char *msg);
+    void Pause(int pnum, bool on);
+    void SendNetVar(U16 netid, const char *str);
+    void SendPlayerOptions(int pnum, class LocalPlayerInfo &p);
+    void RequestSuicide(int pnum);
+    void Kick(class PlayerInfo *p);
+
+    // Send packet to all clients (server)
+    void broadcastPacket(const void *data, size_t size);
+
+    // Send packet to specific client
+    void sendPacketTo(LConnection *conn, const void *data, size_t size);
+
+    //================================================
+    //  Ticcmd and Game State networking
+    //================================================
+
+    /// Called when server receives a ticcmd from a client
+    void OnReceiveTiccmd(LConnection *conn, S32 pnum, const ticcmd_t *cmd, uint16_t seq = 0);
+
+    /// Broadcast game state to all clients (server only)
+    void BroadcastGameState();
 };
 
+///
 /// \brief Vital server properties visible to prospective clients
 ///
 /// A client makes one of these for each server found during server search.

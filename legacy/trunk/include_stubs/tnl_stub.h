@@ -41,11 +41,8 @@ typedef uint32_t IPAddress;
 
 
 // Forward declarations
-#ifdef TNL_STUB_BUILD
-class BitStream;
-#else
+// Use lnet::BitStream for actual serialization
 using lnet::BitStream;
-#endif
 class NetConnection;
 class GhostConnection;
 class NetObject;
@@ -132,62 +129,32 @@ class Socket {};  // Stub for Socket if needed
 
 class Nonce {
 public:
-    Nonce() {}
-    void generate() {}
-    void getRandom() {}
-    void read(BitStream* s) {}
-    void write(BitStream* s) {}
-    bool operator==(const Nonce& other) const { return false; }
+    Nonce() : value(0) {}
+    void generate() { value = rand(); }
+    void getRandom() { value = rand(); }
+    void read(lnet::BitStream* s) { value = s->readUInt32(); }
+    void write(lnet::BitStream* s) const { s->write(value); }
+    bool operator==(const Nonce& other) const { return value == other.value; }
     bool operator!=(const Nonce& other) const { return !(*this == other); }
+
+private:
+    uint32_t value;
 };
 
-#ifdef TNL_STUB_BUILD
-class BitStream {
+// PacketStream - wrapper for sending packets
+// Note: sendto is deprecated, use ENetNetworkAdapter directly
+class PacketStream : public lnet::BitStream {
 public:
-    BitStream() {}
-    BitStream(U8* buffer, U32 size) {}
-    ~BitStream() {}
+    PacketStream() : lnet::BitStream() {}
+    PacketStream(uint8_t* data, size_t size) : lnet::BitStream(data, size) {}
 
-    void write(uint32_t val) {}
-    void write(int size, const byte* data) {}
-    uint32_t read() { return 0; }
-    bool writeFlag(bool val) { return val; }
-    bool readFlag() { return false; }
-    void writeInt(uint32_t val, int bits) {}
-    uint32_t readInt(int bits) { return 0; }
-
-    void writeString(const char* str) {}
-    void readString(char* buffer) {}
-    void readString(char* buffer, size_t maxLen) {}
-    void readString(char* buffer, int maxLen) {}
-    void read(uint16_t* val) { *val = 0; }
-    void read(int* val) { *val = 0; }
-    void read(U32* val) { *val = 0; }
-    void read(S32* val, size_t bits) { *val = 0; }
-    void read(bool* val, size_t bits) { *val = false; }
-    void read(byte* buffer, int bits) {}
-    void read(unsigned char* val) { *val = 0; }
-    void read(bool* val) { *val = false; }
-
-    uint8_t* getBuffer() { return nullptr; }
-    uint32_t getPosition() const { return 0; }
-    void setPosition(uint32_t pos) {}
-    uint32_t getRemainingBits() const { return 0; }
-    bool isCompressed() const { return false; }
-    void setCompressed(bool c) {}
-    void clear() {}
-    void alignBits() {}
-    void writeBits(uint32_t val, int bits) {}
-    uint32_t readBits(int bits) { return 0; }
-    U32 getBufferSize() const { return 0; }
-    U32 getBytePosition() const { return 0; }
-};
-#endif
-
-class PacketStream : public BitStream {
-public:
-    PacketStream() {}
-    void sendto(void* socket, const Address& addr) {}
+    // Deprecated - use ENetNetworkAdapter for actual sending
+    void sendto(void* socket, const Address& addr)
+    {
+        (void)socket;
+        (void)addr;
+        // Deprecated - actual sending should use EnetNetworkAdapter
+    }
 };
 
 class StringPtr {

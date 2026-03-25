@@ -16,13 +16,11 @@
 // GNU General Public License for more details.
 //
 //-----------------------------------------------------------------------------
-
-/// \file
-/// \brief Legacy Network Interface
-///
-/// Uses OpenTNL.
-
-#include "tnl/tnlAsymmetricKey.h"
+//
+// Description:
+//   Legacy Network Interface using ENet
+//
+//-----------------------------------------------------------------------------
 
 #include "command.h"
 #include "cvars.h"
@@ -32,8 +30,6 @@
 #include "n_interface.h"
 
 #include "g_game.h"
-
-// using namespace TNL;  // Removed to avoid std conflicts
 #include "g_type.h"
 
 #include "i_system.h"
@@ -41,8 +37,6 @@
 #include "m_misc.h"
 #include "vfile.h"
 #include "w_wad.h"
-
-// using namespace TNL;  // Removed to avoid std conflicts
 
 //===================================================================
 //    Server lists
@@ -132,37 +126,42 @@ void LNetInterface::SL_Update()
 //===================================================================
 
 static const char *ConnectionState[] = {
-    "Not connected",               ///< Initial state of a NetConnection instance - not connected.
-    "Awaiting challenge response", ///< We've sent a challenge request, awaiting the response.
-    "Sending punch packets", ///< The state of a pending arranged connection when both sides haven't
-                             ///< heard from the other yet
-    "Computing puzzle solution", ///< We've received a challenge response, and are in the process of
-                                 ///< computing a solution to its puzzle.
-    "Awaiting connect response", ///< We've received a challenge response and sent a connect
-                                 ///< request.
-    "Connect timeout",           ///< The connection timed out during the connection process.
-    "Connection rejected",       ///< The connection was rejected.
-    "Connected.",   ///< We've accepted a connect request, or we've received a connect response
-                    ///< accept.
-    "Disconnected", ///< The connection has been disconnected.
-    "Connection timed out" ///< The connection timed out.
+    "Not connected",
+    "Awaiting challenge response",
+    "Sending punch packets",
+    "Computing puzzle solution",
+    "Awaiting connect response",
+    "Connect timeout",
+    "Connection rejected",
+    "Connected.",
+    "Disconnected",
+    "Connection timed out"
 };
 
-LNetInterface::LNetInterface(const Address &bind) : NetInterface(bind)
+LNetInterface::LNetInterface(const Address &bind)
+    : adapter(nullptr)
+    , master_con(nullptr)
+    , server_con(nullptr)
+    , netstate(SV_Unconnected)
+    , nowtime(0)
+    , nextpingtime(0)
+    , autoconnect(false)
+    , nodownload(false)
 {
-    master_con = NULL;
-    server_con = NULL;
-    netstate = SV_Unconnected;
+    (void)bind; // unused for now
 
-    nowtime = nextpingtime = 0;
-    autoconnect = false;
-    nodownload = false;
+    // Create ENet adapter for client mode initially
+    adapter = new EnetNetworkAdapter();
+}
 
-    setAllowsConnections(false);
-
-    // Asymmetric cipher based on elliptic curves
-    // setPrivateKey(new AsymmetricKey(32));
-    // setRequiresKeyExchange(true);
+LNetInterface::~LNetInterface()
+{
+    if (adapter)
+    {
+        adapter->reset();
+        delete adapter;
+        adapter = nullptr;
+    }
 }
 
 void LNetInterface::CL_StartPinging(bool connectany)
@@ -171,6 +170,14 @@ void LNetInterface::CL_StartPinging(bool connectany)
     nextpingtime = I_GetTime();
     pingnonce.getRandom();
     SL_Clear();
+
+    // Initialize as client if not already
+    if (!adapter->initializeClient())
+    {
+        CONS_Printf("Failed to initialize ENet client\n");
+        return;
+    }
+
     netstate = CL_PingingServers;
 }
 
@@ -180,15 +187,18 @@ void LNetInterface::SendPing(const Address &a, const Nonce &cn)
     if (devparm)
         CONS_Printf("Sending out server ping to %s...\n", a.toString());
 
-    PacketStream out;
+    uint8_t buffer[256];
+    lnet::BitStream bs(buffer, sizeof(buffer));
+    bs.write(U8(PT_ServerPing));
+    cn.write(&bs);
+    bs.write(LEGACY_VERSION);
+    bs.writeString(LEGACY_VERSIONSTRING);
+    bs.write(nowtime);
 
-    out.write(U8(PT_ServerPing));
-    cn.write(&out);            // client nonce
-    out.write(LEGACY_VERSION); // version information
-    out.writeString(LEGACY_VERSIONSTRING);
-    out.write(nowtime); // this is used to calculate the ping value
+    // TODO: Send via ENet broadcast
+    // For now, use adapter's sendPacket which will broadcast on server
+    // This is a simplification - LAN discovery needs proper UDP broadcast
 
-    out.sendto(mSocket, a);
     nextpingtime = nowtime + PingDelay;
 }
 
@@ -198,13 +208,15 @@ void LNetInterface::SendQuery(serverinfo_t *s)
     if (devparm)
         CONS_Printf("Querying server %s...\n", s->addr.toString());
 
-    PacketStream out;
+    uint8_t buffer[256];
+    lnet::BitStream bs(buffer, sizeof(buffer));
+    bs.write(U8(PT_ServerQuery));
+    s->cn.write(&bs);
+    bs.write(s->token);
 
-    out.write(U8(PT_ServerQuery));
-    s->cn.write(&out);
-    out.write(s->token);
+    // TODO: Send via ENet to specific address
+    // adapter->sendPacketTo(server, buffer, bs.getNumBytes());
 
-    out.sendto(mSocket, s->addr);
     s->nextquery = nowtime + QueryDelay;
 }
 
@@ -215,17 +227,14 @@ void LNetInterface::handleInfoPacket(const Address &address, U8 packetType, BitS
     switch (packetType)
     {
         case PT_ServerPing:
-            // ping packet only contains a client nonce and the Legacy ID string(s)
-            if (game.server && mAllowConnections)
+            if (game.server && netstate != SV_Unconnected)
             {
                 if (devparm)
                     CONS_Printf("received ping from %s\n", address.toString());
 
-                // read nonce
                 Nonce cn;
                 cn.read(stream);
 
-                // check version TODO different versioning for protocol? no?
                 int version;
                 stream->read(&version);
                 if (version != LEGACY_VERSION)
@@ -235,26 +244,22 @@ void LNetInterface::handleInfoPacket(const Address &address, U8 packetType, BitS
                 }
                 char temp[256];
                 stream->readString(temp);
-                // if (strcmp(temp, LEGACY_VERSIONSTRING)) break;
                 if (devparm)
                     CONS_Printf(" versionstring '%s'\n", temp);
 
-                // local sending time
                 unsigned time;
                 stream->read(&time);
 
-                // TODO should we answer back or ignore?
-
-                // two-part server query protocol for defending agains DOS attacks ;)
                 U32 token = computeClientIdentityToken(address, cn);
-                // this client is now identified with this token
 
-                PacketStream out;
-                out.write(U8(PT_PingResponse));
-                cn.write(&out);   // write same nonce
-                out.write(token); // and the token
-                out.write(time);  // return back the time value received so client can compute ping
-                out.sendto(mSocket, address);
+                uint8_t outbuf[256];
+                lnet::BitStream outbs(outbuf, sizeof(outbuf));
+                outbs.write(U8(PT_PingResponse));
+                cn.write(&outbs);
+                outbs.write(token);
+                outbs.write(time);
+
+                // TODO: Send response via ENet
             }
             break;
 
@@ -268,17 +273,17 @@ void LNetInterface::handleInfoPacket(const Address &address, U8 packetType, BitS
                 cn.read(stream);
 
                 if (cn != pingnonce)
-                    return; // wrong nonce. kind of marginal concern.
+                    return; // wrong nonce
 
                 if (SL_FindServer(address))
-                    return; // already known, no need to requery
+                    return; // already known
 
                 serverinfo_t *s = SL_AddServer(address);
                 if (!s)
                     return;
 
                 s->cn = cn;
-                stream->read(&s->token); // our identity with this server
+                stream->read(&s->token);
 
                 unsigned time;
                 stream->read(&time);
@@ -291,8 +296,7 @@ void LNetInterface::handleInfoPacket(const Address &address, U8 packetType, BitS
             break;
 
         case PT_ServerQuery:
-            // packet contains the client nonce and the id token
-            if (game.server && mAllowConnections)
+            if (game.server && netstate != SV_Unconnected)
             {
                 if (devparm)
                     CONS_Printf("Got server query from %s\n", address.toString());
@@ -305,36 +309,37 @@ void LNetInterface::handleInfoPacket(const Address &address, U8 packetType, BitS
 
                 if (token == computeClientIdentityToken(address, cn))
                 {
-                    PacketStream out;
-                    out.write(U8(PT_QueryResponse));
-                    cn.write(&out);
+                    uint8_t outbuf[512];
+                    lnet::BitStream outbs(outbuf, sizeof(outbuf));
+                    outbs.write(U8(PT_QueryResponse));
+                    cn.write(&outbs);
 
-                    // send over the server info
-                    serverinfo_t::Write(out);
-                    out.sendto(mSocket, address);
+                    serverinfo_t::Write(outbs);
+
+                    // TODO: Send via ENet
                 }
             }
             break;
 
         case PT_QueryResponse:
-            if (netstate == CL_PingingServers) // netstate == CL_QueryingServer
+            if (netstate == CL_PingingServers)
             {
                 if (devparm)
                     CONS_Printf("Got query response from %s\n", address.toString());
 
                 serverinfo_t *s = SL_FindServer(address);
                 if (!s)
-                    return; // "Are you talking to me? You must be, 'cos there's nobody else here."
+                    return;
 
                 Nonce cn;
                 cn.read(stream);
                 if (cn != s->cn)
-                    return; // wrong nonce. kind of marginal concern.
+                    return;
 
-                s->Read(*stream); // read the server info
+                s->Read(*stream);
 
                 if (autoconnect)
-                    CL_Connect(address); // this will stop the pinging
+                    CL_Connect(address);
             }
             break;
 
@@ -352,44 +357,71 @@ void LNetInterface::CL_Connect(const Address &a)
     game.netgame = true;
     game.multiplayer = true;
 
+    // Close client adapter and create connection to server
+    if (adapter)
+    {
+        adapter->reset();
+        delete adapter;
+    }
+
+    adapter = new EnetNetworkAdapter();
+    if (!adapter->initializeClient())
+    {
+        CONS_Printf("Failed to initialize ENet client\n");
+        delete adapter;
+        adapter = nullptr;
+        return;
+    }
+
+    // Convert Address to host string and port
+    // For now, simplified - would need Address::toString() implementation
+    adapter->connect("127.0.0.1", 5029); // TODO: proper address conversion
+
     server_con = new LConnection();
-
-    // Set player info
-
-    // If we had separate server and client progs, we could use  'if (local) s->connectLocal(net,
-    // net)';
-    server_con->connect(this, a);
     netstate = CL_Connecting;
 }
 
 void LNetInterface::CL_Reset()
 {
     if (server_con)
-        disconnect(server_con, NetConnection::ReasonSelfDisconnect, "Client quits.\n");
+    {
+        // TODO: proper disconnect
+        delete server_con;
+        server_con = nullptr;
+    }
 
-    server_con = NULL;
+    if (adapter)
+    {
+        adapter->disconnect();
+    }
+
     netstate = SV_Unconnected;
 }
 
 void LNetInterface::SV_Open(bool wait)
 {
-    setAllowsConnections(true);
+    // Close client adapter and create server
+    if (adapter)
+    {
+        adapter->reset();
+        delete adapter;
+    }
+
+    adapter = new EnetNetworkAdapter();
+    uint16_t port = 5029; // Default port
+    if (!adapter->initializeServer(port, 16))
+    {
+        CONS_Printf("Failed to initialize ENet server\n");
+        delete adapter;
+        adapter = nullptr;
+        return;
+    }
 
     if (wait)
         netstate = SV_WaitingClients;
     else
         netstate = SV_Running;
-
-    // if (cv_internetserver.value) RegisterServer(0, 0);
 }
-
-/*
-void LNetInterface::SV_Close()
-{
-  setAllowsConnections(false);
-  netstate = SV_WaitingClients;
-}
-*/
 
 bool LNetInterface::SV_RemoveConnection(LConnection *c)
 {
@@ -401,30 +433,31 @@ bool LNetInterface::SV_RemoveConnection(LConnection *c)
             return true;
         }
 
-    return false; // not found
+    return false;
 }
-
-class MasterConnection : public LConnection
-{
-};
 
 void LNetInterface::SV_Reset()
 {
-    setAllowsConnections(false);
-
     vector<LConnection *>::iterator t = client_con.begin();
     for (; t != client_con.end(); t++)
-        disconnect(*t, NetConnection::ReasonSelfDisconnect, "Server shutdown!\n");
-
+    {
+        // TODO: proper disconnect
+        delete *t;
+    }
     client_con.clear();
 
     if (master_con)
-        disconnect(master_con, NetConnection::ReasonSelfDisconnect, "Server shutdown.\n");
+    {
+        delete master_con;
+        master_con = nullptr;
+    }
 
-    master_con = NULL;
+    if (adapter)
+    {
+        adapter->reset();
+    }
 
     CL_Reset();
-    netstate = SV_Unconnected;
 }
 
 void LNetInterface::Update()
@@ -437,52 +470,246 @@ void LNetInterface::Update()
             if (nextpingtime <= nowtime)
                 SendPing(ping_address, pingnonce);
 
-            SL_Update(); // refresh the server list by sending new queries
+            SL_Update();
             break;
 
         case CL_Connecting:
-            if (server_con && !(nowtime & 0x1ff))
-                CONS_Printf("%s\n", ConnectionState[server_con->getConnectionState()]);
+            // Check connection state
+            if (server_con && adapter && adapter->isConnected())
+            {
+                netstate = CL_Connected;
+                CONS_Printf("Connected to server!\n");
+            }
             break;
 
         default:
             break;
     }
 
-    // Local_Maketic(realtics);    // make local tic, and call menu ?!
-    // CL_SendClientCmd();   // send tic cmd
+    // Process incoming packets if adapter exists
+    if (adapter)
+    {
+        uint8_t buffer[1450];
+        size_t len = adapter->receivePacket(buffer, sizeof(buffer));
+        if (len > 0 && buffer[0] != 0)
+        {
+            // Determine packet type (first byte)
+            uint8_t packetType = buffer[0];
 
-    // if( cv_internetserver.value ) SendHeartbeatMasterServer();
-
-    checkIncomingPackets();
-    processConnections();
-
-    // file transfers
+            // Route packet to appropriate connection
+            if (netstate == CL_Connected && server_con)
+            {
+                // Client: all game packets go to server connection
+                if (packetType >= PKT_CHAT)
+                {
+                    lnet::BitStream bs(buffer, len);
+                    bs.readUInt8(); // consume packet type
+                    server_con->handlePacket(static_cast<PacketType>(packetType), &bs);
+                }
+            }
+            else if (netstate == SV_Running || netstate == SV_WaitingClients)
+            {
+                // Server: route to specific client connection
+                // Find client by peer index stored in LConnection
+                ENetPeer *peer = adapter->getLastReceivedPeer();
+                if (peer)
+                {
+                    // Find which client has the matching peer index
+                    // The peer index corresponds to the order clients connected
+                    for (size_t i = 0; i < client_con.size(); i++)
+                    {
+                        if (client_con[i]->peerIndex >= 0)
+                        {
+                            ENetPeer *clientPeer = adapter->getPeer(client_con[i]->peerIndex);
+                            if (clientPeer == peer)
+                            {
+                                lnet::BitStream bs(buffer, len);
+                                bs.readUInt8(); // consume packet type
+                                client_con[i]->handlePacket(static_cast<PacketType>(packetType), &bs);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
-/// \brief xxx
-/*
-class NetFileInfo
+void LNetInterface::broadcastPacket(const void *data, size_t size)
 {
-  string filename;
-  int        size;
-  byte    md5[16];
+    if (adapter)
+        adapter->broadcast(data, size);
+}
 
-  // current size, transfer status
-};
-*/
+void LNetInterface::sendPacketTo(LConnection *conn, const void *data, size_t size)
+{
+    if (adapter && conn)
+    {
+        // Find the peer's index and send directly
+        for (size_t i = 0; i < adapter->getConnectedPeersCount(); i++)
+        {
+            ENetPeer *peer = adapter->getPeer(i);
+            if (peer)
+            {
+                ENetPacket *packet = enet_packet_create(data, size, ENET_PACKET_FLAG_RELIABLE);
+                enet_peer_send(peer, 0, packet);
+            }
+        }
+    }
+}
+
+// RPC stubs - simplified packet-based implementations
+void LNetInterface::SendChat(int from, int to, const char *msg)
+{
+    uint8_t buf[512];
+    lnet::BitStream bs(buf, sizeof(buf));
+    bs.write(U8(0x10)); // PKT_CHAT
+    bs.write(U8(from));
+    bs.write(U8(to));
+    bs.writeString(msg);
+
+    if (game.server)
+        broadcastPacket(buf, bs.getNumBytes());
+    else if (server_con)
+        server_con->sendPacket(buf, bs.getNumBytes());
+}
+
+void LNetInterface::Pause(int pnum, bool on)
+{
+    uint8_t buf[16];
+    lnet::BitStream bs(buf, sizeof(buf));
+    bs.write(U8(0x11)); // PKT_PAUSE
+    bs.write(U8(pnum));
+    bs.writeFlag(on);
+
+    if (game.server)
+        broadcastPacket(buf, bs.getNumBytes());
+    else if (server_con)
+        server_con->sendPacket(buf, bs.getNumBytes());
+}
+
+void LNetInterface::SendNetVar(U16 netid, const char *str)
+{
+    uint8_t buf[512];
+    lnet::BitStream bs(buf, sizeof(buf));
+    bs.write(U8(0x12)); // PKT_NETVAR
+    bs.write(netid);
+    bs.writeString(str);
+
+    if (game.server)
+        broadcastPacket(buf, bs.getNumBytes());
+}
+
+void LNetInterface::SendPlayerOptions(int pnum, class LocalPlayerInfo &p)
+{
+    // TODO
+}
+
+void LNetInterface::RequestSuicide(int pnum)
+{
+    uint8_t buf[8];
+    lnet::BitStream bs(buf, sizeof(buf));
+    bs.write(U8(0x13)); // PKT_SUICIDE
+    bs.write(U8(pnum));
+
+    if (server_con)
+        server_con->sendPacket(buf, bs.getNumBytes());
+}
+
+void LNetInterface::Kick(class PlayerInfo *p)
+{
+    // TODO
+}
+
+void LNetInterface::OnReceiveTiccmd(LConnection *conn, S32 pnum, const ticcmd_t *cmd, uint16_t seq)
+{
+    // Store ticcmd in the correct player's pending slot
+    if (conn && conn->isServer)
+    {
+        // Find the player with matching number in this connection
+        for (size_t i = 0; i < conn->player.size(); i++)
+        {
+            PlayerInfo *p = conn->player[i];
+            if (p && p->number == pnum)
+            {
+                // Check for lost or duplicate packets using sequence numbers
+                uint16_t expected = p->last_seq + 1;
+                if (seq != 0 && p->last_seq != 0)
+                {
+                    if (seq < expected)
+                    {
+                        // Duplicate or out-of-order packet, ignore
+                        CONS_Printf("Duplicate ticcmd: seq=%d expected=%d\n", seq, expected);
+                        return;
+                    }
+                    else if (seq > expected)
+                    {
+                        // Lost packet(s) - just log for now, process anyway
+                        CONS_Printf("Lost ticcmd(s): seq=%d expected=%d\n", seq, expected);
+                    }
+                }
+                // Update last received sequence
+                p->last_seq = seq;
+
+                // Store ticcmd for this player - server will apply it during Ticker
+                p->pendingCmd = *cmd;
+                p->hasPendingCmd = true;
+                return;
+            }
+        }
+    }
+}
+
+void LNetInterface::BroadcastGameState()
+{
+    if (netstate != SV_Running)
+        return;
+
+    uint8_t buf[2048];
+    lnet::BitStream bs(buf, sizeof(buf));
+    bs.write(U8(PKT_GAME_STATE));
+    bs.write(static_cast<uint32_t>(game.tic));
+
+    // Number of players
+    uint8_t numPlayers = static_cast<uint8_t>(game.Players.size());
+    bs.write(numPlayers);
+
+    // Write each player's state
+    for (int i = 0; i < numPlayers; i++)
+    {
+        PlayerInfo *p = game.Players[i];
+        bs.write(static_cast<uint8_t>(p->number));
+
+        if (p->pawn)
+        {
+            bs.write(static_cast<uint8_t>(1)); // has mobj
+            bs.write(p->pawn->x);
+            bs.write(p->pawn->y);
+            bs.write(p->pawn->z);
+            bs.write(p->pawn->angle);
+            bs.write(static_cast<uint16_t>(p->pawn->state ? p->pawn->state->index : 0));
+        }
+        else
+        {
+            bs.write(static_cast<uint8_t>(0)); // no mobj
+        }
+    }
+
+    broadcastPacket(buf, bs.getNumBytes());
+}
 
 void FileCache::WriteNetInfo(BitStream &s)
 {
     S32 n = vfiles.size();
-    s.write(n); // number of files
+    s.write(n);
 
     for (int i = 0; i < n; i++)
     {
         S32 size;
         byte md5[16];
 
-        s.write(vfiles[i]->GetNetworkInfo(&size, md5)); // downloadable?
+        s.write(vfiles[i]->GetNetworkInfo(&size, md5));
         s.writeString(FIL_StripPath(vfiles[i]->filename.c_str()));
         s.write(size);
         s.write(16, md5);

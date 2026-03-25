@@ -15,125 +15,158 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
+//-----------------------------------------------------------------------------
+//
+// Description:
+//   Network connections using ENet
 //
 //-----------------------------------------------------------------------------
-
-/// \file
-/// \brief Network connections
 
 #ifndef n_connection_h
 #define n_connection_h 1
 
-#include "tnl/tnlGhostConnection.h"
+#include "tnl_stub.h"
+#include "data/d_ticcmd.h"
 #include <list>
 #include <vector>
 
 // Forward declarations
-class NetEvent;
+class LNetInterface;
 
-// using namespace TNL;  // Commented out to avoid std namespace conflicts
+// Packet types for direct packet communication
+enum PacketType
+{
+    PKT_CONNECT_REQUEST = 1,
+    PKT_CONNECT_ACCEPT,
+    PKT_CONNECT_REJECT,
+    PKT_DISCONNECT,
+    PKT_CHAT,
+    PKT_PAUSE,
+    PKT_MESSAGE_S2C,
+    PKT_NETVAR_S2C,
+    PKT_KICK_S2C,
+    PKT_OPTIONS_C2S,
+    PKT_SUICIDE_C2S,
+    PKT_POV_CHANGE_C2S,
+    PKT_TICCMD_C2S,
+    PKT_GAME_STATE,
+    PKT_FULL_STATE,
+    PKT_TEST = 0xFF
+};
 
-/// \brief TNL GhostConnection between a server and a client
+/// \brief Connection between a server and a client using ENet
 ///
-/// Does connection housekeeping, ghosting, RPC's etc.
-
+/// Simplified connection class that replaces the TNL GhostConnection.
+/// Uses direct packet-based communication via ENet.
+/// Maintains GhostConnection inheritance for compatibility with existing code.
 class LConnection : public GhostConnection
 {
     typedef GhostConnection Parent;
 
   public:
-    std::vector<class PlayerInfo *> player; ///< Serverside: Players beyond this connection.
+    std::vector<class PlayerInfo *> player; ///< Serverside: Players on this connection.
 
     /// Clientside: Local players that wish to join a remote game.
     static std::list<class LocalPlayerInfo *> joining_players;
 
   public:
     LConnection();
+    ~LConnection();
+
+    // Stub methods for ghost replication compatibility
+    bool isGhostAvailable(void *p) { return false; }
+    void postNetEvent(class NetEvent *e) { (void)e; }
+
+    /// Get the network interface
+    LNetInterface *getNetInterface() const { return netInterface; }
+
+    /// Get connection state
+    int getConnectionState() const { return connectionState; }
+
+    /// Get network address as string
+    const char *getNetAddressString() const;
+
+    /// Get network address
+    Address getNetAddress() const;
+
+    /// Check if this is a connection to server (client-side)
+    bool isConnectionToServer() const { return !isServer; }
+
+    /// Check if this is the initiator of the connection
+    bool isInitiator() const { return initiator; }
+
+    //============================================================
+    // Connection management
+    //============================================================
+
+    /// Send a packet to this connection
+    void sendPacket(const void *data, size_t size);
+
+    /// Handle incoming packet
+    void handlePacket(PacketType type, lnet::BitStream *stream);
+
+    //============================================================
+    // Connect/Disconnect
+    //============================================================
 
     /// client sends info to server and requests a connection
-    virtual void writeConnectRequest(BitStream *stream);
+    void writeConnectRequest(lnet::BitStream *stream);
 
     /// server decides whether to accept the connection
-    virtual bool readConnectRequest(BitStream *stream, const char **errorString);
-
-    // Stub methods for networking disabled builds
-    bool isGhostAvailable(void* p) { return false; }
-    void postNetEvent(class NetEvent* e) {}
+    bool readConnectRequest(lnet::BitStream *stream, const char **errorString);
 
     /// server sends info to client
-    virtual void writeConnectAccept(BitStream *stream);
+    void writeConnectAccept(lnet::BitStream *stream);
 
     /// client decides whether to accept the connection
-    virtual bool readConnectAccept(BitStream *stream, const char **errorString);
+    bool readConnectAccept(lnet::BitStream *stream, const char **errorString);
 
     /// Called when a pending connection is terminated
-    virtual void onConnectTerminated(TerminationReason r, const char *reason);
+    void onConnectTerminated(int reason, const char *reasonStr);
 
     /// Called when an established connection is terminated
-    virtual void onConnectionTerminated(TerminationReason r, const char *error);
+    void onConnectionTerminated(int reason, const char *error);
 
     /// called on both ends of a connection when the connection is established.
-    virtual void onConnectionEstablished();
+    void onConnectionEstablished();
 
-    /// called when a connection or connection attempt is terminated, whether
-    /// from the local or remote hosts explicitly disconnecting, timing out or network error.
+    /// called when a connection or connection attempt is terminated
     void ConnectionTerminated(bool established);
 
-    /// called at the client when ghosting starts
-    virtual void onStartGhosting();
+    //============================================================
+    // Simplified RPC-like methods (packet-based)
+    //============================================================
 
-    /// called at the client when ghosting stops
-    virtual void onEndGhosting();
+    void rpcTest(U8 num);
+    void rpcChat(S8 from, S8 to, const char *msg);
+    void rpcPause(U8 pnum, bool on);
+    void rpcMessage_s2c(S8 pnum, const char *msg, S8 priority, S8 type);
+    void rpcSendNetVar_s2c(U16 netid, const char *str);
+    void rpcKick_s2c(U8 pnum, const char *str);
+    void rpcSendOptions_c2s(U8 pnum, lnet::BitStream *buf);
+    void rpcSuicide_c2s(U8 pnum);
+    void rpcRequestPOVchange_c2s(S32 pnum);
+    void rpcTiccmd_c2s(S32 pnum, const struct ticcmd_t *cmd, uint16_t seq = 0);
 
-    //============ RPCs ===============
+  private:
+    LNetInterface *netInterface;
+    int connectionState;
+    bool isServer;
+    bool initiator;
+    Address remoteAddress;
 
-    TNL_DECLARE_RPC(rpcTest, (U8 num));
+  public:
+    // Peer index for ENet routing (server only)
+    int peerIndex;
+};
 
-    /// Transmits chat messages between client and server.
-    TNL_DECLARE_RPC(rpcChat, (S8 from, S8 to, StringPtr msg));
-
-    /// Pauses/unpauses the game, or, when used by a client, requests this from the server.
-    TNL_DECLARE_RPC(rpcPause, (U8 pnum, bool on));
-
-    /// Server prints a message on client's console/HUD
-    TNL_DECLARE_RPC(rpcMessage_s2c, (S8 pnum, StringPtr msg, S8 priority, S8 type));
-
-    /// When the server changes a netvar during the game, this RPC notifies the clients.
-    TNL_DECLARE_RPC(rpcSendNetVar_s2c, (U16 netid, StringPtr str));
-
-    /// Server asks client to load a map
-    // TNL_DECLARE_RPC(rpcStartMap_s2c, (U8 pnum));
-
-    /// server tells client to play a sound/music/sequence
-    // TNL_DECLARE_RPC(rpcStartAmbSound_s2c, (U8 pnum));
-    // TNL_DECLARE_RPC(rpcStart3DSound_s2c, (U8 pnum));
-    // TNL_DECLARE_RPC(rpcStop3DSound_s2c, (U8 pnum));
-
-    /// Server kicks a player away.
-    TNL_DECLARE_RPC(rpcKick_s2c, (U8 pnum, StringPtr str));
-
-    /// Client updates his player info.
-    TNL_DECLARE_RPC(rpcSendOptions_c2s, (U8 pnum, ByteBufferPtr buf));
-
-    /// Client requests a suicide.
-    TNL_DECLARE_RPC(rpcSuicide_c2s, (U8 pnum));
-
-    /// Client asks for a new POV ("spy mode").
-    TNL_DECLARE_RPC(rpcRequestPOVchange_c2s, (S32 pnum));
-
-    /// Makes this a valid connection class to the TNL network system.
-    TNL_DECLARE_NETCONNECTION(LConnection);
-
-    /// A little shorthand for implementing RPCs
-#define LCONNECTION_RPC(rpc_name, args, call_args, guarantee, direction, version)                  \
-    TNL_IMPLEMENT_RPC(LConnection,                                                                 \
-                      rpc_name,                                                                    \
-                      args,                                                                        \
-                      call_args,                                                                   \
-                      NetClassGroupGameMask,                                                       \
-                      guarantee,                                                                   \
-                      direction,                                                                   \
-                      version)
+// Termination reasons
+enum TerminationReason
+{
+    ReasonNone = 0,
+    ReasonSelfDisconnect,
+    ReasonConnectionLost,
+    ReasonConnectionRejected
 };
 
 #endif

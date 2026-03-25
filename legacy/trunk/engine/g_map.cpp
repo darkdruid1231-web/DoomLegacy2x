@@ -105,6 +105,21 @@ Map::Map(MapInfo *i)
     botnodes = NULL;
 };
 
+void Map::ApplyPendingTiccmds()
+{
+    // Apply pending ticcmds received from network clients
+    for (size_t i = 0; i < players.size(); i++)
+    {
+        PlayerInfo *p = players[i];
+        if (p && p->hasPendingCmd)
+        {
+            // Copy pending ticcmd to the player's actual cmd
+            p->cmd = p->pendingCmd;
+            p->hasPendingCmd = false;
+        }
+    }
+}
+
 // destructor
 Map::~Map()
 {

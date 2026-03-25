@@ -314,7 +314,17 @@ void GameInfo::TryRunTics(tic_t elapsed)
 
         // translate inputs (keyboard/mouse/joystick) into a ticcmd
         for (int i = 0; i < NUM_LOCALPLAYERS; i++)
+        {
             LocalPlayers[i].GetInput(elapsed);
+
+            // Apply client-side prediction based on built ticcmd
+            if (LocalPlayers[i].info)
+                LocalPlayers[i].ApplyPrediction(&LocalPlayers[i].info->cmd);
+        }
+
+        // Send ticcmds to server (client only)
+        if (!server)
+            CL_SendTiccmds();
     }
 
     D_ProcessEvents(); // read control events, feed them to responders
@@ -328,8 +338,22 @@ void GameInfo::TryRunTics(tic_t elapsed)
 
     net->Update();
 
+    // Client: advance interpolation for remote players
+    if (!server)
+    {
+        for (size_t i = 0; i < game.Players.size(); i++)
+        {
+            if (game.Players[i])
+                game.Players[i]->AdvanceInterpolation();
+        }
+    }
+
     while (elapsed-- > 0)
         Ticker();
+
+    // Server broadcasts game state to all clients after running simulation
+    if (server && net)
+        net->BroadcastGameState();
 }
 
 /// is there a game running?
@@ -543,6 +567,8 @@ void InitNetwork()
 // ------
 // protos
 // ------
+
+void CL_SendTiccmds();  // defined in cl_main.cpp
 
 void Command_Listserv_f()
 {

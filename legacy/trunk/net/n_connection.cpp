@@ -15,12 +15,12 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
+//-----------------------------------------------------------------------------
 //
+// Description:
+//   Network connections using ENet
 //
 //-----------------------------------------------------------------------------
-
-/// \file
-/// \brief Network connections
 
 #include "command.h"
 #include "cvars.h"
@@ -42,37 +42,46 @@
 
 extern unsigned num_bots;
 
-/*
-More serverside stuff:
-
-void objectLocalScopeAlways(o) (for playerinfos)
-void objectLocalClearAlways(o)
-bool isGhosting()
-
-*/
-
-// netobject:
-/*
-  virtual void onGhostAvailable (GhostConnection *theConnection) // serverside
-  virtual F32  getUpdatePriority (NetObject *scopeObject, U32 updateMask, S32 updateSkips)
-*/
-
 list<class LocalPlayerInfo *> LConnection::joining_players;
 
-TNL_IMPLEMENT_NETCONNECTION(LConnection, NetClassGroupGame, true)
-
 LConnection::LConnection()
+    : netInterface(nullptr)
+    , connectionState(StateNotConnected)
+    , isServer(false)
+    , initiator(false)
+    , peerIndex(-1)
 {
-    // setIsAdaptive();
-    // setTranslatesStrings();
-    // setFixedRateParameters(50, 50, 2000, 2000); // packet rates, sizes (send and receive)
+}
+
+LConnection::~LConnection()
+{
+}
+
+const char *LConnection::getNetAddressString() const
+{
+    static char buf[64];
+    // Simple implementation - would need proper ENet address conversion
+    sprintf(buf, "%08x:%d", remoteAddress.hash(), 0);
+    return buf;
+}
+
+Address LConnection::getNetAddress() const
+{
+    return remoteAddress;
+}
+
+void LConnection::sendPacket(const void *data, size_t size)
+{
+    if (netInterface && netInterface->adapter)
+    {
+        // Send to specific connection
+        netInterface->sendPacketTo(this, data, size);
+    }
 }
 
 // client
-void LConnection::writeConnectRequest(BitStream *stream)
+void LConnection::writeConnectRequest(lnet::BitStream *stream)
 {
-    Parent::writeConnectRequest(stream);
-
     stream->write(LEGACY_VERSION);
     stream->writeString(LEGACY_VERSIONSTRING);
 
@@ -101,13 +110,10 @@ void LConnection::writeConnectRequest(BitStream *stream)
 }
 
 // server
-bool LConnection::readConnectRequest(BitStream *stream, const char **errorString)
+bool LConnection::readConnectRequest(lnet::BitStream *stream, const char **errorString)
 {
-    if (!Parent::readConnectRequest(stream, errorString))
-        return false;
-
-    char temp[256];
-    *errorString = temp; // in case we need it
+    static char temp[256];
+    *errorString = temp;
 
     int version;
     stream->read(&version);
@@ -133,9 +139,7 @@ bool LConnection::readConnectRequest(BitStream *stream, const char **errorString
     unsigned n;
     stream->read(&n);
 
-    LNetInterface *net = (LNetInterface *)getInterface();
-
-    if (net->netstate == LNetInterface::SV_Running)
+    if (netInterface->netstate == LNetInterface::SV_Running)
     {
         if (game.Players.size() >= unsigned(cv_maxplayers.value))
         {
@@ -143,7 +147,7 @@ bool LConnection::readConnectRequest(BitStream *stream, const char **errorString
             return false;
         }
 
-        n = min(n, cv_maxplayers.value - game.Players.size()); // this many fit in
+        n = min(n, cv_maxplayers.value - game.Players.size());
 
         // read joining players' preferences
         for (unsigned i = 0; i < n; i++)
@@ -151,9 +155,8 @@ bool LConnection::readConnectRequest(BitStream *stream, const char **errorString
             PlayerInfo *p = new PlayerInfo();
             p->options.Read(stream);
             p->connection = this;
-            p->client_hash = getNetAddress().hash();
+            p->client_hash = remoteAddress.hash();
 
-            // TODO check that name is unique, change if necessary
             p->name = p->options.name;
 
             player.push_back(p);
@@ -163,90 +166,63 @@ bool LConnection::readConnectRequest(BitStream *stream, const char **errorString
     }
     else
     {
-        // TODO waiting for specific clients to return (check names and hashes!)
+        // Waiting for players
     }
-
-    return true; // server accepts
-}
-
-// server
-void LConnection::writeConnectAccept(BitStream *stream)
-{
-    Parent::writeConnectAccept(stream);
-
-    unsigned n = player.size();
-    stream->write(n); // how many players were accepted?
-    for (unsigned i = 0; i < n; i++)
-        stream->write(player[i]->number); // send pnums
-
-    serverinfo_t::Write(*stream); // first send basic server info (including the gametype!)
-    game.gtype->WriteServerInfo(
-        *stream); // then gametype dependent stuff: netvars, resource file info...
-}
-
-// client
-bool LConnection::readConnectAccept(BitStream *stream, const char **errorString)
-{
-    if (!Parent::readConnectAccept(stream, errorString))
-        return false;
-
-    unsigned n;
-    stream->read(&n); // number of players accepted
-    if (n == 0 || n > joining_players.size())
-        return false;
-
-    CONS_Printf("Server accepts %d players.\n", n);
-    joining_players.resize(n); // humans have precedence over bots
-
-    list<class LocalPlayerInfo *>::iterator t = joining_players.begin();
-    for (; t != joining_players.end(); t++)
-        stream->read(&(*t)->pnumber); // read pnums
-
-    // read server properties
-    LNetInterface *net = (LNetInterface *)getInterface();
-
-    serverinfo_t *s = net->SL_FindServer(getNetAddress());
-    if (!s)
-        s = new serverinfo_t(getNetAddress());
-
-    s->Read(*stream);
-
-    // TODO check if we have the correct gametype DLL!
-    game.gtype->ReadServerInfo(*stream);
-    /*
-    if (!game.FindGametypeDLL(*stream))
-      return false; // no suitable DLL found, must disconnect
-    */
-
-    // FIXME read needed files, check them, download them...
 
     return true;
 }
 
-void LConnection::onConnectTerminated(TerminationReason r, const char *reason)
+// server
+void LConnection::writeConnectAccept(lnet::BitStream *stream)
 {
-    CONS_Printf("Connect terminated (%d), %s\n", r, reason);
+    unsigned n = player.size();
+    stream->write(n);
+
+    for (unsigned i = 0; i < n; i++)
+        stream->write(player[i]->number);
+
+    serverinfo_t::Write(*stream);
+    game.gtype->WriteServerInfo(*stream);
+}
+
+// client
+bool LConnection::readConnectAccept(lnet::BitStream *stream, const char **errorString)
+{
+    unsigned n;
+    stream->read(&n);
+    if (n == 0 || n > joining_players.size())
+        return false;
+
+    CONS_Printf("Server accepts %d players.\n", n);
+    joining_players.resize(n);
+
+    list<class LocalPlayerInfo *>::iterator t = joining_players.begin();
+    for (; t != joining_players.end(); t++)
+        stream->read(&(*t)->pnumber);
+
+    // read server properties
+    serverinfo_t *s = new serverinfo_t(remoteAddress);
+    s->Read(*stream);
+
+    // TODO check if we have the correct gametype DLL!
+    game.gtype->ReadServerInfo(*stream);
+
+    return true;
+}
+
+void LConnection::onConnectTerminated(int reason, const char *reasonStr)
+{
+    CONS_Printf("Connect terminated (%d), %s\n", reason, reasonStr);
     ConnectionTerminated(false);
 }
 
 void LConnection::onConnectionEstablished()
 {
-    // initiator becomes the "client", the other one "server"
-    Parent::onConnectionEstablished();
-
-    // To see how this program performs with 50% packet loss,
-    // Try uncommenting the next line :)
-    // setSimulatedNetParams(0.5, 0);
-
-    LNetInterface *n = (LNetInterface *)getInterface();
-
     if (isInitiator())
     {
         // client side
-        setGhostFrom(false);
-        setGhostTo(true);
-        n->server_con = this;
-        n->netstate = LNetInterface::CL_Connected;
+        netInterface->server_con = this;
+        netInterface->netstate = LNetInterface::CL_Connected;
         CONS_Printf("Connected to server at %s.\n", getNetAddressString());
 
         rpcTest(7467);
@@ -256,25 +232,21 @@ void LConnection::onConnectionEstablished()
     }
     else
     {
-        // server side
-        n->client_con.push_back(this);
+        // server side - this is a new client connection
+        peerIndex = netInterface->adapter->getLastConnectedPeerIndex();
+        netInterface->client_con.push_back(this);
 
         int k = player.size();
         for (int i = 0; i < k; i++)
         {
-            CONS_Printf(
-                "%s entered the game (player %d)\n", player[i]->name.c_str(), player[i]->number);
+            CONS_Printf("%s entered the game (player %d)\n", player[i]->name.c_str(), player[i]->number);
         }
-        setScopeObject(game.gtype);
-        setGhostFrom(true);
-        setGhostTo(false);
-        activateGhosting(); // soon, the new PlayerInfos will be ghosted to everyone
     }
 }
 
-void LConnection::onConnectionTerminated(TerminationReason r, const char *error)
+void LConnection::onConnectionTerminated(int reason, const char *error)
 {
-    CONS_Printf("%s - connection to %s: %s\n.",
+    CONS_Printf("%s - connection to %s: %s\n",
                 getNetAddressString(),
                 isConnectionToServer() ? "server" : "client",
                 error);
@@ -285,8 +257,7 @@ void LConnection::ConnectionTerminated(bool established)
 {
     if (isConnectionToServer())
     {
-        ((LNetInterface *)getInterface())->CL_Reset();
-        // TODO end/reset game? start intro loop?
+        netInterface->CL_Reset();
     }
     else
     {
@@ -298,8 +269,7 @@ void LConnection::ConnectionTerminated(bool established)
                 CONS_Printf("Player (%d) dropped.\n", player[i]->number);
                 player[i]->playerstate = PST_REMOVE;
             }
-            resetGhosting();
-            ((LNetInterface *)getInterface())->SV_RemoveConnection(this);
+            netInterface->SV_RemoveConnection(this);
         }
         else
         {
@@ -308,311 +278,292 @@ void LConnection::ConnectionTerminated(bool established)
     }
 }
 
-void LConnection::onStartGhosting()
-{
-    CONS_Printf("Ghosting started...\n");
-}
-
-void LConnection::onEndGhosting()
-{
-    CONS_Printf("Ghosting ended.\n");
-}
-
 //========================================================
-//            Remote Procedure Calls
+//            Remote Procedure Calls (Packet-based)
 //
 // Functions that are called at one end of the
-// connection and executed at the other. Neat.
+// connection and executed at the other.
 //========================================================
 
-/*
-TODO RPC's from server to client:
-- map change/load
+void LConnection::rpcTest(U8 num)
+{
+    uint8_t buf[16];
+    lnet::BitStream bs(buf, sizeof(buf));
+    bs.write(U8(PKT_TEST));
+    bs.write(num);
+    sendPacket(buf, bs.getNumBytes());
+}
 
-Player ticcmd contains both guaranteed_ordered and unguaranteed elements.
-Shooting and artifact use should be guaranteed...
+void LConnection::rpcChat(S8 from, S8 to, const char *msg)
+{
+    uint8_t buf[512];
+    lnet::BitStream bs(buf, sizeof(buf));
+    bs.write(U8(PKT_CHAT));
+    bs.write(from);
+    bs.write(to);
+    bs.writeString(msg);
+    sendPacket(buf, bs.getNumBytes());
+}
 
-  XD_MAP,
-  XD_EXITLEVEL,
-  XD_LOADGAME,
-  XD_SAVEGAME,
-  XD_ADDPLAYER,
-  XD_USEARTEFACT,
-*/
+void LConnection::rpcPause(U8 pnum, bool on)
+{
+    uint8_t buf[16];
+    lnet::BitStream bs(buf, sizeof(buf));
+    bs.write(U8(PKT_PAUSE));
+    bs.write(pnum);
+    bs.writeFlag(on);
+    sendPacket(buf, bs.getNumBytes());
+}
 
-//////void LConnection::rpcTest(U8 num)
-//////{
-//////    CONS_Printf("client sent this: %d\n", num);
-//////}
-//////
-//////// the chat message "router"
-////void LNetInterface::SendChat(int from, int to, const char *msg)
-//{
-//    if (!game.netgame)
-//        return;
-//
-//    PlayerInfo *sender = game.FindPlayer(from);
-//    if (!sender)
-//        return;
-//
-//    if (game.server)
-//    {
-//        int n = client_con.size();
-//        for (int i = 0; i < n; i++)
-//        {
-//            LConnection *c = client_con[i];
-//            int np = c->player.size();
-//            for (int j = 0; j < np; j++)
-//            {
-//                PlayerInfo *p = c->player[j];
-//                if (to == 0 || p->number == to || p->team == -to)
-//                {
-//                    // We could also use PlayerInfo::SetMessage to trasmit chat messages from server
-//                    // to client, but it is mainly for messages which can easily use
-//                    // TNL::StringTableEntry.
-//                    c->rpcChat(from, to, msg);
-//                    if (p->number == to)
-//                        return; // nobody else should get it
-//
-//                    break; // one rpc per connection
-//                }
-//            }
-//        }
-//
-//        // TODO how to handle messages for local (server) players?
-//        CONS_Printf("\a%s: %s\n", sender->name.c_str(), msg);
-//    }
-//    else if (server_con)
-//        server_con->rpcChat(from, to, msg);
-//}
-//
-//// to: 0 means everyone, positive numbers are players, negative numbers are teams
-//void LConnection::rpcChat(S8 from, S8 to, StringPtr msg)
-//{
-//    PlayerInfo *p = game.FindPlayer(from);
-//
-//    if (isConnectionToServer())
-//    {
-//        // client
-//        if (p)
-//            CONS_Printf("%s: %s\n", p->name.c_str(), msg.getString());
-//        else
-//            CONS_Printf("Unknown player %d: %s\n", from, msg.getString());
-//    }
-//    else
-//    {
-//        if (!p || p->connection != this)
-//        {
-//            CONS_Printf("counterfeit message!\n"); // false sender
-//            return;
-//        }
-//
-//        static_cast<LNetInterface *>(getInterface())->SendChat(from, to, msg.getString());
-//    }
-//}
-//
-//static void PauseMsg(bool on, int pnum)
-//{
-//    const char *guilty = "server";
-//    if (pnum > 0)
-//    {
-//        PlayerInfo *p = game.FindPlayer(pnum);
-//        if (p)
-//            guilty = p->name.c_str();
-//    }
-//
-//    if (on)
-//        CONS_Printf("Game paused by %s.\n", guilty);
-//    else
-//        CONS_Printf("Game unpaused by %s.\n", guilty);
-//}
-//
-///// pauses or unpauses the game
-//void LNetInterface::Pause(int pnum, bool on)
-//{
-//    if (game.server)
-//    {
-//        // server can pause the game anytime
-//        game.Pause(on);
-//
-//        // send rpc event to all clients
-//        if (game.netgame && client_con.size())
-//        {
-//            int n = client_con.size();
-//            NetEvent *e = TNL_RPC_CONSTRUCT_NETEVENT(client_con[0], rpcPause, (pnum, on));
-//
-//            for (int i = 0; i < n; i++)
-//                client_con[i]->postNetEvent(e);
-//        }
-//
-//        PauseMsg(on, pnum);
-//    }
-//    else if (server_con)
-//    {
-//        // client must request a pause from the server
-//        server_con->rpcPause(0, on);
-//
-//        if (on)
-//            CONS_Printf("Pause request sent.\n");
-//        else
-//            CONS_Printf("Unpause request sent.\n");
-//    }
-//}
-//
-//void LConnection::rpcPause(U8 pnum, bool on)
-//{
-//    if (isConnectionToServer())
-//    {
-//        // server orders a pause
-//        game.Pause(on);
-//        PauseMsg(on, pnum);
-//    }
-//    else if (cv_allowpause.value)
-//    {
-//        // got a pause request from a client
-//        static_cast<LNetInterface *>(getInterface())->Pause(player[0]->number, on);
-//    }
-//}
-//
-//void LConnection::rpcMessage_s2c(S8 pnum, StringPtr msg, S8 priority, S8 type)
-//{
-//    for (int i = 0; i < NUM_LOCALPLAYERS; i++)
-//        if (LocalPlayers[i].info && LocalPlayers[i].info->number == pnum)
-//        {
-//            LocalPlayers[i].info->SetMessage(msg.getString(), priority, type);
-//            return;
-//        }
-//
-//    CONS_Printf("Received someone else's message!\n");
-//}
-//
-//void LNetInterface::SendNetVar(U16 netid, const char *str)
-//{
-//    // send netvar as an rpc event to all clients
-//    int n = client_con.size();
-//    for (int i = 0; i < n; i++)
-//        client_con[i]->rpcSendNetVar_s2c(netid, str);
-//}
-//
-//void LConnection::rpcSendNetVar_s2c(U16 netid, StringPtr s)
-//{
-//    consvar_t::GotNetVar(netid, s.getString());
-//}
-//
-///// only called on a server
-//void LNetInterface::Kick(PlayerInfo *p)
-//{
-//    LConnection *c = p->connection;
-//    if (c)
-//    {
-//        c->rpcKick_s2c(p->number, "Get lost!");
-//
-//        if (c->player.size() == 1)
-//        {
-//            disconnect(c, NetConnection::ReasonSelfDisconnect, "You were kicked by the server.\n");
-//        }
-//        else
-//        {
-//            // just kick the one
-//        }
-//    }
-//
-//    CONS_Printf("\2%s kicked from the game.\n", p->name.c_str());
-//}
-//
-//void LConnection::rpcKick_s2c(U8 pnum, StringPtr str)
-//{
-//    // TODO
-//    const char *s = str.getString();
-//    CONS_Printf("\2You were kicked from the game: %s.\n", s);
-//    /*
-//      if(pnum == consoleplayer->number - 1)
-//        {
-//          CL_Reset();
-//          game.StartIntro();
-//          M_StartMessage("You have been kicked by the server\n\nPress ESC\n",NULL,MM_NOTHING);
-//        }
-//      else
-//        CL_RemovePlayer(pnum);
-//    */
-//}
-//
-//void LNetInterface::SendPlayerOptions(int pnum, LocalPlayerInfo &p)
-//{
-//    if (!server_con)
-//        return;
-//
-//    BitStream s;
-//    p.Write(&s);
-//    server_con->rpcSendOptions_c2s(pnum, &s);
-//}
-//
-//void LConnection::rpcSendOptions_c2s(U8 pnum, ByteBufferPtr buf)
-//{
-//    PlayerInfo *p = game.FindPlayer(pnum);
-//
-//    if (!p || p->connection != this || buf->getBufferSize() > 100)
-//    {
-//        // since we receive a variable-length bytebuffer, we better be careful...
-//        CONS_Printf("Bogus PlayerOptions RPC!\n");
-//        return;
-//    }
-//
-//    BitStream s(buf->getBuffer(), buf->getBufferSize());
-//    p->options.Read(&s);
-//
-//    // put a limit on the name length
-//    if (p->options.name.size() > MAXPLAYERNAME)
-//        p->options.name.resize(MAXPLAYERNAME);
-//
-//    p->name = p->options.name;
-//}
-//
-//void LNetInterface::RequestSuicide(int pnum)
-//{
-//    if (server_con)
-//        server_con->rpcSuicide_c2s(pnum);
-//}
-//
-//void LConnection::rpcSuicide_c2s(U8 pnum)
-//{
-//    void Kill_pawn(Actor * v, Actor * k);
-//
-//    PlayerInfo *p = game.FindPlayer(pnum);
-//    if (p->connection == this)
-//        Kill_pawn(p->pawn, p->pawn);
-//}
-//
-//void LConnection::rpcRequestPOVchange_c2s(S32 pnum)
-//{
-//    // spy mode
-//    if (game.state == GameInfo::GS_LEVEL && !cv_hiddenplayers.value)
-//    {
-//        PlayerInfo *p = NULL;
-//
-//        /* FIXME NOW
-//        if (pnum <= 0)
-//      {
-//        // simply "next available POV"
-//        player_iter_t i = Players.upper_bound(player[0]->povnum + 1);
-//        if (i == Players.end())
-//          i = Players.begin();
-//
-//        p = i->second;
-//      }
-//        else
-//      p = game.FindPlayer(pnum);
-//        */
-//
-//        if (p)
-//            player[0]->pov = p->pawn;
-//        else
-//            player[0]->pov = player[0]->pawn;
-//
-//        // tell who's the view
-//        player[0]->SetMessage(va("Viewpoint: %s\n", p->name.c_str()));
-//        player[0]->setMaskBits(PlayerInfo::M_PAWN); // notify network system
-//    }
-//
-//    // TODO client should start HUD on the new pov...
-//}
+void LConnection::rpcMessage_s2c(S8 pnum, const char *msg, S8 priority, S8 type)
+{
+    uint8_t buf[512];
+    lnet::BitStream bs(buf, sizeof(buf));
+    bs.write(U8(PKT_MESSAGE_S2C));
+    bs.write(pnum);
+    bs.writeString(msg);
+    bs.write(priority);
+    bs.write(type);
+    sendPacket(buf, bs.getNumBytes());
+}
+
+void LConnection::rpcSendNetVar_s2c(U16 netid, const char *str)
+{
+    uint8_t buf[512];
+    lnet::BitStream bs(buf, sizeof(buf));
+    bs.write(U8(PKT_NETVAR_S2C));
+    bs.write(netid);
+    bs.writeString(str);
+    sendPacket(buf, bs.getNumBytes());
+}
+
+void LConnection::rpcKick_s2c(U8 pnum, const char *str)
+{
+    uint8_t buf[512];
+    lnet::BitStream bs(buf, sizeof(buf));
+    bs.write(U8(PKT_KICK_S2C));
+    bs.write(pnum);
+    bs.writeString(str);
+    sendPacket(buf, bs.getNumBytes());
+}
+
+void LConnection::rpcSendOptions_c2s(U8 pnum, lnet::BitStream *buf)
+{
+    // TODO: implement
+    (void)pnum;
+    (void)buf;
+}
+
+void LConnection::rpcSuicide_c2s(U8 pnum)
+{
+    uint8_t buf[8];
+    lnet::BitStream bs(buf, sizeof(buf));
+    bs.write(U8(PKT_SUICIDE_C2S));
+    bs.write(pnum);
+    sendPacket(buf, bs.getNumBytes());
+}
+
+void LConnection::rpcRequestPOVchange_c2s(S32 pnum)
+{
+    uint8_t buf[16];
+    lnet::BitStream bs(buf, sizeof(buf));
+    bs.write(U8(PKT_POV_CHANGE_C2S));
+    bs.write(pnum);
+    sendPacket(buf, bs.getNumBytes());
+}
+
+void LConnection::rpcTiccmd_c2s(S32 pnum, const ticcmd_t *cmd, uint16_t seq)
+{
+    uint8_t buf[32];
+    lnet::BitStream bs(buf, sizeof(buf));
+    bs.write(U8(PKT_TICCMD_C2S));
+    bs.write(pnum);  // player number
+    bs.write(seq);    // sequence number for reliable delivery
+    // Send only the essential movement fields
+    bs.write(cmd->forward);   // forward/backward movement
+    bs.write(cmd->side);      // strafe left/right
+    bs.write(cmd->yaw);       // turn angle
+    bs.write(cmd->buttons);   // buttons and weapon changes
+    sendPacket(buf, bs.getNumBytes());
+}
+
+void LConnection::handlePacket(PacketType type, lnet::BitStream *stream)
+{
+    switch (type)
+    {
+        case PKT_TEST:
+        {
+            U8 num = stream->readUInt8();
+            CONS_Printf("rpcTest received: %d\n", num);
+        }
+        break;
+
+        case PKT_CHAT:
+        {
+            S8 from = stream->readInt8();
+            S8 to = stream->readInt8();
+            char msg[256];
+            stream->readString(msg);
+            // TODO: route to proper handler
+            CONS_Printf("Chat from %d to %d: %s\n", from, to, msg);
+        }
+        break;
+
+        case PKT_PAUSE:
+        {
+            U8 pnum = stream->readUInt8();
+            bool on = stream->readFlag();
+            // TODO: implement
+            CONS_Printf("Pause request: pnum=%d, on=%d\n", pnum, on);
+        }
+        break;
+
+        case PKT_TICCMD_C2S:
+        {
+            // Read ticcmd from client (with player number and sequence)
+            S32 pnum;
+            uint16_t seq;
+            stream->read(&pnum);
+            stream->read(&seq);
+            ticcmd_t cmd;
+            cmd.forward = stream->readInt8();
+            cmd.side = stream->readInt8();
+            cmd.yaw = stream->readInt16();
+            cmd.buttons = stream->readUInt16();
+            cmd.item = 0;
+            cmd.pitch = 0;
+
+            // Forward to server for processing (includes player number and sequence)
+            if (netInterface)
+                netInterface->OnReceiveTiccmd(this, pnum, &cmd, seq);
+        }
+        break;
+
+        case PKT_GAME_STATE:
+        {
+            // Client receives authoritative game state from server
+            uint32_t serverTic = stream->readUInt32();
+            uint8_t numPlayers = stream->readUInt8();
+
+            for (int i = 0; i < numPlayers; i++)
+            {
+                uint8_t pnum = stream->readUInt8();
+                uint8_t hasMobj = stream->readUInt8();
+
+                // Read position data into temp variables
+                int32_t server_x = 0, server_y = 0, server_z = 0;
+                uint32_t server_angle = 0;
+                uint16_t stateIndex = 0;
+                if (hasMobj)
+                {
+                    server_x = stream->readInt32();
+                    server_y = stream->readInt32();
+                    server_z = stream->readInt32();
+                    server_angle = stream->readUInt32();
+                    stateIndex = stream->readUInt16();
+                }
+
+                // Find local player info (this machine's players)
+                LocalPlayerInfo *lp = nullptr;
+                for (int j = 0; j < NUM_LOCALPLAYERS; j++)
+                {
+                    if (LocalPlayers[j].pnumber == pnum)
+                    {
+                        lp = &LocalPlayers[j];
+                        break;
+                    }
+                }
+
+                if (lp && lp->info && lp->info->pawn)
+                {
+                    // Local player: compare prediction with server state
+                    if (lp->predicted_valid && hasMobj)
+                    {
+                        // Compute prediction error
+                        int32_t dx = Abs(lp->predicted_x - server_x);
+                        int32_t dy = Abs(lp->predicted_y - server_y);
+                        int32_t dz = Abs(lp->predicted_z - server_z);
+                        // Use predicted position if error is small (< 8 pixels = 8 << FRACBITS)
+                        fixed_t ERROR_THRESHOLD = FRACUNIT * 8; // 8 pixel threshold
+                        if (dx < ERROR_THRESHOLD && dy < ERROR_THRESHOLD && dz < ERROR_THRESHOLD)
+                        {
+                            // Prediction was good - use predicted position
+                            lp->info->pawn->x = lp->predicted_x;
+                            lp->info->pawn->y = lp->predicted_y;
+                            lp->info->pawn->z = lp->predicted_z;
+                            lp->info->pawn->angle = lp->predicted_angle;
+                        }
+                        else
+                        {
+                            // Prediction was wrong - snap to server
+                            lp->info->pawn->x = server_x;
+                            lp->info->pawn->y = server_y;
+                            lp->info->pawn->z = server_z;
+                            lp->info->pawn->angle = server_angle;
+                        }
+                    }
+                    else if (hasMobj)
+                    {
+                        // No prediction yet: snap to server
+                        lp->info->pawn->x = server_x;
+                        lp->info->pawn->y = server_y;
+                        lp->info->pawn->z = server_z;
+                        lp->info->pawn->angle = server_angle;
+                    }
+                    // Update predicted state from server for next prediction
+                    if (hasMobj)
+                    {
+                        lp->predicted_x = server_x;
+                        lp->predicted_y = server_y;
+                        lp->predicted_z = server_z;
+                        lp->predicted_angle = server_angle;
+                        lp->predicted_valid = true;
+                    }
+                }
+                else
+                {
+                    // Remote player: set up interpolation to new position
+                    PlayerInfo *remotePlayer = nullptr;
+                    for (size_t k = 0; k < game.Players.size(); k++)
+                    {
+                        if (game.Players[k]->number == pnum)
+                        {
+                            remotePlayer = game.Players[k];
+                            break;
+                        }
+                    }
+                    if (remotePlayer && remotePlayer->pawn && hasMobj)
+                    {
+                        // Set up interpolation from current position to server position
+                        // Save current position as start of interpolation
+                        remotePlayer->interp_x = remotePlayer->pawn->x;
+                        remotePlayer->interp_y = remotePlayer->pawn->y;
+                        remotePlayer->interp_z = remotePlayer->pawn->z;
+                        remotePlayer->interp_angle = remotePlayer->pawn->angle;
+
+                        // Set target position
+                        remotePlayer->target_x = server_x;
+                        remotePlayer->target_y = server_y;
+                        remotePlayer->target_z = server_z;
+                        remotePlayer->target_angle = server_angle;
+
+                        // Interpolation duration: 1 tic (will be refined by tic rate)
+                        remotePlayer->interp_frac = 0;
+                        remotePlayer->interp_tics = 1;
+                        remotePlayer->interp_elapsed = 0;
+                    }
+                }
+                (void)stateIndex; // State lookup would be needed for full implementation
+            }
+        }
+        break;
+
+        case PKT_DISCONNECT:
+            onConnectionTerminated(ReasonSelfDisconnect, "Received disconnect");
+            break;
+
+        default:
+            CONS_Printf("Unknown packet type: %d\n", type);
+            break;
+    }
+}

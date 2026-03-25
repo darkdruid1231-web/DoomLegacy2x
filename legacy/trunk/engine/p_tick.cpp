@@ -115,6 +115,9 @@ void Map::Ticker()
 
     if (game.server)
     {
+        // Apply pending ticcmds from network clients before running thinkers
+        ApplyPendingTiccmds();
+
         RunThinkers();
 
         // after a player is respawned, its input should be built before it is used in RunThinkers.

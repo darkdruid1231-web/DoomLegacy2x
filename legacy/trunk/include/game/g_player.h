@@ -108,12 +108,27 @@ class LocalPlayerInfo : public PlayerOptions
     class PlayerInfo *info; ///< Pointer to the corresponding (ghosted) PlayerInfo object.
     class BotAI *ai;        ///< possible bot AI controlling the player
 
+    // Client-side prediction state
+    fixed_t predicted_x, predicted_y, predicted_z;  ///< Predicted position for local player
+    angle_t predicted_angle;                        ///< Predicted angle for local player
+    bool predicted_valid;                            ///< True if prediction is valid
+
+    // Ticcmd sequence numbers for reliable delivery
+    uint16_t ticcmd_seq;        ///< Current ticcmd sequence number
+    uint16_t last_acked_seq;    ///< Last sequence number acked by server
+
   public:
     LocalPlayerInfo(const string &n = "bot", int keyset = 0);
     void GetInput(int elapsed);
 
     void UpdatePreferences(); ///< Propagates the preferences to the PlayerInfo or sends them to the
                               ///< server.
+
+    /// Apply a ticcmd locally to generate predicted position
+    void ApplyPrediction(const ticcmd_t *cmd);
+
+    /// Get and increment the sequence number for next ticcmd
+    uint16_t NextTiccmdSeq();
 };
 
 /// \brief Describes a single player, either human or AI.
@@ -221,6 +236,22 @@ class PlayerInfo : public NetConnection
     int invPos;   ///< Position of the active slot on HUD, always 0-6
                   //@}
 
+    /// \name Network controls (for multiplayer)
+    //@{
+    ticcmd_t pendingCmd;     ///< Pending ticcmd received from network
+    bool hasPendingCmd;      ///< True if pendingCmd contains a valid received ticcmd
+    uint16_t last_seq;      ///< Last ticcmd sequence number received from client
+
+    // Remote player interpolation state
+    fixed_t interp_x, interp_y, interp_z;  ///< Start of interpolation
+    fixed_t target_x, target_y, target_z;  ///< Target of interpolation
+    angle_t interp_angle;                   ///< Start angle
+    angle_t target_angle;                  ///< Target angle
+    fixed_t interp_frac;                   ///< Interpolation fraction (0 to FRACUNIT)
+    int interp_tics;                       ///< Total tics for interpolation
+    int interp_elapsed;                    ///< Elapsed tics since interpolation started
+    //@}
+
   public:
     PlayerInfo(const LocalPlayerInfo *p = NULL);
 
@@ -238,6 +269,9 @@ class PlayerInfo : public NetConnection
     void setMaskBits(U32 mask) {}
 
     void Ticker(); ///< called once a tic for each player
+
+    /// Advance interpolation for remote players (called on client)
+    void AdvanceInterpolation();
 
     bool InventoryResponder(short (*gc)[2], struct event_t *ev);
 

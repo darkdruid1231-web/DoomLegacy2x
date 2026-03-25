@@ -362,3 +362,20 @@ bool GameInfo::CL_StartGame()
     SetState(GS_LEVEL);
     return true;
 }
+
+// Send ticcmds to server (client-side only)
+void CL_SendTiccmds()
+{
+    if (!game.server && game.net && game.net->server_con)
+    {
+        // Send ticcmd for each local player
+        for (int i = 0; i < NUM_LOCALPLAYERS; i++)
+        {
+            if (LocalPlayers[i].info)
+            {
+                uint16_t seq = LocalPlayers[i].NextTiccmdSeq();
+                game.net->server_con->rpcTiccmd_c2s(LocalPlayers[i].pnumber, &LocalPlayers[i].info->cmd, seq);
+            }
+        }
+    }
+}
