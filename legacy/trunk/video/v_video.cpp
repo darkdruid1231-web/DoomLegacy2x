@@ -51,9 +51,6 @@ void Material::Draw(float x, float y, int scrn)
     if (rendermode == render_opengl)
     {
         if (oglrenderer && oglrenderer->ReadyToDraw())
-            // Console tries to use some patches before graphics are
-            // initialized. If this is the case, then create the missing
-            // texture.
             oglrenderer->Draw2DGraphic_Doom(x, y, this, scrn & V_FLAGMASK);
         return;
     }
@@ -141,31 +138,52 @@ void PatchTexture::Draw(byte *dest_tl,
                         fixed_t rowfrac,
                         int flags)
 {
-    // Defensive: check for null patch data
+    // Lazy-load patch pixel data if not already loaded.
+    // patch_data stays NULL until GeneratePatch() is called, matching
+    // the pattern used by GetData() and GetMaskedColumn().
     if (!patch_data)
-        return;
+    {
+        GeneratePatch();
+        if (!patch_data)  // still NULL after GeneratePatch? then lump is bad
+            return;
+    }
 
-    patch_t *p = GeneratePatch();
-    if (!p)
+    patch_t *p = reinterpret_cast<patch_t *>(patch_data);
+
+    // The number of destination rows available in this draw call.
+    // (dest_bl - dest_tl) is the total byte span; dividing by vid.width gives row count.
+    int dest_rows = (dest_bl - dest_tl) / vid.width;
+    if (dest_rows <= 0)
         return;
 
     for (; dest_tl < dest_tr; col += colfrac, dest_tl++)
     {
-#warning FIXME LFB top/bottom limits
         post_t *post = reinterpret_cast<post_t *>(patch_data + p->columnofs[col.floor()]);
 
         // step through the posts in a column
         while (post->topdelta != 0xff)
         {
-            // step through the posts in a column
-            byte *dest = dest_tl + (post->topdelta / rowfrac).floor() * vid.width;
+            // Calculate the starting destination row offset from topdelta.
+            // topdelta is in texture-pixel units; divide by rowfrac to get
+            // the scaled position within our dest_rows window.
+            int topdelta_scaled = (post->topdelta / rowfrac).floor();
+            byte *dest = dest_tl + topdelta_scaled * vid.width;
             byte *source = post->data;
-            int count = (post->length / rowfrac).floor();
 
-            fixed_t row = 0;
-            while (count--)
+            // Number of destination rows we need to fill for this post.
+            // This should match dest_rows, not post->length / rowfrac,
+            // because the available destination area is the limiting factor.
+            int count = (dest_rows / rowfrac).floor();
+
+            fixed_t rowfrac_accum = 0;
+            for (int i = 0; i < count; i++, dest += vid.width)
             {
-                byte pixel = source[row.floor()];
+                // Skip if destination is past dest_bl (bounds check).
+                // This can happen if topdelta_scaled pushes past dest_rows.
+                if (dest >= dest_bl)
+                    break;
+
+                byte pixel = source[rowfrac_accum.floor()];
 
                 // the compiler is supposed to optimize the ifs out of the loop
                 if (flags & V_MAP)
@@ -175,8 +193,7 @@ void PatchTexture::Draw(byte *dest_tl,
                     pixel = transtables[0][(pixel << 8) + *dest];
 
                 *dest = pixel;
-                dest += vid.width;
-                row += rowfrac;
+                rowfrac_accum += rowfrac;
             }
             post = reinterpret_cast<post_t *>(&post->data[post->length + 1]); // next post
         }

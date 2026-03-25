@@ -36,6 +36,9 @@
 
 #include "m_menu.h"
 #include "widget.h"
+#include "backends/SoftwareRenderBackend.h"
+#include "backends/IMenuBackend.h"
+#include "backends/ProductionMenuBackend.h"
 #include "menudef.h"
 
 #include "d_event.h"
@@ -67,6 +70,7 @@
 #include "z_zone.h"
 
 #include "n_interface.h"
+#include "menu_helpers.h"  // M_DrawSlider, M_DrawTextBox, M_DrawThermo
 
 /// This is a shorthand macro for constructing menus.
 #define ITEMS(x) (sizeof(x) / sizeof(menuitem_t)), (x)
@@ -86,8 +90,6 @@ extern Menu MainMenuDef, SinglePlayerDef, MultiPlayerDef, SetupPlayerDef, EpiDef
     Mouse2OptionsDef, ServerOptionsDef, QualitySettingsDef, InputSettingsDef,
     LocalPlayDef, OnlinePlayDef, PlayerSetupDef, HostGameDef,
     OGL_PostFXDef, OGL_DeferredDef;
-
-static void M_DrawTextBox(int x, int y, int width, int height);
 
 static short (*setup_gc)[2] =
     commoncontrols; // pointer to the gamecontrols of the player being edited
@@ -139,148 +141,7 @@ static const MenuStyle menu_style = {
 //===========================================================================
 //  Menu item class
 //===========================================================================
-
-/// flags for the menu items
-enum menuflag_t
-{
-    // 2+2 bits, union type + action subtype (what's stored in the union, what to do when a key is
-    // pressed)
-    IT_NONE = 0x0, ///< union is not used (also, no action)
-    IT_CONTROL, ///< <enter>, <backspace>: call specific functions with menuitem alphaKey as param
-
-    IT_SUBMENU = 0x4, ///< union is a submenu (also, <enter>: go to submenu)
-
-    IT_FUNC = 0x8, ///< union is a menufunction (also, <enter>: call func with menuitem number as
-                   ///< param (usually a complex submenu))
-    IT_KEYHANDLER, ///< <key>: call func with <key> as param (except menu navigation keys)
-    IT_FULL_KEYHANDLER, ///< <key>: call func with <key> as param (except <esc>, which always exits)
-
-    IT_CV = 0xC,  ///< union is a consvar (also, cv->str is printed next to name, <left>, <right>,
-                  ///< <enter> to change)
-    IT_CV_SLIDER, ///< as above, instead of string value a slider is drawn next to name
-    IT_CV_BIGSLIDER, ///< as above, but a big slider is drawn under the item
-    IT_CV_TEXTBOX,   ///< <enter>: opens a textbox
-
-    IT_UNION_MASK = 0xC,
-    IT_TYPE_MASK = 0xF,
-
-    // 4 bits: display type (order matters here!)
-    IT_SPACE = 0x00,   ///< big space (a hack, really...)
-    IT_PATCH = 0x10,   ///< a patch or a string with big font
-    IT_STRING = 0x20,  ///< little string (spaced with 10)
-    IT_CSTRING = 0x30, ///< very little string (spaced with 8)
-    IT_DISPLAY_MASK = 0xF0,
-
-    // misc. flags
-    IT_DY = 0x0100,             ///< alphakey is a y offset
-    IT_TEXTBOX_IN_USE = 0x0200, // HACK
-    IT_DISABLED = 0x0400,       ///< cannot be chosen
-    IT_WHITE = 0x0800,          ///< use white colormap
-    IT_GRAY = 0x1000,           ///< use gray colormap
-    IT_COLORMAP_MASK = IT_WHITE | IT_GRAY,
-    IT_HEADER_FLAG = 0x2000,    ///< section header (modern sub-menus)
-    IT_DROPDOWN = 0x4000,       ///< render a dropdown/select for the cvar
-
-    // shorthand for some common uses
-    IT_OFF_BIG = IT_NONE | IT_PATCH | IT_DISABLED | IT_GRAY,
-    IT_OFF = IT_NONE | IT_CSTRING | IT_DISABLED | IT_GRAY,
-    IT_CONTROLSTR = IT_CONTROL | IT_CSTRING,
-    IT_LINK = IT_SUBMENU | IT_STRING | IT_WHITE,
-    IT_ACT = IT_FUNC | IT_PATCH,
-    IT_CALL = IT_FUNC | IT_STRING,
-    IT_CVAR = IT_CV | IT_STRING,
-    IT_TEXTBOX = IT_CV_TEXTBOX | IT_STRING,
-    IT_CVAR_DROPDOWN = IT_CV | IT_STRING | IT_DROPDOWN,
-    IT_HEADER = IT_NONE | IT_CSTRING | IT_DISABLED | IT_WHITE | IT_HEADER_FLAG,
-};
-
-typedef void (*menufunc_t)(int choice);
-
-/// \brief Describes a single menu item
-struct menuitem_t
-{
-    friend class TextBox;
-
-  public:
-    short flags; ///< bit flags
-
-    const char *pic;  ///< Texture name or NULL
-    const char *text; ///< plain text, used when we have a valid font (e.g. FONTBxx lumps)
-
-    /// hotkey in menu OR y offset of the item
-    byte alphaKey;
-
-  private:
-    union
-    {
-        Menu *submenu;   // IT_SUBMENU
-        menufunc_t func; // IT_FUNC
-        consvar_t *cvar; // IT_CV
-    };
-
-  public:
-    menuitem_t() : flags(0), pic(NULL), text(NULL), alphaKey(0), submenu(NULL)
-    {
-    }
-
-    menuitem_t(short f, const char *p, const char *t, byte a = 0)
-        : flags(f), pic(p), text(t), alphaKey(a), submenu(NULL)
-    {
-    }
-
-    menuitem_t(short f, const char *p, const char *t, Menu *sm, byte a = 0)
-        : flags(f), pic(p), text(t), alphaKey(a), submenu(sm)
-    {
-        if ((flags & IT_UNION_MASK) != IT_SUBMENU || !submenu)
-            I_Error("Bad submenu: %s!\n", text);
-    }
-
-    menuitem_t(short f, const char *p, const char *t, menufunc_t r, byte a = 0)
-        : flags(f), pic(p), text(t), alphaKey(a), func(r)
-    {
-        int x = (flags & IT_UNION_MASK);
-        if ((x != IT_FUNC && x != IT_NONE) || !func)
-            I_Error("Bad menufunc: %s!\n", text);
-    }
-
-    menuitem_t(short f, const char *p, const char *t, consvar_t *cv, byte a = 0)
-        : flags(f), pic(p), text(t), alphaKey(a), cvar(cv)
-    {
-        if ((flags & IT_UNION_MASK) != IT_CV || !cvar)
-            I_Error("Bad menu cvar: %s!\n", text);
-    }
-
-    Menu *GetMenu()
-    {
-        return ((flags & IT_UNION_MASK) == IT_SUBMENU) ? submenu : NULL;
-    }
-    menufunc_t GetFunc()
-    {
-        return ((flags & IT_UNION_MASK) == IT_FUNC) ? func : NULL;
-    }
-    consvar_t *GetCV()
-    {
-        return ((flags & IT_UNION_MASK) == IT_CV) ? cvar : NULL;
-    }
-    const consvar_t *GetCV() const
-    {
-        return ((flags & IT_UNION_MASK) == IT_CV) ? cvar : NULL;
-    }
-
-    void SetFunc(menufunc_t f)
-    {
-        func = f;
-        flags &= ~IT_TYPE_MASK;
-        flags |= IT_FUNC;
-    }
-
-    void SetMenu(Menu *m)
-    {
-        submenu = m;
-        flags &= ~IT_TYPE_MASK;
-        flags |= IT_SUBMENU;
-    }
-};
+// menuitem_t and its validating constructors are now defined in m_menu.h.
 
 //==========================================================================
 //        Message box
@@ -629,7 +490,7 @@ static int vidm_column_size;
 //===========================================================================
 
 /// Draws a menu slider (thermometer? thermostat?)
-static void M_DrawThermo(int x, int y, consvar_t *cv)
+void M_DrawThermo(int x, int y, consvar_t *cv)
 {
     const char *leftlump, *rightlump, *centerlump[2], *cursorlump;
     bool raven = (game.mode >= gm_heretic);
@@ -670,7 +531,7 @@ static void M_DrawThermo(int x, int y, consvar_t *cv)
 }
 
 ///  A smaller 'Thermo', with range given as percents (0-100)
-static void M_DrawSlider(int x, int y, int range)
+void M_DrawSlider(int x, int y, int range)
 {
     if (range < 0)
         range = 0;
@@ -703,7 +564,7 @@ void M_DrawSelCell(Menu *menu, int item)
 
 ///  Draw a textbox, like Quake does, because sometimes it's difficult
 ///  to read the text with all the stuff in the background...
-static void M_DrawTextBox(int x, int y, int width, int height)
+void M_DrawTextBox(int x, int y, int width, int height)
 {
     // the parameters give the position and size of the text area, the borders are drawn around it
     int step, boff;
@@ -810,14 +671,16 @@ void Menu::DrawTitle()
 {
     if (font && title)
     {
-        float xtitle = (BASEVIDWIDTH - font->StringWidth(title)) / 2;
-        float ytitle = (y - font->Height()) / 2;
+        float w = s_menuBackend->MenuFontStringWidth(title);
+        int   h = s_menuBackend->MenuFontHeight();
+        float xtitle = (BASEVIDWIDTH - w) / 2;
+        float ytitle = (y - h) / 2;
         if (xtitle < 0)
             xtitle = 0;
         if (ytitle < 0)
             ytitle = 0;
 
-        font->DrawString(xtitle, ytitle, title, V_SCALE);
+        s_menuBackend->DrawMenuFontString(static_cast<int>(xtitle), static_cast<int>(ytitle), title, V_SCALE);
     }
     else if (titlepic)
     {
@@ -831,7 +694,7 @@ void Menu::DrawTitle()
             xtitle = 0;
         if (ytitle < 0)
             ytitle = 0;
-        p->Draw(xtitle, ytitle, V_SCALE);
+        s_menuBackend->DrawPatch(titlepic, xtitle, ytitle, V_SCALE);
     }
 }
 
@@ -854,7 +717,7 @@ void Menu::DrawMenu()
         int panel_w = BASEVIDWIDTH - (menu_style.panel_margin * 2);
         int panel_y = max(menu_style.panel_margin, y - menu_style.panel_padding);
         int panel_h = numitems * LINEHEIGHT + menu_style.panel_padding * 2;
-        window_background->DrawFill(panel_x, panel_y, panel_w, panel_h);
+        s_menuBackend->DrawBackgroundFill(panel_x, panel_y, panel_w, panel_h);
     }
 
     DrawTitle();
@@ -871,11 +734,13 @@ void Menu::DrawMenu()
         if ((items[i].flags & IT_COLORMAP_MASK) || disabled)
             flags |= V_MAP;
         if (disabled)
-            current_colormap = graymap;
+            s_menuBackend->SetColormap(2);  // gray
         else if (items[i].flags & IT_WHITE)
-            current_colormap = whitemap;
+            s_menuBackend->SetColormap(1);  // white
         else if (items[i].flags & IT_GRAY)
-            current_colormap = graymap;
+            s_menuBackend->SetColormap(2);  // gray
+        else
+            s_menuBackend->SetColormap(0); // none
 
         if (i == itemOn)
             cursory = dy;
@@ -897,24 +762,24 @@ void Menu::DrawMenu()
                         // Material invalid, skip drawing
                     }
                     else
-                        m->Draw(x, dy, flags);
+                        s_menuBackend->DrawPatch(items[i].pic, x, dy, flags);
                     h = FONTBHEIGHT;
                 }
                 else if (font && items[i].text)
                 {
-                    font->DrawString(x, dy, items[i].text, flags);
+                    s_menuBackend->DrawMenuFontString(x, dy, items[i].text, flags);
                     h = FONTBHEIGHT;
                 }
                 break;
 
                 // then the "short" ones:
             case IT_STRING:
-                hud_font->DrawString(x, dy, items[i].text, flags);
+                s_menuBackend->DrawHudFontString(x, dy, items[i].text, flags);
                 h = STRINGHEIGHT;
                 break;
 
             case IT_CSTRING:
-                hud_font->DrawString(x, dy, items[i].text, flags);
+                s_menuBackend->DrawHudFontString(x, dy, items[i].text, flags);
                 h = SMALLLINEHEIGHT;
                 break;
         }
@@ -925,40 +790,42 @@ void Menu::DrawMenu()
             switch (items[i].flags & IT_TYPE_MASK)
             {
                 case IT_CV_SLIDER:
-                    M_DrawSlider(BASEVIDWIDTH - x - SLIDER_WIDTH,
-                                 dy,
-                                 ((cv->value - cv->PossibleValue[0].value) * 100 /
-                                  (cv->PossibleValue[1].value - cv->PossibleValue[0].value)));
+                    s_menuBackend->DrawSlider(BASEVIDWIDTH - x - SLIDER_WIDTH,
+                                              dy,
+                                              ((cv->value - cv->PossibleValue[0].value) * 100 /
+                                               (cv->PossibleValue[1].value - cv->PossibleValue[0].value)));
                     break;
 
                 case IT_CV_TEXTBOX:
-                    M_DrawTextBox(x, dy + 4, MAXSTRINGLENGTH, 1);
+                    s_menuBackend->DrawTextBox(x, dy + 4, MAXSTRINGLENGTH, 1);
                     if (items[i].flags & IT_TEXTBOX_IN_USE)
                     {
                         const char *t = textbox.GetText();
-                        hud_font->DrawString(x + 8, dy + 12, t, V_SCALE);
+                        s_menuBackend->DrawHudFontString(x + 8, dy + 12, t, V_SCALE);
                         if (AnimCount < 4)
-                            hud_font->DrawCharacter(x + 8 + hud_font->StringWidth(t),
-                                                    dy + 12,
-                                                    '_',
-                                                    V_WHITEMAP | V_SCALE);
+                        {
+                            float tw = s_menuBackend->HudFontStringWidth(t);
+                            s_menuBackend->DrawHudFontCharacter(
+                                static_cast<int>(x + 8 + tw), dy + 12, '_', V_WHITEMAP | V_SCALE);
+                        }
                     }
                     else
-                        hud_font->DrawString(x + 8, dy + 12, cv->str, V_SCALE);
+                        s_menuBackend->DrawHudFontString(x + 8, dy + 12, cv->str, V_SCALE);
                     h = 26;
                     break;
 
                 case IT_CV_BIGSLIDER:
-                    M_DrawThermo(x, dy + h, items[i].GetCV());
+                    s_menuBackend->DrawThermo(x, dy + h, items[i].GetCV());
                     dy += LINEHEIGHT;
                     break;
 
                 default:
-                    hud_font->DrawString(BASEVIDWIDTH - x - hud_font->StringWidth(cv->str),
-                                         dy,
-                                         cv->str,
-                                         V_WHITEMAP | V_SCALE);
+                {
+                    float strw = s_menuBackend->HudFontStringWidth(cv->str);
+                    s_menuBackend->DrawHudFontString(
+                        BASEVIDWIDTH - x - static_cast<int>(strw), dy, cv->str, V_WHITEMAP | V_SCALE);
                     break;
+                }
             }
         }
         else if ((items[i].flags & IT_TYPE_MASK) == IT_CONTROL)
@@ -983,8 +850,9 @@ void Menu::DrawMenu()
                 if (keys[1] != KEY_NULL)
                     strcat(tmp, G_KeynumToString(keys[1]));
             }
-            hud_font->DrawString(
-                BASEVIDWIDTH - x - hud_font->StringWidth(tmp), dy, tmp, V_WHITEMAP | V_SCALE);
+            float strw = s_menuBackend->HudFontStringWidth(tmp);
+            s_menuBackend->DrawHudFontString(
+                BASEVIDWIDTH - x - static_cast<int>(strw), dy, tmp, V_WHITEMAP | V_SCALE);
         }
 
         dy += h;
@@ -992,9 +860,9 @@ void Menu::DrawMenu()
 
     // draw the skull cursor (or a blinking star)
     if ((items[itemOn].flags & IT_DISPLAY_MASK) < IT_STRING)
-        pointer[which_pointer]->Draw(x - 32, cursory - 5, V_SCALE);
+        s_menuBackend->DrawCursor(x - 32, cursory - 5, which_pointer);
     else if (AnimCount < 4) // blink cursor
-        hud_font->DrawCharacter(x - 10, cursory, '*', V_WHITEMAP | V_SCALE);
+        s_menuBackend->DrawHudFontCharacter(x - 10, cursory, '*', V_WHITEMAP | V_SCALE);
 }
 
 /// Build a WidgetPanel from this menu's item array.
@@ -1079,6 +947,9 @@ void Menu::DrawMenuModern()
     if (!mf)
         mf = hud_font;
 
+    static SoftwareRenderBackend sw_backend;
+    sw_backend.SetFont(mf);
+
     DrawTitle();
 
     if (!menu_panel)
@@ -1118,6 +989,7 @@ void Menu::DrawMenuModern()
 
     // Build the rendering context.
     MenuDrawCtx ctx;
+    ctx.backend        = &sw_backend;
     ctx.font            = mf;
     ctx.mat_panel       = menu_panel;
     ctx.mat_header      = menu_header;
@@ -2915,6 +2787,10 @@ tic_t Menu::NowTic;
 Menu *Menu::currentMenu;
 short Menu::itemOn;
 bool Menu::active;
+IMenuBackend *Menu::s_menuBackend;
+
+/// Static production backend instance (lifetime: whole program).
+static ProductionMenuBackend s_productionBackend;
 
 /// constructor
 Menu::Menu(const char *tpic,
@@ -3591,6 +3467,41 @@ bool Menu::UsingNewUI()
     return menu_use_newui;
 }
 
+void Menu::SetMenuBackend(IMenuBackend *backend)
+{
+    s_menuBackend = backend;
+}
+
+void Menu::SetFontForTesting(font_t *f)
+{
+    // No-op when passed nullptr: preserves whatever font is currently set.
+    // This allows DrawMenuWithBackend to call SetFontForTesting(nullptr) without
+    // overriding a font value that a specific test has set.
+    if (f)
+        font = f;
+}
+
+void Menu::SetNewUIForTesting(bool enabled)
+{
+    menu_use_newui = enabled;
+}
+
+void Menu::SetAnimCountForTesting(short ac)
+{
+    AnimCount = ac;
+}
+
+void Menu::DrawMenuForTesting()
+{
+    // Override state so DrawMenu() exercises the classic path without crashing.
+    // Note: font is intentionally NOT set to null here — DrawTitle() is already a
+    // no-op when title/titlepic are null (the test passes both as nullptr), and
+    // IT_PATCH items with text need font != nullptr to reach DrawMenuFontString.
+    menu_use_newui = false;
+    AnimCount = 0;  // ensures cursor blink is off (AnimCount < 4)
+    DrawMenu();
+}
+
 // resets the menu system according to current game.mode
 // changes menu font, structure etc.
 void Menu::Init()
@@ -3629,6 +3540,9 @@ void Menu::Init()
         font = big_font;
     else
         font = hud_font;
+
+    // Use the production backend for classic menu rendering.
+    s_menuBackend = &s_productionBackend;
 
     // Register MapListWidget as the widget for cv_menu_startmap, replacing the
     // cvar-with-handler HACK with a proper scrollable map list.
@@ -3828,6 +3742,37 @@ Menu OGL_DevDef("M_OPTTTL", "OPTIONS", &OpenGLOptionDef, ITEMS(OGL_Dev_MI), 60, 
 Menu OGL_NormalMapDef("M_OPTTTL", "OPTIONS", &OpenGLOptionDef, ITEMS(OGL_NormalMap_MI), 60, 40);
 Menu OGL_PostFXDef("M_OPTTTL", "OGL_PostFX", &OpenGLOptionDef, ITEMS(OGL_PostFX_MI), 60, 40);
 Menu OGL_DeferredDef("M_OPTTTL", "OGL_Deferred", &OpenGLOptionDef, ITEMS(OGL_Deferred_MI), 60, 40);
+
+//===========================================================================
+//  menuitem_t validating constructors (out-of-line, access I_Error)
+//===========================================================================
+
+menuitem_t::menuitem_t(short f, const char *p, const char *t, byte a)
+    : flags(f), pic(p), text(t), alphaKey(a), submenu(NULL)
+{
+}
+
+menuitem_t::menuitem_t(short f, const char *p, const char *t, Menu *sm, byte a)
+    : flags(f), pic(p), text(t), alphaKey(a), submenu(sm)
+{
+    if ((flags & IT_UNION_MASK) != IT_SUBMENU || !submenu)
+        I_Error("Bad submenu: %s!\n", text);
+}
+
+menuitem_t::menuitem_t(short f, const char *p, const char *t, menufunc_t r, byte a)
+    : flags(f), pic(p), text(t), alphaKey(a), func(r)
+{
+    int x = (flags & IT_UNION_MASK);
+    if ((x != IT_FUNC && x != IT_NONE) || !func)
+        I_Error("Bad menufunc: %s!\n", text);
+}
+
+menuitem_t::menuitem_t(short f, const char *p, const char *t, consvar_t *cv, byte a)
+    : flags(f), pic(p), text(t), alphaKey(a), cvar(cv)
+{
+    if ((flags & IT_UNION_MASK) != IT_CV || !cvar)
+        I_Error("Bad menu cvar: %s!\n", text);
+}
 
 /*
 void Menu::DrawOpenGLMenu()

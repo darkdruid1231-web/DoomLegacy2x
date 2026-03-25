@@ -68,6 +68,7 @@ automap/am_map.cpp
 menu/menu.cpp
 menu/widget.cpp
 menu/menudef.cpp
+menu/backends/SoftwareRenderBackend.cpp
 finale/f_finale.cpp
 finale/wi_stuff.cpp
 hud/st_lib.cpp
