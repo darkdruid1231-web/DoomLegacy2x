@@ -30,6 +30,7 @@
 #include "n_interface.h"
 
 #include "g_game.h"
+#include "g_player.h"
 #include "g_type.h"
 
 #include "i_system.h"
@@ -625,7 +626,7 @@ void LNetInterface::Kick(class PlayerInfo *p)
 void LNetInterface::OnReceiveTiccmd(LConnection *conn, S32 pnum, const ticcmd_t *cmd, uint16_t seq)
 {
     // Store ticcmd in the correct player's pending slot
-    if (conn && conn->isServer)
+    if (conn && !conn->isConnectionToServer())
     {
         // Find the player with matching number in this connection
         for (size_t i = 0; i < conn->player.size(); i++)
@@ -684,10 +685,10 @@ void LNetInterface::BroadcastGameState()
         if (p->pawn)
         {
             bs.write(static_cast<uint8_t>(1)); // has mobj
-            bs.write(p->pawn->x);
-            bs.write(p->pawn->y);
-            bs.write(p->pawn->z);
-            bs.write(p->pawn->angle);
+            bs.write(p->pawn->pos.x);
+            bs.write(p->pawn->pos.y);
+            bs.write(p->pawn->pos.z);
+            bs.write(p->pawn->yaw);
             bs.write(static_cast<uint16_t>(p->pawn->state ? p->pawn->state->index : 0));
         }
         else
