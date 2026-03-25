@@ -164,3 +164,58 @@ target_link_libraries(MockSoundPlayer PRIVATE
 )
 target_compile_definitions(MockSoundPlayer PRIVATE SDL_MAIN_HANDLED)
 
+# ---------------------------------------------------------------------------
+# Network Provider mock implementation
+# ---------------------------------------------------------------------------
+add_library(MockNetworkProvider STATIC
+    mock_network_provider.cpp
+)
+target_include_directories(MockNetworkProvider PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include/game
+)
+target_link_libraries(MockNetworkProvider PRIVATE
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(MockNetworkProvider PRIVATE SDL_MAIN_HANDLED)
+
+# ---------------------------------------------------------------------------
+# Input Provider mock implementation
+# ---------------------------------------------------------------------------
+add_library(MockInputProvider STATIC
+    mock_input_provider.cpp
+)
+target_include_directories(MockInputProvider PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include/game
+    ${SDL2_INCLUDE_DIRS}
+)
+target_link_libraries(MockInputProvider PRIVATE
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(MockInputProvider PRIVATE SDL_MAIN_HANDLED)
+
+# ---------------------------------------------------------------------------
+# Render mock implementation
+# ---------------------------------------------------------------------------
+add_library(MockRenderer STATIC
+    mock_renderer.cpp
+)
+target_include_directories(MockRenderer PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include/game
+)
+target_link_libraries(MockRenderer PRIVATE
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(MockRenderer PRIVATE SDL_MAIN_HANDLED)
+

@@ -98,6 +98,9 @@ extern short commoncontrols[num_commoncontrols][2];
 // clears the pressed-down status of all gamekeys
 void G_ReleaseKeys();
 
+// returns true if the given key is currently held down
+bool G_GetKeyState(int key);
+
 // remaps the input event to a game control.
 bool G_MapEventsToControls(struct event_t *ev);
 

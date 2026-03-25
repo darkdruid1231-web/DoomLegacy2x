@@ -294,3 +294,55 @@ target_link_libraries(test_graphics_settings_gtest PRIVATE
 )
 target_compile_definitions(test_graphics_settings_gtest PRIVATE SDL_MAIN_HANDLED)
 add_test(NAME graphics_settings_gtest COMMAND test_graphics_settings_gtest)
+
+# ---------------------------------------------------------------------------
+# test_network_provider_gtest — INetworkProvider DI pattern demonstration.
+# ---------------------------------------------------------------------------
+add_executable(test_network_provider_gtest unit/test_network_provider_gtest.cpp)
+target_include_directories(test_network_provider_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include/game
+)
+target_link_libraries(test_network_provider_gtest PRIVATE
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_network_provider_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME network_provider_gtest COMMAND test_network_provider_gtest)
+
+# ---------------------------------------------------------------------------
+# test_input_provider_gtest — IInputProvider DI pattern demonstration.
+# ---------------------------------------------------------------------------
+add_executable(test_input_provider_gtest unit/test_input_provider_gtest.cpp)
+target_include_directories(test_input_provider_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include/game
+    ${SDL2_INCLUDE_DIRS}
+)
+target_link_libraries(test_input_provider_gtest PRIVATE
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_input_provider_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME input_provider_gtest COMMAND test_input_provider_gtest)
+
+# ---------------------------------------------------------------------------
+# test_renderer_gtest — IRenderer DI pattern demonstration.
+# ---------------------------------------------------------------------------
+add_executable(test_renderer_gtest unit/test_renderer_gtest.cpp)
+target_include_directories(test_renderer_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include/game
+)
+target_link_libraries(test_renderer_gtest PRIVATE
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_renderer_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME renderer_gtest COMMAND test_renderer_gtest)
