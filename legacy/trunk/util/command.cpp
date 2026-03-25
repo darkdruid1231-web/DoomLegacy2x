@@ -33,6 +33,7 @@
 
 #include "command.h"
 #include "console.h"
+#include "interfaces/i_cvar.h"
 #include "doomdef.h"
 #include "z_zone.h"
 
@@ -674,6 +675,49 @@ consvar_t *consvar_t::FindNetVar(unsigned short netid)
             return cvar;
 
     return NULL;
+}
+
+//====================================================================
+// ICVarProvider adapter - delegates to the global cvar system
+//====================================================================
+
+/// \brief Adapter that implements ICVarProvider by delegating to consvar_t.
+/// \details This allows production code to use ICVarProvider pointers while
+///         still accessing the real console variables. In tests, MockCVarProvider
+///         can be injected instead.
+class CVarProviderAdapter : public ICVarProvider {
+public:
+    int getInt(const char* name) const override {
+        consvar_t* cv = consvar_t::FindVar(name);
+        return cv ? cv->value : 0;
+    }
+
+    const char* getString(const char* name) const override {
+        consvar_t* cv = consvar_t::FindVar(name);
+        return cv ? cv->str : "";
+    }
+
+    bool setInt(const char* name, int value) override {
+        consvar_t* cv = consvar_t::FindVar(name);
+        if (!cv)
+            return false;
+        cv->Set(value);
+        return true;
+    }
+
+    bool exists(const char* name) const override {
+        return consvar_t::FindVar(name) != NULL;
+    }
+};
+
+// Global adapter instance
+static CVarProviderAdapter s_cvarAdapter;
+
+/// \brief Get the global ICVarProvider instance.
+/// \details Returns an adapter pointing to the global cvar system.
+///         Production code should use this instead of directly accessing cvars.
+ICVarProvider* GetGlobalCVarProvider() {
+    return &s_cvarAdapter;
 }
 
 //

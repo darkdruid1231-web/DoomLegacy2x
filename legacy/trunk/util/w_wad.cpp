@@ -35,6 +35,44 @@
 #include "w_wad.h"
 #include "wad.h"
 #include "z_zone.h"
+#include "interfaces/i_wad.h"
+
+//====================================================================
+// IWadRepository adapter - delegates to the global FileCache
+//====================================================================
+
+/// \brief Adapter that implements IWadRepository by delegating to the global fc.
+/// \details This allows production code to use IWadRepository pointers while
+///         still accessing the real FileCache. In tests, MockWadRepository
+///         can be injected instead.
+class WadRepositoryAdapter : public IWadRepository {
+public:
+    int findLump(const char* name) const override {
+        return fc.FindNumForName(name);
+    }
+
+    bool readLump(int lumpnum, void* dest) const override {
+        return fc.ReadLump(lumpnum, dest) > 0;
+    }
+
+    int getLumpSize(int lumpnum) const override {
+        return fc.LumpLength(lumpnum);
+    }
+
+    bool lumpExists(const char* name) const override {
+        return fc.FindNumForName(name) != -1;
+    }
+};
+
+// Global adapter instance
+static WadRepositoryAdapter s_wadAdapter;
+
+/// \brief Get the global IWadRepository instance.
+/// \details Returns an adapter pointing to the global FileCache.
+///         Production code should use this instead of directly accessing fc.
+IWadRepository* GetGlobalWadRepository() {
+    return &s_wadAdapter;
+}
 
 //====================================================================
 // FileCache class implementation

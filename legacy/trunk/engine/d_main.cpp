@@ -56,6 +56,8 @@
 #include "g_player.h"
 #include "g_pawn.h"
 
+#include "interfaces/i_game_backend.h"
+
 #include "doomdata.h"
 
 #include "w_wad.h"
@@ -905,4 +907,69 @@ bool D_DoomMain()
     con.Toggle(true);
     vid.SetMode(); // change video mode if needed, recalculate...
     return true;
+}
+
+//====================================================================
+// IGameBackend adapter - delegates to global game state and functions
+//====================================================================
+
+/// \brief Adapter that implements IGameBackend by delegating to global functions.
+/// \details This allows production code to use IGameBackend pointers while
+///         still accessing the real game state. In tests, MockGameBackend
+///         can be injected instead.
+class GameBackendAdapter : public IGameBackend {
+public:
+    void runGameLoop() override {
+        D_DoomLoop();
+    }
+
+    void advanceTics(int elapsed) override {
+        game.TryRunTics(elapsed);
+    }
+
+    void setGameState(int state) override {
+        game.SetState(static_cast<GameInfo::gamestate_t>(state));
+    }
+
+    void startIntro() override {
+        game.StartIntro();
+    }
+
+    void advanceIntro() override {
+        game.AdvanceIntro();
+    }
+
+    void pauseGame(bool on) override {
+        game.Pause(on);
+    }
+
+    void updateDisplay() override {
+        game.Display();
+    }
+
+    void drawFrame() override {
+        game.Drawer();
+    }
+
+    bool spawnServer(bool force_mapinfo) override {
+        return game.SV_SpawnServer(force_mapinfo);
+    }
+
+    bool isPlaying() override {
+        return game.Playing();
+    }
+
+    void quit() override {
+        I_Quit();
+    }
+};
+
+// Global adapter instance
+static GameBackendAdapter s_gameBackendAdapter;
+
+/// \brief Get the global IGameBackend instance.
+/// \details Returns an adapter pointing to the global game functions.
+///         Production code should use this instead of directly calling globals.
+IGameBackend* GetGlobalGameBackend() {
+    return &s_gameBackendAdapter;
 }

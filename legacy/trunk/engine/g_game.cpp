@@ -48,6 +48,7 @@
 #include "m_random.h"
 
 #include "r_data.h"
+#include "t_parse.h"
 #include "r_draw.h"
 #include "r_main.h"
 #include "r_render.h"
@@ -68,6 +69,8 @@
 
 #include "i_video.h" // rendermode! fix!
 
+#include "interfaces/i_game.h"
+
 #include "hardware/oglrenderer.hpp"
 
 /*!
@@ -79,6 +82,104 @@
 bool nodrawers; // for comparative timing purposes
 
 GameInfo game; ///< The single global instance of GameInfo.
+
+//====================================================================
+// IGameStateProvider adapter - delegates to the global game state
+//====================================================================
+
+/// \brief Adapter that implements IGameStateProvider by delegating to globals.
+/// \details This allows production code to use IGameStateProvider pointers while
+///         still accessing the real game state. In tests, MockGameStateProvider
+///         can be injected instead.
+class GameStateProviderAdapter : public IGameStateProvider {
+public:
+    int getGameState() const override {
+        return static_cast<int>(game.state);
+    }
+
+    unsigned int getGameTic() const override {
+        return game.tic;
+    }
+
+    bool isPaused() const override {
+        return game.paused;
+    }
+
+    bool isNetworkGame() const override {
+        return game.netgame;
+    }
+
+    bool isMultiplayer() const override {
+        return game.multiplayer;
+    }
+
+    Map* getCurrentMap() const override {
+        return current_map;
+    }
+
+    int getCurrentMapLump() const override {
+        return current_map ? current_map->lumpnum : -1;
+    }
+
+    PlayerInfo* findPlayer(int playernum) const override {
+        return game.FindPlayer(playernum);
+    }
+
+    int getPlayerCount() const override {
+        return current_map ? current_map->players.size() : 0;
+    }
+
+    bool isPlayerAlive(const PlayerInfo* p) const override {
+        if (!p)
+            return false;
+        if (p->playerstate != PST_INMAP)
+            return false;
+        if (!p->pawn)
+            return false;
+        return p->pawn->health > 0;
+    }
+
+    int getPlayerHealth(const PlayerInfo* p) const override {
+        if (!p || !p->pawn)
+            return 0;
+        return p->pawn->health;
+    }
+
+    void getPlayerPosition(const PlayerInfo* p, int& x, int& y, int& z) const override {
+        if (p && p->pawn) {
+            x = static_cast<int>(p->pawn->pos.x.value() >> 16);
+            y = static_cast<int>(p->pawn->pos.y.value() >> 16);
+            z = static_cast<int>(p->pawn->pos.z.value() >> 16);
+        } else {
+            x = y = z = 0;
+        }
+    }
+
+    PlayerInfo* getLocalPlayer(int index) const override {
+        if (index < 0 || index >= NUM_LOCALPLAYERS)
+            return nullptr;
+        return LocalPlayers[index].info;
+    }
+
+    bool pollEvent(event_t& ev) override {
+        if (eventhead != eventtail) {
+            ev = events[eventtail];
+            eventtail = (eventtail + 1) & (MAXEVENTS - 1);
+            return true;
+        }
+        return false;
+    }
+};
+
+// Global adapter instance
+static GameStateProviderAdapter s_gameAdapter;
+
+/// \brief Get the global IGameStateProvider instance.
+/// \details Returns an adapter pointing to the global game state.
+///         Production code should use this instead of directly accessing globals.
+IGameStateProvider* GetGlobalGameStateProvider() {
+    return &s_gameAdapter;
+}
 
 GameInfo::GameInfo()
 {

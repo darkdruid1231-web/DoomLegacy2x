@@ -3,6 +3,16 @@
 #
 # Tests are standalone executables with no game library linkage unless
 # explicitly noted.  Run with: ctest --output-on-failure
+#
+# Google Test/Mock infrastructure:
+# - GTest/GMock are fetched via FetchContent in tests/libraries/CMakeLists.txt
+# - Mock objects (MockWad, MockSound) live in tests/libraries/
+# - Interface headers live in include/interfaces/
+
+# ---------------------------------------------------------------------------
+# Test support libraries (GTest/GMock + mock objects)
+# ---------------------------------------------------------------------------
+add_subdirectory(libraries)
 
 # ---------------------------------------------------------------------------
 # test_sprite_logic — pure-math replicas of sprite rendering formulas.
@@ -40,6 +50,24 @@ target_include_directories(test_fixed_t PRIVATE ${SDL2_INCLUDE_DIRS})
 target_link_libraries(test_fixed_t util_base)
 target_compile_definitions(test_fixed_t PRIVATE SDL_MAIN_HANDLED)
 add_test(NAME fixed_t COMMAND test_fixed_t)
+
+# ---------------------------------------------------------------------------
+# test_fixed_t_gtest — Google Test version of fixed-point arithmetic tests.
+# Demonstrates parameterized testing with GTest.
+# ---------------------------------------------------------------------------
+add_executable(test_fixed_t_gtest unit/test_fixed_t_gtest.cpp)
+target_include_directories(test_fixed_t_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${SDL2_INCLUDE_DIRS}
+)
+target_link_libraries(test_fixed_t_gtest PRIVATE
+    util_base
+    gtest
+    TestInterfaces
+)
+target_compile_definitions(test_fixed_t_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME fixed_t_gtest COMMAND test_fixed_t_gtest)
 
 # ---------------------------------------------------------------------------
 # test_vector — vec_t<fixed_t> operations.
@@ -105,3 +133,164 @@ target_include_directories(test_acs PRIVATE ${SDL2_INCLUDE_DIRS})
 target_link_libraries(test_acs util)
 target_compile_definitions(test_acs PRIVATE SDL_MAIN_HANDLED)
 add_test(NAME acs COMMAND test_acs)
+
+# ---------------------------------------------------------------------------
+# test_wad_lump_gtest — Google Test version of WAD lump lookup tests.
+# Demonstrates GTest/Mock infrastructure with MockWadRepository.
+# ---------------------------------------------------------------------------
+add_executable(test_wad_lump_gtest unit/test_wad_lump_gtest.cpp)
+target_include_directories(test_wad_lump_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+)
+target_link_libraries(test_wad_lump_gtest PRIVATE
+    MockWad
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_wad_lump_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME wad_lump_gtest COMMAND test_wad_lump_gtest)
+
+# ---------------------------------------------------------------------------
+# test_wad_lump_reader — WadLumpReader component tests with MockWadRepository.
+# Demonstrates full DI pattern: WadLumpReader -> IWadRepository -> MockWadRepository.
+# ---------------------------------------------------------------------------
+add_executable(test_wad_lump_reader unit/test_wad_lump_reader.cpp)
+target_include_directories(test_wad_lump_reader PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/util
+)
+target_link_libraries(test_wad_lump_reader PRIVATE
+    MockWad
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_wad_lump_reader PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME wad_lump_reader COMMAND test_wad_lump_reader)
+
+# ---------------------------------------------------------------------------
+# test_game_state_gtest — IGameStateProvider DI pattern demonstration.
+# ---------------------------------------------------------------------------
+add_executable(test_game_state_gtest unit/test_game_state_gtest.cpp)
+target_include_directories(test_game_state_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include/game
+)
+target_link_libraries(test_game_state_gtest PRIVATE
+    MockGame
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_game_state_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME game_state_gtest COMMAND test_game_state_gtest)
+
+# ---------------------------------------------------------------------------
+# test_cvar_gtest — ICVarProvider DI pattern demonstration.
+# ---------------------------------------------------------------------------
+add_executable(test_cvar_gtest unit/test_cvar_gtest.cpp)
+target_include_directories(test_cvar_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+)
+target_link_libraries(test_cvar_gtest PRIVATE
+    MockCVar
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_cvar_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME cvar_gtest COMMAND test_cvar_gtest)
+
+# ---------------------------------------------------------------------------
+# test_render_backend_gtest — IRenderBackend DI pattern demonstration.
+# ---------------------------------------------------------------------------
+add_executable(test_render_backend_gtest unit/test_render_backend_gtest.cpp)
+target_include_directories(test_render_backend_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include/game
+)
+target_link_libraries(test_render_backend_gtest PRIVATE
+    MockRender
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_render_backend_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME render_backend_gtest COMMAND test_render_backend_gtest)
+
+# ---------------------------------------------------------------------------
+# test_sound_emitter_gtest — SoundEmitterComponent with MockSoundSystem.
+# ---------------------------------------------------------------------------
+add_executable(test_sound_emitter_gtest unit/test_sound_emitter_gtest.cpp)
+target_include_directories(test_sound_emitter_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include/game
+)
+target_link_libraries(test_sound_emitter_gtest PRIVATE
+    MockSound
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_sound_emitter_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME sound_emitter_gtest COMMAND test_sound_emitter_gtest)
+
+# ---------------------------------------------------------------------------
+# test_hud_gtest — HUDComponent with MockGameStateProvider.
+# ---------------------------------------------------------------------------
+add_executable(test_hud_gtest unit/test_hud_gtest.cpp)
+target_include_directories(test_hud_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include/game
+)
+target_link_libraries(test_hud_gtest PRIVATE
+    MockGame
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_hud_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME hud_gtest COMMAND test_hud_gtest)
+
+# ---------------------------------------------------------------------------
+# test_bsp_traverser_gtest — BSPTraverserComponent with MockRenderBackend.
+# ---------------------------------------------------------------------------
+add_executable(test_bsp_traverser_gtest unit/test_bsp_traverser_gtest.cpp)
+target_include_directories(test_bsp_traverser_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include/game
+)
+target_link_libraries(test_bsp_traverser_gtest PRIVATE
+    MockRender
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_bsp_traverser_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME bsp_traverser_gtest COMMAND test_bsp_traverser_gtest)
+
+# ---------------------------------------------------------------------------
+# test_graphics_settings_gtest — GraphicsSettingsComponent with MockCVarProvider.
+# ---------------------------------------------------------------------------
+add_executable(test_graphics_settings_gtest unit/test_graphics_settings_gtest.cpp)
+target_include_directories(test_graphics_settings_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+)
+target_link_libraries(test_graphics_settings_gtest PRIVATE
+    MockCVar
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_graphics_settings_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME graphics_settings_gtest COMMAND test_graphics_settings_gtest)

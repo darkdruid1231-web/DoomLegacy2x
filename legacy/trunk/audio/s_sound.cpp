@@ -37,10 +37,14 @@
 #include "m_argv.h"
 #include "r_defs.h"
 
-#include "i_sound.h"
 #include "s_sound.h"
+#include "i_sound.h"            // SDL audio callbacks: I_StartSound, etc.
 #include "sounds.h"
 #include "tables.h"
+
+#include "g_actor.h"  // for Actor (mobj_t definition)
+#include "interfaces/i_sound.h" // ISoundSystem interface
+#include "interfaces/i_sound_player.h" // ISoundPlayer interface
 
 #include "w_wad.h"
 #include "z_cache.h"
@@ -61,6 +65,120 @@ consvar_t cv_precachesound = {"precachesound", "0", CV_SAVE, CV_OnOff};
 bool nomusic = false, nosound = false;
 
 SoundSystem S;
+
+//====================================================================
+// ISoundSystem adapter - delegates to the global SoundSystem
+//====================================================================
+
+/// \brief Adapter that implements ISoundSystem by delegating to the global S.
+/// \details This allows production code to use ISoundSystem pointers while
+///         still accessing the real SoundSystem. In tests, MockSoundSystem
+///         can be injected instead.
+class SoundSystemAdapter : public ISoundSystem {
+public:
+    int startSound(Actor* mobj, int sfx_id, float vol) override {
+        return S_StartSound(mobj, sfx_id, vol);
+    }
+
+    void stopSound(Actor* mobj) override {
+        S.Stop3DSound(mobj);
+    }
+
+    void setListenerPosition(float x, float y, float z) override {
+        // SoundSystem derives listener position from ViewPlayers automatically.
+        // This method is a no-op for compatibility with the interface.
+    }
+
+    bool isChannelPlaying(int channel) const override {
+        return S.ChannelPlaying(channel);
+    }
+
+    void setChannelVolume(int channel, float vol) override {
+        if (channel < 0 || channel >= static_cast<int>(S.channels.size()))
+            return;
+        S.channels[channel].b_volume = vol;
+    }
+
+    int getActiveChannelCount() const override {
+        int count = 0;
+        for (const auto& ch : S.channels) {
+            if (ch.playing)
+                ++count;
+        }
+        return count;
+    }
+
+    void precacheSound(int sfx_id) override {
+        soundID_iter_t i = SoundID.find(sfx_id);
+        if (i != SoundID.end()) {
+            S_PrecacheSound(i->second->lumpname);
+        }
+    }
+};
+
+// Global adapter instance
+static SoundSystemAdapter s_soundAdapter;
+
+/// \brief Get the global ISoundSystem instance.
+/// \details Returns an adapter pointing to the global SoundSystem.
+///         Production code should use this instead of directly accessing S.
+ISoundSystem* GetGlobalSoundSystem() {
+    return &s_soundAdapter;
+}
+
+//====================================================================
+// ISoundPlayer adapter - delegates to global SoundSystem
+//====================================================================
+
+/// \brief Adapter that implements ISoundPlayer by delegating to global S.
+/// \details This allows production code to use ISoundPlayer pointers while
+///         still accessing the real SoundSystem. In tests, MockSoundPlayer
+///         can be injected instead.
+class SoundPlayerAdapter : public ISoundPlayer {
+public:
+    bool startMusic(const char* lumpname, bool loop) override {
+        return S.StartMusic(lumpname, loop);
+    }
+
+    void stopMusic() override {
+        S.StopMusic();
+    }
+
+    void pauseMusic() override {
+        S.PauseMusic();
+    }
+
+    void resumeMusic() override {
+        S.ResumeMusic();
+    }
+
+    const char* getCurrentMusic() const override {
+        return S.GetMusic();
+    }
+
+    void setMusicVolume(int volume) override {
+        // Music volume is controlled via the cv_musicvolume cvar
+        cv_musicvolume.value = volume;
+    }
+
+    void updateCD() override {
+        I_UpdateCD();
+    }
+
+    bool startMusicByEnum(int musenum, bool loop) override {
+        return S_StartMusic(musenum, loop);
+    }
+};
+
+// Global adapter instance
+static SoundPlayerAdapter s_soundPlayerAdapter;
+
+/// \brief Get the global ISoundPlayer instance.
+/// \details Returns an adapter pointing to the global SoundSystem music functions.
+///         Production code should use this instead of directly accessing S.
+ISoundPlayer* GetGlobalSoundPlayer() {
+    return &s_soundPlayerAdapter;
+}
 
 /// \brief RIFF/WAVE file header
 struct WAV_t

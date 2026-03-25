@@ -3,6 +3,17 @@ cmake_minimum_required(VERSION 3.16)
 project(doomlegacy C CXX)
 
 option(BUILD_TESTING "Build tests" ON)
+option(ENABLE_IWYU "Run Include-what-you-use on new interface headers" OFF)
+
+# IWYU (Include What You Use) — only available if explicitly enabled
+# and only runs on interface headers in CI, not blocking for local dev
+find_program(IWYU_COMMAND NAMES include-what-you-use iwyu)
+if(IWYU_COMMAND AND ENABLE_IWYU)
+  message(STATUS "IWYU found: ${IWYU_COMMAND}")
+  set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE "${IWYU_COMMAND};--transitive")
+else()
+  message(STATUS "IWYU not enabled or not found (found: ${IWYU_COMMAND})")
+endif()
 
 # Global include directories
 include_directories(
