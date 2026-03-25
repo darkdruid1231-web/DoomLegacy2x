@@ -286,6 +286,9 @@ void ExitMode_OnChange()
 //    Main server code
 //========================================================================
 
+// defined in cl_main.cpp
+void CL_SendTiccmds();
+
 void GameInfo::TryRunTics(tic_t elapsed)
 {
     extern bool singletics;
@@ -567,8 +570,6 @@ void InitNetwork()
 // ------
 // protos
 // ------
-
-void CL_SendTiccmds();  // defined in cl_main.cpp
 
 void Command_Listserv_f()
 {
