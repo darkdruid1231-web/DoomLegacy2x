@@ -27,6 +27,7 @@
 #include "doomdef.h"
 
 #include "n_interface.h"
+#include "n_connection.h"
 
 #include "g_game.h"
 #include "g_input.h"
