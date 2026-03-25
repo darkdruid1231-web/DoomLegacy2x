@@ -127,3 +127,40 @@ target_link_libraries(MockRender PRIVATE
     TestInterfaces
 )
 target_compile_definitions(MockRender PRIVATE SDL_MAIN_HANDLED)
+
+# ---------------------------------------------------------------------------
+# Game Backend mock implementation
+# ---------------------------------------------------------------------------
+add_library(MockGameBackend STATIC
+    mock_game_backend.cpp
+)
+target_include_directories(MockGameBackend PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include/game
+)
+target_link_libraries(MockGameBackend PRIVATE
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(MockGameBackend PRIVATE SDL_MAIN_HANDLED)
+
+# ---------------------------------------------------------------------------
+# Sound Player mock implementation
+# ---------------------------------------------------------------------------
+add_library(MockSoundPlayer STATIC
+    mock_sound_player.cpp
+)
+target_include_directories(MockSoundPlayer PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${SDL2_INCLUDE_DIRS}
+)
+target_link_libraries(MockSoundPlayer PRIVATE
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(MockSoundPlayer PRIVATE SDL_MAIN_HANDLED)
+

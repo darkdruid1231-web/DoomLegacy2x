@@ -223,3 +223,74 @@ target_link_libraries(test_render_backend_gtest PRIVATE
 )
 target_compile_definitions(test_render_backend_gtest PRIVATE SDL_MAIN_HANDLED)
 add_test(NAME render_backend_gtest COMMAND test_render_backend_gtest)
+
+# ---------------------------------------------------------------------------
+# test_sound_emitter_gtest — SoundEmitterComponent with MockSoundSystem.
+# ---------------------------------------------------------------------------
+add_executable(test_sound_emitter_gtest unit/test_sound_emitter_gtest.cpp)
+target_include_directories(test_sound_emitter_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include/game
+)
+target_link_libraries(test_sound_emitter_gtest PRIVATE
+    MockSound
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_sound_emitter_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME sound_emitter_gtest COMMAND test_sound_emitter_gtest)
+
+# ---------------------------------------------------------------------------
+# test_hud_gtest — HUDComponent with MockGameStateProvider.
+# ---------------------------------------------------------------------------
+add_executable(test_hud_gtest unit/test_hud_gtest.cpp)
+target_include_directories(test_hud_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include/game
+)
+target_link_libraries(test_hud_gtest PRIVATE
+    MockGame
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_hud_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME hud_gtest COMMAND test_hud_gtest)
+
+# ---------------------------------------------------------------------------
+# test_bsp_traverser_gtest — BSPTraverserComponent with MockRenderBackend.
+# ---------------------------------------------------------------------------
+add_executable(test_bsp_traverser_gtest unit/test_bsp_traverser_gtest.cpp)
+target_include_directories(test_bsp_traverser_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/include/game
+)
+target_link_libraries(test_bsp_traverser_gtest PRIVATE
+    MockRender
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_bsp_traverser_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME bsp_traverser_gtest COMMAND test_bsp_traverser_gtest)
+
+# ---------------------------------------------------------------------------
+# test_graphics_settings_gtest — GraphicsSettingsComponent with MockCVarProvider.
+# ---------------------------------------------------------------------------
+add_executable(test_graphics_settings_gtest unit/test_graphics_settings_gtest.cpp)
+target_include_directories(test_graphics_settings_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+)
+target_link_libraries(test_graphics_settings_gtest PRIVATE
+    MockCVar
+    gtest
+    gmock
+    TestInterfaces
+)
+target_compile_definitions(test_graphics_settings_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME graphics_settings_gtest COMMAND test_graphics_settings_gtest)

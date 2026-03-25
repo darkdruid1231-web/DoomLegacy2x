@@ -44,6 +44,7 @@
 
 #include "g_actor.h"  // for Actor (mobj_t definition)
 #include "interfaces/i_sound.h" // ISoundSystem interface
+#include "interfaces/i_sound_player.h" // ISoundPlayer interface
 
 #include "w_wad.h"
 #include "z_cache.h"
@@ -123,6 +124,60 @@ static SoundSystemAdapter s_soundAdapter;
 ///         Production code should use this instead of directly accessing S.
 ISoundSystem* GetGlobalSoundSystem() {
     return &s_soundAdapter;
+}
+
+//====================================================================
+// ISoundPlayer adapter - delegates to global SoundSystem
+//====================================================================
+
+/// \brief Adapter that implements ISoundPlayer by delegating to global S.
+/// \details This allows production code to use ISoundPlayer pointers while
+///         still accessing the real SoundSystem. In tests, MockSoundPlayer
+///         can be injected instead.
+class SoundPlayerAdapter : public ISoundPlayer {
+public:
+    bool startMusic(const char* lumpname, bool loop) override {
+        return S.StartMusic(lumpname, loop);
+    }
+
+    void stopMusic() override {
+        S.StopMusic();
+    }
+
+    void pauseMusic() override {
+        S.PauseMusic();
+    }
+
+    void resumeMusic() override {
+        S.ResumeMusic();
+    }
+
+    const char* getCurrentMusic() const override {
+        return S.GetMusic();
+    }
+
+    void setMusicVolume(int volume) override {
+        // Music volume is controlled via the cv_musicvolume cvar
+        cv_musicvolume.value = volume;
+    }
+
+    void updateCD() override {
+        I_UpdateCD();
+    }
+
+    bool startMusicByEnum(int musenum, bool loop) override {
+        return S_StartMusic(musenum, loop);
+    }
+};
+
+// Global adapter instance
+static SoundPlayerAdapter s_soundPlayerAdapter;
+
+/// \brief Get the global ISoundPlayer instance.
+/// \details Returns an adapter pointing to the global SoundSystem music functions.
+///         Production code should use this instead of directly accessing S.
+ISoundPlayer* GetGlobalSoundPlayer() {
+    return &s_soundPlayerAdapter;
 }
 
 /// \brief RIFF/WAVE file header
