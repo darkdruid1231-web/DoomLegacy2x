@@ -84,6 +84,12 @@ void G_ReleaseKeys()
         gamekeydown[i] = false;
 }
 
+/// Returns true if the given key is currently held down.
+bool G_GetKeyState(int key)
+{
+    return gamekeydown[key];
+}
+
 /// Two key (or virtual key) codes per game control
 short gamecontrol[NUM_LOCALHUMANS][num_gamecontrols][2];
 
