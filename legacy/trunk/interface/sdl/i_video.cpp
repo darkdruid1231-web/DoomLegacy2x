@@ -759,6 +759,9 @@ int I_SetVideoMode(int modeNum)
 
         vid.direct = static_cast<byte *>(vidSurface->pixels);
         vid.direct[0] = 1;
+        // Link screens[0] to direct like Recalc() does for software mode
+        // (SDL2 doesn't call vid.SetMode() so we must set this manually)
+        vid.screens[0] = vid.direct;
     }
     else
     {
@@ -923,6 +926,9 @@ bool I_StartupGraphics()
             return false;
         }
         vid.direct = static_cast<byte *>(vidSurface->pixels);
+        // Link screens[0] to direct like Recalc() does for software mode
+        // (SDL2 doesn't call vid.SetMode() so we must set this manually)
+        vid.screens[0] = vid.direct;
     }
 
     SDL_ShowCursor(SDL_DISABLE);
