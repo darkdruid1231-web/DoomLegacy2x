@@ -824,10 +824,13 @@ void Rend::R_RenderPlayerView(PlayerInfo *player)
 
     R_RenderBSPNode(numnodes - 1);
 
-    // Add all actors via thinker list. This is more reliable than
-    // per-subsector sector-thinglist traversal, which misses actors in
-    // sectors that the BSP renderer doesn't visit (e.g. live moving monsters).
-    // This mirrors the fix applied to the OpenGL renderer in commit 758dce0.
+    // Safety-net pass: project any monsters/items that R_AddSprites may have missed.
+    // R_AddSprites is the primary path (called from BSP traversal via R_Subsector) and
+    // handles all actors in visible sectors.  This thinker loop is a catch-all for actors
+    // whose sectors were not visited by the BSP (e.g. around corners, behind the player).
+    // It also re-projects actors in visited sectors in case R_AddSprites skipped them for
+    // any reason (pres null at sector visit time, etc.).  Double-projection of an opaque
+    // sprite is harmless.
     for (Thinker *th = player->mp->thinkercap.Next(); th != &player->mp->thinkercap; th = th->Next())
     {
         Actor *a = th->Inherits<Actor>();
@@ -835,24 +838,33 @@ void Rend::R_RenderPlayerView(PlayerInfo *player)
         if (a->flags2 & MF2_DONTDRAW) continue;
         // Only process monsters and items (not projectiles, players, etc.)
         if (!(a->flags & (MF_MONSTER | MF_SPECIAL))) continue;
-        sector_t *sec = a->subsector ? a->subsector->sector : NULL;
-        if (sec && sec->validcount == validcount)
-            continue; // Skip if already processed by R_AddSprites
 
-        // Compute projection (same as R_AddSprites sector-thinglist traversal)
-        // Note: proj_tz and proj_tx are static globals used by spritepres_t::Project()
+        // Set spritelights from the actor's sector so Project() gets correct lighting.
+        // R_AddSprites does this per-sector; we must do the same here.
+        sector_t *sec = a->subsector ? a->subsector->sector : NULL;
+        if (sec && !sec->numlights)
+        {
+            int lightlevel = (sec->heightsec == -1) ? sec->lightlevel : sec->lightlevel;
+            int lightnum   = (lightlevel >> LIGHTSEGSHIFT) + extralight;
+            if (lightnum < 0)
+                spritelights = scalelight[0];
+            else if (lightnum >= LIGHTLEVELS)
+                spritelights = scalelight[LIGHTLEVELS - 1];
+            else
+                spritelights = scalelight[lightnum];
+        }
+
+        // Compute projection globals used by spritepres_t::Project().
         fixed_t tr_x = a->pos.x - viewx;
         fixed_t tr_y = a->pos.y - viewy;
         proj_tz = (tr_x * viewcos) + (tr_y * viewsin);
 
-        // Behind view plane?
-        if (proj_tz < 4) // MINZ
+        if (proj_tz < 4) // MINZ: behind view plane?
             continue;
 
         proj_tx = (tr_x * viewsin) - (tr_y * viewcos);
 
-        // Too far off the side?
-        if (abs(proj_tx) > (proj_tz << 2))
+        if (abs(proj_tx) > (proj_tz << 2)) // too far off the side?
             continue;
 
         a->pres->Project(a);

@@ -226,6 +226,12 @@ void spritepres_t::Project(Actor *p)
         flip = sprframe->flip[0];
     }
 
+    // Guard against missing/dummy materials before accessing mat members.
+    // Walking frames with unloaded rotation slots produce dummy Materials with
+    // empty tex[] or worldwidth==0, which yield zero-width vissprites (invisible).
+    if (!mat || mat->tex.empty() || !mat->tex[0].t || mat->worldwidth <= 0)
+        return;
+
     Material::TextureRef &tr = mat->tex[0];
 
     // software renderer part

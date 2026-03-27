@@ -48,6 +48,7 @@ extern fixed_t pspriteyscale; // added:02-02-98:for aspect ratio
 // sprite projection globals (used by r_main.cpp thinker loop)
 extern fixed_t proj_tz;
 extern fixed_t proj_tx;
+extern int *spritelights; // current sector's scale-light table (set by R_AddSprites)
 
 extern const int PSpriteSY[];
 
