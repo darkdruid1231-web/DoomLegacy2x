@@ -8,18 +8,18 @@ Full feature list: [`docs/features.md`](legacy/trunk/docs/features.md)
 
 ### Graphics
 - OpenGL hardware-accelerated renderer ✅
-- Dynamic GL node generation (ZDBSP) - 🚧
-- Deferred lighting with G-buffer (normals, albedo, depth)
-- Dynamic lights: per-actor light definitions (LIGHTDEFS lump), projectile lights, weapon flash
-- Corona halos with distance fade and projectile flicker
+- Dynamic GL node generation (ZDBSP) ✅
+- Deferred lighting with G-buffer (normals, albedo, depth) 🚧
+- Dynamic lights: per-actor light definitions (LIGHTDEFS lump), projectile lights, weapon flash 🚧
+- Corona halos with distance fade and projectile flicker 🚧
 - Blob shadows (Doom64-style), bloom, SSAO, screen-space reflections, volumetric fog 🚧
 - MD2/MD3 model support ✅
 - glb model support (future) ❌
-- Hi-res PNG/JPEG texture and sprite support (tested with DoomHDTextures.pk3 & marcelus_hd_sprites.pk3)
+- Hi-res PNG/JPEG texture and sprite support (tested with DoomHDTextures.pk3 & marcelus_hd_sprites.pk3) ✅
 - Software renderer fallback ❌ - Likely broken right now
 
 ### Gameplay
-- Doom, Heretic, and Hexen support
+- Doom, Heretic, and Hexen support 🚧
 - Up to 4-player splitscreen 🚧
 - Deathmatch, co-op, (CTF, domination, assault in future)
 - Level hubs in future (return to visited maps)
@@ -27,8 +27,8 @@ Full feature list: [`docs/features.md`](legacy/trunk/docs/features.md)
 ### Editing / Modding
 - WAD, PK3/ZIP, PAK, and directory resource files ✅
 - ZDoom-style MAPINFO, partial DECORATE, SNDINFO, SNDSEQ, ANIMDEFS ✅
-- DeHackEd / BEX support 🚧
-- FraggleScript scripting
+- DeHackEd / BEX support ✅
+- FraggleScript scripting ✅
 - LIGHTDEFS lump for data-driven per-actor light definitions ✅
 
 ## Building
