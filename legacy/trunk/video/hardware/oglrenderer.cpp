@@ -97,6 +97,7 @@ consvar_t cv_grstaticlighting = {"gr_staticlighting", "On", CV_SAVE, CV_OnOff, N
 consvar_t cv_grshadows        = {"gr_shadows",        "On", CV_SAVE, CV_OnOff, NULL, 1};
 consvar_t cv_grcoronas        = {"gr_coronas",        "On", CV_SAVE, CV_OnOff, NULL, 1};
 consvar_t cv_grcoronasize     = {"gr_coronasize",    "1",   CV_SAVE, NULL, NULL, 1};
+consvar_t cv_grdebugwall      = {"gr_debugwall",     "0",   CV_SAVE, NULL, NULL, 1};
 consvar_t cv_monball_light    = {"monball_light",     "On", CV_SAVE, CV_OnOff, NULL, 1};
 
 /// Convert Doom light level (0-255) to OpenGL color component (0.0-1.0).
@@ -745,6 +746,7 @@ void OGLRenderer::InitGLState()
     cv_grshadows.Reg();
     cv_grcoronas.Reg();
     cv_grcoronasize.Reg();
+    cv_grdebugwall.Reg();
     cv_monball_light.Reg();
 
     // Populate the data-driven light emitter table with hardcoded defaults.
@@ -2589,8 +2591,46 @@ void OGLRenderer::GetSegQuads(int num, quad &u, quad &m, quad &l) const
     lowertex = lsd->bottomtexture;
 
     // Texture X offsets.
+    // Use the wall's actual length in world units for texture mapping.
+    // This is the correct width - the seg length is the physical wall width.
     texleft = lsd->textureoffset.Float() + s->offset.Float();
     texright = texleft + s->length;
+
+    // Debug output - show yscale values to diagnose vertical stretching
+    // ONLY prints for middle textures to keep output manageable
+    if (middletex && cv_grdebugwall.value > 0 && s_ogl_frame % 300 == 0)
+    {
+        CONS_Printf("=== YDEBUG seg=%d mid: w=%.0f h=%.0f xs=%.3f ys=%.3f ===\n",
+            num, middletex->worldwidth, middletex->worldheight,
+            middletex->tex[0].xscale, middletex->tex[0].yscale);
+    }
+
+    // Debug for upper/lower textures vertical coords
+    if (cv_grdebugwall.value > 0 && s_ogl_frame % 600 == 0)
+    {
+        if (uppertex)
+        {
+            utexhei = rs_ceil < ls_ceil ? ls_ceil - rs_ceil : 0;
+            if (ld->flags & ML_DONTPEGTOP)
+                texbottom = tex_yoff, textop = texbottom - utexhei;
+            else
+                texbottom = tex_yoff, textop = texbottom - utexhei;
+            CONS_Printf("=== UPPER seg=%d utexhei=%.2f tex_yoff=%.2f top=%.2f bot=%.2f wh=%.2f uv_t=%.4f uv_b=%.4f ===\n",
+                num, utexhei, tex_yoff, textop, texbottom, uppertex->worldheight,
+                textop / uppertex->worldheight, texbottom / uppertex->worldheight);
+        }
+        if (lowertex)
+        {
+            ltexhei = rs_floor > ls_floor ? rs_floor - ls_floor : 0;
+            if (ld->flags & ML_DONTPEGBOTTOM)
+                texbottom = tex_yoff + ls_height - lowertex->worldheight, textop = texbottom - ltexhei;
+            else
+                textop = tex_yoff, texbottom = textop + ltexhei;
+            CONS_Printf("=== LOWER seg=%d ltexhei=%.2f tex_yoff=%.2f top=%.2f bot=%.2f wh=%.2f uv_t=%.4f uv_b=%.4f ===\n",
+                num, ltexhei, tex_yoff, textop, texbottom, lowertex->worldheight,
+                textop / lowertex->worldheight, texbottom / lowertex->worldheight);
+        }
+    }
 
     // Ready to draw textures.
     if (rs != NULL)

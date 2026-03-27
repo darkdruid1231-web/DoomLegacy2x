@@ -866,6 +866,11 @@ void Material::TextureRef::GLSetTextureParams()
     glTexParameterf(GL_TEXTURE_2D,
                     GL_TEXTURE_MAX_ANISOTROPY_EXT,
                     max_anisotropy ? max_anisotropy : cv_granisotropy.value);
+
+    // Use GL_REPEAT for wall textures so they tile properly when wall height
+    // exceeds texture height. Sky textures override this to GL_CLAMP_TO_EDGE.
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
 int Material::GLUse()
@@ -1144,12 +1149,13 @@ Material *material_cache_t::Get(const char *name, material_class_t mode)
         case TEX_lod: // menu, HUD, console, background images
             if (!(t = new_tex.Find(name)))
                 if (!(t = lod_tex.Find(name)))
-                {
-                    // Not found there either, try loading on demand
-                    Texture *tex = textures.Load(name);
-                    if (tex)
-                        t = BuildMaterial(tex, lod_tex); // wasteful...
-                }
+                    if (!(t = doom_tex.Find(name)))
+                    {
+                        // Not found there either, try loading on demand
+                        Texture *tex = textures.Load(name);
+                        if (tex)
+                            t = BuildMaterial(tex, lod_tex); // wasteful...
+                    }
             break;
     }
 
