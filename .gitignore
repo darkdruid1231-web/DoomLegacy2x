@@ -1,4 +1,4 @@
-# Build artifacts
+# Compiled objects and libraries
 *.o
 *.obj
 *.a
@@ -9,27 +9,6 @@
 *.exe
 *.pdb
 *.ilk
-*.suo
-*.user
-*.aps
-*.pch
-*.vspscc
-*_i.c
-*_p.c
-*.ncb
-*.suo
-*.tlb
-*.tlh
-*.tmp
-*.tmp_proj
-*.log
-*.vspscc
-*.vssscc
-.builds
-*.pidb
-*.log
-*.svclog
-*.scc
 
 # CMake
 CMakeCache.txt
@@ -40,19 +19,9 @@ compile_commands.json
 CTestTestfile.cmake
 _deps/
 
-# Build directories
-/build/
-/build-debug/
-/build-release/
-/build-relwithdebinfo/
-/build-minsizerel/
-/build-new/
-/build-win32/
-/build-win64/
-/build-linux/
-/build-macos/
-/legacy/trunk/build/
-/legacy_one/trunk/build/
+# Build directories (matches any depth)
+build/
+build-*/
 
 # Visual Studio
 *.vcxproj
@@ -64,24 +33,17 @@ _deps/
 *.aps
 *.pch
 *.vspscc
+*.vssscc
 *_i.c
 *_p.c
 *.ncb
-*.suo
 *.tlb
 *.tlh
-*.tmp
 *.tmp_proj
-*.log
-*.vspscc
-*.vssscc
-.builds
 *.pidb
-*.log
 *.svclog
 *.scc
-*.vssscc
-*.vspscc
+.builds
 
 # Xcode
 *.pbxuser
@@ -92,39 +54,34 @@ _deps/
 project.xcworkspace/
 xcuserdata/
 
-# Qt Creator
+# Other IDEs
 *.pro.user
 *.pro.user.*
-
-# Eclipse
 .project
 .cproject
 .autotools
 .factorypath
 .settings/
-
-# Sublime Text
+.vscode/
+.idea/
 *.sublime-workspace
 *.sublime-project
 
-# Vim
+# Vim / Emacs
 *.swp
 *.swo
-*~
-
-# Emacs
 *~
 \#*\#
 /.emacs.desktop
 /.emacs.desktop.lock
 *.elc
+auto-save-list
+tramp
+.\#*
 
 # Local assistant settings
 .claude/
 .grok/
-auto-save-list
-tramp
-.\#*
 
 # OS generated files
 .DS_Store
@@ -139,25 +96,16 @@ Desktop.ini
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
 *.egg
-MANIFEST
+
+# Logs and temp files
+*.log
+*.tmp
+*.temp
+*.bak
+*.backup
+logs/
 
 # Testing artifacts
 test/screenshots/*.png
@@ -166,26 +114,8 @@ performance_trends.json
 test_report.json
 test_report.html
 
-# Logs
-logs/
-*.log
-
-# Temporary files
-*.tmp
-*.temp
-*.bak
-*.backup
-
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Game assets (optional - uncomment if you want to ignore large WAD files)
-# *.wad
-# *.pk3
-# *.pk7
+# Debug output files
+our_gl_dump.bin
 
 # Development notes
 TODO.md
@@ -195,3 +125,13 @@ stderr.txt
 stdout.txt
 common/tools/tools.dep
 bash.exe.stackdump
+legacy/trunk/thirdparty/zdbsp/Unused/nodebuild.cpp-nogl
+legacy/trunk/thirdparty/zdbsp/Unused/nodebuild.h-nogl
+legacy/trunk/thirdparty/zdbsp/Unused/rejectbuilder.cpp
+legacy/trunk/thirdparty/zdbsp/Unused/rejectbuilder.cpp-nogl
+legacy/trunk/thirdparty/zdbsp/Unused/rejectbuilder.cpp-slow
+legacy/trunk/thirdparty/zdbsp/Unused/rejectbuilder.h
+legacy/trunk/thirdparty/zdbsp/Unused/rejectbuilder.h-nogl
+legacy/trunk/thirdparty/zdbsp/Unused/rejectbuilder.h-slow
+legacy/trunk/thirdparty/zdbsp/Unused/vis.cpp
+legacy/trunk/thirdparty/zdbsp/Unused/visflow.cpp
