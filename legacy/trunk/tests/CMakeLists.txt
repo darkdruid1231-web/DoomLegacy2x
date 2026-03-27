@@ -298,7 +298,7 @@ target_link_libraries(test_bsp_compiler_gtest PRIVATE
     doomengine
     gtest
     zdbsp
-    C:/msys64/mingw64/lib/libz.a
+    ZLIB::ZLIB
     "-Wl,--end-group"
 )
 target_compile_definitions(test_bsp_compiler_gtest PRIVATE SDL_MAIN_HANDLED)

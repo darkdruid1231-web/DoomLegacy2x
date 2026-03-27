@@ -77,4 +77,5 @@ target_compile_definitions(zdbsp_cli PRIVATE -DDISABLE_SSE)
 # Use POSIX getopt from system
 target_compile_definitions(zdbsp_cli PRIVATE _POSIX_C_SOURCE=200809L)
 # Link with zlib for compression
-target_link_libraries(zdbsp_cli PRIVATE C:/msys64/mingw64/lib/libz.a)
+find_package(ZLIB REQUIRED)
+target_link_libraries(zdbsp_cli PRIVATE ZLIB::ZLIB)
