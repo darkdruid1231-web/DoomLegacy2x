@@ -26,9 +26,24 @@
 #include "doomdef.h"
 #include "p_setup.h"
 #include "r_data.h"
+#include "core/tables.h"
 #include "z_zone.h"
 #include "r_defs.h"
-#include "zdbsp_integration.h"
+#include "bsp_compiler.h"
+
+// Helper to convert Material* to an 8-char name string
+static void TextureToName(Material* mat, char name[8])
+{
+    memset(name, 0, 8);
+    if (mat)
+    {
+        const char* matname = mat->GetName();
+        if (matname && matname[0])
+        {
+            strncpy(name, matname, 7);
+        }
+    }
+}
 
 // Constants for partition evaluation (from glBSP/Doomsday)
 static const float SHORT_HEDGE_EPSILON = 4.0f;
@@ -777,30 +792,406 @@ void BuildGLSubsectors(Map *map)
     }
 }
 
-void BuildGLData(Map *map)
+// Build GL nodes using BspCompiler (ZDBSP library)
+bool BuildGLDataWithBspCompiler(Map* map)
 {
-    // Try zdbsp first if available - it provides better GL nodes
-    if (ZDBSPIntegration::IsZDBSPAvailable())
+    if (!BspCompiler::isAvailable())
     {
         if (devparm)
-            CONS_Printf("zdbsp available - generating GL nodes...\n");
+            CONS_Printf("BspCompiler not available\n");
+        return false;
+    }
 
-        // Run zdbsp to generate GL nodes and modify the WAD
-        // zdbsp -g -x -m MAP01 -o output.wad input.wad
-        if (ZDBSPIntegration::GenerateGLNodes(map->lumpname))
+    if (devparm)
+        CONS_Printf("Building GL nodes with BspCompiler (ZDBSP library)...\n");
+
+    // Convert map data to ZDBSP input format
+
+    // 1. Convert vertices
+    std::vector<ZDBSPInputVertex> vertices;
+    vertices.reserve(map->numvertexes);
+    for (int i = 0; i < map->numvertexes; i++)
+    {
+        ZDBSPInputVertex v;
+        v.x = map->vertexes[i].x.value();
+        v.y = map->vertexes[i].y.value();
+        vertices.push_back(v);
+    }
+
+    // 2. Convert linedefs
+    std::vector<ZDBSPInputLinedef> linedefs;
+    linedefs.reserve(map->numlines);
+    for (int i = 0; i < map->numlines; i++)
+    {
+        line_t* ld = &map->lines[i];
+        ZDBSPInputLinedef l;
+        l.v1 = ld->v1 - map->vertexes;  // index
+        l.v2 = ld->v2 - map->vertexes;  // index
+        l.flags = ld->flags;
+        l.special = ld->special;
+        l.tag = ld->tag;
+        l.sidenum[0] = (ld->sideptr[0] != NULL) ? (ld->sideptr[0] - map->sides) : -1;
+        l.sidenum[1] = (ld->sideptr[1] != NULL) ? (ld->sideptr[1] - map->sides) : -1;
+        linedefs.push_back(l);
+    }
+
+    // 3. Convert sidedefs
+    std::vector<ZDBSPInputSidedef> sidedefs;
+    sidedefs.reserve(map->numsides);
+    for (int i = 0; i < map->numsides; i++)
+    {
+        side_t* sd = &map->sides[i];
+        ZDBSPInputSidedef s;
+        s.textureoffset = sd->textureoffset.value();
+        s.rowoffset = sd->rowoffset.value();
+        TextureToName(sd->toptexture, s.toptexture);
+        TextureToName(sd->bottomtexture, s.bottomtexture);
+        TextureToName(sd->midtexture, s.midtexture);
+        s.sector = sd->sector ? (sd->sector - map->sectors) : -1;
+        sidedefs.push_back(s);
+    }
+
+    // 4. Convert sectors
+    std::vector<ZDBSPInputSector> sectors;
+    sectors.reserve(map->numsectors);
+    for (int i = 0; i < map->numsectors; i++)
+    {
+        sector_t* sec = &map->sectors[i];
+        ZDBSPInputSector s;
+        s.floorheight = sec->floorheight.value();
+        s.ceilingheight = sec->ceilingheight.value();
+        TextureToName(sec->floorpic, s.floorpic);
+        TextureToName(sec->ceilingpic, s.ceilingpic);
+        s.lightlevel = sec->lightlevel;
+        s.special = sec->special;
+        s.tag = sec->tag;
+        sectors.push_back(s);
+    }
+
+    // Call BspCompiler
+    BspCompiler compiler;
+    ZDBSPOutput output;
+
+    if (!compiler.buildGLNodes(map->lumpname.c_str(), vertices, linedefs, sidedefs, sectors, output))
+    {
+        if (devparm)
+            CONS_Printf("BspCompiler failed: %s\n", compiler.getError());
+        return false;
+    }
+
+    if (devparm)
+        CONS_Printf("BspCompiler GL nodes built: %d vertices, %d segs, %d subsectors, %d nodes\n",
+                    (int)output.vertices.size(), (int)output.segs.size(),
+                    (int)output.subsectors.size(), (int)output.nodes.size());
+
+    // Debug: Verify output data before copying
+    if (devparm)
+    {
+        CONS_Printf("DEBUG: BspCompiler output verification:\n");
+        CONS_Printf("  numOriginalVertices = %d\n", output.numOriginalVertices);
+
+        // Check first few vertices
+        for (int i = 0; i < std::min(3, (int)output.vertices.size()); i++)
         {
-            if (devparm)
-                CONS_Printf("zdbsp generated GL nodes. Re-load to use them.\n");
-            // For now, fall back to built-in - full reload would need WAD re-initialization
-            // TODO: Implement WAD reload after zdbsp modification
+            CONS_Printf("  vertex[%d]: x=%d, y=%d\n", i,
+                       (int)output.vertices[i].x, (int)output.vertices[i].y);
+        }
+
+        // Check first few segs
+        for (int i = 0; i < std::min(5, (int)output.segs.size()); i++)
+        {
+            CONS_Printf("  seg[%d]: v1=%u, v2=%u, linedef=%u, side=%u, partner=%u, isMiniseg=%d\n",
+                       i, output.segs[i].v1, output.segs[i].v2, output.segs[i].linedef,
+                       output.segs[i].side, output.segs[i].partner,
+                       output.segs[i].linedef == (uint32_t)-1 ? 1 : 0);
+        }
+
+        // Check first few subsectors
+        for (int i = 0; i < std::min(3, (int)output.subsectors.size()); i++)
+        {
+            CONS_Printf("  subsector[%d]: numlines=%u, firstline=%u\n",
+                       i, output.subsectors[i].numlines, output.subsectors[i].firstline);
+        }
+
+        // Check first few nodes
+        for (int i = 0; i < std::min(3, (int)output.nodes.size()); i++)
+        {
+            CONS_Printf("  node[%d]: x=%d, y=%d, dx=%d, dy=%d, children=[%u, %u]\n",
+                       i, (int)output.nodes[i].x, (int)output.nodes[i].y,
+                       (int)output.nodes[i].dx, (int)output.nodes[i].dy,
+                       output.nodes[i].children[0], output.nodes[i].children[1]);
         }
     }
 
-    // Use built-in GL node generation (fallback or if zdbsp not available)
+    // Copy output to map structures
+
+    // GL vertices
+    map->glvertexes = (vertex_t*)Z_Malloc(output.vertices.size() * sizeof(vertex_t), PU_LEVEL, 0);
+    map->numglvertexes = output.vertices.size();
+    for (size_t i = 0; i < output.vertices.size(); i++)
+    {
+        // ZDBSP fixed_t is already 16.16 format, use raw constructor to avoid double-shift
+        map->glvertexes[i].x = fixed_t(output.vertices[i].x, true);
+        map->glvertexes[i].y = fixed_t(output.vertices[i].y, true);
+    }
+
+    // GL segs
+    map->glsegs = (seg_t*)Z_Malloc(output.segs.size() * sizeof(seg_t), PU_LEVEL, 0);
+    map->numglsegs = output.segs.size();
+
+    // Debug: verify seg vertex indices and show vertex coordinates
     if (devparm)
-        CONS_Printf("Building GL data with minisegs...\n");
-    BuildGLVertexes(map);
-    BuildGLNodes(map);
+    {
+        CONS_Printf("  Seg vertex index check (numOriginal=%d, totalVerts=%zu):\n",
+                   output.numOriginalVertices, output.vertices.size());
+
+        // Print vertices around index 11 specifically
+        CONS_Printf("  ZDBSP output.vertices around index 11:\n");
+        for (int j = 9; j <= 13 && j < (int)output.vertices.size(); j++) {
+            int vx = output.vertices[j].x;
+            int vy = output.vertices[j].y;
+            CONS_Printf("    output.vertices[%d]: raw=(%d, %d), fixed=(%.1f, %.1f)\n",
+                       j, vx, vy, fixed_t(vx, true).Float(), fixed_t(vy, true).Float());
+        }
+
+        for (size_t i = 0; i < output.segs.size() && i < 10; i++)
+        {
+            const ZDBSPOutputGLSeg& seg = output.segs[i];
+            bool v1_orig = seg.v1 < (uint32_t)output.numOriginalVertices;
+            bool v2_orig = seg.v2 < (uint32_t)output.numOriginalVertices;
+
+            // Get vertex indices
+            int v1_gl_idx = v1_orig ? -1 : (int)(seg.v1 - output.numOriginalVertices);
+            int v2_gl_idx = v2_orig ? -1 : (int)(seg.v2 - output.numOriginalVertices);
+
+            // Get vertex coordinates from output.vertices array
+            float v1x=0, v1y=0, v2x=0, v2y=0;
+            v1x = fixed_t(output.vertices[seg.v1].x, true).Float();
+            v1y = fixed_t(output.vertices[seg.v1].y, true).Float();
+            v2x = fixed_t(output.vertices[seg.v2].x, true).Float();
+            v2y = fixed_t(output.vertices[seg.v2].y, true).Float();
+
+            CONS_Printf("  seg[%zu]: v1=%u(%s) v2=%u(%s) linedef=%u\n",
+                       i, seg.v1, v1_orig ? "orig" : "GL",
+                       seg.v2, v2_orig ? "orig" : "GL", seg.linedef);
+            CONS_Printf("    v1=(%.1f,%.1f) v2=(%.1f,%.1f)\n", v1x, v1y, v2x, v2y);
+        }
+    }
+
+    for (size_t i = 0; i < output.segs.size(); i++)
+    {
+        seg_t* glseg = &map->glsegs[i];
+        const ZDBSPOutputGLSeg& seg = output.segs[i];
+
+        // Vertex indices: ZDBSP uses indices into its own vertex array
+        // For original vertices (index < numOriginalVertices), point to map->vertexes
+        // For minisegs (index >= numOriginalVertices), point to map->glvertexes
+        // glvertexes[] contains ALL output vertices (original + GL-only) in ZDBSP index order.
+        // Use the index directly for both kinds; do NOT reference the old vertexes[] which
+        // is freed by p_setup.cpp immediately after BuildGLData() returns.
+        glseg->v1 = &map->glvertexes[seg.v1];
+        glseg->v2 = &map->glvertexes[seg.v2];
+
+        // linedef is uint32_t, but -1 is stored as 0xFFFFFFFF which is > 0 in unsigned comparison
+        // Cast to int32_t to properly detect the sentinel value for minisegs
+        glseg->linedef = ((int32_t)seg.linedef >= 0) ? &map->lines[seg.linedef] : NULL;
+        glseg->side = seg.side;
+
+        // Calculate angle and length from v1 to v2
+        float dx = (glseg->v2->x - glseg->v1->x).Float();
+        float dy = (glseg->v2->y - glseg->v1->y).Float();
+        if (dx == 0.0f)
+            glseg->angle = (dy > 0) ? ANG90 : ANG270;
+        else
+            glseg->angle = (angle_t)((atan2(dy, dx) * (float)ANG180) / (float)M_PI);
+        glseg->length = sqrtf(dx * dx + dy * dy);
+
+        // Set sidedef - derived from linedef and side
+        glseg->sidedef = glseg->linedef ? glseg->linedef->sideptr[glseg->side] : NULL;
+
+        // Set sectors based on which side of the linedef this seg is on
+        if (glseg->linedef)
+        {
+            glseg->frontsector = glseg->linedef->sideptr[glseg->side]->sector;
+            if (glseg->linedef->flags & ML_TWOSIDED)
+                glseg->backsector = glseg->linedef->sideptr[glseg->side ^ 1]->sector;
+            else
+                glseg->backsector = NULL;
+
+            // Calculate offset: distance along the linedef from v1 to seg start
+            float sx = ((glseg->side ? glseg->linedef->v2->x : glseg->linedef->v1->x) - glseg->v1->x).Float();
+            float sy = ((glseg->side ? glseg->linedef->v2->y : glseg->linedef->v1->y) - glseg->v1->y).Float();
+            glseg->offset = sqrtf(sx * sx + sy * sy);
+        }
+        else
+        {
+            glseg->frontsector = NULL;
+            glseg->backsector = NULL;
+            glseg->offset = 0;
+        }
+
+        glseg->partner_seg = NULL;  // Will be filled in a second pass
+        glseg->numlights = 0;
+        glseg->rlights = NULL;
+    }
+
+    // Second pass: set partner_seg
+    for (size_t i = 0; i < output.segs.size(); i++)
+    {
+        const ZDBSPOutputGLSeg& seg = output.segs[i];
+        if (seg.partner != (uint32_t)-1 && seg.partner < (uint32_t)output.segs.size())
+        {
+            map->glsegs[i].partner_seg = &map->glsegs[seg.partner];
+        }
+    }
+
+    // GL subsectors
+    map->glsubsectors = (subsector_t*)Z_Malloc(output.subsectors.size() * sizeof(subsector_t), PU_LEVEL, 0);
+    map->numglsubsectors = output.subsectors.size();
+    for (size_t i = 0; i < output.subsectors.size(); i++)
+    {
+        subsector_t* glsub = &map->glsubsectors[i];
+        glsub->num_segs = output.subsectors[i].numlines;
+        glsub->first_seg = output.subsectors[i].firstline;
+
+        // Find the sector from a non-miniseg in this subsector
+        sector_t* sec = NULL;
+        for (int j = 0; j < glsub->num_segs; j++)
+        {
+            const seg_t* gs = &map->glsegs[glsub->first_seg + j];
+            if (gs->frontsector)
+            {
+                sec = gs->frontsector;
+                break;
+            }
+        }
+        glsub->sector = sec;
+    }
+
+    // Debug: Check for NULL sectors in glsubsectors
     if (devparm)
-        CONS_Printf("GL data complete.\n");
+    {
+        int nullSectorCount = 0;
+        for (size_t i = 0; i < output.subsectors.size(); i++)
+        {
+            if (!map->glsubsectors[i].sector)
+            {
+                nullSectorCount++;
+                if (nullSectorCount <= 5)
+                {
+                    CONS_Printf("  WARNING: glsubsector[%zu] has NULL sector! num_segs=%d, first_seg=%d\n",
+                               i, map->glsubsectors[i].num_segs, map->glsubsectors[i].first_seg);
+                    // Print the segs in this subsector
+                    for (int j = 0; j < map->glsubsectors[i].num_segs && j < 5; j++)
+                    {
+                        const seg_t* gs = &map->glsegs[map->glsubsectors[i].first_seg + j];
+                        CONS_Printf("    glseg[%d]: v1=%p, v2=%p, linedef=%p, frontsector=%p\n",
+                                   (int)(map->glsubsectors[i].first_seg + j),
+                                   (void*)gs->v1, (void*)gs->v2,
+                                   (void*)gs->linedef, (void*)gs->frontsector);
+                    }
+                }
+            }
+        }
+        if (nullSectorCount > 0)
+            CONS_Printf("  WARNING: %d/%zu glsubsectors have NULL sector\n",
+                       nullSectorCount, output.subsectors.size());
+    }
+
+    // GL nodes (reuse same structure)
+    map->glnodes = (node_t*)Z_Malloc(output.nodes.size() * sizeof(node_t), PU_LEVEL, 0);
+    map->numglnodes = output.nodes.size();
+    for (size_t i = 0; i < output.nodes.size(); i++)
+    {
+        node_t* node = &map->glnodes[i];
+
+        // ZDBSP's MapNodeEx stores x,y,dx,dy as int (4 bytes) which are
+        // actually 16.16 fixed-point values.
+        // Our ZDBSPOutputNode copies these as int32_t.
+        // We use the raw-shifted constructor to store without additional shifting.
+        node->x = fixed_t(output.nodes[i].x, true);
+        node->y = fixed_t(output.nodes[i].y, true);
+        node->dx = fixed_t(output.nodes[i].dx, true);
+        node->dy = fixed_t(output.nodes[i].dy, true);
+
+        // Debug output for node values
+        if (devparm && i < 3)
+        {
+            CONS_Printf("  DEBUG node[%zu]: raw x=%d, as_fixed=%.2f, dx=%d, dy=%d\n",
+                       i, output.nodes[i].x, node->x.Float(),
+                       output.nodes[i].dx, output.nodes[i].dy);
+        }
+
+        for (int j = 0; j < 2; j++)
+        {
+            for (int k = 0; k < 4; k++)
+            {
+                // Use .box[] directly; operator[] returns by value and can't be assigned to
+                node->bbox[j].box[k] = output.nodes[i].bbox[j][k];
+            }
+        }
+        node->children[0] = output.nodes[i].children[0];
+        node->children[1] = output.nodes[i].children[1];
+    }
+
+    // Debug: write our generated GL data to a file for comparison
+    // Write to current directory (will be in build folder when running from there)
+    {
+        FILE* f = fopen("our_gl_dump.bin", "wb");
+        if (f)
+        {
+            CONS_Printf("  DEBUG: Writing our GL dump...\n");
+            // Write counts
+            int32_t counts[4] = {map->numglvertexes, map->numglsegs, map->numglsubsectors, map->numglnodes};
+            fwrite(counts, 4, 4, f);
+            // Write first 10 vertices as binary (x, y pairs)
+            for (int i = 0; i < std::min(10, map->numglvertexes); i++)
+            {
+                int32_t vx = map->glvertexes[i].x.value();
+                int32_t vy = map->glvertexes[i].y.value();
+                fwrite(&vx, 4, 1, f);
+                fwrite(&vy, 4, 1, f);
+            }
+            // Write first 5 nodes as binary (x, y, dx, dy)
+            for (int i = 0; i < std::min(5, map->numglnodes); i++)
+            {
+                int32_t nx = map->glnodes[i].x.value();
+                int32_t ny = map->glnodes[i].y.value();
+                int32_t ndx = map->glnodes[i].dx.value();
+                int32_t ndy = map->glnodes[i].dy.value();
+                fwrite(&nx, 4, 1, f);
+                fwrite(&ny, 4, 1, f);
+                fwrite(&ndx, 4, 1, f);
+                fwrite(&ndy, 4, 1, f);
+            }
+            fclose(f);
+            CONS_Printf("  DEBUG: Wrote our_gl_dump.bin (%d verts, %d segs, %d subs, %d nodes)\n",
+                       map->numglvertexes, map->numglsegs, map->numglsubsectors, map->numglnodes);
+        }
+    }
+
+    return true;
+}
+
+void BuildGLData(Map *map)
+{
+    // Use BspCompiler (ZDBSP library) for in-process GL node generation
+    // This is the ONLY supported path - no fallback to manual generation
+    if (!BspCompiler::isAvailable())
+    {
+        if (devparm)
+            CONS_Printf("BspCompiler not available - cannot generate GL nodes.\n");
+        return;
+    }
+
+    CONS_Printf("BspCompiler available - generating GL nodes...\n");
+
+    if (!BuildGLDataWithBspCompiler(map))
+    {
+        if (devparm)
+            CONS_Printf("BspCompiler failed to generate GL nodes.\n");
+        return;
+    }
+
+    CONS_Printf("BspCompiler generated GL nodes successfully.\n");
 }

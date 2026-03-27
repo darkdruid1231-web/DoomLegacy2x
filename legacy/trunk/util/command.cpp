@@ -74,6 +74,15 @@ struct cmdalias_t
 
 command_buffer_t COM;
 
+/// If true, "Unknown command" errors are suppressed.
+/// Used during early config loading before CVARs are registered.
+static bool suppress_unknown_commands = false;
+
+void COM_SetSuppressUnknownCommands(bool suppress)
+{
+    suppress_unknown_commands = suppress;
+}
+
 command_buffer_t::command_buffer_t()
 {
     com_commands = NULL;
@@ -365,7 +374,8 @@ void command_buffer_t::COM_ExecuteString(char *text)
     // (don't flood the console in software mode with bad gr_xxx command)
     if (!consvar_t::Command())
     {
-        CONS_Printf("Unknown command '%s'\n", Argv(0));
+        if (!suppress_unknown_commands)
+            CONS_Printf("Unknown command '%s'\n", Argv(0));
     }
 }
 

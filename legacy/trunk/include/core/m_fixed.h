@@ -68,6 +68,12 @@ class fixed_t
     {
         val = a << FBITS;
     }
+    /// Construct from a raw 16.16 value that has already been shifted (no additional shift applied)
+    inline fixed_t(int a, bool rawShifted)
+    {
+        (void)rawShifted;  // unused, only distinguishes from single-arg constructor
+        val = a;
+    }
     inline fixed_t(float f)
     {
         // No reason for this slowdown. We don't check int's either.

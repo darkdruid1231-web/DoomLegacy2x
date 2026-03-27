@@ -1,6 +1,6 @@
 set(SRC_FILES
 gl_bsp.cpp
-zdbsp_integration.cpp
+bsp_compiler.cpp
 g_game.cpp
 g_state.cpp
 g_demo.cpp
@@ -77,3 +77,5 @@ hud/hu_stuff.cpp
 )
 
 add_library(doomengine STATIC ${SRC_FILES})
+target_include_directories(doomengine PRIVATE ${CMAKE_SOURCE_DIR}/thirdparty/zdbsp)
+target_link_libraries(doomengine PRIVATE zdbsp)

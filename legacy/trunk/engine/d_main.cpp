@@ -711,9 +711,11 @@ bool D_DoomMain()
         // It is called after fc.InitMultipleFiles below.
 
         // Load config early to collect autoload entries.
-        // Client CVars (video, input, etc.) are not yet registered, so they
-        // will be applied on the second M_FirstLoadConfig call below.
-        M_FirstLoadConfig(); // WARNING : this does a "COM_BufExecute()"
+        // Client CVARs (video, input, etc.) are not yet registered, so
+        // we suppress "Unknown command" errors during this early load.
+        COM_SetSuppressUnknownCommands(true);
+        M_FirstLoadConfig(true);
+        COM_SetSuppressUnknownCommands(false);
     }
 
     // game title
@@ -760,9 +762,9 @@ bool D_DoomMain()
         free(autoload_files[i]);
     }
     num_autoload_files = 0;
-    // Freeze autoload list: the file cache is about to be built.
-    // Any autoload commands from the second M_FirstLoadConfig call will be ignored.
-    autoload_frozen = true;
+    // Note: autoload_frozen is set to true AFTER CL_Init() in the
+    // "continue subsystem initializations" block, so that config.cfg
+    // can be executed in M_FirstLoadConfig() after all CVARs are registered.
 
     //========================== continue subsystem initializations ==========================
 
@@ -791,10 +793,13 @@ bool D_DoomMain()
     if (!game.dedicated)
         CL_Init();
 
+    // Freeze autoload list: we've collected autoload entries from config.cfg,
+    // and any further autoload commands should be ignored.
+    autoload_frozen = true;
+
     // Second config load: all CVars (including client CVars from CL_Init) are now
     // registered, so saved video/input/sound settings are properly applied.
-    // autoload commands are silently ignored this time (autoload_frozen = true).
-    M_FirstLoadConfig();
+    M_FirstLoadConfig(true);
 
     // Convert old static game data structures into dynamic ones.
     // DEHACKED patches etc. must be applied before this.

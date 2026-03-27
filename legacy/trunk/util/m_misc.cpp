@@ -238,16 +238,20 @@ void Command_ChangeConfig_f()
 
 //
 // Load the default config file
+// execconfig: if true, executes config.cfg (for after CVARs are registered)
 //
-void M_FirstLoadConfig()
+void M_FirstLoadConfig(bool execconfig)
 {
     // load default control
     G_Controldefault();
 
-    // load config, make sure those commands doesnt require the screen..
-    CONS_Printf("\n");
-    COM.PrependText(va("exec \"%s\"\n", configfile));
-    COM.BufExecute(); // make sure initial settings are done
+    if (execconfig)
+    {
+        // load config, make sure those commands doesnt require the screen..
+        CONS_Printf("\n");
+        COM.PrependText(va("exec \"%s\"\n", configfile));
+        COM.BufExecute(); // make sure initial settings are done
+    }
 
     // make sure I_Quit() will write back the correct config
     // (do not write back the config if it crash before)

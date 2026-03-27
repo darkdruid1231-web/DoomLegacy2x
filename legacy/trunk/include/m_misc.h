@@ -52,7 +52,7 @@ void Command_SaveConfig_f();
 void Command_LoadConfig_f();
 void Command_ChangeConfig_f();
 
-void M_FirstLoadConfig();
+void M_FirstLoadConfig(bool execconfig = true);
 // Fab:26-04-98: save game config : cvars, aliases..
 void M_SaveConfig(char *filename);
 

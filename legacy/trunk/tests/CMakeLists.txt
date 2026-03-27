@@ -279,6 +279,32 @@ target_compile_definitions(test_bsp_traverser_gtest PRIVATE SDL_MAIN_HANDLED)
 add_test(NAME bsp_traverser_gtest COMMAND test_bsp_traverser_gtest)
 
 # ---------------------------------------------------------------------------
+# test_bsp_compiler_gtest — BspCompiler (ZDBSP library) tests.
+# Tests that BspCompiler produces valid GL nodes from a minimal map.
+# ---------------------------------------------------------------------------
+add_executable(test_bsp_compiler_gtest unit/test_bsp_compiler_gtest.cpp)
+target_include_directories(test_bsp_compiler_gtest PRIVATE
+    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/core
+    ${CMAKE_SOURCE_DIR}/engine
+    ${CMAKE_SOURCE_DIR}/thirdparty/zdbsp
+    ${CMAKE_SOURCE_DIR}/thirdparty/zdbsp/zlib
+)
+# Link order: Use linker group to handle circular dependencies between zdbsp and zlib
+# zdbsp uses zlib functions, so zlib must be resolvable after zdbsp is processed
+target_link_libraries(test_bsp_compiler_gtest PRIVATE
+    "-Wl,--start-group"
+    doomengine
+    gtest
+    zdbsp
+    C:/msys64/mingw64/lib/libz.a
+    "-Wl,--end-group"
+)
+target_compile_definitions(test_bsp_compiler_gtest PRIVATE SDL_MAIN_HANDLED)
+add_test(NAME bsp_compiler_gtest COMMAND test_bsp_compiler_gtest)
+
+# ---------------------------------------------------------------------------
 # test_graphics_settings_gtest — GraphicsSettingsComponent with MockCVarProvider.
 # ---------------------------------------------------------------------------
 add_executable(test_graphics_settings_gtest unit/test_graphics_settings_gtest.cpp)

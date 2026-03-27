@@ -110,6 +110,7 @@ class command_buffer_t
 };
 
 extern command_buffer_t COM;
+void COM_SetSuppressUnknownCommands(bool suppress);
 
 //==================
 // Console variables

@@ -1593,7 +1593,9 @@ void OGLRenderer::RenderPlayerView(PlayerInfo *player)
 {
     validcount++;
 
-    if (devparm)
+    // Reduced noise: only print every 60 frames
+    static int framecounter = 0;
+    if (devparm && (framecounter++ % 60 == 0))
         CONS_Printf("[RenderPlayerView] player=%p pov=%p mp=%p\n",
                     (void*)player,
                     player ? (void*)player->pov : (void*)0,
