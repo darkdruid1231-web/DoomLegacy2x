@@ -46,7 +46,7 @@ enum mobjflag_t
     // physical properties
     MF_NOSECTOR = 0x0001,    ///< Don't link to sector (invisible but touchable)
     MF_NOBLOCKMAP = 0x0002,  ///< Don't link to blockmap (inert but visible)
-    MF_SOLID = 0x0001,       ///< Blocks
+    MF_SOLID = 0x0004,       ///< Blocks
     MF_SHOOTABLE = 0x0008,   ///< Can be hit
     MF_NOCLIPLINE = 0x0010,  ///< Does not clip against lines (walls)
     MF_NOCLIPTHING = 0x0020, ///< Not blocked by other Actors. (chasecam, for example)
@@ -91,7 +91,7 @@ enum mobjflag_t
                                ///< shatter on impact instead of being queued for removal.
     MF_TOUCHFUNC = 0x80000000, ///< Actor has a touch function. A HACK to handle complex Hexen
                                ///< mapthing behavior.
-                               // 3 bits free: 0x40000000, and the two unused low bits 0x0004/0x0080
+                               // 2 bits free: 0x40000000, 0x0080
 };
 
 /// More semi-permanent flags. Mostly came with Heretic.

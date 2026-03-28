@@ -128,10 +128,24 @@ void SF_Print()
     if (!t_argc)
         return;
 
+    // Build full string for HUD display, and print each arg to console
+    int strsize = 0;
+    for (int i = 0; i < t_argc; i++)
+        strsize += strlen(stringvalue(t_argv[i]));
+
+    char *tempstr = (char *)Z_Malloc(strsize + 1, PU_STATIC, 0);
+    tempstr[0] = '\0';
     for (int i = 0; i < t_argc; i++)
     {
-        CONS_Printf("%s", stringvalue(t_argv[i]));
+        const char *s = stringvalue(t_argv[i]);
+        CONS_Printf("%s", s);
+        strcat(tempstr, s);
     }
+
+    if (trigger_player)
+        trigger_player->SetMessage(tempstr, 0, PlayerInfo::M_HUD);
+
+    Z_Free(tempstr);
 }
 
 // return a random number from 0 to 255
@@ -440,7 +454,7 @@ void SF_Message()
     for (i = 0; i < t_argc; i++)
         sprintf(tempstr, "%s%s", tempstr, stringvalue(t_argv[i]));
 
-    trigger_player->SetMessage(tempstr, 1);
+    trigger_player->SetMessage(tempstr, 1, PlayerInfo::M_HUD);
     Z_Free(tempstr);
 }
 
@@ -2936,9 +2950,8 @@ void SF_Warp()
 
 void SF_GameSkill()
 {
-    // Return game skill 1-5
     t_return.type = svt_int;
-    t_return.value.i = 1;
+    t_return.value.i = game.skill;
 }
 
 void SF_PlayerAddFrag()

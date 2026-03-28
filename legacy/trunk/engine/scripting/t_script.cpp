@@ -182,6 +182,16 @@ void Map::FS_DelayedScripts()
                 current->script->variables[i] = current->variables[i];
             current->script->trigger = current->trigger; // copy trigger
 
+            // Lazy resolution: levelscripts have trigger=NULL at load time
+            // because the pawn doesn't exist yet. By the time a delayed script
+            // resumes, the player has been added to the map and the pawn exists.
+            if (!current->script->trigger && !players.empty())
+            {
+                PlayerInfo *pi = players[0];
+                if (pi && pi->pawn)
+                    current->script->trigger = pi->pawn;
+            }
+
             // continue the script
             current->script->continue_script(current->savepoint);
             // TODO? too bad we can't just keep this runningscript instance
@@ -337,8 +347,18 @@ void Map::FS_LoadScripts(char *data)
 
     // clear the levelscript
     // levelscript started by first player (not necessarily player 0) 'superplayer'
-    //  FS_levelscript->player = NULL;  // FIXME who is superplayer?
-    FS_levelscript->trigger = NULL; // superplayer->pawn;
+    // Match 1.x behavior: set trigger to first player's pawn. The pawn may not
+    // exist yet at load time; delayed scripts resolve it lazily in FS_DelayedScripts.
+    {
+        Actor *superplayer_pawn = NULL;
+        if (!game.Players.empty())
+        {
+            PlayerInfo *pi = game.Players.begin()->second;
+            if (pi && pi->pawn)
+                superplayer_pawn = pi->pawn;
+        }
+        FS_levelscript->trigger = superplayer_pawn;
+    }
 
     FS_levelscript->scriptnum = -1;
     FS_levelscript->parent = &hub_script;
