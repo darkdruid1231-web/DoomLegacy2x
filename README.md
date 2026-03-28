@@ -22,7 +22,8 @@ Full feature list: [`docs/features.md`](legacy/trunk/docs/features.md)
 ### Gameplay
 - Doom, Heretic, and Hexen support 🚧
 - Up to 4-player splitscreen 🚧
-  <img width="586" height="333" alt="Screenshot 2026-03-19 000707" src="https://github.com/user-attachments/assets/1334a695-84d0-4c8c-9645-d57717f4554b" />
+<img width="586" height="333" alt="Screenshot 2026-03-19 000707" src="https://github.com/user-attachments/assets/1334a695-84d0-4c8c-9645-d57717f4554b" />
+
 - Deathmatch, co-op, (CTF, domination, assault in future)
 - Level hubs in future (return to visited maps)
 
