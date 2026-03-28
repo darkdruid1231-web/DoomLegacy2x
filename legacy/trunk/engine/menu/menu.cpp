@@ -97,7 +97,7 @@ static int controltochange;
 
 static Material *paused_tex = NULL;
 
-static bool menu_use_newui = false;
+static bool menu_use_newui = true;
 static bool menu_dropdown_open = false;
 static int menu_dropdown_index = 0;
 static int menu_dropdown_item = -1;
