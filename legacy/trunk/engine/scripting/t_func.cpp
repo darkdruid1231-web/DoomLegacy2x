@@ -1084,16 +1084,19 @@ void SF_MobjTarget()
 
     if (t_argc >= 2)
     {
+        DActor *dmo = mo->Inherits<DActor>();
         if (t_argv[1].type != svt_actor && intvalue(t_argv[1]) == -1)
         {
             // Set target to NULL
             mo->target = NULL;
-            // mo->SetState(mo->info->spawnstate);
+            if (dmo && dmo->info->spawnstate)
+                dmo->SetState(dmo->info->spawnstate);
         }
         else
         {
             mo->target = MobjForSvalue(t_argv[1]);
-            // mo->SetState(mo->info->seestate);
+            if (dmo && dmo->info->seestate)
+                dmo->SetState(dmo->info->seestate);
         }
     }
 
