@@ -143,7 +143,7 @@ void SF_Print()
     }
 
     if (trigger_player)
-        trigger_player->SetMessage(tempstr, 0, PlayerInfo::M_HUD);
+        trigger_player->SetMessage(tempstr, 0, PlayerInfo::M_HUD, 150);
 
     Z_Free(tempstr);
 }
@@ -454,7 +454,7 @@ void SF_Message()
     for (i = 0; i < t_argc; i++)
         sprintf(tempstr, "%s%s", tempstr, stringvalue(t_argv[i]));
 
-    trigger_player->SetMessage(tempstr, 1, PlayerInfo::M_HUD);
+    trigger_player->SetMessage(tempstr, 1, PlayerInfo::M_HUD, 150);
     Z_Free(tempstr);
 }
 
@@ -3232,21 +3232,21 @@ void SF_HealObj()
 
 void SF_MapthingNumExist()
 {
-    // mapthingnumexist(thingnum)
+    // mapthingnumexist(thingnum) - returns 1 if thingnum is in range and has a live actor
     t_return.type = svt_int;
     t_return.value.i = 0;
-    
+
     if (t_argc < 1)
     {
         script_error("mapthingnumexist: requires thing number\n");
         return;
     }
-    
+
     int thingnum = intvalue(t_argv[0]);
-    
-    // Check if mapthing exists - simplified implementation
-    t_return.value.i = (thingnum >= 0 && thingnum < 0) ? 1 : 0;
-    // Would need actual mapthing data access
+
+    if (thingnum >= 0 && thingnum < current_map->nummapthings &&
+        current_map->mapthings[thingnum].mobj != NULL)
+        t_return.value.i = 1;
 }
 
 void SF_Mapthings()
