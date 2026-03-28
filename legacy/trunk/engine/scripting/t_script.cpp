@@ -598,8 +598,12 @@ Actor *MobjForSvalue(svalue_t svalue)
 
     Actor *p = current_map->mapthings[intval].mobj;
 
+    // Non-fatal: a mapthing may have no actor if it was skill-restricted,
+    // already removed, or is a non-spawning type. Killing the script here
+    // prevents subsequent removeobj() calls from running. Log and return NULL;
+    // callers already null-check the result.
     if (!p)
-        script_error("mapthing %i has no Actor\n", intval);
+        CONS_Printf("FS: mapthing %i has no Actor (skipped)\n", intval);
 
     return p;
 }
