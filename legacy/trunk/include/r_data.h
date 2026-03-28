@@ -380,6 +380,17 @@ extern texture_cache_t textures;
 
 //===============================================================================
 
+// Material lookup orders - must be declared before Material class
+enum material_class_t
+{
+    TEX_wall = 0,
+    TEX_floor,
+    TEX_sprite,
+    TEX_lod
+};
+
+//===============================================================================
+
 /// "Material" definition, uses one or more Textures and maybe shaders.
 class Material : public cacheitem_t
 {
@@ -390,6 +401,11 @@ class Material : public cacheitem_t
     float worldwidth, worldheight; ///< dimensions in world units (from tex0)
     float leftoffs, topoffs; ///< external image offsets in world units (from tex0) (used by sprites
                              ///< and HUD graphics)
+
+    material_class_t mode;         ///< TEX_wall, TEX_floor, TEX_sprite, TEX_lod
+
+    /// Get material class for wrap mode decisions
+    inline material_class_t GetMode() const { return mode; }
 
     struct TextureRef
     {
@@ -415,8 +431,8 @@ class Material : public cacheitem_t
             worldheight = t->height / yscale;
         }
 
-        /// Binds the Texture and sets its params
-        void GLSetTextureParams();
+        /// Binds the Texture and sets its params (mode for wrap mode)
+        void GLSetTextureParams(material_class_t mode = TEX_lod);
     };
 
     std::vector<TextureRef> tex; ///< allow several textures per material
@@ -455,7 +471,8 @@ class Material : public cacheitem_t
     Material(const char *name,
              Texture *t,
              float xscale = 1,
-             float yscale = 1); ///< Create a single-Texture Material.
+             float yscale = 1,
+             material_class_t mode = TEX_lod); ///< Create a single-Texture Material.
 
     virtual ~Material();
 
@@ -513,15 +530,6 @@ class Material : public cacheitem_t
 
 //===============================================================================
 
-/// Material lookup orders
-enum material_class_t
-{
-    TEX_wall = 0,
-    TEX_floor,
-    TEX_sprite,
-    TEX_lod
-};
-
 /// \brief Cache for Materials
 class material_cache_t
 {
@@ -549,7 +557,7 @@ class material_cache_t
 
     /// Creates a Material from the Texture, inserts it to the given source, inserts the Texture to
     /// texturecache.
-    Material *BuildMaterial(Texture *t, cachesource_t<Material> &source, bool h_start = false);
+    Material *BuildMaterial(Texture *t, cachesource_t<Material> &source, material_class_t mode, bool h_start = false);
 
     /// sw renderer: colormaps for palette conversions (one for each resource file)
     std::vector<byte *> palette_conversion;

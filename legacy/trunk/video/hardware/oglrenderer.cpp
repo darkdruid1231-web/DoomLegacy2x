@@ -2787,6 +2787,11 @@ void OGLRenderer::DrawSingleQuad(Material *m,
                                  float cmg,
                                  float cmb) const
 {
+    // Enable blending for textures that have transparency (alpha channel).
+    // This is needed for wall textures that contain transparent pixels.
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     m->GLUse();
 
     shader_attribs_t sa; // TEST
@@ -2919,9 +2924,8 @@ void OGLRenderer::DrawSpriteItem(const vec_t<fixed_t> &pos, Material *mat, int f
 
     mat->GLUse();
 
-    // Sky textures must not tile — clamp to avoid seam artefacts at edges.
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    // NOTE: Material::GLSetTextureParams now handles clamping for masked textures.
+    // This was previously hardcoded here but is now done correctly in r_data.cpp.
 
     glBegin(GL_QUADS);
     glTexCoord2f(texleft, texbottom);

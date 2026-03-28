@@ -812,16 +812,18 @@ Material::Material(const char *name) : cacheitem_t(name)
     shader = NULL;
     glossiness = 1.0f;
     specularlevel = 1.0f;
+    mode = TEX_lod;
     // The rest are taken care of by InitializeMaterial() later when Textures have been attached.
 }
 
 // Single-texture Materials. tex.size() guaranteed to be 1 after this constructor.
-Material::Material(const char *name, Texture *t, float xs, float ys) : cacheitem_t(name)
+Material::Material(const char *name, Texture *t, float xs, float ys, material_class_t m) : cacheitem_t(name)
 {
     id_number = -1;
     shader = NULL;
     glossiness = 1.0f;
     specularlevel = 1.0f;
+    mode = m;
 
     tex.resize(1);
     tex[0].t = t;
@@ -853,7 +855,7 @@ Material::TextureRef::TextureRef()
     max_anisotropy = 0.0;
 }
 
-void Material::TextureRef::GLSetTextureParams()
+void Material::TextureRef::GLSetTextureParams(material_class_t mode)
 {
     glBindTexture(GL_TEXTURE_2D, t->GLPrepare()); // bind the texture
 
@@ -867,10 +869,11 @@ void Material::TextureRef::GLSetTextureParams()
                     GL_TEXTURE_MAX_ANISOTROPY_EXT,
                     max_anisotropy ? max_anisotropy : cv_granisotropy.value);
 
-    // Use GL_REPEAT for wall textures so they tile properly when wall height
-    // exceeds texture height. Sky textures override this to GL_CLAMP_TO_EDGE.
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // Use GL_CLAMP_TO_EDGE for sprites and LOD (menu/HUD graphics).
+    // Use GL_REPEAT for wall and floor textures (tiling).
+    GLenum wrap = (mode == TEX_wall || mode == TEX_floor) ? GL_REPEAT : GL_CLAMP_TO_EDGE;
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
 }
 
 int Material::GLUse()
@@ -887,7 +890,7 @@ int Material::GLUse()
             continue;
         }
         glActiveTexture(GL_TEXTURE0 + i); // activate correct texture unit
-        tex[i].GLSetTextureParams();      // and set its parameters (may trigger texture upload)
+        tex[i].GLSetTextureParams(mode);  // pass material mode for wrap mode
     }
     // Bind neutrals for any PBR slots beyond what this material defines
     if (shader)
@@ -1016,7 +1019,7 @@ Material *material_cache_t::Edit(const char *name, material_class_t mode, bool c
 
 /// Build a single-Texture Material during startup, insert it into a given source.
 /// Texture is assumed not to be in cache before call (unless there is a namespace overlap).
-Material *material_cache_t::BuildMaterial(Texture *t, cachesource_t<Material> &source, bool h_start)
+Material *material_cache_t::BuildMaterial(Texture *t, cachesource_t<Material> &source, material_class_t mode, bool h_start)
 {
     if (!t)
         return NULL;
@@ -1063,7 +1066,7 @@ Material *material_cache_t::BuildMaterial(Texture *t, cachesource_t<Material> &s
 
     if (!m)
     {
-        m = new Material(name.c_str(), t); // create a new Material
+        m = new Material(name.c_str(), t, 1.0f, 1.0f, mode); // create a new Material
         source.Insert(m);
         Register(m);
     }
@@ -1154,7 +1157,7 @@ Material *material_cache_t::Get(const char *name, material_class_t mode)
                         // Not found there either, try loading on demand
                         Texture *tex = textures.Load(name);
                         if (tex)
-                            t = BuildMaterial(tex, lod_tex); // wasteful...
+                            t = BuildMaterial(tex, lod_tex, TEX_lod); // wasteful...
                     }
             break;
     }
@@ -1478,7 +1481,7 @@ int material_cache_t::ReadTextures()
                             i);
             }
 
-            Material *m = BuildMaterial(tex, doom_tex);
+            Material *m = BuildMaterial(tex, doom_tex, TEX_wall);
 
             // ZDoom extension, scaling. FIXME this could be done more gracefully (params to
             // BuildMaterial?)
@@ -1500,7 +1503,7 @@ int material_cache_t::ReadTextures()
                     continue; // already defined in TEXTUREx
 
                 PatchTexture *tex = new PatchTexture(name8, patchlookup[i]);
-                BuildMaterial(tex, doom_tex);
+                BuildMaterial(tex, doom_tex, TEX_wall);
                 numtextures++;
 
                 // CONS_Printf(" Bare PNAMES texture '%s' found!\n", name8);
@@ -1531,7 +1534,7 @@ int material_cache_t::ReadTextures()
         }
 
         for (; lump < end; lump++)
-            if (BuildMaterial(textures.LoadLump(fc.FindNameForNum(lump), lump), new_tex))
+            if (BuildMaterial(textures.LoadLump(fc.FindNameForNum(lump), lump), new_tex, TEX_lod))
                 num_textures++;
     }
 
@@ -1589,7 +1592,7 @@ int material_cache_t::ReadTextures()
                 continue;
             }
 
-            BuildMaterial(t, flat_tex);
+            BuildMaterial(t, flat_tex, TEX_floor);
             num_textures++;
         }
     }
@@ -1619,7 +1622,7 @@ int material_cache_t::ReadTextures()
         }
 
         for (; lump < end; lump++)
-            if (BuildMaterial(textures.LoadLump(fc.FindNameForNum(lump), lump), sprite_tex))
+            if (BuildMaterial(textures.LoadLump(fc.FindNameForNum(lump), lump), sprite_tex, TEX_sprite))
                 num_textures++;
     }
 
@@ -1643,7 +1646,7 @@ int material_cache_t::ReadTextures()
         for (; lump < end; lump++)
         {
             Texture *tex = textures.LoadLump(fc.FindNameForNum(lump), lump);
-            if (!BuildMaterial(tex, doom_tex, true) && !BuildMaterial(tex, flat_tex, true))
+            if (!BuildMaterial(tex, doom_tex, TEX_wall, true) && !BuildMaterial(tex, flat_tex, TEX_floor, true))
             {
                 CONS_Printf(" H_START texture '%8s' in file '%s' has no original, ignored.\n",
                             fc.FindNameForNum(lump),
@@ -1714,45 +1717,45 @@ int material_cache_t::ReadTextures()
                         // walls, flats, or sprites. Route to whichever cache owns the name.
                         Material *m;
                         if (flat_tex.Find(stem))
-                            m = BuildMaterial(tex, flat_tex);
+                            m = BuildMaterial(tex, flat_tex, TEX_floor);
                         else if (sprite_tex.Find(stem))
-                            m = BuildMaterial(tex, sprite_tex);
+                            m = BuildMaterial(tex, sprite_tex, TEX_sprite);
                         else
-                            m = BuildMaterial(tex, doom_tex);
+                            m = BuildMaterial(tex, doom_tex, TEX_wall);
                         if (m) { existed ? replaced++ : created++; num_textures++; }
                         break;
                     }
                     case PK3_FLATS:
                     {
                         bool existed = textures.Exists(stem);
-                        Material *m = BuildMaterial(tex, flat_tex);
+                        Material *m = BuildMaterial(tex, flat_tex, TEX_floor);
                         if (m) { existed ? replaced++ : created++; num_textures++; }
                         break;
                     }
                     case PK3_SPRITES:
                     {
                         bool existed = textures.Exists(stem);
-                        Material *m = BuildMaterial(tex, sprite_tex);
+                        Material *m = BuildMaterial(tex, sprite_tex, TEX_sprite);
                         if (m) { existed ? replaced++ : created++; num_textures++; }
                         break;
                     }
                     case PK3_HIRES_SPRITES:
                     {
                         // Scale HD sprite to match original world dimensions.
-                        Material *m = BuildMaterial(tex, sprite_tex, true);
+                        Material *m = BuildMaterial(tex, sprite_tex, TEX_sprite, true);
                         if (m) { replaced++; }
                         else
                         {
                             // No original sprite yet (e.g. mod-only sprite) — add directly.
-                            m = BuildMaterial(tex, sprite_tex, false);
+                            m = BuildMaterial(tex, sprite_tex, TEX_sprite, false);
                             if (m) { created++; num_textures++; }
                         }
                         break;
                     }
                     case PK3_HIRES:
-                        if (BuildMaterial(tex, doom_tex, true) ||
-                            BuildMaterial(tex, flat_tex, true) ||
-                            BuildMaterial(tex, sprite_tex, true))
+                        if (BuildMaterial(tex, doom_tex, TEX_wall, true) ||
+                            BuildMaterial(tex, flat_tex, TEX_floor, true) ||
+                            BuildMaterial(tex, sprite_tex, TEX_sprite, true))
                             hires_ok++;
                         else
                             hires_miss++;
@@ -1764,7 +1767,7 @@ int material_cache_t::ReadTextures()
                         // HELP1, WIMAPs, etc. Register in lod_tex so materials.Get() finds them
                         // with the default TEX_lod mode (used by D_PageDrawer, menus, HUD).
                         bool existed = lod_tex.Find(stem) != NULL;
-                        Material *m = BuildMaterial(tex, lod_tex);
+                        Material *m = BuildMaterial(tex, lod_tex, TEX_lod);
                         if (m) { existed ? replaced++ : created++; num_textures++; }
                         break;
                     }
