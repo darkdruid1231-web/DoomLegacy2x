@@ -47,7 +47,7 @@ void P_MinotaurSlam(Actor *source, Actor *target)
     fixed_t thrust = Random(16, 20);
     target->vel.x += thrust * Cos(angle);
     target->vel.y += thrust * Sin(angle);
-    target->Damage(NULL, NULL, HITDICE(6)); // FIXME Hexen minotaur HITDICE(4)
+    target->Damage(NULL, NULL, HITDICE(4)); // Hexen minotaur attack
 
     // if(target->player)
     target->reactiontime = 14 + (P_Random() & 7);
