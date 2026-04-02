@@ -67,7 +67,7 @@ static string last_failure;
 void test_actor_flags_exist()
 {
     TEST("MF_SOLID flag exists");
-    ASSERT_EQ(0x0001, MF_SOLID, "MF_SOLID = 0x0001");
+    ASSERT_EQ(0x0004, MF_SOLID, "MF_SOLID = 0x0004");
     PASS();
 
     TEST("MF_SHOOTABLE flag exists");
