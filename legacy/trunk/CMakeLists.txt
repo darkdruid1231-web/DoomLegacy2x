@@ -2,6 +2,13 @@ cmake_minimum_required(VERSION 3.16)
 
 project(doomlegacy C CXX)
 
+# Default to Release build if not specified
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    message(STATUS "Setting build type to 'Release' as none was specified.")
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "RelWithDebInfo" "MinSizeRel")
+endif()
+
 option(BUILD_TESTING "Build tests" ON)
 option(ENABLE_IWYU "Run Include-what-you-use on new interface headers" OFF)
 
