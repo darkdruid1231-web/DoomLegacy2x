@@ -182,4 +182,18 @@ void ASMCALL R_DrawTranslucentColumn_16();
 void ASMCALL R_DrawTranslatedColumn_16();
 void ASMCALL R_DrawSpan_16();
 
+// -----------------------
+// Software renderer profiling counters (reset each frame)
+// -----------------------
+struct sw_profiler_t {
+    int wall_columns;     // wall columns drawn via colfunc in R_RenderSegLoop
+    int masked_columns;   // masked texture columns drawn
+    int spans;            // floor/ceiling spans drawn
+    int getcolumn_calls;  // GetColumn + GetMaskedColumn calls
+    int masked_seg_calls; // R_RenderMaskedSegRange invocations
+};
+extern struct sw_profiler_t sw_profiler;
+
+void R_ResetSWProfiler();
+
 #endif

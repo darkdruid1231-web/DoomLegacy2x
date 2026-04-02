@@ -720,3 +720,38 @@ bool wipe_ScreenWipe(int ticks)
 
     return false;
 }
+
+// -----------------------
+// Software renderer profiling
+// -----------------------
+#include "command.h"
+
+struct sw_profiler_t sw_profiler;
+
+static void Command_SWDrawStats_f();
+
+void R_ResetSWProfiler()
+{
+    static bool commands_registered = false;
+    if (!commands_registered)
+    {
+        COM.AddCommand("sw_drawstats", Command_SWDrawStats_f);
+        commands_registered = true;
+    }
+
+    sw_profiler.wall_columns = 0;
+    sw_profiler.masked_columns = 0;
+    sw_profiler.spans = 0;
+    sw_profiler.getcolumn_calls = 0;
+    sw_profiler.masked_seg_calls = 0;
+}
+
+static void Command_SWDrawStats_f()
+{
+    CONS_Printf("SW Draw Stats this frame:\n");
+    CONS_Printf("  Wall columns:    %d\n", sw_profiler.wall_columns);
+    CONS_Printf("  Masked columns:  %d\n", sw_profiler.masked_columns);
+    CONS_Printf("  Spans:           %d\n", sw_profiler.spans);
+    CONS_Printf("  GetColumn calls: %d\n", sw_profiler.getcolumn_calls);
+    CONS_Printf("  Masked segs:    %d\n", sw_profiler.masked_seg_calls);
+}

@@ -157,6 +157,7 @@ static void R_DrawSplatColumn(column_t *column)
             //  Drawn by either R_DrawColumn
             //   or (SHADOW) R_DrawFuzzColumn.
             colfunc();
+            sw_profiler.wall_columns++;
         }
         column = (column_t *)((byte *)column + column->length + 4);
     }
@@ -306,6 +307,7 @@ void Rend::R_DrawWallSplats()
 
             // draw the texture
             column_t *col = mat->GetMaskedColumn(texturecolumn);
+            sw_profiler.getcolumn_calls++;
             R_DrawSplatColumn(col);
         }
     } // next splat
@@ -356,6 +358,7 @@ void R_Render2sidedMultiPatchColumn(column_t *column)
     {
         dc_source = (byte *)column;
         colfunc();
+        sw_profiler.wall_columns++;
     }
 }
 
@@ -508,6 +511,7 @@ void Rend::R_RenderMaskedSegRange(drawseg_t *ds, int x1, int x2)
             else
                 col = (column_t *)mat->GetColumn(maskedtexturecol[dc_x]); // HACK
 #warning GetColumn should get a fixed_t param
+            sw_profiler.getcolumn_calls++;
 
             unsigned index;
             if (dc_numlights)
@@ -574,18 +578,21 @@ void Rend::R_RenderMaskedSegRange(drawseg_t *ds, int x1, int x2)
                     {
                         windowbottom = realbot;
                         colfunc_2s(col);
+                        sw_profiler.masked_columns++;
                         for (i++; i < dc_numlights; i++)
                             dc_lightlist[i].height += dc_lightlist[i].heightstep;
 
                         continue;
                     }
                     colfunc_2s(col);
+                    sw_profiler.masked_columns++;
                     windowtop = windowbottom + 1;
                     dc_colormap = dc_lightlist[i].rcolormap;
                 }
                 windowbottom = realbot;
                 if (windowtop < windowbottom)
                     colfunc_2s(col);
+                    sw_profiler.masked_columns++;
 
                 spryscale += rw_scalestep;
                 continue;
@@ -611,6 +618,7 @@ void Rend::R_RenderMaskedSegRange(drawseg_t *ds, int x1, int x2)
 
             // draw the texture
             colfunc_2s(col);
+            sw_profiler.masked_columns++;
         }
         spryscale += rw_scalestep;
     }
@@ -781,6 +789,7 @@ void Rend::R_RenderThickSideRange(drawseg_t *ds, int x1, int x2, ffloor_t *ffloo
             else
                 col = (column_t *)mat->GetColumn(maskedtexturecol[dc_x]); // HACK
 #warning GetColumn should get a fixed_t param
+            sw_profiler.getcolumn_calls++;
 
             // SoM: New code does not rely on r_drawColumnShadowed_8 which
             // will (hopefully) put less strain on the stack.
@@ -910,6 +919,7 @@ void Rend::R_RenderThickSideRange(drawseg_t *ds, int x1, int x2, ffloor_t *ffloo
                     {
                         windowbottom = sprbotscreen;
                         colfunc_2s(col);
+                        sw_profiler.masked_columns++;
                         for (i++; i < dc_numlights; i++)
                         {
                             dc_lightlist[i].height += dc_lightlist[i].heightstep;
@@ -919,6 +929,7 @@ void Rend::R_RenderThickSideRange(drawseg_t *ds, int x1, int x2, ffloor_t *ffloo
                         continue;
                     }
                     colfunc_2s(col);
+                    sw_profiler.masked_columns++;
                     if (solid)
                         windowtop = bheight;
                     else
@@ -929,6 +940,7 @@ void Rend::R_RenderThickSideRange(drawseg_t *ds, int x1, int x2, ffloor_t *ffloo
                 windowbottom = sprbotscreen;
                 if (windowtop < windowbottom)
                     colfunc_2s(col);
+                    sw_profiler.masked_columns++;
 
                 spryscale += rw_scalestep;
                 continue;
@@ -958,6 +970,7 @@ void Rend::R_RenderThickSideRange(drawseg_t *ds, int x1, int x2, ffloor_t *ffloo
 
             // draw the texture
             colfunc_2s(col);
+            sw_profiler.masked_columns++;
             spryscale += rw_scalestep;
         }
     }
@@ -1202,9 +1215,11 @@ void Rend::R_RenderSegLoop()
             dc_texturemid = rw_midtexturemid * tr.yscale;
             dc_iscale = base_iscale * tr.yscale;
             dc_source = midtexture->GetColumn(texturecolumn);
+            sw_profiler.getcolumn_calls++;
             dc_texheight = tr.t->height;
 
             colfunc();
+            sw_profiler.wall_columns++;
 
             // dont draw anything more for this column, since
             // a midtexture blocks the view
@@ -1234,9 +1249,11 @@ void Rend::R_RenderSegLoop()
                     dc_texturemid = rw_toptexturemid * tr.yscale;
                     dc_iscale = base_iscale * tr.yscale;
                     dc_source = toptexture->GetColumn(texturecolumn);
+                    sw_profiler.getcolumn_calls++;
                     dc_texheight = tr.t->height;
 
                     colfunc();
+                    sw_profiler.wall_columns++;
 
                     ceilingclip[rw_x] = mid;
                 }
@@ -1275,9 +1292,11 @@ void Rend::R_RenderSegLoop()
                     dc_texturemid = rw_bottomtexturemid * tr.yscale;
                     dc_iscale = base_iscale * tr.yscale;
                     dc_source = bottomtexture->GetColumn(texturecolumn);
+                    sw_profiler.getcolumn_calls++;
                     dc_texheight = tr.t->height;
 
                     colfunc();
+                    sw_profiler.wall_columns++;
 
                     floorclip[rw_x] = mid;
 #ifdef OLDWATER

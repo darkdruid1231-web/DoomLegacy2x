@@ -231,6 +231,7 @@ void R_MapPlane(int y, int x1, int x2) // t1
 #endif
 
     spanfunc();
+    sw_profiler.spans++;
 
 #ifdef TIMING
     RDMSR(0x10, &mycount);

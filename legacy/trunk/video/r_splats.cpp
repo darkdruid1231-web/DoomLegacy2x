@@ -28,6 +28,7 @@
 #include "r_data.h"
 #include "r_main.h"
 #include "r_render.h"
+#include "r_draw.h"
 #include "r_splats.h"
 
 //==========================================================================
@@ -513,6 +514,7 @@ static void R_RenderFloorSplat(floorsplat_t *pSplat, vertex_t *verts, byte *pTex
         ds_x1 = x1;
         ds_x2 = x2;
         spanfunc();
+        sw_profiler.spans++;
 
         // reset for next calls to edge rasterizer
         rastertab[y].minx = fixed_t::FMAX;
@@ -540,7 +542,7 @@ static void R_RenderFloorSplat(floorsplat_t *pSplat, vertex_t *verts, byte *pTex
 
         x = (x2 - x1) + 1;
 
-        // point de d‚part dans la texture
+        // point de dï¿½part dans la texture
         tx = rastertab[y].tx1;
         ty = rastertab[y].ty1;
 
@@ -558,7 +560,7 @@ static void R_RenderFloorSplat(floorsplat_t *pSplat, vertex_t *verts, byte *pTex
             }
         }
 
-        // r‚initialise les minimus maximus pour le prochain appel
+        // rï¿½initialise les minimus maximus pour le prochain appel
         rastertab[y].minx = fixed_t::FMAX;
         rastertab[y].maxx = fixed_t::FMIN;
     }

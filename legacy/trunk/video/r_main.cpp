@@ -797,6 +797,7 @@ void R_SetViewport(int viewport)
 
 void Rend::R_RenderPlayerView(PlayerInfo *player)
 {
+    R_ResetSWProfiler();
     SetMap(player->mp);
     R_SetupFrame(player);
 
