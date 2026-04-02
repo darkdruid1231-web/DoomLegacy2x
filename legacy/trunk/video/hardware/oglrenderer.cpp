@@ -2865,6 +2865,21 @@ void OGLRenderer::DrawSpriteItem(const vec_t<fixed_t> &pos, Material *mat, int f
     if (!mat)
         return;
 
+    // In deferred mode the G-buffer MRT has draw buffers {0=scene, 1=normals} active.
+    // Fixed-function (no shader) writes gl_FragColor to ALL draw buffers, which would
+    // corrupt the normals attachment with sprite colour data and break deferred lighting.
+    // Restrict writes to attachment 0 (scene colour) for the duration of this sprite draw.
+    GLint cur_db[2] = {};
+    bool narrow_drawbuf = false;
+    glGetIntegerv(GL_DRAW_BUFFER0, &cur_db[0]);
+    glGetIntegerv(GL_DRAW_BUFFER1, &cur_db[1]);
+    if (cur_db[1] != GL_NONE)
+    {
+        GLenum only0 = GL_COLOR_ATTACHMENT0;
+        glDrawBuffers(1, &only0);
+        narrow_drawbuf = true;
+    }
+
     // Sprites always need blending enabled because they contain transparent pixels
     // (the "holes" in sprite graphics). Enable it explicitly even though it may
     // already be enabled from InitGLState.
@@ -2954,6 +2969,13 @@ void OGLRenderer::DrawSpriteItem(const vec_t<fixed_t> &pos, Material *mat, int f
     UploadMatrixUBO();
 
     glColor4f(1.0, 1.0, 1.0, 1.0); // back to normal material params
+
+    // Restore the draw buffers to what they were before the sprite draw.
+    if (narrow_drawbuf)
+    {
+        GLenum restore[2] = { (GLenum)cur_db[0], (GLenum)cur_db[1] };
+        glDrawBuffers(2, restore);
+    }
 }
 
 /// Check for visibility between the given glsubsectors. Returns true
