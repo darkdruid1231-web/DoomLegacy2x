@@ -1049,9 +1049,10 @@ Material *material_cache_t::BuildMaterial(Texture *t, cachesource_t<Material> &s
         r.yscale = t->height / r.worldheight;
         return m;
     }
-    // Normal (non-hires) case: insert texture, then create or replace material.
-    // insert Texture into cache, change name if it is already taken (HACK for namespace overlaps,
-    // just a few)
+    // Normal (non-hires) case: insert texture, then create material if none exists yet.
+    // All loading loops iterate nwads-1 down to 0 so later-loaded (PWAD) files are
+    // processed first and have priority.  When an earlier-loaded (IWAD) file provides a
+    // duplicate name, we keep the already-inserted PWAD version.
     if (textures.Exists(name.c_str()))
     {
         CONS_Printf("Overlap in Texture names '%s'!\n", name.c_str());
@@ -1070,18 +1071,7 @@ Material *material_cache_t::BuildMaterial(Texture *t, cachesource_t<Material> &s
         source.Insert(m);
         Register(m);
     }
-    else
-    {
-        // replace Texture in an existing Material (assume it has just one)
-        Material::TextureRef &r = m->tex[0];
-
-        r.t->Release();
-        t->AddRef();
-        r.t = t;
-        r.xscale = 1;
-        r.yscale = 1;
-        m->InitializeMaterial();
-    }
+    // else: material already exists from a higher-priority (later-loaded) file — keep it.
 
     return m;
 }
