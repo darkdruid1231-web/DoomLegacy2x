@@ -71,6 +71,12 @@ bool QuadBatch::AddQuad(const QuadVertex corners[4])
 void QuadBatch::Flush()
 {
     if (!quad_count || !vao_id) return;
+
+    // Save current VAO binding — Flush() uses its own VAO but immediate
+    // mode rendering (glBegin/glEnd) depends on the default VAO binding.
+    GLint saved_vao = 0;
+    glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &saved_vao);
+
     int vert_count = quad_count * 4;
     glBindVertexArray(vao_id);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
@@ -78,6 +84,10 @@ void QuadBatch::Flush()
     glDrawArrays(GL_QUADS, 0, vert_count);
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // Restore previous VAO binding so immediate mode continues to work.
+    glBindVertexArray(saved_vao);
+
     quad_count = 0;
 }
 
