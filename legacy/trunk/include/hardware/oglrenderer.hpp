@@ -214,6 +214,14 @@ private:
   GLfloat fog_color[3];
   GLfloat fog_start, fog_end;
 
+  // Fog state caching to skip redundant glEnable/Disable per subsector
+  GLboolean last_fog_enabled;
+  int last_fog_lightlevel;
+  GLfloat last_fog_start, last_fog_end;
+
+  // Texture bind tracking to skip redundant GLUse() calls
+  mutable Material *current_material;
+
   void UploadMatrixUBO();
   void DrawBlobShadow(class Actor *thing) const;
   void DrawAllBlobShadows() const;
@@ -244,6 +252,19 @@ public:
   void FinishFrame();
   void ClearDrawColorAndLights();
   bool WriteScreenshot(const char *fname = NULL);
+
+  // Profiling counters (reset each frame in StartFrame)
+  mutable int frame_wall_quads;
+  mutable int frame_flushes;
+  mutable int frame_texture_binds;
+  mutable int frame_sprite_draws;
+  mutable int frame_sprite_batches;
+  // Sprite state tracking for batching
+  Material *last_sprite_mat;
+  float last_sprite_alpha;
+  int last_sprite_flags;
+  // Helper to increment profiling counters from const methods
+  void inc_profiling_counters(bool texture_bind);
 
   bool ReadyToDraw() const { return workinggl; } // Console tries to draw to screen before video is initialized.
 

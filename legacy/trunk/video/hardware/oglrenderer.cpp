@@ -69,6 +69,7 @@ inline int SDL_GetWindowHeight_wrapper(SDL_Window *w) { int width, height; SDL_G
 #include "hardware/hw_gbuffer.h"
 #include "hardware/hw_shadowmap.h"
 #include "hardware/hw_lightdefs.h"
+#include "hardware/hw_quadbatch.h"
 
 #include "am_map.h"
 #include "m_random.h"
@@ -91,6 +92,9 @@ extern trace_t trace;
 
 void MD3_InitNormLookup();
 
+// Forward declaration for profiling console command
+static void Command_GrDrawStats_f();
+
 // CVar definitions (declared extern in cvars.h; hwr_render.cpp is not compiled).
 // Initialize value=1 so features are active before Reg() is called.
 consvar_t cv_grstaticlighting = {"gr_staticlighting", "On", CV_SAVE, CV_OnOff, NULL, 1};
@@ -98,6 +102,7 @@ consvar_t cv_grshadows        = {"gr_shadows",        "On", CV_SAVE, CV_OnOff, N
 consvar_t cv_grcoronas        = {"gr_coronas",        "On", CV_SAVE, CV_OnOff, NULL, 1};
 consvar_t cv_grcoronasize     = {"gr_coronasize",    "1",   CV_SAVE, NULL, NULL, 1};
 consvar_t cv_grdebugwall      = {"gr_debugwall",     "0",   CV_SAVE, NULL, NULL, 1};
+consvar_t cv_grbatchquads     = {"gr_batchquads",    "Off", CV_SAVE, CV_OnOff, NULL, 1};
 consvar_t cv_monball_light    = {"monball_light",     "On", CV_SAVE, CV_OnOff, NULL, 1};
 
 /// Convert Doom light level (0-255) to OpenGL color component (0.0-1.0).
@@ -662,6 +667,21 @@ OGLRenderer::OGLRenderer()
     fog_color[0] = fog_color[1] = fog_color[2] = 0.0f;
     fog_start = 0.0f;
     fog_end   = 0.0f;
+    // Fog state caching
+    last_fog_enabled = GL_FALSE;
+    last_fog_lightlevel = -1;
+    last_fog_start = 0.0f;
+    last_fog_end = 0.0f;
+    // Profiling counters
+    frame_wall_quads = 0;
+    frame_flushes = 0;
+    frame_texture_binds = 0;
+    frame_sprite_draws = 0;
+    frame_sprite_batches = 0;
+    last_sprite_mat = nullptr;
+    last_sprite_alpha = -1.0f;
+    last_sprite_flags = 0;
+    current_material = nullptr;
     // Identity matrices for safety
     cached_mv[0]   = cached_mv[5]   = cached_mv[10]  = cached_mv[15]  = 1.0f;
     cached_proj[0] = cached_proj[5] = cached_proj[10] = cached_proj[15] = 1.0f;
@@ -710,6 +730,14 @@ OGLRenderer::~OGLRenderer()
 /// Sets up those GL states that never change during rendering.
 void OGLRenderer::InitGLState()
 {
+    // One-time command registration
+    static bool commands_registered = false;
+    if (!commands_registered)
+    {
+        COM.AddCommand("gr_drawstats", Command_GrDrawStats_f);
+        commands_registered = true;
+    }
+
     glShadeModel(GL_SMOOTH);
     glEnable(GL_TEXTURE_2D);
 
@@ -747,6 +775,7 @@ void OGLRenderer::InitGLState()
     cv_grcoronas.Reg();
     cv_grcoronasize.Reg();
     cv_grdebugwall.Reg();
+    cv_grbatchquads.Reg();
     cv_monball_light.Reg();
 
     // Populate the data-driven light emitter table with hardcoded defaults.
@@ -755,6 +784,9 @@ void OGLRenderer::InitGLState()
     // Build the blob shadow and corona glow textures.
     InitShadowTexture();
     InitCoronaTexture();
+
+    // Initialize the quad batcher (VBO/VAO allocation).
+    quadbatch.Init();
 
     // Create and bind the MatrixUBO at binding point 0
     glGenBuffers(1, &matrix_ubo);
@@ -775,6 +807,16 @@ static int s_ogl_frame = 0;
 void OGLRenderer::StartFrame()
 {
     ++s_ogl_frame;
+    // Reset profiling counters
+    frame_wall_quads = 0;
+    frame_flushes = 0;
+    frame_texture_binds = 0;
+    frame_sprite_draws = 0;
+    frame_sprite_batches = 0;
+    last_sprite_mat = nullptr;
+    last_sprite_alpha = -1.0f;
+    last_sprite_flags = 0;
+    current_material = nullptr;
     if (postfx.IsActive())
         postfx.BindSceneFBO();
     // When G-buffer deferred mode is active, override the single-attachment
@@ -796,6 +838,13 @@ void OGLRenderer::FinishFrame()
 #else
     SDL_GL_SwapBuffers(); // Double buffered OpenGL goodness.
 #endif
+}
+
+void OGLRenderer::inc_profiling_counters(bool texture_bind)
+{
+    frame_wall_quads++;
+    if (texture_bind)
+        frame_texture_binds++;
 }
 
 // Set default material colors and lights to bright white with full
@@ -2164,6 +2213,7 @@ void OGLRenderer::RenderGlSsecPolygon(
 
     glNormal3f(0.0, 0.0, -loopinc);
     mat->GLUse();
+    current_material = mat;  // maintain cache coherence with floor/ceiling draws
 
     // For normal-mapped flats, supply a world-space tangent along +X.
     // The floor normal is (0,0,±1), so T=(1,0,0) gives B=cross(N,T)=(0,±1,0),
@@ -2355,6 +2405,7 @@ void OGLRenderer::RenderGLSubsector(int num)
     // Distance fog: darker sectors have denser fog (shorter visible range).
     // Phase F: when the sector has a fade_color set via extra_colormap,
     // use it as the fog end color (Doom 64-style colored fade).
+    // Fog state caching: skip redundant glEnable/Disable and glFog* calls.
     if (cv_grstaticlighting.value)
     {
         float light = (float)s->lightlevel / 255.0f;
@@ -2373,13 +2424,22 @@ void OGLRenderer::RenderGLSubsector(int num)
                 }
             }
         }
-        glEnable(GL_FOG);
-        glFogi(GL_FOG_MODE, GL_LINEAR);
-        glFogfv(GL_FOG_COLOR, fogColor);
         float fogStart = light * 1600.0f;
         float fogEnd   = fogStart + 800.0f;
-        glFogf(GL_FOG_START, fogStart);
-        glFogf(GL_FOG_END,   fogEnd);
+
+        // Fog state caching: only call GL if fog is disabled or lightlevel changed.
+        if (last_fog_enabled == GL_FALSE || last_fog_lightlevel != s->lightlevel)
+        {
+            glEnable(GL_FOG);
+            glFogi(GL_FOG_MODE, GL_LINEAR);
+            glFogfv(GL_FOG_COLOR, fogColor);
+            glFogf(GL_FOG_START, fogStart);
+            glFogf(GL_FOG_END,   fogEnd);
+            last_fog_enabled = GL_TRUE;
+            last_fog_lightlevel = s->lightlevel;
+            last_fog_start = fogStart;
+            last_fog_end = fogEnd;
+        }
         fog_color[0] = fogColor[0];
         fog_color[1] = fogColor[1];
         fog_color[2] = fogColor[2];
@@ -2388,7 +2448,12 @@ void OGLRenderer::RenderGLSubsector(int num)
     }
     else
     {
-        glDisable(GL_FOG);
+        // Fog state caching: only call glDisable if fog was enabled.
+        if (last_fog_enabled == GL_TRUE)
+        {
+            glDisable(GL_FOG);
+            last_fog_enabled = GL_FALSE;
+        }
         fog_start = fog_end = 0.0f;  // disable in-shader fog too
     }
 
@@ -2787,14 +2852,23 @@ void OGLRenderer::DrawSingleQuad(Material *m,
                                  float cmg,
                                  float cmb) const
 {
+    // Track wall quad count for profiling.
+    frame_wall_quads++;
+
     // Enable blending for textures that have transparency (alpha channel).
     // This is needed for wall textures that contain transparent pixels.
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    m->GLUse();
+    // Texture bind caching: skip redundant GLUse() when material hasn't changed.
+    if (m != current_material)
+    {
+        m->GLUse();
+        current_material = m;
+        frame_texture_binds++;
+    }
 
-    shader_attribs_t sa; // TEST
+    shader_attribs_t sa;
     sa.tangent[0] = (v2->x - v1->x).Float();
     sa.tangent[1] = (v2->y - v1->y).Float();
     sa.tangent[2] = 0;
@@ -2855,6 +2929,21 @@ void OGLRenderer::DrawSingleQuad(Material *m,
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
+static void Command_GrDrawStats_f()
+{
+    if (!oglrenderer)
+    {
+        CONS_Printf("gr_drawstats: OpenGL renderer not initialized.\n");
+        return;
+    }
+    CONS_Printf("GL Draw Stats this frame:\n");
+    CONS_Printf("  Wall quads:      %d\n", oglrenderer->frame_wall_quads);
+    CONS_Printf("  Flushes:         %d\n", oglrenderer->frame_flushes);
+    CONS_Printf("  Texture binds:    %d\n", oglrenderer->frame_texture_binds);
+    CONS_Printf("  Sprite draws:     %d\n", oglrenderer->frame_sprite_draws);
+    CONS_Printf("  Sprite batches:   %d\n", oglrenderer->frame_sprite_batches);
+}
+
 // Draws the specified item (weapon, monster, flying rocket etc) in
 // the 3D view. Translations and rotations are done with OpenGL
 // matrices.
@@ -2865,34 +2954,19 @@ void OGLRenderer::DrawSpriteItem(const vec_t<fixed_t> &pos, Material *mat, int f
     if (!mat)
         return;
 
-    // In deferred mode the G-buffer MRT has draw buffers {0=scene, 1=normals} active.
-    // Fixed-function (no shader) writes gl_FragColor to ALL draw buffers, which would
-    // corrupt the normals attachment with sprite colour data and break deferred lighting.
-    // Restrict writes to attachment 0 (scene colour) for the duration of this sprite draw.
-    GLint cur_db[2] = {};
-    bool narrow_drawbuf = false;
-    glGetIntegerv(GL_DRAW_BUFFER0, &cur_db[0]);
-    glGetIntegerv(GL_DRAW_BUFFER1, &cur_db[1]);
-    if (cur_db[1] != GL_NONE)
+    // Detect material or state change → new sprite batch
+    bool new_batch = (mat != last_sprite_mat || alpha != last_sprite_alpha || flags != last_sprite_flags);
+    if (new_batch)
     {
-        GLenum only0 = GL_COLOR_ATTACHMENT0;
-        glDrawBuffers(1, &only0);
-        narrow_drawbuf = true;
-    }
-
-    // Sprites always need blending enabled because they contain transparent pixels
-    // (the "holes" in sprite graphics). Enable it explicitly even though it may
-    // already be enabled from InitGLState.
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    if (alpha < 1.0)
-    {
-        glColor4f(1.0, 1.0, 1.0, alpha); // set material params
-    }
-    else
-    {
-        glColor4f(1.0, 1.0, 1.0, 1.0); // fully opaque
+        // Restore color before switching materials
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glColor4f(1.0f, 1.0f, 1.0f, alpha);
+        last_sprite_alpha = alpha;
+        last_sprite_flags = flags;
+        last_sprite_mat = mat;
+        frame_sprite_batches++;
     }
 
     GLfloat top, bottom, left, right;
@@ -2937,7 +3011,12 @@ void OGLRenderer::DrawSpriteItem(const vec_t<fixed_t> &pos, Material *mat, int f
     UploadMatrixUBO();
     glNormal3f(-1.0, 0.0, 0.0);
 
-    mat->GLUse();
+    // Use material bind caching (same as wall quads)
+    if (new_batch)
+    {
+        mat->GLUse();
+        current_material = mat;
+    }
 
     // NOTE: Material::GLSetTextureParams now handles clamping for masked textures.
     // This was previously hardcoded here but is now done correctly in r_data.cpp.
@@ -2968,14 +3047,7 @@ void OGLRenderer::DrawSpriteItem(const vec_t<fixed_t> &pos, Material *mat, int f
     memcpy(cached_mv, saved_mv, 64);
     UploadMatrixUBO();
 
-    glColor4f(1.0, 1.0, 1.0, 1.0); // back to normal material params
-
-    // Restore the draw buffers to what they were before the sprite draw.
-    if (narrow_drawbuf)
-    {
-        GLenum restore[2] = { (GLenum)cur_db[0], (GLenum)cur_db[1] };
-        glDrawBuffers(2, restore);
-    }
+    frame_sprite_draws++;
 }
 
 /// Check for visibility between the given glsubsectors. Returns true
