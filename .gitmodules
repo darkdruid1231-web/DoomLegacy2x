@@ -1,6 +1,0 @@
-[submodule "legacy/trunk/build/_deps/catch2-src"]
-	path = legacy/trunk/build/_deps/catch2-src
-	url = https://github.com/catchorg/Catch2.git
-[submodule "legacy/trunk/build-mingw/_deps/catch2-src"]
-	path = legacy/trunk/build-mingw/_deps/catch2-src
-	url = https://github.com/catchorg/Catch2.git

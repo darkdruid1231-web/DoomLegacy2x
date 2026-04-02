@@ -19,7 +19,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ${{ github.workspace }}/.sccache
-        key: ${{ runner.os }}-sccache-${{ hashFiles('legacy/trunk/**.[ch]pp', 'legacy/trunk/CMakeLists.txt', 'legacy/trunk/**/CMakeLists.txt') }}
+        key: ${{ runner.os }}-sccache-${{ hashFiles('src/**.[ch]pp', 'src/CMakeLists.txt', 'src/**/CMakeLists.txt') }}
         restore-keys: ${{ runner.os }}-sccache-
 
     - name: Set up MSYS2 MinGW64
@@ -54,8 +54,8 @@ jobs:
     - name: Configure CMake
       shell: msys2 {0}
       run: |
-        mkdir -p legacy/trunk/build-windows
-        cd legacy/trunk/build-windows
+        mkdir -p src/build-windows
+        cd src/build-windows
         cmake -G Ninja \
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_C_COMPILER_LAUNCHER=sccache \
@@ -65,13 +65,13 @@ jobs:
     - name: Build
       shell: msys2 {0}
       run: |
-        cd legacy/trunk/build-windows
+        cd src/build-windows
         ninja -j4
 
     - name: Run tests
       shell: msys2 {0}
       run: |
-        cd legacy/trunk/build-windows
+        cd src/build-windows
         ctest --output-on-failure
 
     - name: sccache stats
@@ -82,8 +82,8 @@ jobs:
     - name: Gather release files
       shell: msys2 {0}
       run: |
-        mkdir -p legacy/trunk/release
-        cd legacy/trunk/release
+        mkdir -p src/release
+        cd src/release
         cp ../build-windows/doomlegacy.exe .
         ldd doomlegacy.exe | grep '/mingw64/' | awk '{print $3}' | xargs -I{} cp {} .
         cp ../resources/legacy.wad .
@@ -92,6 +92,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: doomlegacy-windows
-        path: legacy/trunk/release/
+        path: src/release/
         retention-days: 30
         if-no-files-found: error

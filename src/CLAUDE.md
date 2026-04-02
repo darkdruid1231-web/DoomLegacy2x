@@ -12,7 +12,7 @@ Doom Legacy is a Doom/Doom II source port - a classic first-person shooter game 
 
 ```bash
 # Open MSYS2 MinGW64 shell
-cd legacy/trunk
+cd src
 mkdir build && cd build
 cmake .. -G Ninja
 ninja
@@ -27,7 +27,7 @@ skip recompilation of changed files.
 ### Linux / MSYS2 POSIX
 
 ```bash
-cd doomlegacy-svn/legacy/trunk
+cd doomlegacy-svn/src
 mkdir build && cd build
 cmake .. -G Ninja
 ninja
@@ -150,7 +150,7 @@ The project has dual networking stacks:
 - The loading screen is also called the **loading screen** or **startup screen** in comments.
 
 ### CONSBACK console background
-- Lump name `CONSBACK`, sourced from `legacy/trunk/resources/CON_background.png`, packed into
+- Lump name `CONSBACK`, sourced from `src/resources/CON_background.png`, packed into
   `legacy.wad` via `legacy.wad.inventory`.
 - In OGL mode the background is always drawn regardless of `con_backpic` cvar; in SW mode the
   cvar `con_backpic` toggles between the picture and the translucent overlay.

@@ -44,14 +44,14 @@ jobs:
 
     - name: Configure CMake
       run: |
-        cd legacy/trunk
+        cd src
         mkdir -p build-codeql
         cd build-codeql
         cmake .. -DCMAKE_BUILD_TYPE=Debug -DUSE_MODERN_NETWORKING=ON
 
     - name: Build (CodeQL traces the compiler)
       run: |
-        cd legacy/trunk/build-codeql
+        cd src/build-codeql
         cmake --build . --target test_fixed_t test_fixed_catch2 \
               test_vector test_console test_actor test_save_load_unit \
               --parallel

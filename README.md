@@ -1,10 +1,10 @@
 # Doom Legacy
 
-A source port of the classic Doom engine, extended with OpenGL rendering, multiplayer, splitscreen, and mod support. The codebase is a mix of C and C++ targeting the `legacy/trunk/` directory.
+A source port of the classic Doom engine, extended with OpenGL rendering, multiplayer, splitscreen, and mod support. The codebase is a mix of C and C++ targeting the `src/` directory.
 
 ## Features
 
-Full feature list: [`docs/features.md`](legacy/trunk/docs/features.md)
+Full feature list: [`docs/features.md`](src/docs/features.md)
 
 ### Graphics
 - OpenGL hardware-accelerated renderer ✅
@@ -36,7 +36,7 @@ Full feature list: [`docs/features.md`](legacy/trunk/docs/features.md)
 
 ## Building
 
-Full compile instructions: [`docs/compiling.md`](legacy/trunk/docs/compiling.md)
+Full compile instructions: [`docs/compiling.md`](src/docs/compiling.md)
 
 The CI pipeline builds Windows only using MSYS2 MinGW64 with Ninja — this is the supported and tested build path.
 
@@ -57,7 +57,7 @@ The CI pipeline builds Windows only using MSYS2 MinGW64 with Ninja — this is t
    ```
 3. Build:
    ```bash
-   cd legacy/trunk
+   cd src
    mkdir -p build && cd build
    cmake -G Ninja ..
    ninja
@@ -87,7 +87,7 @@ A Doom IWAD is required (`doom.wad`, `doom2.wad`, `doom1.wad`, etc.).
 
 ### In-game console
 
-Press the key below **Esc** to open the console. Full command reference: [`docs/console.md`](legacy/trunk/docs/console.md)
+Press the key below **Esc** to open the console. Full command reference: [`docs/console.md`](src/docs/console.md)
 
 Useful OpenGL cvars:
 
@@ -103,7 +103,7 @@ Useful OpenGL cvars:
 ## Project Structure
 
 ```
-legacy/trunk/
+src/
   engine/       Game logic: AI, actors, physics, map loading
   audio/        SDL_mixer sound and music
   video/        Rendering: OpenGL renderer, software renderer, hardware/
@@ -128,7 +128,7 @@ Key headers:
 ## Testing
 
 ```bash
-cd legacy/trunk/build
+cd src/build
 ctest              # run all registered tests
 ./test_fixed_t     # fixed-point arithmetic
 ./test_actor       # actor/mobj system
@@ -149,7 +149,7 @@ Validates the binary exists and responds to `--help`.
 
 ## Documentation
 
-All docs are in [`legacy/trunk/docs/`](legacy/trunk/docs/):
+All docs are in [`src/docs/`](src/docs/):
 
 | File | Contents |
 |---|---|
@@ -169,4 +169,4 @@ Based on the Doom Legacy engine. Licensed under the GNU General Public License v
 
 - Original Doom engine: id Software
 - Doom Legacy development team
-- See [`docs/legacy.html`](legacy/trunk/docs/legacy.html) for full credits
+- See [`docs/legacy.html`](src/docs/legacy.html) for full credits
