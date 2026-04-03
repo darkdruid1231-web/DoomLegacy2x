@@ -26,6 +26,13 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <limits.h>
+
+// On non-Windows, _stricmp is not available; use strcasecmp
+#if !defined(_WIN32)
+#include <cstring>
+#define _stricmp strcasecmp
+#endif
+
 #include "sc_man.h"
 
 #ifdef _MSC_VER
@@ -668,11 +675,7 @@ int SC_MustMatchString (const char **strings)
 
 bool SC_Compare (const char *text)
 {
-#ifdef _MSC_VER
-	return (_stricmp (text, sc_String) == 0);
-#else
-	return (strcasecmp (text, sc_String) == 0);
-#endif
+	return (stricmp (text, sc_String) == 0);
 }
 
 //==========================================================================

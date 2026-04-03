@@ -8,6 +8,13 @@
 #include <stdio.h>
 #include <string.h>
 
+// On non-Windows, stricmp/strnicmp are not available; use strcasecmp/strncasecmp
+#if !defined(_WIN32)
+#include <cstring>
+#define stricmp strcasecmp
+#define strnicmp(a, b, n) strncasecmp(a, b, n)
+#endif
+
 #include "zdbsp.h"
 #include "tarray.h"
 
