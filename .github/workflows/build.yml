@@ -79,20 +79,28 @@ jobs:
       shell: msys2 {0}
       run: sccache --show-stats
 
+    - name: Build legacy.wad
+      shell: msys2 {0}
+      run: bash src/build_wad.sh src/release/legacy.wad
+
     - name: Gather release files
       shell: msys2 {0}
       run: |
         mkdir -p src/release
+        cp src/build-windows/doomlegacy.exe src/release/
+        ldd src/build-windows/doomlegacy.exe | grep '/mingw64/' | awk '{print $3}' | xargs -I{} cp {} src/release/
+
+    - name: Package release
+      shell: msys2 {0}
+      run: |
         cd src/release
-        cp ../build-windows/doomlegacy.exe .
-        ldd doomlegacy.exe | grep '/mingw64/' | awk '{print $3}' | xargs -I{} cp {} .
-        cp ../resources/legacy.wad .
+        zip -r ../doomlegacy-windows.zip .
 
     - name: Upload Windows release
       uses: actions/upload-artifact@v4
       with:
         name: doomlegacy-windows
-        path: src/release/
+        path: src/doomlegacy-windows.zip
         retention-days: 30
         if-no-files-found: error
 
@@ -152,16 +160,23 @@ jobs:
       if: always()
       run: sccache --show-stats
 
+    - name: Build legacy.wad
+      run: bash src/build_wad.sh src/release-linux/legacy.wad
+
     - name: Gather release files
       run: |
         mkdir -p src/release-linux
         cp src/build-linux/doomlegacy src/release-linux/
-        cp src/resources/legacy.wad src/release-linux/
+
+    - name: Package release
+      run: |
+        cd src
+        tar -czf doomlegacy-linux.tar.gz -C release-linux .
 
     - name: Upload Linux release
       uses: actions/upload-artifact@v4
       with:
         name: doomlegacy-linux
-        path: src/release-linux/
+        path: src/doomlegacy-linux.tar.gz
         retention-days: 30
         if-no-files-found: error
