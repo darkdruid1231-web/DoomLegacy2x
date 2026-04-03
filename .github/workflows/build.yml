@@ -176,7 +176,9 @@ jobs:
       run: sccache --show-stats
 
     - name: Build legacy.wad
-      run: bash src/build_wad.sh src/release-linux/legacy.wad
+      run: |
+        mkdir -p src/release-linux
+        bash src/build_wad.sh src/release-linux/legacy.wad
 
     - name: Gather release files
       run: |
