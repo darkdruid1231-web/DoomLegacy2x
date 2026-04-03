@@ -143,16 +143,7 @@ jobs:
           libenet-dev \
           libwavpack-dev \
           flex bison lemon \
-          patchelf wget
-
-    - name: Download AppImage tools
-      run: |
-        # Download linuxdeploy (for bundling) and appimagetool (for creating AppImage)
-        wget -q "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage" -O linuxdeploy.AppImage
-        chmod +x linuxdeploy.AppImage
-
-        wget -q "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -O appimagetool.AppImage
-        chmod +x appimagetool.AppImage
+          patchelf
 
     - name: Configure CMake
       run: |
@@ -188,15 +179,83 @@ jobs:
         mkdir -p src/release-linux
         cp src/build-linux/doomlegacy src/release-linux/
 
+    - name: Create portable Linux bundle
+      run: |
+        # Create directory structure
+        mkdir -p src/portable/usr/bin
+        mkdir -p src/portable/usr/lib
+        mkdir -p src/portable/usr/share/applications
+
+        # Copy binary
+        cp src/build-linux/doomlegacy src/portable/usr/bin/
+
+        # Copy legacy.wad
+        cp src/release-linux/legacy.wad src/portable/usr/bin/
+
+        # Copy all required libraries
+        ldd src/build-linux/doomlegacy | grep "=>" | awk '{print $3}' | grep -v "^$" | while read lib; do
+          if [ -f "$lib" ]; then
+            mkdir -p "src/portable/usr/lib/$(dirname "$lib" | sed 's|/usr/lib/x86_64-linux-gnu||' | sed 's|/usr/lib||')"
+            cp -L "$lib" "src/portable/usr/lib/" 2>/dev/null || true
+          fi
+        done
+
+        # Also copy key SDL/GL libraries by name
+        for libname in libSDL2-2.0.so.0 libSDL2_mixer-2.0.so.0 libGLEW.so.2.2 \
+                       libpng16.so.16 libjpeg.so.62 libfreetype.so.6 \
+                       libvorbis.so.0 libvorbisfile.so.3 libFLAC.so.8 \
+                       libmpg123.so.0 libopus.so.0 libopenal.so.1 \
+                       libz.so.1 libenet.so.7 libWavPack.so.1 \
+                       libmad.so.0 libogg.so.0 libtheoraenc.so.0 \
+                       libtheoradec.so.1 libtheora.so.0; do
+          find /usr/lib -name "$libname*" 2>/dev/null | head -1 | xargs -I{} cp -L {} src/portable/usr/lib/ 2>/dev/null || true
+        done
+
+        # Copy additional GL libraries
+        for libname in libOpenGL.so.0 libGLX.so.0 libGLdispatch.so.0 libGL.so.1; do
+          find /usr/lib -name "$libname*" 2>/dev/null | head -1 | xargs -I{} cp -L {} src/portable/usr/lib/ 2>/dev/null || true
+        done
+
+        # Create launcher script
+        cat > src/portable/doomlegacy.sh << 'LAUNCHER'
+        #!/bin/bash
+        SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+        export LD_LIBRARY_PATH="${SCRIPT_DIR}/usr/lib:${LD_LIBRARY_PATH}"
+        export SDL_VIDEODRIVER=x11
+        exec "${SCRIPT_DIR}/usr/bin/doomlegacy" "$@"
+        LAUNCHER
+        chmod +x src/portable/doomlegacy.sh
+
+        # Create desktop file
+        cat > src/portable/doomlegacy.desktop << 'DESKTOP'
+        [Desktop Entry]
+        Name=Doom Legacy
+        Comment=Classic Doom source port
+        Exec=doomlegacy.sh
+        Icon=doomlegacy
+        Terminal=false
+        Type=Application
+        Categories=Game;ActionGame;
+        DESKTOP
+        cp src/portable/doomlegacy.desktop src/portable/usr/share/applications/
+
+        # Fix library paths in binary
+        patchelf --set-rpath '$ORIGIN/../lib' src/portable/usr/bin/doomlegacy 2>/dev/null || true
+
     - name: Package release
       run: |
         cd src
+        # Create tar.gz for portable distribution
+        tar -czf doomlegacy-portable.tar.gz -C portable .
+        # Also keep legacy tar.gz for dependency-less version
         tar -czf doomlegacy-linux.tar.gz -C release-linux .
 
     - name: Upload Linux release
       uses: actions/upload-artifact@v5
       with:
         name: doomlegacy-linux
-        path: src/doomlegacy-linux.tar.gz
+        path: |
+          src/doomlegacy-linux.tar.gz
+          src/doomlegacy-portable.tar.gz
         retention-days: 30
         if-no-files-found: error
