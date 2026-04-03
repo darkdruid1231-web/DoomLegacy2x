@@ -50,6 +50,7 @@ jobs:
           flex
           lemon
           bison
+          zip
 
     - name: Configure CMake
       shell: msys2 {0}
