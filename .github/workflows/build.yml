@@ -52,6 +52,13 @@ jobs:
           bison
           zip
 
+    - name: Cache MSYS2 packages
+      uses: actions/cache@v4
+      with:
+        path: C:\msys64\var\cache\pacman\pkg
+        key: ${{ runner.os }}-msys2-pkg-${{ hashFiles('.github/workflows/build.yml') }}
+        restore-keys: ${{ runner.os }}-msys2-pkg-
+
     - name: Configure CMake
       shell: msys2 {0}
       run: |
@@ -136,6 +143,13 @@ jobs:
           libenet-dev \
           libwavpack-dev \
           flex bison lemon
+
+    - name: Cache apt packages
+      uses: actions/cache@v4
+      with:
+        path: /var/cache/apt/archives
+        key: ${{ runner.os }}-apt-pkg-${{ hashFiles('.github/workflows/build.yml') }}
+        restore-keys: ${{ runner.os }}-apt-pkg-
 
     - name: Configure CMake
       run: |
