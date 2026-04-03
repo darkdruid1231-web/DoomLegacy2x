@@ -34,8 +34,6 @@ jobs:
           mingw-w64-x86_64-pkg-config
           mingw-w64-x86_64-sccache
           mingw-w64-x86_64-glew
-          mingw-w64-x86_64-SDL2
-          mingw-w64-x86_64-SDL2_mixer
           mingw-w64-x86_64-libpng
           mingw-w64-x86_64-libjpeg-turbo
           mingw-w64-x86_64-openal
@@ -52,6 +50,20 @@ jobs:
           bison
           zip
 
+    - name: Download SDL3
+      shell: bash
+      run: |
+        curl -L -o SDL3.zip https://github.com/libsdl-org/SDL/releases/download/release-3.2.0/SDL3-devel-3.2.0-mingw.tar.gz
+        tar -xzf SDL3.zip -C /mingw64
+        rm SDL3.zip
+
+    - name: Download SDL3_mixer
+      shell: bash
+      run: |
+        curl -L -o SDL3_mixer.tar.gz https://github.com/libsdl-org/SDL_mixer/releases/download/release-3.2.0/SDL3_mixer-devel-3.2.0-mingw.tar.gz
+        tar -xzf SDL3_mixer.tar.gz -C /mingw64
+        rm SDL3_mixer.tar.gz
+
     - name: Cache MSYS2 packages
       uses: actions/cache@v5
       with:
@@ -62,12 +74,14 @@ jobs:
     - name: Configure CMake
       shell: msys2 {0}
       run: |
+        export PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:$PKG_CONFIG_PATH"
         mkdir -p src/build-windows
         cd src/build-windows
         cmake -G Ninja \
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_C_COMPILER_LAUNCHER=sccache \
           -DCMAKE_CXX_COMPILER_LAUNCHER=sccache \
+          -DSDL3_DIR=/mingw64 \
           ..
 
     - name: Build
@@ -133,7 +147,7 @@ jobs:
         sudo apt-get install -y \
           cmake ninja-build pkg-config sccache \
           gcc g++ \
-          libsdl2-dev libsdl2-mixer-dev \
+          libsdl3-dev \
           libglew-dev \
           libpng-dev libjpeg-dev \
           zlib1g-dev \
@@ -201,7 +215,7 @@ jobs:
         done
 
         # Also copy key SDL/GL libraries by name
-        for libname in libSDL2-2.0.so.0 libSDL2_mixer-2.0.so.0 libGLEW.so.2.2 \
+        for libname in libSDL-3.0.so.0 libSDL3_mixer.so.0 libGLEW.so.2.2 \
                        libpng16.so.16 libjpeg.so.62 libfreetype.so.6 \
                        libvorbis.so.0 libvorbisfile.so.3 libFLAC.so.8 \
                        libmpg123.so.0 libopus.so.0 libopenal.so.1 \
