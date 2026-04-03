@@ -20,6 +20,11 @@
 
 // HEADER FILES ------------------------------------------------------------
 
+#ifndef WIN32
+#define stricmp strcasecmp
+#define strnicmp strncasecmp
+#endif
+
 #ifdef _WIN32
 
 // Need windows.h for QueryPerformanceCounter

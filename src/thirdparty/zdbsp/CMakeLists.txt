@@ -53,6 +53,11 @@ target_include_directories(zdbsp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # ZDBSP defines
 target_compile_definitions(zdbsp PRIVATE -DDISABLE_SSE)
 
+# Skip Windows-only map viewer code on non-Windows platforms
+if(NOT WIN32)
+    target_compile_definitions(zdbsp PRIVATE -DNO_MAP_VIEWER)
+endif()
+
 # Also build the CLI tool (zdbsp.exe) using same compiler settings
 # Note: getopt.c is excluded - use system getopt instead (conflict with modern MinGW)
 set(ZDBSP_CLI_SOURCES
