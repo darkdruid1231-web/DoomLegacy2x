@@ -24,6 +24,9 @@
 
 #if defined(_WIN32) || defined(__MINGW32__)
 #define GLEW_STATIC
+#endif
+#if defined(_WIN32) || defined(__MINGW32__) || defined(__linux__)
+#define GLEW_NO_GDL
 #include <GL/glew.h>
 #endif
 #ifdef SDL2
