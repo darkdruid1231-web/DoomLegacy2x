@@ -78,7 +78,7 @@ typedef int BOOL;
 // NOTE! Somewhere in the code we may still implicitly assume that int = 32 bits, short = 16 bits!
 // These should be replaced with the unambiguous types defined below.
 #ifdef SDL
-#include "SDL_types.h"
+#include "SDL3/SDL_stdinc.h"
 #else
 #include <stdint.h>
 typedef int8_t Sint8;

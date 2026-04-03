@@ -65,7 +65,7 @@ add_library(MockSound STATIC
 target_include_directories(MockSound PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/include/core
-    ${SDL2_INCLUDE_DIRS}
+    ${SDL3_INCLUDE_DIRS}
 )
 target_link_libraries(MockSound PRIVATE
     gtest
@@ -84,7 +84,7 @@ target_include_directories(MockGame PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/include/core
     ${CMAKE_SOURCE_DIR}/include/game
-    ${SDL2_INCLUDE_DIRS}
+    ${SDL3_INCLUDE_DIRS}
 )
 target_link_libraries(MockGame PRIVATE
     gtest
@@ -155,7 +155,7 @@ add_library(MockSoundPlayer STATIC
 target_include_directories(MockSoundPlayer PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/include/core
-    ${SDL2_INCLUDE_DIRS}
+    ${SDL3_INCLUDE_DIRS}
 )
 target_link_libraries(MockSoundPlayer PRIVATE
     gtest
@@ -192,7 +192,7 @@ target_include_directories(MockInputProvider PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/include/core
     ${CMAKE_SOURCE_DIR}/include/game
-    ${SDL2_INCLUDE_DIRS}
+    ${SDL3_INCLUDE_DIRS}
 )
 target_link_libraries(MockInputProvider PRIVATE
     gtest

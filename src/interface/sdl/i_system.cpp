@@ -49,35 +49,31 @@
 #include <termios.h>
 #endif
 
-#include "SDL.h"
+#include "SDL3/SDL.h"
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
-#ifdef SDL2
-// SDL2 compatibility macros for SDL1 code
-#include <SDL2/SDL_video.h>
+#ifdef SDL3
+// SDL3 compatibility macros for SDL1 code
+#include <SDL3/SDL_video.h>
 #define SDLKey SDL_Keycode
-#define SDL_Keysym SDL_Keysym
 #define SDL_WarpMouse(x, y) SDL_WarpMouseInWindow(NULL, x, y)
 #define SDL_WM_SetCaption(t, i) SDL_SetWindowTitle(NULL, t)
-#define SDL_EnableUNICODE(x) // no-op in SDL2
+#define SDL_EnableUNICODE(x) // no-op in SDL3
 
-// SDL2 removed the unicode field in keysym. Translate keycode + modifiers to a
-// Unicode code point for printable ASCII characters (US QWERTY layout).
+// SDL3 removed SDL_Keysym - key info is directly in SDL_KeyboardEvent.
+// This function computes unicode from keycode + modifiers (US QWERTY layout).
 // Covers all console input needs without requiring SDL_TEXTINPUT events.
-static int SDL_Keysym_unicode(SDL_Keysym keysym)
+static int SDL_Keysym_unicode(SDL_Keycode sym, SDL_Keymod mod)
 {
-    SDL_Keycode sym = keysym.sym;
-    int mod = keysym.mod;
-
-    // SDL2 printable ASCII keycodes match their ASCII values (32-126)
+    // SDL3 printable ASCII keycodes match their ASCII values (32-126)
     if (sym < 32 || sym > 126)
         return 0;
 
-    bool shift = (mod & KMOD_SHIFT) != 0;
-    bool caps  = (mod & KMOD_CAPS)  != 0;
+    bool shift = (mod & SDL_KMOD_SHIFT) != 0;
+    bool caps  = (mod & SDL_KMOD_CAPS)  != 0;
 
     if (sym >= 'a' && sym <= 'z')
         return (shift ^ caps) ? sym - 32 : sym;
@@ -99,7 +95,7 @@ static int SDL_Keysym_unicode(SDL_Keysym keysym)
     }
 }
 
-// SDL2 mouse grab - use GetSDLWindow from i_video.cpp
+// SDL3 mouse grab - use GetSDLWindow from i_video.cpp
 extern SDL_Window* GetSDLWindow();
 #define SDL_WM_GrabInput(mode) SDL_SetWindowGrab(GetSDLWindow(), mode)
 #define SDL_GRAB_QUERY SDL_FALSE
@@ -192,11 +188,11 @@ static int xlatekey(SDLKey sym)
     if (sym >= ' ' && sym <= '~')
         return sym;
 
-    // Handle SDL2 key codes that changed from SDL1
-    // SDL2 uses different values for special keys
+    // Handle SDL3 key codes that changed from SDL1
+    // SDL3 uses different values for special keys
     switch (sym)
     {
-        // Arrow keys (SDL2 values: 26-29)
+        // Arrow keys (SDL3 values: 26-29)
         case SDLK_UP:    return KEY_UPARROW;
         case SDLK_DOWN:  return KEY_DOWNARROW;
         case SDLK_RIGHT: return KEY_RIGHTARROW;
@@ -209,7 +205,7 @@ static int xlatekey(SDLKey sym)
         case SDLK_PAGEUP:   return KEY_PGUP;
         case SDLK_PAGEDOWN: return KEY_PGDN;
 
-        // Function keys (SDL2: 258-269)
+        // Function keys (SDL3: 258-269)
         case SDLK_F1:  return KEY_F1;
         case SDLK_F2:  return KEY_F2;
         case SDLK_F3:  return KEY_F3;
@@ -223,7 +219,7 @@ static int xlatekey(SDLKey sym)
         case SDLK_F11: return KEY_F11;
         case SDLK_F12: return KEY_F12;
 
-        // Keypad keys (SDL2: 256-271)
+        // Keypad keys (SDL3: 256-271)
         case SDLK_KP_0:       return KEY_KEYPAD0;
         case SDLK_KP_1:       return KEY_KEYPAD1;
         case SDLK_KP_2:       return KEY_KEYPAD2;
@@ -300,21 +296,21 @@ void I_GetEvent()
     {
         switch (inputEvent.type)
         {
-            case SDL_KEYDOWN:
+            case SDL_EVENT_KEY_DOWN:
             {
                 event.type = ev_keydown;
-                SDLKey sym = inputEvent.key.keysym.sym;
+                SDLKey sym = inputEvent.key.key;
                 event.data1 = xlatekey(sym); // key symbol
 
-                int mod = inputEvent.key.keysym.mod; // modifier key states
+                SDL_Keymod mod = inputEvent.key.mod; // modifier key states
                 // TODO actually this belongs in D_PostEvent, but not until we have another
                 // interface...
-                shiftdown = mod & KMOD_SHIFT;
-                altdown = mod & KMOD_ALT;
+                shiftdown = mod & SDL_KMOD_SHIFT;
+                altdown = mod & SDL_KMOD_ALT;
 
                 // Corresponding ASCII char, if applicable (for console etc.), otherwise zero.
-#ifdef SDL2
-                event.data2 = SDL_Keysym_unicode(inputEvent.key.keysym);
+#ifdef SDL3
+                event.data2 = SDL_Keysym_unicode(inputEvent.key.key, mod);
 #else
                 event.data2 =
                     inputEvent.key.keysym
@@ -325,34 +321,35 @@ void I_GetEvent()
             }
             break;
 
-            case SDL_KEYUP:
+            case SDL_EVENT_KEY_UP:
                 event.type = ev_keyup;
-                event.data1 = xlatekey(inputEvent.key.keysym.sym);
+                event.data1 = xlatekey(inputEvent.key.key);
 
                 shiftdown =
-                    inputEvent.key.keysym.mod & KMOD_SHIFT;     // SHIFT may just have been released
-                altdown = inputEvent.key.keysym.mod & KMOD_ALT; // same for ALT
+                    inputEvent.key.mod & SDL_KMOD_SHIFT;     // SHIFT may just have been released
+                altdown = inputEvent.key.mod & SDL_KMOD_ALT; // same for ALT
                 D_PostEvent(&event);
                 break;
 
-            case SDL_MOUSEMOTION:
+            case SDL_EVENT_MOUSE_MOTION:
                 if (cv_usemouse[0].value)
                 {
                     // If the event is from warping the pointer back to middle
                     // of the screen then ignore it.
-                    if ((inputEvent.motion.x == vid.width / 2) &&
-                        (inputEvent.motion.y == vid.height / 2))
+                    float mx = inputEvent.motion.x;
+                    float my = inputEvent.motion.y;
+                    if ((mx == vid.width / 2) && (my == vid.height / 2))
                     {
-                        lastmousex = inputEvent.motion.x;
-                        lastmousey = inputEvent.motion.y;
+                        lastmousex = (int)mx;
+                        lastmousey = (int)my;
                         break;
                     }
                     else
                     {
-                        event.data2 = (inputEvent.motion.x - lastmousex) << 2;
-                        lastmousex = inputEvent.motion.x;
-                        event.data3 = (lastmousey - inputEvent.motion.y) << 2;
-                        lastmousey = inputEvent.motion.y;
+                        event.data2 = (int)(inputEvent.motion.xrel * 4.0f);
+                        event.data3 = (int)(inputEvent.motion.yrel * 4.0f);
+                        lastmousex = (int)mx;
+                        lastmousey = (int)my;
                     }
                     event.type = ev_mouse;
                     event.data1 = 0;
@@ -361,22 +358,22 @@ void I_GetEvent()
 
                     // Warp the pointer back to the middle of the window
                     //  or we cannot move any further if it's at a border.
-                    if ((inputEvent.motion.x < (vid.width / 2) - (vid.width / 4)) ||
-                        (inputEvent.motion.y < (vid.height / 2) - (vid.height / 4)) ||
-                        (inputEvent.motion.x > (vid.width / 2) + (vid.width / 4)) ||
-                        (inputEvent.motion.y > (vid.height / 2) + (vid.height / 4)))
+                    if ((mx < (vid.width / 2) - (vid.width / 4)) ||
+                        (my < (vid.height / 2) - (vid.height / 4)) ||
+                        (mx > (vid.width / 2) + (vid.width / 4)) ||
+                        (my > (vid.height / 2) + (vid.height / 4)))
                     {
                         if (warp_mouse)
-                            SDL_WarpMouse(vid.width / 2, vid.height / 2);
+                            SDL_WarpMouse((float)(vid.width / 2), (float)(vid.height / 2));
                     }
                 }
                 break;
 
-            case SDL_MOUSEBUTTONDOWN:
-            case SDL_MOUSEBUTTONUP:
+            case SDL_EVENT_MOUSE_BUTTON_DOWN:
+            case SDL_EVENT_MOUSE_BUTTON_UP:
                 if (cv_usemouse[0].value)
                 {
-                    if (inputEvent.type == SDL_MOUSEBUTTONDOWN)
+                    if (inputEvent.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
                         event.type = ev_keydown;
                     else
                         event.type = ev_keyup;
@@ -385,21 +382,21 @@ void I_GetEvent()
                 }
                 break;
 
-            case SDL_JOYBUTTONDOWN:
+            case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
                 event.type = ev_keydown;
                 event.data1 =
                     TranslateJoybutton(inputEvent.jbutton.which, inputEvent.jbutton.button);
                 D_PostEvent(&event);
                 break;
 
-            case SDL_JOYBUTTONUP:
+            case SDL_EVENT_JOYSTICK_BUTTON_UP:
                 event.type = ev_keyup;
                 event.data1 =
                     TranslateJoybutton(inputEvent.jbutton.which, inputEvent.jbutton.button);
                 D_PostEvent(&event);
                 break;
 
-            case SDL_QUIT:
+            case SDL_EVENT_QUIT:
                 I_Quit();
                 break;
 
@@ -424,31 +421,31 @@ void I_GrabMouse()
     if (devparm)
         return; // we don't want to hog input when debugging
 
-#ifdef SDL2
+#ifdef SDL3
     SDL_Window* win = GetSDLWindow();
-    if (cv_grabinput.value && win && SDL_GetWindowGrab(win) == SDL_FALSE)
-        SDL_SetWindowGrab(win, SDL_TRUE);
+    if (cv_grabinput.value && win && !SDL_GetWindowMouseGrab(win))
+        SDL_SetWindowMouseGrab(win, true);
 #else
     if (cv_grabinput.value && SDL_WM_GrabInput(SDL_GRAB_QUERY) == SDL_GRAB_OFF)
         SDL_WM_GrabInput(SDL_GRAB_ON);
 #endif
 
-    SDL_ShowCursor(SDL_DISABLE);
+    SDL_HideCursor();
     warp_mouse = true;
 }
 
 void I_UngrabMouse()
 {
-#ifdef SDL2
+#ifdef SDL3
     SDL_Window* win = GetSDLWindow();
-    if (win && SDL_GetWindowGrab(win) == SDL_TRUE)
-        SDL_SetWindowGrab(win, SDL_FALSE);
+    if (win && SDL_GetWindowMouseGrab(win))
+        SDL_SetWindowMouseGrab(win, false);
 #else
     if (SDL_WM_GrabInput(SDL_GRAB_QUERY) == SDL_GRAB_ON)
         SDL_WM_GrabInput(SDL_GRAB_OFF);
 #endif
 
-    SDL_ShowCursor(SDL_ENABLE);
+    SDL_ShowCursor();
     warp_mouse = false;
 }
 
@@ -711,24 +708,22 @@ void I_JoystickInit()
     // Joystick subsystem was initialized at the same time as video,
     // because otherwise it won't work. (don't know why, though ...)
 
-    int numjoysticks = SDL_NumJoysticks();
+    int numjoysticks = 0;
+    SDL_JoystickID *joystick_ids = SDL_GetJoysticks(&numjoysticks);
     CONS_Printf(" %d joystick(s) found.\n", numjoysticks);
 
-    // Start receiving joystick events.
-    SDL_JoystickEventState(SDL_ENABLE);
+    // In SDL3, joystick events are automatically enabled through the event loop.
+    // SDL_JoystickEventState(SDL_ENABLE) is no longer needed.
 
     for (int i = 0; i < numjoysticks; i++)
     {
-        SDL_Joystick *joy = SDL_JoystickOpen(i);
+        SDL_JoystickID instance_id = joystick_ids[i];
+        SDL_Joystick *joy = SDL_OpenJoystick(instance_id);
         joysticks.push_back(joy);
-        if (devparm)
+        if (devparm && joy)
         {
             CONS_Printf(" Properties of joystick %d:\n", i);
-            CONS_Printf("    %s.\n", SDL_JoystickName(i));
-            CONS_Printf("    %d axes.\n", SDL_JoystickNumAxes(joy));
-            CONS_Printf("    %d buttons.\n", SDL_JoystickNumButtons(joy));
-            CONS_Printf("    %d hats.\n", SDL_JoystickNumHats(joy));
-            CONS_Printf("    %d trackballs.\n", SDL_JoystickNumBalls(joy));
+            CONS_Printf("    %s.\n", SDL_GetJoystickName(joy));
         }
     }
 }
@@ -741,8 +736,10 @@ void I_ShutdownJoystick()
     CONS_Printf("Shutting down joysticks.\n");
     for (i = 0; i < (int)joysticks.size(); i++)
     {
-        CONS_Printf("Closing joystick %s.\n", SDL_JoystickName(i));
-        SDL_JoystickClose(joysticks[i]);
+        if (joysticks[i]) {
+            CONS_Printf("Closing joystick %s.\n", SDL_GetJoystickName(joysticks[i]));
+            SDL_CloseJoystick(joysticks[i]);
+        }
     }
     joysticks.clear();
     CONS_Printf("Joystick subsystem closed cleanly.\n");

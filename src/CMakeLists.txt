@@ -33,8 +33,8 @@ include_directories(
 # Global compile options
 # Workaround for GCC 13+ / MinGW intrinsics conflicts
 add_compile_definitions(_XSAVEINTRIN_H_INCLUDED _CPUID_H_INCLUDED _XGETBV_DEFINED WIN32_LEAN_AND_MEAN NOMINMAX)
-# SDL2 only
-add_compile_definitions(SDL SDL2)
+# SDL3 only
+add_compile_definitions(SDL SDL3)
 # Use TNL stub (no actual TNL library)
 add_compile_definitions(TNL_STUB_BUILD)
 # Math constants (M_PI not in C++11 by default)
@@ -65,54 +65,43 @@ set(DL_VERSION_PATCH "9")
 set(DL_VERSION "${DL_VERSION_MAJOR}.${DL_VERSION_MINOR}.${DL_VERSION_PATCH}")
 
 # External libraries. First SDL.
-option(USE_SDL2 "Enable SDL2 support" ON)
-
-if(USE_SDL2)
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(SDL2 REQUIRED sdl2)
-    if(SDL2_LIBRARY_DIRS)
-        link_directories(${SDL2_LIBRARY_DIRS})
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(SDL3 REQUIRED sdl3)
+if(SDL3_LIBRARY_DIRS)
+    link_directories(${SDL3_LIBRARY_DIRS})
+endif()
+option(USE_SOUND "Enable sound support" ON)
+if(USE_SOUND STREQUAL "ON")
+    pkg_check_modules(SDL3MIXER sdl3-mixer)
+    if(SDL3MIXER_LIBRARY_DIRS)
+        link_directories(${SDL3MIXER_LIBRARY_DIRS})
     endif()
-    option(USE_SOUND "Enable sound support" ON)
-    if(USE_SOUND STREQUAL "ON")
-        pkg_check_modules(SDL2MIXER SDL2_mixer)
-        if(SDL2MIXER_LIBRARY_DIRS)
-            link_directories(${SDL2MIXER_LIBRARY_DIRS})
+    if(SDL3MIXER_FOUND)
+        set(HAVE_MIXER 1)
+        list(APPEND SOURCES interface/sdl/i_sound.cpp)
+    else()
+        message(STATUS "SDL3_mixer not found, disabling sound")
+        add_compile_definitions(NO_MIXER)
+    endif()
+endif()
+# FreeType for TrueType font support
+option(USE_TTF "Enable TrueType font support" ON)
+if(USE_TTF STREQUAL "ON")
+    pkg_check_modules(FREETYPE freetype2)
+    if(FREETYPE_FOUND)
+        set(HAVE_TTF 1)
+        add_compile_definitions(HAVE_TTF)
+        include_directories(${FREETYPE_INCLUDE_DIRS})
+        if(FREETYPE_LIBRARY_DIRS)
+            link_directories(${FREETYPE_LIBRARY_DIRS})
         endif()
-        if(SDL2MIXER_FOUND)
-            set(HAVE_MIXER 1)
-            list(APPEND SOURCES interface/sdl/i_sound.cpp)
-        else()
-            message(STATUS "SDL2_mixer not found, disabling sound")
-        endif()
+        message(STATUS "FreeType found, TrueType fonts enabled")
+    else()
+        message(STATUS "FreeType not found, TrueType fonts disabled")
     endif()
-    # FreeType for TrueType font support
-    option(USE_TTF "Enable TrueType font support" ON)
-    if(USE_TTF STREQUAL "ON")
-        pkg_check_modules(FREETYPE freetype2)
-        if(FREETYPE_FOUND)
-            set(HAVE_TTF 1)
-            add_compile_definitions(HAVE_TTF)
-            include_directories(${FREETYPE_INCLUDE_DIRS})
-            if(FREETYPE_LIBRARY_DIRS)
-                link_directories(${FREETYPE_LIBRARY_DIRS})
-            endif()
-            message(STATUS "FreeType found, TrueType fonts enabled")
-        else()
-            message(STATUS "FreeType not found, TrueType fonts disabled")
-        endif()
-    endif()
-    if(SDL2_FOUND)
-        include_directories(${SDL2_INCLUDE_DIRS})
-    endif()
-else()
-    message(STATUS "SDL2 disabled, using SDL1")
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(SDL REQUIRED sdl)
-    include_directories(${SDL_INCLUDE_DIRS})
-    add_compile_definitions(SDL)
-    set(SDL2_LIBRARIES ${SDL_LIBRARIES})
-    set(SDL2_INCLUDE_DIRS ${SDL_INCLUDE_DIRS})
+endif()
+if(SDL3_FOUND)
+    include_directories(${SDL3_INCLUDE_DIRS})
 endif()
 
 # OpenGL
@@ -171,7 +160,6 @@ add_subdirectory(interface)
 # Get interface sources for the executable
 set(INTERFACE_SOURCES
     interface/sdl/endtxt.cpp
-    interface/sdl/i_cdmus.cpp
     interface/sdl/i_main.cpp
     interface/sdl/i_net.cpp
     interface/sdl/i_sound.cpp
@@ -203,8 +191,8 @@ target_link_libraries(doomlegacy PRIVATE
     ${GLEW_LIBRARIES}
     ${OPENGL_LIBRARIES}
     "-Wl,--end-group"
-    ${SDL2_LIBRARIES}
-    ${SDL2MIXER_LIBRARIES}
+    ${SDL3_LIBRARIES}
+    ${SDL3MIXER_LIBRARIES}
     ${FREETYPE_LIBRARIES}
     ${ZLIB_LIBRARIES}
     ${PNG_LIBRARY}
@@ -237,8 +225,8 @@ target_link_libraries(test_menu_navigation PRIVATE
     ${GLEW_LIBRARIES}
     ${OPENGL_LIBRARIES}
     "-Wl,--end-group"
-    ${SDL2_LIBRARIES}
-    ${SDL2MIXER_LIBRARIES}
+    ${SDL3_LIBRARIES}
+    ${SDL3MIXER_LIBRARIES}
     ${FREETYPE_LIBRARIES}
     ${ZLIB_LIBRARIES}
     ${PNG_LIBRARY}
@@ -268,8 +256,8 @@ target_link_libraries(test_menu_widget PRIVATE
     ${GLEW_LIBRARIES}
     ${OPENGL_LIBRARIES}
     "-Wl,--end-group"
-    ${SDL2_LIBRARIES}
-    ${SDL2MIXER_LIBRARIES}
+    ${SDL3_LIBRARIES}
+    ${SDL3MIXER_LIBRARIES}
     ${FREETYPE_LIBRARIES}
     ${ZLIB_LIBRARIES}
     ${PNG_LIBRARY}
@@ -300,8 +288,8 @@ target_link_libraries(test_menu_draw PRIVATE
     ${GLEW_LIBRARIES}
     ${OPENGL_LIBRARIES}
     "-Wl,--end-group"
-    ${SDL2_LIBRARIES}
-    ${SDL2MIXER_LIBRARIES}
+    ${SDL3_LIBRARIES}
+    ${SDL3MIXER_LIBRARIES}
     ${FREETYPE_LIBRARIES}
     ${ZLIB_LIBRARIES}
     ${PNG_LIBRARY}

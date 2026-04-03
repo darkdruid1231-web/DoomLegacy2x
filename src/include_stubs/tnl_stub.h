@@ -13,16 +13,13 @@ typedef unsigned char byte;
 #include <string>
 #include <vector>
 #include "lnet.h"
-#ifdef SDL2
-#include <SDL2/SDL.h>
-#ifdef HAVE_SDL2_MIXER
-#include <SDL2/SDL_mixer.h>
+#ifdef SDL3
+#include <SDL3/SDL.h>
+#ifdef HAVE_SDL3_MIXER
+#include <SDL3/SDL_mixer.h>
 #endif
 #else
-#include <SDL/SDL.h>
-#ifdef HAVE_SDL2_MIXER
-#include <SDL/SDL_mixer.h>
-#endif
+#error "This codebase now requires SDL3"
 #endif
 #include <map>
 

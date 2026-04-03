@@ -19,12 +19,11 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
 #endif
-#ifdef SDL2
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
+#ifdef SDL3
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_opengl.h>
 #else
-#include <SDL/SDL.h>
-#include <SDL/SDL_opengl.h>
+#error "This codebase now requires SDL3"
 #endif
 #include <GL/gl.h>
 #include <GL/glext.h>

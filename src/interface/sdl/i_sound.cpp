@@ -30,9 +30,9 @@
 #include <string.h>
 
 // SDL and OpenAL
-#include "SDL.h"
+#include "SDL3/SDL.h"
 #ifndef NO_MIXER
-#include "SDL_mixer.h"
+#include "SDL3/SDL_mixer.h"
 #endif
 
 // OpenAL headers (only when available)
@@ -189,16 +189,10 @@ static stub_music_stream_t music_stream = {false};
 
 // Legacy software mixing support
 #ifndef NO_MIXER
-static struct music_channel_t
-{
-    Mix_Music *mus;
-    SDL_RWops *rwop;
-    music_channel_t()
-    {
-        mus = NULL;
-        rwop = NULL;
-    }
-} music;
+// SDL3_mixer structures
+static MIX_Mixer *music_mixer = nullptr;
+static MIX_Audio *music_audio = nullptr;
+static MIX_Track *music_track = nullptr;
 #endif
 
 static void I_SetChannels()
@@ -886,19 +880,11 @@ int I_StartSound(soundchannel_t *c)
         return I_OpenALStartSound(c);
     }
 
-#ifdef NO_MIXER
-    SDL_LockAudio();
-#endif
-
     c->samplesize = c->si->depth;
     c->data = (Uint8 *)c->si->sdata;
     c->end = c->data + c->si->length;
     c->stepremainder = 0;
     c->playing = true;
-
-#ifdef NO_MIXER
-    SDL_UnlockAudio();
-#endif
 
     return 1;
 }
@@ -1006,9 +992,14 @@ void I_StartupSound()
     }
     
     audio.freq = SAMPLERATE;
+#ifndef SDL3
     audio.format = AUDIO_S16SYS;
     audio.channels = 2;
     audio.samples = SAMPLECOUNT;
+#else
+    audio.format = SDL_AUDIO_S16;
+    audio.channels = 2;
+#endif
 
     // Try to initialize OpenAL first
     if (I_InitOpenAL())
@@ -1031,15 +1022,20 @@ void I_StartupSound()
     CONS_Printf("Sound: OpenAL not available, using software mixing\n");
 
     // Fallback to SDL audio
-    audio.callback = I_UpdateSound_sdl;
-
     I_SetChannels();
 
 #ifdef NO_MIXER
+#ifdef SDL3
+    // SDL3 audio uses stream-based API - stub out since OpenAL should be used anyway
+    CONS_Printf("SDL3 audio stream API not yet implemented - sound disabled\n");
+    nosound = true;
+#else
+    audio.callback = I_UpdateSound_sdl;
     SDL_OpenAudio(&audio, NULL);
     CONS_Printf("Audio device initialized: %d Hz, %d samples/slice.\n", audio.freq, audio.samples);
     SDL_PauseAudio(0);
     soundStarted = true;
+#endif
 #else
     sound_provider = SP_SOFTWARE;
 #endif
@@ -1055,41 +1051,27 @@ void I_InitMusic()
 
     // In OpenAL mode, we can still use SDL_mixer for music
     // by opening its own audio device
-    
+
     // Software mode - use SDL_mixer for music
 #ifdef NO_MIXER
     nomusic = true;
 #else
-    // Need to open SDL_mixer for music
-    if (Mix_OpenAudio(audio.freq, audio.format, audio.channels, audio.samples) < 0)
+    // Need to open SDL_mixer for music using SDL3 API
+    SDL_AudioSpec spec;
+    spec.freq = audio.freq;
+    spec.format = audio.format;
+    spec.channels = audio.channels;
+
+    music_mixer = MIX_CreateMixer(&spec);
+    if (!music_mixer)
     {
-        CONS_Printf("Unable to open audio for music: %s\n", Mix_GetError());
+        CONS_Printf("Unable to create SDL3_mixer: %s\n", SDL_GetError());
         nomusic = true;
         return;
     }
 
-    int temp;
-    if (!Mix_QuerySpec(&audio.freq, &audio.format, &temp))
-    {
-        CONS_Printf("Mix_QuerySpec: %s\n", Mix_GetError());
-        nomusic = true;
-        return;
-    }
+    CONS_Printf("Audio device for music: %d Hz, %d channels.\n", spec.freq, spec.channels);
 
-    // Even for OpenAL sound effects, we need Mix_SetPostMix for music
-    // But don't let software mixing interfere with OpenAL
-    if (sound_provider == SP_SOFTWARE)
-    {
-        Mix_SetPostMix(audio.callback, NULL);
-    }
-    
-    CONS_Printf("Audio device for music: %d Hz, %d channels.\n", audio.freq, audio.channels);
-    Mix_Resume(-1);
-
-    if (nomusic)
-        return;
-
-    Mix_ResumeMusic();
     mus2mid_buffer = (byte *)Z_Malloc(MIDBUFFERSIZE, PU_MUSIC, NULL);
     CONS_Printf("Music initialized.\n");
     musicStarted = true;
@@ -1112,9 +1094,28 @@ void I_ShutdownSound()
     CONS_Printf("I_ShutdownSound: ");
 
 #ifdef NO_MIXER
-    SDL_CloseAudio();
+#ifdef SDL3
+    // SDL3 audio not implemented - nothing to close
 #else
-    Mix_CloseAudio();
+    SDL_CloseAudio();
+#endif
+#else
+    if (music_track)
+    {
+        MIX_StopTrack(music_track, 0);
+        MIX_DestroyTrack(music_track);
+        music_track = nullptr;
+    }
+    if (music_audio)
+    {
+        MIX_DestroyAudio(music_audio);
+        music_audio = nullptr;
+    }
+    if (music_mixer)
+    {
+        MIX_DestroyMixer(music_mixer);
+        music_mixer = nullptr;
+    }
 #endif
 
     CONS_Printf("shut down\n");
@@ -1135,10 +1136,48 @@ void I_PlaySong(int handle, int looping)
     if (nomusic)
         return;
 
-    if (music.mus)
+    if (!music_mixer || !music_audio)
+        return;
+
+    // Destroy previous track if exists
+    if (music_track)
     {
-        Mix_FadeInMusic(music.mus, looping ? -1 : 0, 500);
+        MIX_StopTrack(music_track, 0);
+        MIX_DestroyTrack(music_track);
     }
+
+    // Create new track
+    music_track = MIX_CreateTrack(music_mixer);
+    if (!music_track)
+    {
+        CONS_Printf("Failed to create music track: %s\n", SDL_GetError());
+        return;
+    }
+
+    // Set the audio on the track
+    if (!MIX_SetTrackAudio(music_track, music_audio))
+    {
+        CONS_Printf("Failed to set track audio: %s\n", SDL_GetError());
+        MIX_DestroyTrack(music_track);
+        music_track = nullptr;
+        return;
+    }
+
+    // Set looping - -1 means infinite, 0 means play once, positive means that many times
+    int loops = looping ? -1 : 0;
+    MIX_SetTrackLoops(music_track, loops);
+
+    // Set fade-in frames (500ms at typical sample rate ~60fps)
+    SDL_PropertiesID props = SDL_CreateProperties();
+    SDL_SetNumberProperty(props, MIX_PROP_PLAY_FADE_IN_FRAMES_NUMBER, 30);
+
+    if (!MIX_PlayTrack(music_track, props))
+    {
+        CONS_Printf("Failed to play music: %s\n", SDL_GetError());
+        MIX_DestroyTrack(music_track);
+        music_track = nullptr;
+    }
+    SDL_DestroyProperties(props);
 #endif
 }
 
@@ -1149,7 +1188,10 @@ void I_PauseSong(int handle)
     if (nomusic)
         return;
 
-    I_StopSong(handle);
+    if (music_track)
+    {
+        MIX_PauseTrack(music_track);
+    }
 #endif
 }
 
@@ -1160,7 +1202,10 @@ void I_ResumeSong(int handle)
     if (nomusic)
         return;
 
-    I_PlaySong(handle, true);
+    if (music_track)
+    {
+        MIX_ResumeTrack(music_track);
+    }
 #endif
 }
 
@@ -1171,7 +1216,11 @@ void I_StopSong(int handle)
     if (nomusic)
         return;
 
-    Mix_FadeOutMusic(500);
+    if (music_track)
+    {
+        // Fade out over 500ms (~30 frames)
+        MIX_StopTrack(music_track, 30);
+    }
 #endif
 }
 
@@ -1182,11 +1231,16 @@ void I_UnRegisterSong(int handle)
     if (nomusic)
         return;
 
-    if (music.mus)
+    if (music_track)
     {
-        Mix_FreeMusic(music.mus);
-        music.mus = NULL;
-        music.rwop = NULL;
+        MIX_StopTrack(music_track, 0);
+        MIX_DestroyTrack(music_track);
+        music_track = nullptr;
+    }
+    if (music_audio)
+    {
+        MIX_DestroyAudio(music_audio);
+        music_audio = nullptr;
     }
 #endif
 }
@@ -1198,12 +1252,13 @@ int I_RegisterSong(void *data, int len)
     if (nomusic)
         return 0;
 
-    if (music.mus)
+    if (music_audio)
     {
         I_Error("Two registered pieces of music simultaneously!\n");
     }
 
     byte *bdata = static_cast<byte *>(data);
+    SDL_IOStream *rwop = nullptr;
 
     if (memcmp(data, MUSMAGIC, 4) == 0)
     {
@@ -1215,23 +1270,25 @@ int I_RegisterSong(void *data, int len)
             return 0;
         }
 
-        music.rwop = SDL_RWFromConstMem(mus2mid_buffer, midlength);
+        rwop = SDL_IOFromConstMem(mus2mid_buffer, midlength);
     }
     else
     {
-        music.rwop = SDL_RWFromConstMem(data, len);
+        rwop = SDL_IOFromConstMem(data, len);
     }
 
-#ifdef SDL2
-    music.mus = Mix_LoadMUS_RW(music.rwop, 0);
-#else
-    music.mus = Mix_LoadMUS_RW(music.rwop);
-#endif
-
-    if (!music.mus)
+    if (!rwop)
     {
-        CONS_Printf("Couldn't load music lump: %s\n", Mix_GetError());
-        music.rwop = NULL;
+        CONS_Printf("Couldn't create SDL_IOStream for music: %s\n", SDL_GetError());
+        return 0;
+    }
+
+    // Load audio using SDL3_mixer
+    music_audio = MIX_LoadAudio_IO(music_mixer, rwop, true, true); // predecode=true, closeio=true
+    if (!music_audio)
+    {
+        CONS_Printf("Couldn't load music lump: %s\n", SDL_GetError());
+        return 0;
     }
 
 #endif
@@ -1246,7 +1303,12 @@ void I_SetMusicVolume(int volume)
     if (nomusic)
         return;
 
-    Mix_VolumeMusic(volume * 2);
+    if (music_track)
+    {
+        // volume is 0-127, convert to gain (0.0-1.0+)
+        float gain = (volume * 2) / 127.0f;
+        MIX_SetTrackGain(music_track, gain);
+    }
 #endif
 }
 
@@ -1260,3 +1322,14 @@ consvar_t cv_dopplerfactor = {"doppler_factor", "1.0", CV_SAVE, CV_Float};
 
 // Note: Additional console variable registration would be needed
 // in SoundSystem::Startup() for these to be functional
+
+// CD audio stubs - CD audio support was removed (i_cdmus.cpp deleted)
+// These are stubs to satisfy linker dependencies
+void I_InitCD() {}
+void I_StopCD() {}
+void I_PauseCD() {}
+void I_ResumeCD() {}
+void I_ShutdownCD() {}
+void I_UpdateCD() {}
+void I_PlayCD(int track, bool looping) {(void)track; (void)looping;}
+int I_SetVolumeCD(int volume) {(void)volume; return 0;}

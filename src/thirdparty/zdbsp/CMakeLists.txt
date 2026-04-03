@@ -47,6 +47,10 @@ set(ZDBSP_HEADERS
 # Build as static library
 add_library(zdbsp STATIC ${ZDBSP_SOURCES} ${ZDBSP_HEADERS})
 
+# Link with zlib for compression (needed by processor.cpp)
+find_package(ZLIB REQUIRED)
+target_link_libraries(zdbsp PRIVATE ZLIB::ZLIB)
+
 # Only ZDBSP's own include path - no parent paths
 target_include_directories(zdbsp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

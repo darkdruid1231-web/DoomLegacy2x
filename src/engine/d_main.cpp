@@ -25,8 +25,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#ifdef SDL2
-#include <SDL2/SDL.h>
+#ifdef SDL3
+#include <SDL3/SDL.h>
 #endif
 
 #include "command.h"
@@ -145,7 +145,7 @@ static char *D_ResolveAutoloadPath(const char *path)
         if (!strncmp(path, "$PROGDIR", 8))
         {
             // Get the directory where the executable is located
-#ifdef SDL2
+#ifdef SDL3
             char *basepath = SDL_GetBasePath();
             snprintf(resolved_path, sizeof(resolved_path), "%s%s",
                      basepath ? basepath : "", path + 8);
@@ -256,7 +256,7 @@ void D_DoomLoop()
     // main game loop
     while (1)
     {
-#ifdef SDL2
+#ifdef SDL3
         Uint32 frame_start = SDL_GetTicks();
 #endif
 
@@ -330,7 +330,7 @@ void D_DoomLoop()
         HW3S_EndFrameUpdate();
 #endif
 
-#ifdef SDL2
+#ifdef SDL3
         // FPS limiter: sleep remainder of the frame budget if a cap is set
         if (cv_fpslimit.value > 0)
         {
@@ -428,7 +428,7 @@ static void D_IdentifyVersion()
         else
         {
             // If not found, try relative to the executable directory
-#ifdef SDL2
+#ifdef SDL3
             char *basepath = SDL_GetBasePath();
             if (basepath)
             {

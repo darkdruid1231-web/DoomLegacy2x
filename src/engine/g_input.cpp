@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "SDL.h"
+#include "SDL3/SDL.h"
 
 #include "command.h"
 #include "cvars.h"
@@ -331,7 +331,7 @@ void ticcmd_t::Build(LocalPlayerInfo *pref, int realtics)
         if (j.playnum != cks)
             continue;
 
-        int value = int(j.scale * SDL_JoystickGetAxis(joysticks[j.joynum], j.axisnum));
+        int value = int(j.scale * SDL_GetJoystickAxis(joysticks[j.joynum], j.axisnum));
         switch (j.action)
         {
             case ja_pitch:
@@ -925,7 +925,7 @@ void Command_BindJoyaxis_f()
         CONS_Printf("Attempting to bind non-existent joystick %d.\n", j.joynum);
         return;
     }
-    if (j.axisnum < 0 || j.axisnum >= SDL_JoystickNumAxes(joysticks[j.joynum]))
+    if (j.axisnum < 0 || j.axisnum >= SDL_GetNumJoystickAxes(joysticks[j.joynum]))
     {
         CONS_Printf("Attempting to bind non-existent axis %d.\n", j.axisnum);
         return;

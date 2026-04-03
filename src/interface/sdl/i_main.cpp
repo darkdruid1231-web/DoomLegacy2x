@@ -20,9 +20,10 @@
 /// \file
 /// \brief Main program, simply calls D_DoomMain and the main game loop D_DoomLoop.
 
-#ifdef SDL2
+#ifdef SDL3
 #define SDL_MAIN_HANDLED
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
 #endif
 
 #include <stdio.h>
@@ -42,7 +43,7 @@ int main(int argc, char **argv)
     myargc = argc;
     myargv = argv;
 
-#ifdef SDL2
+#ifdef SDL3
     SDL_SetMainReady();
 #endif
 

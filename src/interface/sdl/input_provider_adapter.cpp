@@ -22,7 +22,7 @@
 
 #include "interfaces/i_input_provider.h"
 
-#include "SDL.h"
+#include "SDL3/SDL.h"
 
 #include "i_system.h"
 #include "d_event.h"
@@ -67,7 +67,7 @@ public:
 
     void warpMouse(int x, int y) override
     {
-        SDL_WarpMouse(x, y);
+        SDL_WarpMouseInWindow(NULL, x, y);
     }
 
     int getJoystickCount() const override
@@ -86,7 +86,7 @@ public:
     {
         if (index < 0 || index >= static_cast<int>(joysticks.size()))
             return 0;
-        return SDL_JoystickNumAxes(joysticks[index]);
+        return SDL_JoystickGetNumAxes(joysticks[index]);
     }
 
     int16_t getJoystickAxis(int joystickIndex, int axisIndex) const override

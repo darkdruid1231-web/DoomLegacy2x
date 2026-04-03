@@ -40,24 +40,22 @@
 # pragma GCC diagnostic ignored "-Wattributes"
 #endif
 
-// SDL2 headers - use SDL2/SDL.h on MSYS2/MinGW or SDL/SDL.h fallback
-// SDL1 code (USE_SDL2 not defined) falls back to same headers for compatibility
-#ifdef SDL2
-#  include <SDL2/SDL.h>
+// SDL3 headers
+#ifdef SDL3
+#  include <SDL3/SDL.h>
 #else
-#  include <SDL/SDL.h>
+#  error "This codebase now requires SDL3"
 #endif
 
 #ifdef __MINGW32__
 # pragma GCC diagnostic pop
 #endif
 
-// SDL1 -> SDL2 compatibility shims for legacy renderer code
-// These map SDL1 constants to SDL2 equivalents when using SDL2
+// SDL1 -> SDL3 compatibility shims for legacy renderer code
+// These map SDL1 constants to SDL3 equivalents when using SDL3
 #ifndef SDL_SWSURFACE
 #  define SDL_SWSURFACE 0
 #endif
-#ifdef USE_SDL2
 #ifndef SDL_OPENGL
 #  define SDL_OPENGL SDL_WINDOW_OPENGL
 #endif
@@ -70,16 +68,13 @@
 #ifndef SDL_GL_SwapBuffers
 #  define SDL_GL_SwapBuffers SDL_GL_SwapWindow
 #endif
-#endif
 
-#ifdef SDL2
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_video.h>
-#include <SDL2/SDL_opengl.h>
+#ifdef SDL3
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_video.h>
+#include <SDL3/SDL_opengl.h>
 #else
-#include <SDL/SDL.h>
-#include <SDL/SDL_video.h>
-#include <SDL/SDL_opengl.h>
+#error "This codebase now requires SDL3"
 #endif
 
 #include<GL/gl.h>
@@ -157,9 +152,9 @@ private:
   bool  workinggl;  ///< Do we have a working OpenGL context?
   GLfloat glversion;  ///< Current (runtime) OpenGL version (major.minor).
 
-#ifdef SDL2
-  SDL_Window *screen;    ///< Main screen window (SDL2)
-  SDL_GLContext glCtx;   ///< OpenGL context (SDL2)
+#ifdef SDL3
+  SDL_Window *screen;    ///< Main screen window (SDL3)
+  SDL_GLContext glCtx;   ///< OpenGL context (SDL3)
 #else
   SDL_Surface *screen;   ///< Main screen surface (SDL1)
 #endif
@@ -268,7 +263,7 @@ public:
 
   bool ReadyToDraw() const { return workinggl; } // Console tries to draw to screen before video is initialized.
 
-#ifdef SDL2
+#ifdef SDL3
   SDL_Window *GetScreen() const { return screen; }
 #endif
 

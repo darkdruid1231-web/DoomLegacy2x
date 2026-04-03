@@ -20,10 +20,10 @@
 /// \file
 /// \brief SDL specific part of the OpenGL API for Doom Legacy
 
-#include "SDL.h"
+#include "SDL3/SDL.h"
 
-#ifdef SDL2
-#include <SDL2/SDL_video.h>
+#ifdef SDL3
+#include <SDL3/SDL_video.h>
 #endif
 
 #include "command.h"
@@ -32,16 +32,16 @@
 #include "screen.h"
 #include "v_video.h"
 
-#ifdef SDL2
+#ifdef SDL3
 static SDL_Window *oglWindow = NULL;
 static SDL_GLContext glContext = NULL;
 #else
-static SDL_Surface *vidSurface = NULL; // use the one from i_video_sdl.c instead?
+#error "This codebase now requires SDL3"
 #endif
 
 bool OglSdlSurface()
 {
-#ifdef SDL2
+#ifdef SDL3
     Uint32 windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
 
     if (cv_fullscreen.value == 1)
@@ -123,17 +123,17 @@ bool OglSdlSurface()
 
 void OglSdlFinishUpdate(bool vidwait)
 {
-#ifdef SDL2
+#ifdef SDL3
     if (oglWindow)
         SDL_GL_SwapWindow(oglWindow);
 #else
-    SDL_GL_SwapBuffers();
+#error "This codebase now requires SDL3"
 #endif
 }
 
 void OglSdlShutdown()
 {
-#ifdef SDL2
+#ifdef SDL3
     if (glContext)
     {
         SDL_GL_DeleteContext(glContext);
@@ -145,21 +145,17 @@ void OglSdlShutdown()
         oglWindow = NULL;
     }
 #else
-    if (NULL != vidSurface)
-    {
-        SDL_FreeSurface(vidSurface);
-        vidSurface = NULL;
-    }
+#error "This codebase now requires SDL3"
 #endif
 }
 
 void OglSdlSetGamma(float r, float g, float b)
 {
-#ifdef SDL2
-    // SDL2 removed SDL_SetGamma, need to use OpenGL directly
+#ifdef SDL3
+    // SDL3 removed SDL_SetGamma, need to use OpenGL directly
     // For now, this is a no-op
 #else
-    SDL_SetGamma(r, g, b);
+#error "This codebase now requires SDL3"
 #endif
 }
 

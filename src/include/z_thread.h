@@ -25,10 +25,10 @@
 
 #include "doomtype.h"
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_thread.h>
-#include <SDL2/SDL_mutex.h>
-#include <SDL2/SDL_atomic.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_thread.h>
+#include <SDL3/SDL_mutex.h>
+#include <SDL3/SDL_atomic.h>
 
 //=========================================================================
 // Thread
@@ -88,11 +88,11 @@ class Thread
 // Mutex
 //=========================================================================
 
-/// Simple mutex wrapper around SDL_mutex
+/// Simple mutex wrapper around SDL_Mutex
 class Mutex
 {
   protected:
-    SDL_mutex *mutex;
+    SDL_Mutex *mutex;
 
   public:
     Mutex()
@@ -109,13 +109,15 @@ class Mutex
     /// Lock the mutex, blocks if already locked
     bool Lock()
     {
-        return SDL_LockMutex(mutex) == 0;
+        SDL_LockMutex(mutex);
+        return true;
     }
 
     /// Unlock the mutex
     bool Unlock()
     {
-        return SDL_UnlockMutex(mutex) == 0;
+        SDL_UnlockMutex(mutex);
+        return true;
     }
 
     /// Try to lock, returns immediately if already locked
@@ -125,7 +127,7 @@ class Mutex
     }
 
     /// Get raw SDL mutex for advanced operations
-    SDL_mutex *GetRaw() const { return mutex; }
+    SDL_Mutex *GetRaw() const { return mutex; }
 };
 
 //=========================================================================
@@ -171,7 +173,7 @@ class MutexLocker
 class Semaphore
 {
   protected:
-    SDL_sem *sem;
+    SDL_Semaphore *sem;
 
   public:
     explicit Semaphore(int initial_count = 0)
@@ -189,20 +191,21 @@ class Semaphore
     bool Wait(int timeout_ms = 0)
     {
         if (timeout_ms > 0)
-            return SDL_SemWaitTimeout(sem, timeout_ms) == 0;
-        return SDL_SemWait(sem) == 0;
+            return SDL_WaitSemaphoreTimeout(sem, timeout_ms);
+        SDL_WaitSemaphore(sem);
+        return true;
     }
 
     /// Increment (post)
-    bool Post()
+    void Post()
     {
-        return SDL_SemPost(sem) == 0;
+        SDL_SignalSemaphore(sem);
     }
 
     /// Get current count
     int GetValue() const
     {
-        return SDL_SemValue(sem);
+        return SDL_GetSemaphoreValue(sem);
     }
 };
 
@@ -214,42 +217,42 @@ class Semaphore
 class AtomicCounter
 {
   protected:
-    SDL_atomic_t value;
+    SDL_AtomicInt value;
 
   public:
     explicit AtomicCounter(int initial = 0)
     {
-        SDL_AtomicSet(&value, initial);
+        SDL_SetAtomicInt(&value, initial);
     }
 
     /// Increment and return new value
     int Increment()
     {
-        return SDL_AtomicIncRef(&value);
+        return SDL_AddAtomicInt(&value, 1);
     }
 
     /// Decrement and return new value
     int Decrement()
     {
-        return SDL_AtomicDecRef(&value);
+        return SDL_AddAtomicInt(&value, -1);
     }
 
     /// Get current value
     int Get() const
     {
-        return SDL_AtomicGet(const_cast<SDL_atomic_t*>(&value));
+        return SDL_GetAtomicInt(&value);
     }
 
     /// Set value
     void Set(int v)
     {
-        SDL_AtomicSet(&value, v);
+        SDL_SetAtomicInt(&value, v);
     }
 
     /// Compare and swap
     bool CAS(int oldval, int newval)
     {
-        return SDL_AtomicCAS(&value, oldval, newval) != SDL_FALSE;
+        return SDL_CompareAndSwapAtomicInt(&value, oldval, newval);
     }
 };
 

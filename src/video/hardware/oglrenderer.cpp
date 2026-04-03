@@ -29,19 +29,17 @@
 #define GLEW_NO_GDL
 #include <GL/glew.h>
 #endif
-#ifdef SDL2
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_video.h>
-#include <SDL2/SDL_opengl.h>
+#ifdef SDL3
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_video.h>
+#include <SDL3/SDL_opengl.h>
 #else
-#include <SDL/SDL.h>
-#include <SDL/SDL_video.h>
-#include <SDL/SDL_opengl.h>
+#error "This codebase now requires SDL3"
 #endif
 
-// Compatibility macros for SDL1/SDL2 screen dimension access
-#ifdef SDL2
-// SDL2 uses SDL_GetWindowSize which takes two pointers
+// Compatibility macros for SDL1/SDL3 screen dimension access
+#ifdef SDL3
+// SDL3 uses SDL_GetWindowSize which takes two pointers
 // We need to provide wrapper functions
 inline int SDL_GetWindowWidth_wrapper(SDL_Window *w) { int width, height; SDL_GetWindowSize(w, &width, &height); return width; }
 inline int SDL_GetWindowHeight_wrapper(SDL_Window *w) { int width, height; SDL_GetWindowSize(w, &width, &height); return height; }
@@ -50,8 +48,7 @@ inline int SDL_GetWindowHeight_wrapper(SDL_Window *w) { int width, height; SDL_G
 #define SCREEN_W(w) SDL_GetWindowWidth(w)
 #define SCREEN_H(h) SDL_GetWindowHeight(h)
 #else
-#define SCREEN_W(s) ((s)->w)
-#define SCREEN_H(s) ((s)->h)
+#error "This codebase now requires SDL3"
 #endif
 
 #include "command.h"
@@ -656,7 +653,7 @@ OGLRenderer::OGLRenderer()
     workinggl = false;
     glversion = 0;
     screen = NULL;
-#ifdef SDL2
+#ifdef SDL3
     glCtx = NULL;
 #endif
     curssec = NULL;
@@ -716,10 +713,10 @@ OGLRenderer::~OGLRenderer()
 {
     CONS_Printf("Closing OpenGL renderer.\n");
     Z_Free(palette);
-#ifdef SDL2
+#ifdef SDL3
     if (glCtx)
     {
-        SDL_GL_DeleteContext(glCtx);
+        SDL_GL_DestroyContext(glCtx);
         glCtx = NULL;
     }
     if (screen)
@@ -836,7 +833,7 @@ void OGLRenderer::FinishFrame()
     // Apply post-processing (bloom, SSAO) before swap.
     if (postfx.IsActive())
         postfx.ApplyEffects();
-#ifdef SDL2
+#ifdef SDL3
     SDL_GL_SwapWindow(screen); // Double buffered OpenGL goodness.
 #else
     SDL_GL_SwapBuffers(); // Double buffered OpenGL goodness.
@@ -867,82 +864,12 @@ void OGLRenderer::SetGlobalColor(GLfloat *rgba)
 // Writes a screen shot to the specified file. Writing is done in BMP
 // format, as SDL has direct support of that. Adds proper file suffix
 // when necessary. Returns true on success.
-#ifndef SDL2
-bool OGLRenderer::WriteScreenshot(const char *fname)
-{
-    int fnamelength;
-    string finalname;
-    SDL_Surface *buffer;
-    bool success;
-
-    if (screen == NULL)
-        return false;
-
-    /*
-    if(screen->pixels == NULL) {
-      CONS_Printf("Empty SDL surface. Can not take screenshot.\n");
-      return false;
-    }
-    */
-
-    if (fname == NULL)
-        finalname = "DOOM000.bmp";
-    else
-    {
-        fnamelength = strlen(fname);
-
-        if (!strcmp(fname + fnamelength - 4, ".bmp") || !strcmp(fname + fnamelength - 4, ".BMP"))
-            finalname = fname;
-        else
-        {
-            finalname = fname;
-            finalname += ".bmp";
-        }
-    }
-
-    // Now we know the file name. Time to start the magic.
-
-    // Potential endianness bug with masks?
-    buffer = SDL_CreateRGBSurface(
-        SDL_SWSURFACE, screen->w, screen->h, 32, 0xff000000, 0xff0000, 0xff00, 0xff);
-    if (!buffer)
-    {
-        CONS_Printf("Could not create SDL surface. SDL error: %s\n", SDL_GetError());
-        return false;
-    }
-
-    SDL_LockSurface(buffer);
-    glReadPixels(0, 0, screen->w, screen->h, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, buffer->pixels);
-
-    // OpenGL keeps the pixel data "upside down" for some reason. Flip
-    // the surface.
-    char *templine = new char[buffer->pitch];
-    for (int j = 0; j < buffer->h / 2; j++)
-    {
-        char *p1;
-        char *p2;
-        p1 = static_cast<char *>(buffer->pixels) + j * buffer->pitch;
-        p2 = static_cast<char *>(buffer->pixels) + (buffer->h - j - 1) * buffer->pitch;
-        memcpy(templine, p1, buffer->pitch);
-        memcpy(p1, p2, buffer->pitch);
-        memcpy(p2, templine, buffer->pitch);
-    }
-    delete[] templine;
-
-    SDL_UnlockSurface(buffer);
-    success = !SDL_SaveBMP(buffer, finalname.c_str());
-    SDL_FreeSurface(buffer);
-    return success;
-}
-#else
-// SDL2 screenshot not yet implemented
 bool OGLRenderer::WriteScreenshot(const char *fname)
 {
     (void)fname;
-    CONS_Printf("Screenshot not yet implemented for SDL2\n");
+    CONS_Printf("Screenshot not yet implemented for SDL3\n");
     return false;
 }
-#endif
 
 bool OGLRenderer::InitVideoMode(const int w, const int h, const int displaymode)
 {
@@ -975,12 +902,12 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const int displaymode)
 
     workinggl = false;
 
-#ifdef SDL2
+#ifdef SDL3
     // Clean up old context and window if they exist.
     // Context must be deleted BEFORE the window is destroyed.
     if (glCtx)
     {
-        SDL_GL_DeleteContext(glCtx);
+        SDL_GL_DestroyContext(glCtx);
         glCtx = NULL;
     }
     if (screen)
@@ -993,7 +920,7 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const int displaymode)
     if (displaymode == 1)
         surfaceflags |= SDL_WINDOW_FULLSCREEN;
     else if (displaymode == 2)
-        surfaceflags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+        surfaceflags |= SDL_WINDOW_FULLSCREEN;
     else
         surfaceflags |= SDL_WINDOW_RESIZABLE;
 
@@ -1050,25 +977,29 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const int displaymode)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 
-    // In SDL2, we just try to create the window - no need for SDL_VideoModeOK
-    screen = SDL_CreateWindow("Doom Legacy",
-                              SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                              w, h, surfaceflags);
+    // In SDL3, we just try to create the window - no need for SDL_VideoModeOK
+    screen = SDL_CreateWindow("Doom Legacy", w, h, surfaceflags);
     if (!screen && cv_msaa.value > 0)
     {
         // MSAA request rejected by driver — fall back to no anti-aliasing
         CONS_Printf(" MSAA %dx not available, falling back to no anti-aliasing.\n", cv_msaa.value);
         SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
         SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
-        screen = SDL_CreateWindow("Doom Legacy",
-                                  SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                  w, h, surfaceflags);
+        screen = SDL_CreateWindow("Doom Legacy", w, h, surfaceflags);
     }
     if (!screen)
     {
         CONS_Printf(" Could not obtain requested resolution.\n");
         return false;
     }
+
+    // Center window (not applicable in fullscreen)
+    if (displaymode != 1 && displaymode != 2)
+        SDL_SetWindowPosition(screen, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+
+    // For fullscreen desktop mode, set the display mode to desktop resolution
+    if (displaymode == 2)
+        SDL_SetWindowFullscreenMode(screen, NULL);
 
     // Create OpenGL context
     glCtx = SDL_GL_CreateContext(screen);
@@ -1094,7 +1025,7 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const int displaymode)
         return false;
     }
 
-    int cbpp = 24; // Assume 24-bit for SDL2
+    int cbpp = 24; // Assume 24-bit for SDL3
 #else
     surfaceflags = SDL_OPENGL;
     if (fullscreen)
@@ -1119,15 +1050,7 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const int displaymode)
     }
 #endif
 
-    // Initialize GLEW (if not already initialized in SDL2 path)
-#ifndef SDL2
-    GLenum glewErr = glewInit();
-    if (glewErr != GLEW_OK)
-    {
-        CONS_Printf(" GLEW initialization failed: %s\n", glewGetErrorString(glewErr));
-        return false;
-    }
-#endif
+    // Initialize GLEW (if not already initialized in SDL3 path)
 
     // This is the earlies possible point to print these since GL
     // context is not guaranteed to exist until the call to
@@ -1164,22 +1087,12 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const int displaymode)
     CONS_Printf((displaymode == 1) ? " (fullscreen)\n" : (displaymode == 2) ? " (borderless)\n" : " (windowed)\n");
 
     // Calculate the screen's aspect ratio. Assumes square pixels.
-#ifdef SDL2
     if (w == 1280 && h == 1024 && displaymode == 1)
         screenar = 4.0 / 3.0;
     else if (w == 320 && h == 200 && displaymode == 1)
         screenar = 4.0 / 3.0;
     else
         screenar = GLfloat(w) / h;
-#else
-    if (w == 1280 && h == 1024 && // Check a couple of exceptions.
-        surfaceflags & SDL_FULLSCREEN)
-        screenar = 4.0 / 3.0;
-    else if (w == 320 && h == 200 && surfaceflags & SDL_FULLSCREEN)
-        screenar = 4.0 / 3.0;
-    else
-        screenar = GLfloat(w) / h;
-#endif
 
     CONS_Printf(" Screen aspect ratio %.2f.\n", screenar);
     CONS_Printf(" HUD aspect ratio %.2f.\n", hudar);
@@ -1250,7 +1163,7 @@ bool OGLRenderer::InitVideoMode(const int w, const int h, const int displaymode)
 // Set up viewport projection matrix, and 2D mode using the new aspect ratio.
 void OGLRenderer::SetFullScreenViewport()
 {
-#ifdef SDL2
+#ifdef SDL3
     viewportw = SDL_GetWindowWidth(screen);
     viewporth = SDL_GetWindowHeight(screen);
 #else
@@ -1272,7 +1185,7 @@ void OGLRenderer::SetViewport(unsigned vp)
 
     viewportdef_t *v = &gl_viewports[n][vp];
 
-#ifdef SDL2
+#ifdef SDL3
     viewportw = GLint(SDL_GetWindowWidth(screen) * v->w);
     viewporth = GLint(SDL_GetWindowHeight(screen) * v->h);
     viewportar = GLfloat(viewportw) / viewporth;
@@ -1457,7 +1370,7 @@ void OGLRenderer::Draw2DGraphic_Doom(GLfloat x, GLfloat y, Material *mat, int fl
     }
     else
     {
-#ifdef SDL2
+#ifdef SDL3
         l = x / SDL_GetWindowWidth(screen);
         t = y / SDL_GetWindowHeight(screen);
 #else
@@ -1480,7 +1393,7 @@ void OGLRenderer::Draw2DGraphic_Doom(GLfloat x, GLfloat y, Material *mat, int fl
     }
     else
     {
-#ifdef SDL2
+#ifdef SDL3
         l -= mat->leftoffs / SDL_GetWindowWidth(screen);
         r = l + tr.worldwidth / SDL_GetWindowWidth(screen);
 

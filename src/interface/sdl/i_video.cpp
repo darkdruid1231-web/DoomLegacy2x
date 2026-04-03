@@ -27,23 +27,72 @@
 #include <limits.h>
 #include <math.h>
 
-#include "SDL.h"
+#include "SDL3/SDL.h"
 
-#ifdef SDL2
-#include <SDL2/SDL_video.h>
-// SDL2 compatibility macros
+#ifdef SDL3
+#include <SDL3/SDL_video.h>
+#include <SDL3/SDL_render.h>
+
+// SDL3 compatibility macros
 #define SDL_VideoInfo SDL_DisplayMode
 #define SDL_HWPALETTE 0
 #define SDL_FULLSCREEN SDL_WINDOW_FULLSCREEN
-#define SDL_SetVideoMode(w, h, b, flags) SDL_CreateWindow("", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, flags)
-#define SDL_Flip(surface) // SDL2 uses SDL_RenderPresent instead
+#define SDL_Flip(surface) // SDL3 uses SDL_RenderPresent instead
 #define SDL_SetColors(surface, colors, first, n) 0
-#define SDL_SetGamma(r, g, b) // SDL2 removed this
-#define SDL_GetVideoInfo() SDL_GetDesktopDisplayMode()
+#define SDL_SetGamma(r, g, b) // SDL3 removed this
+#define SDL_GetVideoInfo() SDL_GetDesktopDisplayMode(SDL_GetPrimaryDisplay())
 #define vidInfo (*vidInfo_ptr)
 static SDL_DisplayMode* vidInfo_ptr = NULL;
 #define SDL_SWSURFACE 0
 #define SDL_HWPALETTE 0
+#define SDL_WINDOW_SHOWN 0
+#define SDL_GetWindowDisplayIndex SDL_GetDisplayForWindow
+#define SDL_GetNumDisplayModes(display) ({ \
+    SDL_DisplayMode **modes; int count = 0; \
+    modes = SDL_GetFullscreenDisplayModes(SDL_GetPrimaryDisplay(), &count); \
+    SDL_free(modes); \
+    count; \
+})
+// SDL_GetDesktopDisplayMode returns pointer, not int. Usage: SDL_GetDesktopDisplayMode(display, &mode)
+static inline int SDL_GetDesktopDisplayMode_Helper(SDL_DisplayID id, SDL_DisplayMode *mode) {
+    const SDL_DisplayMode *dm = SDL_GetDesktopDisplayMode(id);
+    if (dm && mode) { *mode = *dm; return 0; }
+    return -1;
+}
+#define SDL_GetDesktopDisplayMode(display, mode_ptr) SDL_GetDesktopDisplayMode_Helper(display, mode_ptr)
+// In SDL3, SDL_Surface.format is an SDL_PixelFormat enum, use SDL_BITSPERPIXEL
+#define SDL_SURFACE_FORMAT_BPP(surface) SDL_BITSPERPIXEL((surface)->format)
+// In SDL3, locked flag is accessed via SDL_SURFACE_LOCKED, not direct member
+#define SDL_SURFACE_IS_LOCKED(surface) (((surface)->flags & SDL_SURFACE_LOCKED) != 0)
+// SDL_GetDisplayMode gets a display mode by index
+static inline SDL_Renderer* SDL_CreateRendererCompat(SDL_Window *window, int index, Uint32 flags) {
+    (void)index; // unused in SDL3
+    SDL_PropertiesID props = SDL_CreateProperties();
+    SDL_SetPointerProperty(props, SDL_PROP_RENDERER_CREATE_WINDOW_POINTER, window);
+    SDL_SetStringProperty(props, SDL_PROP_RENDERER_CREATE_NAME_STRING, NULL);
+    if (flags & 0x00000002u) // SDL_RENDERER_ACCELERATED flag value
+        SDL_SetBooleanProperty(props, SDL_PROP_RENDERER_CREATE_PRESENT_VSYNC_NUMBER, 1);
+    SDL_Renderer *r = SDL_CreateRendererWithProperties(props);
+    SDL_DestroyProperties(props);
+    return r;
+}
+#define SDL_CreateRenderer SDL_CreateRendererCompat
+static inline int SDL_GetDisplayMode_Helper(SDL_DisplayID id, int index, SDL_DisplayMode *mode) {
+    int count = 0;
+    SDL_DisplayMode **modes = SDL_GetFullscreenDisplayModes(id, &count);
+    if (modes && index >= 0 && index < count) { if (mode) *mode = *(modes[index]); SDL_free(modes); return 0; }
+    if (modes) SDL_free(modes);
+    return -1;
+}
+#define SDL_GetDisplayMode SDL_GetDisplayMode_Helper
+#define SDL_RenderCopy SDL_RenderTexture
+#define SDL_FreeSurface SDL_DestroySurface
+#define SDL_FIRSTEVENT SDL_EVENT_FIRST
+#define SDL_LASTEVENT SDL_EVENT_LAST
+#define SDL_DISABLE (-1)
+#define SDL_ENABLE 1
+#define SDL_WINDOW_FULLSCREEN_DESKTOP SDL_WINDOW_FULLSCREEN
+#define SDL_RENDERER_ACCELERATED 0
 #endif
 
 #include "command.h"
@@ -66,17 +115,17 @@ extern consvar_t cv_aspectratio;
 
 // VSync CVar
 static CV_PossibleValue_t vsync_cons_t[] = {{0,"Off"},{1,"On"},{-1,"Adaptive"},{0,NULL}};
-#ifdef SDL2
+#ifdef SDL3
 static void CV_VSync_OnChange();
 #endif
 consvar_t cv_vsync = {"vsync","On", CV_SAVE|CV_CALL, vsync_cons_t,
-#ifdef SDL2
+#ifdef SDL3
     CV_VSync_OnChange
 #else
     NULL
 #endif
 };
-#ifdef SDL2
+#ifdef SDL3
 static void CV_VSync_OnChange()
 {
     SDL_GL_SetSwapInterval(cv_vsync.value);
@@ -98,21 +147,27 @@ static LegacyDLL OGL_renderer;
 #endif
 
 // SDL vars
-#ifdef SDL2
+#ifdef SDL3
 static SDL_Window *sdlWindow = NULL;
 static SDL_Renderer *sdlRenderer = NULL;
 static SDL_Texture *sdlTexture = NULL;
 static SDL_DisplayMode vidInfo_mode;
 #define vidInfo (&vidInfo_mode)
 #else
-static const SDL_VideoInfo *vidInfo = NULL;
+#error "This codebase now requires SDL3"
 #endif
 static SDL_Surface *vidSurface = NULL;
 static SDL_Color localPalette[256];
 
+// SDL3 software rendering: use a shadow 8-bit buffer for the SW renderer
+// (SDL3 doesn't support indexed 8-bit surfaces via SDL_CreateSurface)
+static Uint8 *swShadowBuffer = NULL;
+static int swShadowBufferWidth = 0;
+static int swShadowBufferHeight = 0;
+
 // Export window pointer for other modules (like i_system.cpp).
 // In GL mode the active window is owned by oglrenderer, not sdlWindow.
-#ifdef SDL2
+#ifdef SDL3
 SDL_Window* GetSDLWindow()
 {
     if (rendermode == render_opengl && oglrenderer)
@@ -129,7 +184,7 @@ struct vidmode_t
     char name[16];
 };
 
-#ifdef SDL2
+#ifdef SDL3
 static std::vector<vidmode_t> fullscreenModes;
 static std::vector<vidmode_t> windowedModes;
 static int modesDisplayIndex = -1;
@@ -150,17 +205,15 @@ static vidmode_t windowedModes[] = {
 #define MAXWINMODES (int)(sizeof(windowedModes)/sizeof(windowedModes[0]))
 #endif
 
-#ifdef SDL2
-static int GetActiveDisplayIndex()
+#ifdef SDL3
+static SDL_DisplayID GetActiveDisplayIndex()
 {
     SDL_Window *w = GetSDLWindow();
     if (w)
     {
-        int idx = SDL_GetWindowDisplayIndex(w);
-        if (idx >= 0)
-            return idx;
+        return SDL_GetDisplayForWindow(w);
     }
-    return 0;
+    return SDL_GetPrimaryDisplay();
 }
 
 static bool AspectRatioMatches(int w, int h)
@@ -348,17 +401,11 @@ static void BuildDisplayModeLists()
 
 static void ApplySoftwareBpp()
 {
-    if (cv_scr_depth.value <= 8)
-    {
-        vid.BitsPerPixel = 8;
-        vid.BytesPerPixel = 1;
-    }
-    else
-    {
-        // Software renderer only supports 8-bit and 16-bit paths.
-        vid.BitsPerPixel = 16;
-        vid.BytesPerPixel = 2;
-    }
+    // SDL3 software rendering: always use 8-bit palette mode.
+    // Our I_FinishUpdate converts 8-bit indices to ARGB8888 via palette lookup.
+    // 16-bit and higher are not supported in this implementation.
+    vid.BitsPerPixel = 8;
+    vid.BytesPerPixel = 1;
 }
 #endif
 
@@ -399,19 +446,13 @@ void I_FinishUpdate()
 {
     if (rendermode == render_soft)
     {
-#ifdef SDL2
-        // In SDL2 software mode, convert surface to ARGB and render
+        // In SDL3 software mode, convert shadow buffer to ARGB and render
         if (vidSurface && sdlRenderer && sdlTexture)
         {
-            // Lock surface if needed
-            if (SDL_MUSTLOCK(vidSurface) && vidSurface->locked == 0)
-                SDL_LockSurface(vidSurface);
+            // Software renderer writes to swShadowBuffer (8-bit indices)
+            // We convert to ARGB8888 for display
+            Uint8 *srcPixels = swShadowBuffer;
 
-            // Get the surface pixels
-            Uint8 *srcPixels = (Uint8 *)vidSurface->pixels;
-            int pitch = vidSurface->pitch;
-
-            // We need to convert surface (indexed8 or RGB565) to ARGB8888
             // Create a temporary buffer for conversion if needed
             static Uint32 *convertBuffer = NULL;
             static int convertWidth = 0;
@@ -429,40 +470,16 @@ void I_FinishUpdate()
                 convertHeight = height;
             }
 
-            if (vidSurface->format->BitsPerPixel == 8)
+            // Convert shadow 8-bit buffer to ARGB8888 using the palette
+            for (int y = 0; y < height; y++)
             {
-                // Convert indexed to ARGB using the palette
-                for (int y = 0; y < height; y++)
+                Uint8 *srcRow = srcPixels + y * width;
+                Uint32 *dstRow = convertBuffer + y * width;
+                for (int x = 0; x < width; x++)
                 {
-                    Uint8 *srcRow = srcPixels + y * pitch;
-                    Uint32 *dstRow = convertBuffer + y * width;
-                    for (int x = 0; x < width; x++)
-                    {
-                        Uint8 index = srcRow[x];
-                        SDL_Color col = localPalette[index];
-                        dstRow[x] = (col.a << 24) | (col.r << 16) | (col.g << 8) | col.b;
-                    }
-                }
-            }
-            else if (vidSurface->format->BitsPerPixel == 16)
-            {
-                // Convert RGB565 to ARGB8888
-                for (int y = 0; y < height; y++)
-                {
-                    Uint16 *srcRow = (Uint16 *)(srcPixels + y * pitch);
-                    Uint32 *dstRow = convertBuffer + y * width;
-                    for (int x = 0; x < width; x++)
-                    {
-                        Uint16 p = srcRow[x];
-                        Uint8 r = (Uint8)((p >> 11) & 0x1F);
-                        Uint8 g = (Uint8)((p >> 5) & 0x3F);
-                        Uint8 b = (Uint8)(p & 0x1F);
-                        // Expand to 8-bit
-                        r = (r << 3) | (r >> 2);
-                        g = (g << 2) | (g >> 4);
-                        b = (b << 3) | (b >> 2);
-                        dstRow[x] = 0xFF000000 | (r << 16) | (g << 8) | b;
-                    }
+                    Uint8 index = srcRow[x];
+                    SDL_Color col = localPalette[index];
+                    dstRow[x] = (col.a << 24) | (col.r << 16) | (col.g << 8) | col.b;
                 }
             }
 
@@ -470,20 +487,7 @@ void I_FinishUpdate()
             SDL_RenderClear(sdlRenderer);
             SDL_RenderCopy(sdlRenderer, sdlTexture, NULL, NULL);
             SDL_RenderPresent(sdlRenderer);
-
-            if (SDL_MUSTLOCK(vidSurface))
-                SDL_UnlockSurface(vidSurface);
         }
-#else
-        /*
-        if (vid.screens[0] != vid.direct)
-      memcpy(vid.direct, vid.screens[0], vid.height*vid.rowbytes);
-        */
-        SDL_Flip(vidSurface);
-
-        if (SDL_MUSTLOCK(vidSurface))
-            SDL_UnlockSurface(vidSurface);
-#endif
     }
     else if (oglrenderer != NULL)
         oglrenderer->FinishFrame();
@@ -515,7 +519,7 @@ void I_SetGamma(float r, float g, float b)
 // All three display modes (Windowed/Fullscreen/Borderless) share the same resolution list.
 int I_NumVideoModes()
 {
-#ifdef SDL2
+#ifdef SDL3
     BuildDisplayModeLists();
     if (cv_fullscreen.value == 1)
         return (int)fullscreenModes.size();
@@ -527,7 +531,7 @@ int I_NumVideoModes()
 
 const char *I_GetVideoModeName(unsigned n)
 {
-#ifdef SDL2
+#ifdef SDL3
     BuildDisplayModeLists();
     const std::vector<vidmode_t> &list =
         (cv_fullscreen.value == 1) ? fullscreenModes : windowedModes;
@@ -543,7 +547,7 @@ const char *I_GetVideoModeName(unsigned n)
 
 int I_GetVideoModeForSize(int w, int h)
 {
-#ifdef SDL2
+#ifdef SDL3
     BuildDisplayModeLists();
     const std::vector<vidmode_t> &list =
         (cv_fullscreen.value == 1) ? fullscreenModes : windowedModes;
@@ -593,7 +597,7 @@ int I_GetVideoModeForSize(int w, int h)
 
 void I_GetDesktopResolution(int &w, int &h)
 {
-#ifdef SDL2
+#ifdef SDL3
     SDL_DisplayMode dm;
     if (SDL_GetDesktopDisplayMode(GetActiveDisplayIndex(), &dm) == 0)
     {
@@ -608,7 +612,7 @@ void I_GetDesktopResolution(int &w, int &h)
 
 void I_GetDisplayUsableBounds(int &w, int &h)
 {
-#ifdef SDL2
+#ifdef SDL3
     SDL_Rect r;
     if (SDL_GetDisplayUsableBounds(GetActiveDisplayIndex(), &r) == 0)
     {
@@ -625,7 +629,7 @@ int I_SetVideoMode(int modeNum)
     Uint32 flags = surfaceFlags;
     vid.modenum = modeNum;
 
-#ifdef SDL2
+#ifdef SDL3
     int dispmode = cv_fullscreen.value; // 0=Windowed, 1=Fullscreen, 2=Borderless
 
     BuildDisplayModeLists();
@@ -719,11 +723,11 @@ int I_SetVideoMode(int modeNum)
             windowFlags |= SDL_WINDOW_RESIZABLE;
 
         sdlWindow = SDL_CreateWindow("Doom Legacy",
-            SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
             vid.width, vid.height, windowFlags);
-
         if (sdlWindow == NULL)
             I_Error("Could not set vidmode: %s\n", SDL_GetError());
+
+        SDL_SetWindowPosition(sdlWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
         // Create renderer for software rendering
         sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
@@ -738,29 +742,36 @@ int I_SetVideoMode(int modeNum)
         if (sdlTexture == NULL)
             I_Error("Could not create texture: %s\n", SDL_GetError());
 
-        // Create surface for software rendering (for direct pixel access)
-        // Note: SDL2 renderer doesn't directly support 8-bit, so we convert in I_FinishUpdate.
-        if (vid.BitsPerPixel <= 8)
-        {
-            vidSurface = SDL_CreateRGBSurfaceWithFormat(0, vid.width, vid.height, 8,
-                SDL_PIXELFORMAT_INDEX8);
-        }
-        else
-        {
-            vidSurface = SDL_CreateRGBSurfaceWithFormat(0, vid.width, vid.height, 16,
-                SDL_PIXELFORMAT_RGB565);
-        }
-
+        // Create surface for blitting to screen (SDL3 doesn't support indexed 8-bit)
+        vidSurface = SDL_CreateSurface(vid.width, vid.height,
+            SDL_PIXELFORMAT_ARGB8888);
         if (vidSurface == NULL)
             I_Error("Could not create surface: %s\n", SDL_GetError());
+        CONS_Printf("I_SetVideoMode: using ARGB8888 surface\n");
 
-        if (vidSurface->pixels == NULL)
-            I_Error("Didn't get a valid pixels pointer (SDL). Exiting.\n");
+        // Create shadow 8-bit buffer for SW renderer to write into.
+        // The SW renderer writes 1-byte pixel indices; we convert to ARGB8888 at present time.
+        if (swShadowBuffer)
+        {
+            if (swShadowBufferWidth != vid.width || swShadowBufferHeight != vid.height)
+            {
+                free(swShadowBuffer);
+                swShadowBuffer = NULL;
+            }
+        }
+        if (!swShadowBuffer)
+        {
+            swShadowBuffer = (Uint8 *)malloc(vid.width * vid.height);
+            swShadowBufferWidth = vid.width;
+            swShadowBufferHeight = vid.height;
+        }
+        if (!swShadowBuffer)
+            I_Error("Could not allocate shadow buffer\n");
 
-        vid.direct = static_cast<byte *>(vidSurface->pixels);
+        vid.direct = swShadowBuffer;
         vid.direct[0] = 1;
         // Link screens[0] to direct like Recalc() does for software mode
-        // (SDL2 doesn't call vid.SetMode() so we must set this manually)
+        // (SDL3 doesn't call vid.SetMode() so we must set this manually)
         vid.screens[0] = vid.direct;
     }
     else
@@ -776,61 +787,6 @@ int I_SetVideoMode(int modeNum)
     I_StartupMouse(); // grabs mouse and keyboard input if necessary
 
     return 1;
-#else
-    // Original SDL1 code (fullscreen/windowed only; borderless not supported on SDL1)
-    if (rendermode == render_soft)
-    {
-        if (cv_scr_depth.value <= 8)
-        {
-            vid.BitsPerPixel = 8;
-            vid.BytesPerPixel = 1;
-        }
-        else
-        {
-            vid.BitsPerPixel = 16;
-            vid.BytesPerPixel = 2;
-        }
-    }
-    vid.width  = windowedModes[modeNum].w;
-    vid.height = windowedModes[modeNum].h;
-
-    int log_bpp = (rendermode == render_soft) ? vid.BitsPerPixel : cv_scr_depth.value;
-
-    if (cv_fullscreen.value == 1)
-    {
-        flags |= SDL_FULLSCREEN;
-        CONS_Printf("I_SetVideoMode: fullscreen %d x %d (%d bpp)\n",
-                    vid.width, vid.height, log_bpp);
-    }
-    else
-    {
-        CONS_Printf("I_SetVideoMode: windowed %d x %d (%d bpp)\n",
-                    vid.width, vid.height, log_bpp);
-    }
-
-    if (rendermode == render_soft)
-    {
-        SDL_FreeSurface(vidSurface);
-
-        vidSurface = SDL_SetVideoMode(vid.width, vid.height, vid.BitsPerPixel, flags);
-        if (vidSurface == NULL)
-            I_Error("Could not set vidmode\n");
-
-        if (vidSurface->pixels == NULL)
-            I_Error("Didn't get a valid pixels pointer (SDL). Exiting.\n");
-
-        vid.direct = static_cast<byte *>(vidSurface->pixels);
-        vid.direct[0] = 1;
-    }
-    else
-    {
-        if (!oglrenderer->InitVideoMode(vid.width, vid.height, dispmode))
-            I_Error("Could not set OpenGL vidmode.\n");
-    }
-
-    I_StartupMouse(); // grabs mouse and keyboard input if necessary
-
-    return 1;
 #endif
 }
 
@@ -839,7 +795,7 @@ bool I_StartupGraphics()
     if (graphics_started)
         return true;
 
-#ifdef SDL2
+#ifdef SDL3
     // Get desktop display mode for reference
     if (SDL_GetDesktopDisplayMode(GetActiveDisplayIndex(), &vidInfo_mode) < 0)
     {
@@ -879,14 +835,14 @@ bool I_StartupGraphics()
             flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
         sdlWindow = SDL_CreateWindow("Doom Legacy",
-            SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
             vid.width, vid.height, flags);
-
         if (sdlWindow == NULL)
         {
             CONS_Printf("Could not create window: %s\n", SDL_GetError());
             return false;
         }
+
+        SDL_SetWindowPosition(sdlWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
         // Create renderer for software rendering
         sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
@@ -907,139 +863,44 @@ bool I_StartupGraphics()
             return false;
         }
 
-        // Create surface for software rendering (for direct pixel access).
-        // Use paletted 8-bit for classic mode; RGB565 for highcolor (16-bit).
-        if (vid.BitsPerPixel <= 8)
-        {
-            vidSurface = SDL_CreateRGBSurfaceWithFormat(0, vid.width, vid.height, 8,
-                SDL_PIXELFORMAT_INDEX8);
-        }
-        else
-        {
-            vidSurface = SDL_CreateRGBSurfaceWithFormat(0, vid.width, vid.height, 16,
-                SDL_PIXELFORMAT_RGB565);
-        }
+        // Create surface for blitting to screen (SDL3 doesn't support indexed 8-bit)
+        vidSurface = SDL_CreateSurface(vid.width, vid.height,
+            SDL_PIXELFORMAT_ARGB8888);
 
         if (vidSurface == NULL)
         {
             CONS_Printf("Could not create surface: %s\n", SDL_GetError());
             return false;
         }
-        vid.direct = static_cast<byte *>(vidSurface->pixels);
+
+        // Create shadow 8-bit buffer for SW renderer to write into.
+        if (swShadowBuffer)
+        {
+            if (swShadowBufferWidth != vid.width || swShadowBufferHeight != vid.height)
+            {
+                free(swShadowBuffer);
+                swShadowBuffer = NULL;
+            }
+        }
+        if (!swShadowBuffer)
+        {
+            swShadowBuffer = (Uint8 *)malloc(vid.width * vid.height);
+            swShadowBufferWidth = vid.width;
+            swShadowBufferHeight = vid.height;
+        }
+        if (!swShadowBuffer)
+        {
+            CONS_Printf("Could not allocate shadow buffer\n");
+            return false;
+        }
+
+        vid.direct = swShadowBuffer;
         // Link screens[0] to direct like Recalc() does for software mode
-        // (SDL2 doesn't call vid.SetMode() so we must set this manually)
+        // (SDL3 doesn't call vid.SetMode() so we must set this manually)
         vid.screens[0] = vid.direct;
     }
 
-    SDL_ShowCursor(SDL_DISABLE);
-    I_StartupMouse(); // grab mouse and keyboard input if needed
-
-    graphics_started = true;
-
-    return true;
-#else
-    // Original SDL1 code
-    // Get video info for screen resolutions
-    vidInfo = SDL_GetVideoInfo();
-    // now we _could_ do all kinds of cool tests to determine which
-    // video modes are available, but...
-    // vidInfo->vfmt is the pixelformat of the "best" video mode available
-
-    // CONS_Printf("Bpp = %d, bpp = %d\n", vidInfo->vfmt->BytesPerPixel,
-    // vidInfo->vfmt->BitsPerPixel);
-
-    // list all available video modes corresponding to the "best" pixelformat
-    SDL_Rect **modeList = SDL_ListModes(NULL, SDL_FULLSCREEN | surfaceFlags);
-
-    if (modeList == NULL)
-    {
-        CONS_Printf(" No video modes present!\n");
-        return false;
-    }
-    else if (modeList == reinterpret_cast<SDL_Rect **>(-1))
-    {
-        CONS_Printf(" Unexpected: any video resolution is available in fullscreen mode.\n");
-        return false;
-    }
-
-    // Name the unified mode list
-    for (int n = 0; n < MAXWINMODES; n++)
-        sprintf(windowedModes[n].name, "%dx%d", windowedModes[n].w, windowedModes[n].h);
-
-        // even if I set vid.bpp and highscreen properly it does seem to
-        // support only 8 bit  ...  strange
-        // so lets force 8 bit (software mode only)
-        // TODO why not use hicolor in sw mode too? it must work...
-
-#if defined(__APPLE_CC__) || defined(__MACOS__)
-    vid.BytesPerPixel = vidInfo->vfmt->BytesPerPixel;
-    vid.BitsPerPixel = vidInfo->vfmt->BitsPerPixel;
-    if (!M_CheckParm("-opengl"))
-    {
-        // software mode
-        vid.BytesPerPixel = 1;
-        vid.BitsPerPixel = 8;
-    }
-#else
-    if (cv_scr_depth.value <= 8)
-    {
-        vid.BytesPerPixel = 1;
-        vid.BitsPerPixel = 8;
-    }
-    else
-    {
-        vid.BytesPerPixel = 2;
-        vid.BitsPerPixel = 16;
-    }
-#endif
-
-    // default resolution
-    vid.width = BASEVIDWIDTH;
-    vid.height = BASEVIDHEIGHT;
-    if (M_CheckParm("-opengl"))
-    {
-        // OpenGL mode
-        rendermode = render_opengl;
-
-#if 0 // FIXME: Hurdler: for now we do not use that anymore (but it should probably be back some day
-#ifdef DYNAMIC_LINKAGE
-      // dynamic linkage
-      OGL_renderer.Open("r_opengl.dll");
-
-      if (OGL_renderer.api_version != R_OPENGL_INTERFACE_VERSION)
-        I_Error("r_opengl.dll interface version does not match with Legacy.exe!\n"
-                "You must use the r_opengl.dll that came in the same distribution as your Legacy.exe.");
-
-      hw_renderer_export_t *temp = (hw_renderer_export_t *)OGL_renderer.GetSymbol("r_export");
-      memcpy(&HWD, temp, sizeof(hw_renderer_export_t));
-      CONS_Printf("%s loaded.\n", OGL_renderer.name);
-#else
-      // static linkage
-      memcpy(&HWD, &r_export, sizeof(hw_renderer_export_t));
-#endif
-#endif
-
-        oglrenderer = new OGLRenderer;
-    }
-    else
-    {
-        // software mode
-        rendermode = render_soft;
-        CONS_Printf("I_StartupGraphics: windowed %d x %d x %d bpp\n",
-                    vid.width,
-                    vid.height,
-                    vid.BitsPerPixel);
-        vidSurface = SDL_SetVideoMode(vid.width, vid.height, vid.BitsPerPixel, surfaceFlags);
-
-        if (vidSurface == NULL)
-        {
-            CONS_Printf("Could not set video mode!\n");
-            return false;
-        }
-        vid.direct = static_cast<byte *>(vidSurface->pixels);
-    }
-
-    SDL_ShowCursor(SDL_DISABLE);
+    SDL_HideCursor();
     I_StartupMouse(); // grab mouse and keyboard input if needed
 
     graphics_started = true;
@@ -1054,7 +915,7 @@ void I_ShutdownGraphics()
     if (!graphics_started)
         return;
 
-#ifdef SDL2
+#ifdef SDL3
     if (rendermode == render_soft)
     {
         if (vidSurface)
@@ -1077,21 +938,14 @@ void I_ShutdownGraphics()
             SDL_DestroyWindow(sdlWindow);
             sdlWindow = NULL;
         }
-    }
-    else
-    {
-        delete oglrenderer;
-        oglrenderer = NULL;
-
-#ifdef DYNAMIC_LINKAGE
-        if (ogl_handle)
-            CloseDLL(ogl_handle);
-#endif
-    }
-#else
-    if (rendermode == render_soft)
-    {
-        // vidSurface should be automatically freed
+        // Free shadow buffer
+        if (swShadowBuffer)
+        {
+            free(swShadowBuffer);
+            swShadowBuffer = NULL;
+            swShadowBufferWidth = 0;
+            swShadowBufferHeight = 0;
+        }
     }
     else
     {
