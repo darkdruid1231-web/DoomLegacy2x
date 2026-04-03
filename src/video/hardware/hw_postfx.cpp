@@ -672,7 +672,7 @@ bool PostFX::Init(int w, int h)
 {
 #if defined(GL_VERSION_2_0) && !defined(NO_SHADERS)
     // Check for FBO support
-    if (!GLEW_VERSION_3_0 && !GLEW_ARB_framebuffer_object)
+    if (!GL_VERSION_3_0 && !GL_ARB_framebuffer_object)
     {
         CONS_Printf("PostFX: FBOs not supported, post-processing disabled.\n");
         return false;
