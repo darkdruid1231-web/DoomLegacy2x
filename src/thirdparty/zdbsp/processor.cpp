@@ -21,6 +21,11 @@
 #include "processor.h"
 //#include "rejectbuilder.h"
 
+#ifndef WIN32
+#define stricmp strcasecmp
+#define strnicmp strncasecmp
+#endif
+
 extern void ShowView (FLevel *level);
 
 enum

@@ -23,6 +23,11 @@
 #include "processor.h"
 #include "sc_man.h"
 
+#ifndef WIN32
+#define stricmp strcasecmp
+#define strnicmp strncasecmp
+#endif
+
 typedef double real64;
 typedef unsigned int uint32;
 typedef signed int int32;
