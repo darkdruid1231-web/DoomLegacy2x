@@ -27,10 +27,10 @@
 #include <stdarg.h>
 #include <limits.h>
 
-// On non-Windows, _stricmp is not available; use strcasecmp
+// On non-Windows, stricmp is not available; use strcasecmp
 #if !defined(_WIN32)
 #include <cstring>
-#define _stricmp strcasecmp
+#define stricmp strcasecmp
 #endif
 
 #include "sc_man.h"

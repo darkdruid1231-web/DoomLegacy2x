@@ -10,8 +10,14 @@ TOOLS_SRC="$SCRIPT_DIR/../common/tools"
 INCLUDE_DIR="$SCRIPT_DIR/include"
 MD5_SRC="$SCRIPT_DIR/util/md5.cpp"
 RESOURCES="$SCRIPT_DIR/resources"
-INVENTORY="$RESOURCES/legacy.wad.inventory"
-OUTPUT_WAD="${1:-$RESOURCES/legacy.wad}"
+INVENTORY="$(cd "$SCRIPT_DIR" && pwd)/resources/legacy.wad.inventory"
+OUTPUT_WAD="${1:-}"
+if [[ -z "$OUTPUT_WAD" ]]; then
+    OUTPUT_WAD="$SCRIPT_DIR/resources/legacy.wad"
+else
+    # Resolve to absolute path
+    OUTPUT_WAD="$(cd "$(dirname "$OUTPUT_WAD")" && pwd)/$(basename "$OUTPUT_WAD")"
+fi
 mkdir -p "$(dirname "$OUTPUT_WAD")"
 STAGE_DIR="$(mktemp -d)"
 
