@@ -12,6 +12,7 @@ MD5_SRC="$SCRIPT_DIR/util/md5.cpp"
 RESOURCES="$SCRIPT_DIR/resources"
 INVENTORY="$RESOURCES/legacy.wad.inventory"
 OUTPUT_WAD="${1:-$RESOURCES/legacy.wad}"
+mkdir -p "$(dirname "$OUTPUT_WAD")"
 STAGE_DIR="$(mktemp -d)"
 
 # Windows (MSYS2) needs .exe suffix; Linux does not
