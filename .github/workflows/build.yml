@@ -95,3 +95,73 @@ jobs:
         path: src/release/
         retention-days: 30
         if-no-files-found: error
+
+  linux-build:
+    runs-on: ubuntu-latest
+    env:
+      SCCACHE_DIR: ${{ github.workspace }}/.sccache
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup sccache cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ github.workspace }}/.sccache
+        key: ${{ runner.os }}-sccache-${{ hashFiles('src/**.[ch]pp', 'src/CMakeLists.txt', 'src/**/CMakeLists.txt') }}
+        restore-keys: ${{ runner.os }}-sccache-
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          cmake ninja-build pkg-config sccache \
+          gcc g++ \
+          libsdl2-dev libsdl2-mixer-dev \
+          libglew-dev \
+          libpng-dev libjpeg-dev \
+          zlib1g-dev \
+          libopenal-dev \
+          libvorbis-dev libflac-dev libmpg123-dev libopus-dev libopusfile-dev \
+          libfreetype-dev \
+          libenet-dev \
+          libwavpack-dev \
+          flex bison lemon
+
+    - name: Configure CMake
+      run: |
+        mkdir -p src/build-linux
+        cd src/build-linux
+        cmake -G Ninja \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_C_COMPILER_LAUNCHER=sccache \
+          -DCMAKE_CXX_COMPILER_LAUNCHER=sccache \
+          ..
+
+    - name: Build
+      run: |
+        cd src/build-linux
+        ninja -j$(nproc)
+
+    - name: Run tests
+      run: |
+        cd src/build-linux
+        ctest --output-on-failure
+
+    - name: sccache stats
+      if: always()
+      run: sccache --show-stats
+
+    - name: Gather release files
+      run: |
+        mkdir -p src/release-linux
+        cp src/build-linux/doomlegacy src/release-linux/
+        cp src/resources/legacy.wad src/release-linux/
+
+    - name: Upload Linux release
+      uses: actions/upload-artifact@v4
+      with:
+        name: doomlegacy-linux
+        path: src/release-linux/
+        retention-days: 30
+        if-no-files-found: error
