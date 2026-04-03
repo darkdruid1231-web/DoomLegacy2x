@@ -13,10 +13,10 @@ jobs:
       SCCACHE_DIR: ${{ github.workspace }}/.sccache
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Setup sccache cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ${{ github.workspace }}/.sccache
         key: ${{ runner.os }}-sccache-${{ hashFiles('src/**.[ch]pp', 'src/CMakeLists.txt', 'src/**/CMakeLists.txt') }}
@@ -53,7 +53,7 @@ jobs:
           zip
 
     - name: Cache MSYS2 packages
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: C:\msys64\var\cache\pacman\pkg
         key: ${{ runner.os }}-msys2-pkg-${{ hashFiles('.github/workflows/build.yml') }}
@@ -105,7 +105,7 @@ jobs:
         zip -r ../doomlegacy-windows.zip .
 
     - name: Upload Windows release
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: doomlegacy-windows
         path: src/doomlegacy-windows.zip
@@ -118,10 +118,10 @@ jobs:
       SCCACHE_DIR: ${{ github.workspace }}/.sccache
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Setup sccache cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ${{ github.workspace }}/.sccache
         key: ${{ runner.os }}-sccache-${{ hashFiles('src/**.[ch]pp', 'src/CMakeLists.txt', 'src/**/CMakeLists.txt') }}
@@ -142,14 +142,17 @@ jobs:
           libfreetype-dev \
           libenet-dev \
           libwavpack-dev \
-          flex bison lemon
+          flex bison lemon \
+          patchelf wget
 
-    - name: Cache apt packages
-      uses: actions/cache@v4
-      with:
-        path: /var/cache/apt/archives
-        key: ${{ runner.os }}-apt-pkg-${{ hashFiles('.github/workflows/build.yml') }}
-        restore-keys: ${{ runner.os }}-apt-pkg-
+    - name: Download AppImage tools
+      run: |
+        # Download linuxdeploy (for bundling) and appimagetool (for creating AppImage)
+        wget -q "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage" -O linuxdeploy.AppImage
+        chmod +x linuxdeploy.AppImage
+
+        wget -q "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -O appimagetool.AppImage
+        chmod +x appimagetool.AppImage
 
     - name: Configure CMake
       run: |
@@ -191,7 +194,7 @@ jobs:
         tar -czf doomlegacy-linux.tar.gz -C release-linux .
 
     - name: Upload Linux release
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: doomlegacy-linux
         path: src/doomlegacy-linux.tar.gz
