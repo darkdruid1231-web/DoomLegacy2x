@@ -7,7 +7,7 @@ sdl/i_system.cpp
 sdl/i_video.cpp
 )
 
-add_library(interface OBJECT ${SRC_FILES})
+add_library(interface STATIC ${SRC_FILES})
 
 target_include_directories(interface PRIVATE
     ${CMAKE_SOURCE_DIR}/include
@@ -29,4 +29,13 @@ if(OpenAL_FOUND)
     target_include_directories(interface PRIVATE ${OpenAL_INCLUDE_DIR})
     target_link_libraries(interface PRIVATE ${OpenAL_LIBRARY})
     message(STATUS "OpenAL found - hardware-accelerated 3D audio enabled")
+endif()
+
+# Check for FluidSynth (MIDI backend)
+find_package(FluidSynth QUIET)
+if(FluidSynth_FOUND)
+    target_compile_definitions(interface PRIVATE HAVE_FLUIDSYNTH)
+    target_include_directories(interface PRIVATE ${FluidSynth_INCLUDE_DIRS})
+    target_link_libraries(interface PRIVATE FluidSynth::libfluidsynth)
+    message(STATUS "FluidSynth found - MIDI playback enabled")
 endif()

@@ -32,7 +32,7 @@ include_directories(
 
 # Global compile options
 # Workaround for GCC 13+ / MinGW intrinsics conflicts
-add_compile_definitions(_XSAVEINTRIN_H_INCLUDED _CPUID_H_INCLUDED _XGETBV_DEFINED WIN32_LEAN_AND_MEAN NOMINMAX)
+add_compile_definitions(_XSAVEINTRIN_H_INCLUDED _CPUID_H_INCLUDED _XGETBV_DEFINED WIN32_LEAN_AND_MEAN NOMINMAX _WIN32)
 # SDL3 only
 add_compile_definitions(SDL SDL3)
 # Use TNL stub (no actual TNL library)
@@ -128,6 +128,15 @@ else()
     message(STATUS "OpenAL not found - using software audio")
 endif()
 
+# FluidSynth for MIDI playback (when SDL_mixer MIDI fails)
+find_package(FluidSynth QUIET)
+if(FluidSynth_FOUND)
+    add_compile_definitions(HAVE_FLUIDSYNTH)
+    message(STATUS "FluidSynth found - MIDI playback enabled")
+else()
+    message(STATUS "FluidSynth not found - MIDI playback disabled")
+endif()
+
 # ENet
 pkg_check_modules(ENET libenet)
 if(ENET_LIBRARY_DIRS)
@@ -193,6 +202,7 @@ target_link_libraries(doomlegacy PRIVATE
     "-Wl,--end-group"
     ${SDL3_LIBRARIES}
     ${SDL3MIXER_LIBRARIES}
+    FluidSynth::libfluidsynth
     ${FREETYPE_LIBRARIES}
     ${ZLIB_LIBRARIES}
     ${PNG_LIBRARY}
@@ -227,6 +237,7 @@ target_link_libraries(test_menu_navigation PRIVATE
     "-Wl,--end-group"
     ${SDL3_LIBRARIES}
     ${SDL3MIXER_LIBRARIES}
+    FluidSynth::libfluidsynth
     ${FREETYPE_LIBRARIES}
     ${ZLIB_LIBRARIES}
     ${PNG_LIBRARY}
@@ -258,6 +269,7 @@ target_link_libraries(test_menu_widget PRIVATE
     "-Wl,--end-group"
     ${SDL3_LIBRARIES}
     ${SDL3MIXER_LIBRARIES}
+    FluidSynth::libfluidsynth
     ${FREETYPE_LIBRARIES}
     ${ZLIB_LIBRARIES}
     ${PNG_LIBRARY}
@@ -290,6 +302,7 @@ target_link_libraries(test_menu_draw PRIVATE
     "-Wl,--end-group"
     ${SDL3_LIBRARIES}
     ${SDL3MIXER_LIBRARIES}
+    FluidSynth::libfluidsynth
     ${FREETYPE_LIBRARIES}
     ${ZLIB_LIBRARIES}
     ${PNG_LIBRARY}
