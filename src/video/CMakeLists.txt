@@ -10,6 +10,7 @@ r_data.cpp
 r_draw.cpp
 r_draw8.cpp
 r_draw16.cpp
+r_draw32.cpp
 r_main.cpp
 r_plane.cpp
 r_segs.cpp

@@ -2232,6 +2232,7 @@ static menuitem_t VideoOptions_MI[] = {
     menuitem_t(IT_LINK, NULL, "Video modes...", &VidModeDef, 0),
     menuitem_t(IT_CVAR_DROPDOWN, NULL, "Display Mode", &cv_fullscreen, 0),
     menuitem_t(IT_CVAR_DROPDOWN, NULL, "Aspect Ratio", &cv_aspectratio, 0),
+    menuitem_t(IT_CVAR_DROPDOWN, NULL, "Color Depth", &cv_scr_depth, 0),
     menuitem_t(IT_CVAR_DROPDOWN, NULL, "VSync", &cv_vsync, 0),
     menuitem_t(IT_CVAR_DROPDOWN, NULL, "FPS Limit", &cv_fpslimit, 0),
     menuitem_t(IT_HEADER, NULL, "IMAGE"),
@@ -3646,7 +3647,7 @@ extern Menu OGL_LightingDef, OGL_FogDef, OGL_ColorDef, OGL_DevDef, OGL_NormalMap
 static menuitem_t OpenGLOptions_MI[] = {
     // menuitem_t(IT_CVAR, NULL, "Mouse look"          , &cv_grcrappymlook     ,  0),
     menuitem_t(IT_CVAR, NULL, "Field of view", &cv_fov, 10),
-    menuitem_t(IT_CVAR_DROPDOWN, NULL, "Quality", &cv_scr_depth, 20),
+    menuitem_t(IT_CVAR_DROPDOWN, NULL, "Color Depth", &cv_scr_depth, 20),
     menuitem_t(IT_CVAR_DROPDOWN, NULL, "Texture Filter", &cv_grfiltermode, 30),
     menuitem_t(IT_CV_SLIDER | IT_STRING, NULL, "Anisotropy", &cv_granisotropy, 40),
 

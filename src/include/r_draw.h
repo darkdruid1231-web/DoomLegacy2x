@@ -180,7 +180,24 @@ void ASMCALL R_DrawColumn_16();
 void ASMCALL R_DrawFuzzColumn_16();
 void ASMCALL R_DrawTranslucentColumn_16();
 void ASMCALL R_DrawTranslatedColumn_16();
+void ASMCALL R_DrawShadeColumn_16();
 void ASMCALL R_DrawSpan_16();
+
+// -------------------
+// 32bpp DRAWING CODE
+// -------------------
+
+void R_DrawColumn_32();
+void R_DrawSkyColumn_32();
+void R_DrawFuzzColumn_32();
+void R_DrawTranslucentColumn_32();
+void R_DrawTranslatedColumn_32();
+void R_DrawShadeColumn_32();
+void R_DrawFogColumn_32();
+void R_DrawColumnShadowed_32();
+void R_DrawSpan_32();
+void R_DrawTranslucentSpan_32();
+void R_DrawFogSpan_32();
 
 // -----------------------
 // Software renderer profiling counters (reset each frame)

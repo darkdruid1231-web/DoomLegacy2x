@@ -74,8 +74,12 @@ int spritememory;
 int texturememory;
 
 // faB: highcolor stuff
-short color8to16[256]; // remap color index to highcolor rgb value
-short *hicolormaps;    // test a 32k colormap remaps high -> high
+short color8to16[256]; // remap color index to 15-bit highcolor rgb value
+short color8to16_565[256]; // remap color index to RGB565 16-bit color
+short *hicolormaps;    // 32KB colormap for high->high color remapping
+
+// 32-bit ARGB8888 palette - initialized from PLAYPAL
+Uint32 palette32[256]; // pre-converted ARGB8888 colors for each palette entry
 
 //==================================================================
 //   Texture cache
@@ -2707,6 +2711,12 @@ static int makecol15(int r, int g, int b)
     return (((r >> 3) << 10) | ((g >> 3) << 5) | ((b >> 3)));
 }
 
+//  build a table for quick conversion from 8bpp to RGB565 16bpp
+static inline unsigned short makecol16(int r, int g, int b)
+{
+    return (((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3));
+}
+
 void R_Init8to16()
 {
     int i;
@@ -2716,14 +2726,17 @@ void R_Init8to16()
     {
         // doom PLAYPAL are 8 bit values
         color8to16[i] = makecol15(palette[0], palette[1], palette[2]);
+        color8to16_565[i] = makecol16(palette[0], palette[1], palette[2]);
+        // Initialize 32-bit ARGB8888 palette
+        palette32[i] = 0xFF000000 | (palette[0] << 16) | (palette[1] << 8) | palette[2];
         palette += 3;
     }
-    Z_Free(palette);
+    // PU_DAVE means don't cache, returns pointer to static data - don't free!
 
-    // test a big colormap
-    hicolormaps = static_cast<short int *>(Z_Malloc(32768 /**34*/, PU_STATIC, 0));
-    for (i = 0; i < 16384; i++)
-        hicolormaps[i] = i << 1;
+    // 64KB colormap for RGB565 high->high color remapping
+    hicolormaps = static_cast<short int *>(Z_Malloc(65536 * sizeof(short), PU_STATIC, 0));
+    for (i = 0; i < 65536; i++)
+        hicolormaps[i] = i;
 }
 
 //==================================================================

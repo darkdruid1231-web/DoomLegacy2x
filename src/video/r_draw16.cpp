@@ -39,12 +39,9 @@
 // ==========================================================================
 
 // r_data.c
-extern short color8to16[256]; // remap color index to highcolor
-extern short *hicolormaps;    // remap high colors to high colors..
-
-#define HIMASK1                                                                                    \
-    0x7bde // kick out the upper bit of each
-           // composant (we're in 5:5:5)
+extern short color8to16[256];     // remap color index to 15-bit highcolor
+extern short color8to16_565[256];  // remap color index to RGB565 16-bit color
+extern short *hicolormaps;         // colormap for high->high color remapping
 
 //  standard upto 128high posts column drawer
 //
@@ -83,9 +80,8 @@ void R_DrawColumn_16(void)
     do
     {
         // Re-map color indices from wall texture column
-        //  using a lighting/special effects LUT.
-        //*dest = *( (short *)dc_colormap + dc_source[(frac.floor())&127] );
-        *dest = hicolormaps[((short *)dc_source)[(frac.floor()) & 127] >> 1];
+        //  using a lighting/special effects LUT, then convert to RGB565.
+        *dest = color8to16_565[dc_colormap[dc_source[(frac.floor()) & 127]]];
 
         dest += vid.width;
         frac += fracstep;
@@ -121,9 +117,8 @@ void R_DrawSkyColumn_16(void)
 
     do
     {
-        // DUMMY, just to see it's active
-        *dest = (15 << 10);
-        // hicolormaps[ ((short*)dc_source)[(frac.floor())&255]>>1 ];
+        // Sky texture - use colormap to get palette index, then convert to RGB565
+        *dest = color8to16_565[dc_colormap[dc_source[(frac.floor()) & 255]]];
 
         dest += vid.width;
         frac += fracstep;
@@ -170,11 +165,11 @@ void R_DrawFuzzColumn_16()
 
     do
     {
-        // Lookup framebuffer, and retrieve
-        //  a pixel that is either one column
-        //  left or right of the current one.
-        // Add index from colormap to index.
-        *dest = color8to16[R.base_colormap[6 * 256 + dest[fuzzoffset[fuzzpos]]]];
+        // Lookup framebuffer pixel, and retrieve a pixel that is either
+        // one column left or right of the current one. Apply fuzz colormap.
+        // dest is short* (RGB565), read the shifted pixel as a byte index approximation.
+        byte shifted_pixel = ((byte *)dest)[fuzzoffset[fuzzpos]];
+        *dest = color8to16_565[R.base_colormap[6 * 256 + shifted_pixel]];
 
         // Clamp table lookup index.
         if (++fuzzpos == FUZZTABLE)
@@ -226,9 +221,20 @@ void R_DrawTranslucentColumn_16(void)
     // Here we do an additional index re-mapping.
     do
     {
-        *dest =
-            (((color8to16[dc_source[frac.floor()]] >> 1) & 0x39ce) + (*dest & HIMASK1)) /*>> 1*/ &
-            0x7fff;
+        // RGB565 translucency: blend source and dest 50/50
+        unsigned short src = color8to16_565[dc_source[frac.floor()]];
+        unsigned short dst = *dest;
+        unsigned src_r = (src >> 11) & 0x1F;
+        unsigned src_g = (src >> 5) & 0x3F;
+        unsigned src_b = src & 0x1F;
+        unsigned dst_r = (dst >> 11) & 0x1F;
+        unsigned dst_g = (dst >> 5) & 0x3F;
+        unsigned dst_b = dst & 0x1F;
+        // 50/50 blend
+        unsigned r = (src_r + dst_r) >> 1;
+        unsigned g = (src_g + dst_g) >> 1;
+        unsigned b = (src_b + dst_b) >> 1;
+        *dest = (r << 11) | (g << 5) | b;
 
         dest += vid.width;
         frac += fracstep;
@@ -267,13 +273,50 @@ void R_DrawTranslatedColumn_16(void)
     // Here we do an additional index re-mapping.
     do
     {
-        *dest = color8to16[dc_colormap[dc_translation[dc_source[frac.floor()]]]];
+        *dest = color8to16_565[dc_colormap[dc_translation[dc_source[frac.floor()]]]];
         dest += vid.width;
 
         frac += fracstep;
     } while (count--);
 }
 // #endif
+
+// Shade column for 16-bit RGB565
+void R_DrawShadeColumn_16()
+{
+    if ((dc_yl < 0) || (dc_x >= vid.width))
+        return;
+
+    int count = dc_yh - dc_yl;
+    if (count < 0)
+        return;
+
+#ifdef RANGECHECK
+    if ((unsigned)dc_x >= vid.width || dc_yl < 0 || dc_yh >= vid.height)
+        I_Error("R_DrawShadeColumn_16: %i to %i at %i", dc_yl, dc_yh, dc_x);
+#endif
+
+    short *dest = (short *)(ylookup[dc_yl] + columnofs[dc_x]);
+
+    fixed_t fracstep = dc_iscale;
+    fixed_t frac = dc_texturemid + (dc_yl - centery) * fracstep;
+
+    do
+    {
+        unsigned short src = color8to16_565[dc_colormap[dc_source[frac.floor()]]];
+        // Shade: darken by 50%
+        unsigned r = (src >> 11) & 0x1F;
+        unsigned g = (src >> 5) & 0x3F;
+        unsigned b = src & 0x1F;
+        r >>= 1;
+        g >>= 1;
+        b >>= 1;
+        *dest = (r << 11) | (g << 5) | b;
+
+        dest += vid.width;
+        frac += fracstep;
+    } while (count--);
+}
 
 // ==========================================================================
 // SPANS
@@ -311,8 +354,8 @@ void R_DrawSpan_16(void)
         spot = ((yfrac >> (16 - 6)) & (63 * 64)) + ((xfrac >> 16) & 63);
 
         // Lookup pixel from flat texture tile,
-        //  re-index using light/colormap.
-        *dest++ = hicolormaps[((short *)ds_source)[spot] >> 1];
+        //  re-index using light/colormap, then convert to RGB565.
+        *dest++ = color8to16_565[ds_colormap[ds_source[spot]]];
 
         // Next step in u,v.
         xfrac += ds_xstep.value();

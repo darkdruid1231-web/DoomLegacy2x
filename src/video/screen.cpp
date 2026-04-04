@@ -59,12 +59,12 @@ extern consvar_t cv_grgammagreen;
 extern consvar_t cv_grgammablue;
 
 static CV_PossibleValue_t scr_depth_cons_t[] = {
-    {8, "8 bits"}, {16, "16 bits"}, {24, "24 bits"}, {32, "32 bits"}, {0, NULL}};
+    {8, "8 bits"}, {16, "16 bits"}, {0, NULL}};
 
 // added:03-02-98: default screen mode, as loaded/saved in config
 consvar_t cv_scr_width = {"scr_width", "320", CV_SAVE, CV_Unsigned};
 consvar_t cv_scr_height = {"scr_height", "200", CV_SAVE, CV_Unsigned};
-consvar_t cv_scr_depth = {"scr_depth", "32 bits", CV_SAVE | CV_CALL, scr_depth_cons_t, CV_ScrDepth_OnChange};
+consvar_t cv_scr_depth = {"scr_depth", "8 bits", CV_SAVE | CV_CALL, scr_depth_cons_t, CV_ScrDepth_OnChange};
 // 0=Windowed, 1=Fullscreen, 2=Borderless. Old configs with "Yes"→1 and "No"→0 load correctly.
 static CV_PossibleValue_t displaymode_cons_t[] = {
     {0,"Windowed"}, {1,"Fullscreen"}, {2,"Borderless"}, {0,NULL}};
@@ -187,17 +187,29 @@ void Video::SetMode()
         shadecolfunc = R_DrawShadeColumn_8; // R_DrawColumn_8;
         spanfunc = basespanfunc = R_DrawSpan_8;
     }
-    else if (BytesPerPixel > 1)
+    else if (BytesPerPixel == 2)
     {
-        CONS_Printf("using highcolor mode\n");
+        CONS_Printf("using RGB565 mode\n");
 
         colfunc = basecolfunc = R_DrawColumn_16;
         skycolfunc = R_DrawColumn_16;
 
         fuzzcolfunc = (cv_fuzzymode.value) ? R_DrawFuzzColumn_16 : R_DrawTranslucentColumn_16;
         transcolfunc = R_DrawTranslatedColumn_16;
-        shadecolfunc = NULL; // detect error if used somewhere..
+        shadecolfunc = R_DrawShadeColumn_16;
         spanfunc = basespanfunc = R_DrawSpan_16;
+    }
+    else if (BytesPerPixel == 4)
+    {
+        CONS_Printf("using truecolor mode\n");
+
+        colfunc = basecolfunc = R_DrawColumn_32;
+        skycolfunc = R_DrawSkyColumn_32;
+
+        fuzzcolfunc = (cv_fuzzymode.value) ? R_DrawFuzzColumn_32 : R_DrawTranslucentColumn_32;
+        transcolfunc = R_DrawTranslatedColumn_32;
+        shadecolfunc = R_DrawShadeColumn_32;
+        spanfunc = basespanfunc = R_DrawSpan_32;
     }
     else
         I_Error("unknown bytes per pixel mode %d\n", BytesPerPixel);
@@ -229,8 +241,8 @@ void Video::Startup()
     LoadPalette("PLAYPAL");
     SetPalette(0);
 
-    // fab highcolor maps
-    if (BytesPerPixel == 2)
+    // fab highcolor maps - also needed for 32-bit mode (palette32)
+    if (BytesPerPixel == 2 || BytesPerPixel == 4)
     {
         CONS_Printf("\nInitHighColor...");
         R_Init8to16();
@@ -337,13 +349,21 @@ void Video::CheckDefaultMode()
     int scr_forcex = 0;
     int scr_forcey = 0;
 
+    CONS_Printf("DEBUG CheckDefaultMode: myargc=%d\n", myargc);
+    for (int i = 0; i < myargc && i < 16; i++)
+        CONS_Printf("DEBUG CheckDefaultMode: argv[%d]='%s'\n", i, myargv[i]);
+
     int p = M_CheckParm("-width");
+    CONS_Printf("DEBUG CheckDefaultMode: M_CheckParm(-width)=%d\n", p);
     if (p && p < myargc - 1)
         scr_forcex = atoi(myargv[p + 1]);
 
     p = M_CheckParm("-height");
+    CONS_Printf("DEBUG CheckDefaultMode: M_CheckParm(-height)=%d\n", p);
     if (p && p < myargc - 1)
         scr_forcey = atoi(myargv[p + 1]);
+
+    CONS_Printf("DEBUG CheckDefaultMode: scr_forcex=%d scr_forcey=%d\n", scr_forcex, scr_forcey);
 
     // Handle uninitialized resolution (when config file not found)
     if (cv_scr_width.value == 0)
