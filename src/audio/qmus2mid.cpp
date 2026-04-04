@@ -146,8 +146,9 @@ static void WriteTrack(int tracknum, byte **file)
     fwritelong(size, file);
     if (!tracknum)
     {
-        memset(*file, '\0', 33);
-        *file += 33;
+        fwritemem(TRACKMAGIC1, 4, 1, file);  // track-name meta-event: 00 FF 03 1D
+        memset(*file, '\0', 29);             // empty track name (29 bytes)
+        *file += 29;
     }
     quot = (size_t)(track[tracknum].current / 4096);
     rem = (size_t)(track[tracknum].current - quot * 4096);
@@ -158,9 +159,8 @@ static void WriteTrack(int tracknum, byte **file)
 
 static void WriteFirstTrack(byte **file)
 {
-    Uint16 size;
-
-    size = 43;
+    // Size: TRACKMAGIC3(4) + 22(null) + TRACKMAGIC4(6) + TRACKMAGIC5(7) + TRACKMAGIC6(4) = 43
+    Uint16 size = 43;
     fwritemem("MTrk", 4, 1, file);
     fwritelong(size, file);
     fwritemem(TRACKMAGIC3, 4, 1, file);
@@ -271,9 +271,17 @@ int qmus2mid(byte *mus,
     {
         if (MUS2MIDchannel[MUSchannel] == -1)
         {
-            MIDIchannel = MUS2MIDchannel[MUSchannel] =
-                // if percussion use channel 9
-                (MUSchannel == 15 ? 9 : FirstChannelAvailable(MUS2MIDchannel));
+            // Use GZDoom-style channel mapping:
+            // MUS 15 (percussion) -> MIDI 9
+            // MUS 9-14 -> MIDI 10-15
+            // MUS 0-8 -> MIDI 0-8
+            if (MUSchannel == 15)
+                MIDIchannel = 9;
+            else if (MUSchannel >= 9)
+                MIDIchannel = MUSchannel + 1;
+            else
+                MIDIchannel = MUSchannel;
+            MUS2MIDchannel[MUSchannel] = MIDIchannel;
             MIDItrack = MIDIchan2track[MIDIchannel] = (byte)TrackCnt++;
             if (!(track[MIDItrack].data = (char *)malloc(TRACKBUFFERSIZE)))
             {
@@ -288,6 +296,8 @@ int qmus2mid(byte *mus,
         }
         TWriteVarLen(MIDItrack, track[MIDItrack].DeltaTime);
         track[MIDItrack].DeltaTime = 0;
+        // After delta time, running status must be reset so next event writes full status
+        track[MIDItrack].LastEvent = 0;
         switch (et)
         {
             case 0: /* release note */
