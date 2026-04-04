@@ -35,6 +35,11 @@
 #include "SDL3/SDL_mixer.h"
 #endif
 
+// FluidSynth for MIDI playback
+#ifdef HAVE_FLUIDSYNTH
+#include <fluidsynth.h>
+#endif
+
 // OpenAL headers (only when available)
 #ifdef HAVE_OPENAL
 #ifdef _WIN32
@@ -102,6 +107,10 @@ static int vol_lookup[128][256];
 
 // MIDI buffer
 static byte *mus2mid_buffer;
+static int mus2mid_length = 0;
+
+// Flag to use FluidSynth for MIDI playback
+static bool use_fluidsynth = false;
 
 // Flags for options
 extern bool nosound;
@@ -152,6 +161,18 @@ typedef struct music_stream_s
 static music_stream_t music_stream;
 #endif
 
+// FluidSynth MIDI state (when SDL_mixer MIDI fails)
+#ifdef HAVE_FLUIDSYNTH
+static fluid_synth_t *fluidsynth = nullptr;
+static fluid_settings_t *fluidsynth_settings = nullptr;
+static SDL_AudioStream *fluid_stream = nullptr;  // SDL3 stream fed by FluidSynth
+static fluid_player_t *fluid_player = nullptr;
+static bool fluidsynth_ready = false;
+
+// Flag indicating we should use FluidSynth for current music
+static bool use_fluid_pcm = false;
+#endif
+
 static bool musicStarted = false;
 static bool soundStarted = false;
 
@@ -190,6 +211,7 @@ static stub_music_stream_t music_stream = {false};
 // Legacy software mixing support
 #ifndef NO_MIXER
 // SDL3_mixer structures
+static SDL_AudioDeviceID music_device = 0;
 static MIX_Mixer *music_mixer = nullptr;
 static MIX_Audio *music_audio = nullptr;
 static MIX_Track *music_track = nullptr;
@@ -1006,16 +1028,19 @@ void I_StartupSound()
     {
         sound_provider = SP_OPENAL;
         openal_initialized = true;
-        
+
         // For OpenAL mode, we DON'T open SDL audio for sound effects
         // But we DON'T call SDL_OpenAudio so SDL_mixer can use it for music
-        
+
         soundStarted = true;
         CONS_Printf("Sound: Using OpenAL audio provider (SDL_mixer for music)\n");
-        
+
         // Register OpenAL debug command
         COM.AddCommand("openaldebug", openaldebug_f);
-        
+
+        // Still need to initialize music system (SDL_mixer for music + FluidSynth fallback)
+        I_InitMusic();
+
         return;
     }
 
@@ -1041,6 +1066,341 @@ void I_StartupSound()
 #endif
 }
 
+// FluidSynth MIDI backend initialization
+#ifdef HAVE_FLUIDSYNTH
+
+// SDL3 audio stream get-callback: SDL3_mixer calls this when the music track needs more PCM.
+static void SDLCALL FluidSynthStreamCallback(
+    void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount)
+{
+    if (!fluidsynth || !fluid_player ||
+        fluid_player_get_status(fluid_player) != FLUID_PLAYER_PLAYING)
+        return;
+
+    int frames = additional_amount / (int)(sizeof(int16_t) * 2);
+    int16_t *buf = (int16_t *)SDL_malloc(additional_amount);
+    if (!buf) return;
+
+    fluid_synth_write_s16(fluidsynth, frames, buf, 0, 2, buf, 1, 2);
+    SDL_PutAudioStreamData(stream, buf, additional_amount);
+    SDL_free(buf);
+}
+
+static void I_InitFluidSynth()
+{
+    if (fluidsynth_ready)
+        return;
+
+    fluidsynth_settings = new_fluid_settings();
+    if (!fluidsynth_settings)
+        return;
+
+    fluid_settings_setnum(fluidsynth_settings, "synth.sample-rate", 44100.0);
+    fluid_settings_setnum(fluidsynth_settings, "synth.gain", 0.8);
+    // No OS audio driver — SDL3 stream handles output
+    fluid_settings_setstr(fluidsynth_settings, "audio.driver", "no");
+
+    fluidsynth = new_fluid_synth(fluidsynth_settings);
+    if (!fluidsynth)
+    {
+        delete_fluid_settings(fluidsynth_settings);
+        fluidsynth_settings = nullptr;
+        return;
+    }
+
+    const char *soundfont_paths[] = {
+        "gzdoom.sf2",
+        "FluidR3_GM.sf2",
+        "/usr/share/sounds/sf2/FluidR3_GM.sf2",
+        NULL
+    };
+
+    bool sf_loaded = false;
+    for (int i = 0; soundfont_paths[i]; i++)
+    {
+        if (fluid_synth_sfload(fluidsynth, soundfont_paths[i], 1) >= 0)
+        {
+            CONS_Printf("FluidSynth: Loaded SoundFont: %s\n", soundfont_paths[i]);
+            sf_loaded = true;
+            break;
+        }
+    }
+    if (!sf_loaded)
+    {
+        CONS_Printf("FluidSynth: No SoundFont found, MIDI disabled\n");
+        delete_fluid_synth(fluidsynth);
+        fluidsynth = nullptr;
+        delete_fluid_settings(fluidsynth_settings);
+        fluidsynth_settings = nullptr;
+        return;
+    }
+
+    // Create SDL3 audio stream — SDL3_mixer reads PCM from this stream via the track
+    SDL_AudioSpec spec;
+    spec.format = SDL_AUDIO_S16;
+    spec.channels = 2;
+    spec.freq = 44100;
+    fluid_stream = SDL_CreateAudioStream(&spec, &spec);
+    if (!fluid_stream)
+    {
+        CONS_Printf("FluidSynth: Failed to create audio stream, MIDI disabled\n");
+        delete_fluid_synth(fluidsynth);
+        fluidsynth = nullptr;
+        delete_fluid_settings(fluidsynth_settings);
+        fluidsynth_settings = nullptr;
+        return;
+    }
+    SDL_SetAudioStreamGetCallback(fluid_stream, FluidSynthStreamCallback, nullptr);
+
+    fluidsynth_ready = true;
+    CONS_Printf("FluidSynth: Initialized (SDL3 stream)\n");
+}
+
+static void I_ShutdownFluidSynth()
+{
+    use_fluid_pcm = false;
+
+    if (fluid_stream)
+    {
+        SDL_DestroyAudioStream(fluid_stream);
+        fluid_stream = nullptr;
+    }
+    if (fluidsynth)
+    {
+        delete_fluid_synth(fluidsynth);
+        fluidsynth = nullptr;
+    }
+    if (fluidsynth_settings)
+    {
+        delete_fluid_settings(fluidsynth_settings);
+        fluidsynth_settings = nullptr;
+    }
+    fluidsynth_ready = false;
+}
+
+// (I_PreRenderFluidSynthMIDI removed — FluidSynth now streams via SDL_AudioStream)
+#if 0
+static bool I_PreRenderFluidSynthMIDI(byte *mididata, int midilen)
+{
+    if (!fluidsynth || !fluidsynth_ready)
+        return false;
+
+    if (!mididata || midilen <= 0)
+    {
+        SDL_Log("I_PreRenderFluidSynthMIDI: ERROR - null or zero-length MIDI data!");
+        return false;
+    }
+
+    SDL_Log("I_PreRenderFluidSynthMIDI: mididata=%p, midilen=%d", mididata, midilen);
+
+    // Verify synth is working by checking a simple parameter
+    double gain = 0.0;
+    fluid_settings_getnum(fluidsynth_settings, "synth.gain", &gain);
+    SDL_Log("I_PreRenderFluidSynthMIDI: synth.gain = %.2f", gain);
+    fluid_synth_set_gain(fluidsynth, 0.8f);
+    fluid_settings_getnum(fluidsynth_settings, "synth.gain", &gain);
+    SDL_Log("I_PreRenderFluidSynthMIDI: synth.gain after set = %.2f", gain);
+
+    // Check how many SFOUND fonts are loaded
+    int sfont_count = fluid_synth_sfcount(fluidsynth);
+    SDL_Log("I_PreRenderFluidSynthMIDI: SoundFonts loaded: %d", sfont_count);
+
+    // Debug: print first few bytes of MIDI data
+    SDL_Log("I_PreRenderFluidSynthMIDI: First 16 bytes: %02x %02x %02x %02x %02x %02x %02x %02x ...",
+            mididata[0], mididata[1], mididata[2], mididata[3],
+            mididata[4], mididata[5], mididata[6], mididata[7]);
+    // Also print last bytes
+    SDL_Log("I_PreRenderFluidSynthMIDI: Last 8 bytes: %02x %02x %02x %02x %02x %02x %02x %02x",
+            mididata[midilen-8], mididata[midilen-7], mididata[midilen-6], mididata[midilen-5],
+            mididata[midilen-4], mididata[midilen-3], mididata[midilen-2], mididata[midilen-1]);
+
+    // Parse MIDI header info
+    // MIDI header structure:
+    //   0-3: "MThd"
+    //   4-7: header length (big-endian, usually 6)
+    //   8-9: format (big-endian)
+    //   10-11: num_tracks (big-endian)
+    //   12-13: division (big-endian)
+    if (midilen >= 14 && memcmp(mididata, "MThd", 4) == 0)
+    {
+        Uint16 format = (mididata[8] << 8) | mididata[9];
+        Uint16 num_tracks = (mididata[10] << 8) | mididata[11];
+        Uint16 division = (mididata[12] << 8) | mididata[13];
+        SDL_Log("I_PreRenderFluidSynthMIDI: MIDI format=%d, tracks=%d, division=%d",
+                format, num_tracks, division);
+
+        // Find ALL MTrk chunks
+        size_t off = 14;
+        int track_num = 0;
+        while (off + 8 < (size_t)midilen && track_num < num_tracks)
+        {
+            if (memcmp(mididata + off, "MTrk", 4) == 0)
+            {
+                Uint32 tlen = (mididata[off+4] << 24) | (mididata[off+5] << 16) |
+                             (mididata[off+6] << 8) | mididata[off+7];
+                SDL_Log("I_PreRenderFluidSynthMIDI: MTrk %d at offset %zu, len=%u",
+                        track_num, off, tlen);
+
+                // Dump first 40 bytes of track data (after 8-byte header)
+                if (tlen > 0 && off + 8 + 40 <= (size_t)midilen)
+                {
+                    SDL_Log("  Track %d bytes 0-39: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x",
+                            track_num,
+                            mididata[off+8], mididata[off+9], mididata[off+10], mididata[off+11],
+                            mididata[off+12], mididata[off+13], mididata[off+14], mididata[off+15],
+                            mididata[off+16], mididata[off+17], mididata[off+18], mididata[off+19],
+                            mididata[off+20], mididata[off+21], mididata[off+22], mididata[off+23],
+                            mididata[off+24], mididata[off+25], mididata[off+26], mididata[off+27],
+                            mididata[off+28], mididata[off+29], mididata[off+30], mididata[off+31],
+                            mididata[off+32], mididata[off+33], mididata[off+34], mididata[off+35],
+                            mididata[off+36], mididata[off+37], mididata[off+38], mididata[off+39],
+                            mididata[off+40], mididata[off+41], mididata[off+42], mididata[off+43],
+                            mididata[off+44], mididata[off+45], mididata[off+46], mididata[off+47]);
+                }
+
+                off += 8 + tlen;  // skip to next track
+                track_num++;
+            }
+            else
+            {
+                off++;
+            }
+        }
+        SDL_Log("I_PreRenderFluidSynthMIDI: Found %d MTrk chunks total", track_num);
+    }
+
+    // Free any existing buffers
+    if (fluid_wav_buffer)
+    {
+        SDL_free(fluid_wav_buffer);
+        fluid_wav_buffer = nullptr;
+    }
+    if (fluid_pcm_buffer)
+    {
+        SDL_free(fluid_pcm_buffer);
+        fluid_pcm_buffer = nullptr;
+    }
+
+    const int sample_rate = 44100;
+    const int channels = 2;  // Stereo
+
+    // Create a player to track timing
+    fluid_player_t *player = new_fluid_player(fluidsynth);
+    if (!player)
+    {
+        SDL_Log("I_PreRenderFluidSynthMIDI: Failed to create player");
+        return false;
+    }
+
+    // Load the MIDI data
+    SDL_Log("I_PreRenderFluidSynthMIDI: Adding MIDI data to player...");
+    if (fluid_player_add_mem(player, mididata, midilen) != FLUID_OK)
+    {
+        SDL_Log("I_PreRenderFluidSynthMIDI: Failed to add MIDI data");
+        delete_fluid_player(player);
+        return false;
+    }
+    SDL_Log("I_PreRenderFluidSynthMIDI: MIDI data added successfully");
+
+    // Pre-allocate a large buffer (max ~6 minutes at 44.1kHz stereo = ~64MB)
+    const size_t max_samples = sample_rate * channels * 60 * 6;
+    fluid_pcm_buffer = (byte *)SDL_malloc(max_samples * sizeof(short));
+    if (!fluid_pcm_buffer)
+    {
+        SDL_Log("I_PreRenderFluidSynthMIDI: Failed to allocate PCM buffer");
+        delete_fluid_player(player);
+        return false;
+    }
+
+    short *pcm_out = (short *)fluid_pcm_buffer;
+    size_t samples_written = 0;
+
+    // For now, just do a simple test - use FluidSynth's program change to verify the synth works
+    SDL_Log("I_PreRenderFluidSynthMIDI: Testing synth with program change...");
+
+    fluid_player_stop(player);
+    delete_fluid_player(player);
+    player = nullptr;
+
+    // Try playing a note directly via FluidSynth API to verify sound works
+    SDL_Log("I_PreRenderFluidSynthMIDI: Playing test note on channel 0...");
+    fluid_synth_program_change(fluidsynth, 0, 0);  // Set piano on channel 0
+    fluid_synth_noteon(fluidsynth, 0, 60, 127);  // Play C4, velocity 127
+    SDL_Delay(500);  // Wait 500ms
+    fluid_synth_noteoff(fluidsynth, 0, 60);  // Release
+    SDL_Log("I_PreRenderFluidSynthMIDI: Test note played");
+
+    // Now render 2 seconds of silence (since we can't easily render without player timing)
+    SDL_Log("I_PreRenderFluidSynthMIDI: Rendering 2 seconds of silence...");
+    int test_samples = sample_rate * 2;
+    memset(fluid_pcm_buffer, 0, test_samples * channels * sizeof(short));
+    samples_written = test_samples * channels;
+    SDL_Log("I_PreRenderFluidSynthMIDI: Fallback render complete: %zu samples", samples_written);
+
+    fluid_player_stop(player);
+    delete_fluid_player(player);
+    player = nullptr;
+
+    fluid_pcm_buffer_size = samples_written * sizeof(short);
+
+    SDL_Log("I_PreRenderFluidSynthMIDI: Rendered %zu samples (%zu bytes, ~%.1f seconds)",
+            samples_written, fluid_pcm_buffer_size,
+            (double)samples_written / (sample_rate * channels));
+
+    // Create WAV header + data
+    // WAV header is 44 bytes
+    const size_t wav_header_size = 44;
+    fluid_wav_buffer_size = wav_header_size + fluid_pcm_buffer_size;
+    fluid_wav_buffer = (byte *)SDL_malloc(fluid_wav_buffer_size);
+    if (!fluid_wav_buffer)
+    {
+        SDL_Log("I_PreRenderFluidSynthMIDI: Failed to allocate WAV buffer");
+        SDL_free(fluid_pcm_buffer);
+        fluid_pcm_buffer = nullptr;
+        return false;
+    }
+
+    // Build WAV header
+    byte *wav = fluid_wav_buffer;
+    size_t offset = 0;
+
+    // RIFF header
+    memcpy(wav + offset, "RIFF", 4); offset += 4;
+    Uint32 file_size = 36 + fluid_pcm_buffer_size;
+    memcpy(wav + offset, &file_size, 4); offset += 4;
+    memcpy(wav + offset, "WAVE", 4); offset += 4;
+
+    // fmt chunk
+    memcpy(wav + offset, "fmt ", 4); offset += 4;
+    Uint32 fmt_size = 16;  // PCM format
+    memcpy(wav + offset, &fmt_size, 4); offset += 4;
+    Uint16 audio_format = 1;  // PCM
+    memcpy(wav + offset, &audio_format, 2); offset += 2;
+    Uint16 num_channels = channels;
+    memcpy(wav + offset, &num_channels, 2); offset += 2;
+    Uint32 sample_rate_val = sample_rate;
+    memcpy(wav + offset, &sample_rate_val, 4); offset += 4;
+    Uint32 byte_rate = sample_rate * channels * sizeof(short);
+    memcpy(wav + offset, &byte_rate, 4); offset += 4;
+    Uint16 block_align = channels * sizeof(short);
+    memcpy(wav + offset, &block_align, 2); offset += 2;
+    Uint16 bits_per_sample = 16;
+    memcpy(wav + offset, &bits_per_sample, 2); offset += 2;
+
+    // data chunk
+    memcpy(wav + offset, "data", 4); offset += 4;
+    Uint32 data_size = fluid_pcm_buffer_size;
+    memcpy(wav + offset, &data_size, 4); offset += 4;
+
+    // Copy PCM data after header
+    memcpy(wav + offset, fluid_pcm_buffer, fluid_pcm_buffer_size);
+
+    SDL_Log("I_PreRenderFluidSynthMIDI: Created WAV buffer, total size = %zu bytes", fluid_wav_buffer_size);
+    return true;
+}
+#endif // 0
+#endif // HAVE_FLUIDSYNTH
+
 void I_InitMusic()
 {
     if (nosound)
@@ -1056,50 +1416,102 @@ void I_InitMusic()
 #ifdef NO_MIXER
     nomusic = true;
 #else
-    // Need to open SDL_mixer for music using SDL3 API
+    // Open SDL audio device for music playback
     SDL_AudioSpec spec;
     spec.freq = audio.freq;
     spec.format = audio.format;
     spec.channels = audio.channels;
 
-    music_mixer = MIX_CreateMixer(&spec);
-    if (!music_mixer)
+    // Debug: list available audio playback devices
+    int num_devices = 0;
+    SDL_AudioDeviceID *devices = SDL_GetAudioPlaybackDevices(&num_devices);
+    CONS_Printf("Available audio playback devices: %d\n", num_devices);
+    for (int i = 0; i < num_devices; i++)
     {
-        CONS_Printf("Unable to create SDL3_mixer: %s\n", SDL_GetError());
+        CONS_Printf("  Device %d: %s\n", i, SDL_GetAudioDeviceName(devices[i]));
+    }
+    if (devices) SDL_free(devices);
+
+    // Open a playback audio device for music with specific format
+    SDL_AudioSpec desired = {0};
+    desired.freq = 44100;
+    desired.format = SDL_AUDIO_S16;
+    desired.channels = 2;
+    SDL_Log("I_InitMusic: Opening audio device with freq=%d, format=0x%x, channels=%d",
+            desired.freq, desired.format, desired.channels);
+    music_device = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &desired);
+    if (music_device == 0)
+    {
+        SDL_Log("I_InitMusic: FAILED to open audio device: %s", SDL_GetError());
+        CONS_Printf("Unable to open audio device for music: %s\n", SDL_GetError());
         nomusic = true;
         return;
     }
+    SDL_Log("I_InitMusic: Audio device opened successfully, device ID=%d", music_device);
 
-    CONS_Printf("Audio device for music: %d Hz, %d channels.\n", spec.freq, spec.channels);
+    // Get the actual device format
+    SDL_AudioSpec dev_spec;
+    if (!SDL_GetAudioDeviceFormat(music_device, &dev_spec, NULL))
+    {
+        SDL_Log("I_InitMusic: Failed to get device format: %s", SDL_GetError());
+        CONS_Printf("Failed to get audio device format: %s\n", SDL_GetError());
+        SDL_CloseAudioDevice(music_device);
+        nomusic = true;
+        return;
+    }
+    SDL_Log("I_InitMusic: Device format: freq=%d, format=0x%x, channels=%d",
+            dev_spec.freq, dev_spec.format, dev_spec.channels);
+
+    // Initialize SDL3_mixer
+    if (!MIX_Init())
+    {
+        SDL_Log("I_InitMusic: FAILED to initialize SDL3_mixer: %s", SDL_GetError());
+        CONS_Printf("Unable to initialize SDL3_mixer: %s\n", SDL_GetError());
+        SDL_CloseAudioDevice(music_device);
+        nomusic = true;
+        return;
+    }
+    SDL_Log("I_InitMusic: SDL3_mixer initialized successfully");
+
+    // Debug: list available audio decoders
+    int num_decoders = MIX_GetNumAudioDecoders();
+    SDL_Log("Available audio decoders: %d", num_decoders);
+    for (int i = 0; i < num_decoders; i++)
+    {
+        SDL_Log("  Decoder %d: %s", i, MIX_GetAudioDecoder(i));
+    }
+
+    // Create mixer connected to the audio device
+    music_mixer = MIX_CreateMixerDevice(music_device, &dev_spec);
+    if (!music_mixer)
+    {
+        SDL_Log("I_InitMusic: FAILED to create mixer: %s", SDL_GetError());
+        CONS_Printf("Unable to create SDL3_mixer: %s\n", SDL_GetError());
+        SDL_CloseAudioDevice(music_device);
+        nomusic = true;
+        return;
+    }
+    SDL_Log("I_InitMusic: Mixer created successfully");
+
+    // Note: SDL3 audio devices start in unpaused state, no need to unpause
+    CONS_Printf("Music audio device opened: %d Hz, %d channels.\n", dev_spec.freq, dev_spec.channels);
 
     mus2mid_buffer = (byte *)Z_Malloc(MIDBUFFERSIZE, PU_MUSIC, NULL);
+#endif
+
+    // Initialize FluidSynth as a fallback for MIDI playback
+#ifdef HAVE_FLUIDSYNTH
+    I_InitFluidSynth();
+#endif
+
     CONS_Printf("Music initialized.\n");
     musicStarted = true;
-#endif
 }
 
 void I_ShutdownSound()
 {
-    if (sound_provider == SP_OPENAL && openal_initialized)
-    {
-        I_ShutdownOpenAL();
-        soundStarted = false;
-        musicStarted = false;
-        return;
-    }
-
-    if (!soundStarted)
-        return;
-
-    CONS_Printf("I_ShutdownSound: ");
-
-#ifdef NO_MIXER
-#ifdef SDL3
-    // SDL3 audio not implemented - nothing to close
-#else
-    SDL_CloseAudio();
-#endif
-#else
+    // Always clean up SDL_mixer resources first if they exist
+#ifndef NO_MIXER
     if (music_track)
     {
         MIX_StopTrack(music_track, 0);
@@ -1116,6 +1528,42 @@ void I_ShutdownSound()
         MIX_DestroyMixer(music_mixer);
         music_mixer = nullptr;
     }
+    if (music_device != 0)
+    {
+        SDL_CloseAudioDevice(music_device);
+        music_device = 0;
+    }
+    // Quit SDL_mixer (this destroys all remaining SDL_mixer objects)
+    MIX_Quit();
+#endif
+
+    // Clean up FluidSynth
+#ifdef HAVE_FLUIDSYNTH
+    if (fluidsynth_ready)
+    {
+        I_ShutdownFluidSynth();
+    }
+#endif
+
+    if (sound_provider == SP_OPENAL && openal_initialized)
+    {
+        I_ShutdownOpenAL();
+        soundStarted = false;
+        musicStarted = false;
+        return;
+    }
+
+    if (!soundStarted)
+        return;
+
+    CONS_Printf("I_ShutdownSound: ");
+
+#ifdef NO_MIXER
+#ifndef SDL3
+    SDL_CloseAudio();
+#endif
+#else
+    // SDL_mixer resources already cleaned up above
 #endif
 
     CONS_Printf("shut down\n");
@@ -1133,11 +1581,57 @@ void I_PlaySong(int handle, int looping)
 {
     // In OpenAL mode, still use SDL_mixer for music
 #ifndef NO_MIXER
+    SDL_Log("I_PlaySong called: nomusic=%d, music_mixer=%p, music_audio=%p, looping=%d, use_fluid_pcm=%d",
+            nomusic, (void*)music_mixer, (void*)music_audio, looping, use_fluid_pcm);
     if (nomusic)
         return;
 
-    if (!music_mixer || !music_audio)
+    // Handle FluidSynth MIDI — route through music_track for unified volume control
+#ifdef HAVE_FLUIDSYNTH
+    if (use_fluid_pcm && fluid_player)
+    {
+        if (!music_mixer || !fluid_stream)
+        {
+            SDL_Log("I_PlaySong: FluidSynth path missing mixer or stream");
+            return;
+        }
+
+        // Destroy any previous track
+        if (music_track)
+        {
+            MIX_StopTrack(music_track, 0);
+            MIX_DestroyTrack(music_track);
+            music_track = nullptr;
+        }
+
+        music_track = MIX_CreateTrack(music_mixer);
+        if (!music_track)
+        {
+            SDL_Log("I_PlaySong: Failed to create FluidSynth track: %s", SDL_GetError());
+            return;
+        }
+
+        MIX_SetTrackAudioStream(music_track, fluid_stream);
+
+        fluid_player_set_loop(fluid_player, looping ? -1 : 0);
+        fluid_player_play(fluid_player);
+
+        SDL_PropertiesID props = SDL_CreateProperties();
+        SDL_SetNumberProperty(props, MIX_PROP_PLAY_FADE_IN_FRAMES_NUMBER, 30);
+        if (!MIX_PlayTrack(music_track, props))
+            SDL_Log("I_PlaySong: MIX_PlayTrack (FluidSynth) failed: %s", SDL_GetError());
+        else
+            SDL_Log("I_PlaySong: FluidSynth MIDI started via SDL3 mixer track");
+        SDL_DestroyProperties(props);
         return;
+    }
+#endif
+
+    if (!music_mixer || !music_audio)
+    {
+        SDL_Log("I_PlaySong: returning early - mixer or audio is NULL");
+        return;
+    }
 
     // Destroy previous track if exists
     if (music_track)
@@ -1150,18 +1644,22 @@ void I_PlaySong(int handle, int looping)
     music_track = MIX_CreateTrack(music_mixer);
     if (!music_track)
     {
+        SDL_Log("I_PlaySong: FAILED to create track: %s", SDL_GetError());
         CONS_Printf("Failed to create music track: %s\n", SDL_GetError());
         return;
     }
+    SDL_Log("I_PlaySong: Track created successfully");
 
     // Set the audio on the track
     if (!MIX_SetTrackAudio(music_track, music_audio))
     {
+        SDL_Log("I_PlaySong: FAILED to set track audio: %s", SDL_GetError());
         CONS_Printf("Failed to set track audio: %s\n", SDL_GetError());
         MIX_DestroyTrack(music_track);
         music_track = nullptr;
         return;
     }
+    SDL_Log("I_PlaySong: Track audio set successfully");
 
     // Set looping - -1 means infinite, 0 means play once, positive means that many times
     int loops = looping ? -1 : 0;
@@ -1173,9 +1671,14 @@ void I_PlaySong(int handle, int looping)
 
     if (!MIX_PlayTrack(music_track, props))
     {
+        SDL_Log("I_PlaySong: FAILED to play track: %s", SDL_GetError());
         CONS_Printf("Failed to play music: %s\n", SDL_GetError());
         MIX_DestroyTrack(music_track);
         music_track = nullptr;
+    }
+    else
+    {
+        SDL_Log("I_PlaySong: Music started successfully!");
     }
     SDL_DestroyProperties(props);
 #endif
@@ -1187,6 +1690,14 @@ void I_PauseSong(int handle)
 #ifndef NO_MIXER
     if (nomusic)
         return;
+
+    // FluidSynth pre-rendered PCM uses SDL_mixer pause
+#ifdef HAVE_FLUIDSYNTH
+    if (use_fluid_pcm)
+    {
+        // Fall through to SDL_mixer pause
+    }
+#endif
 
     if (music_track)
     {
@@ -1202,6 +1713,14 @@ void I_ResumeSong(int handle)
     if (nomusic)
         return;
 
+    // FluidSynth pre-rendered PCM uses SDL_mixer resume
+#ifdef HAVE_FLUIDSYNTH
+    if (use_fluid_pcm)
+    {
+        // Fall through to SDL_mixer resume
+    }
+#endif
+
     if (music_track)
     {
         MIX_ResumeTrack(music_track);
@@ -1211,6 +1730,18 @@ void I_ResumeSong(int handle)
 
 void I_StopSong(int handle)
 {
+    // Handle FluidSynth player stop
+#ifdef HAVE_FLUIDSYNTH
+    if (use_fluid_pcm && fluid_player)
+    {
+        SDL_Log("I_StopSong: Stopping FluidSynth player");
+        fluid_player_stop(fluid_player);
+        if (music_track)
+            MIX_StopTrack(music_track, 30);
+        return;
+    }
+#endif
+
     // In OpenAL mode, still use SDL_mixer for music
 #ifndef NO_MIXER
     if (nomusic)
@@ -1226,6 +1757,25 @@ void I_StopSong(int handle)
 
 void I_UnRegisterSong(int handle)
 {
+    // Handle FluidSynth player cleanup
+#ifdef HAVE_FLUIDSYNTH
+    if (use_fluid_pcm && fluid_player)
+    {
+        SDL_Log("I_UnRegisterSong: Cleaning up FluidSynth player");
+        fluid_player_stop(fluid_player);
+        delete_fluid_player(fluid_player);
+        fluid_player = nullptr;
+        use_fluid_pcm = false;
+        if (music_track)
+        {
+            MIX_DestroyTrack(music_track);
+            music_track = nullptr;
+        }
+        SDL_Log("I_UnRegisterSong: FluidSynth cleanup complete");
+        return;
+    }
+#endif
+
     // In OpenAL mode, still use SDL_mixer for music
 #ifndef NO_MIXER
     if (nomusic)
@@ -1249,6 +1799,7 @@ int I_RegisterSong(void *data, int len)
 {
     // In OpenAL mode, still use SDL_mixer for music
 #ifndef NO_MIXER
+    SDL_Log("I_RegisterSong called: data=%p, len=%d, nomusic=%d", data, len, nomusic);
     if (nomusic)
         return 0;
 
@@ -1260,36 +1811,243 @@ int I_RegisterSong(void *data, int len)
     byte *bdata = static_cast<byte *>(data);
     SDL_IOStream *rwop = nullptr;
 
-    if (memcmp(data, MUSMAGIC, 4) == 0)
-    {
-        int err;
-        Uint32 midlength;
-        if ((err = qmus2mid(bdata, mus2mid_buffer, 89, 64, 0, len, MIDBUFFERSIZE, &midlength)) != 0)
-        {
-            CONS_Printf("Cannot convert MUS to MIDI: error %d.\n", err);
-            return 0;
-        }
+    // Check if this is a MUS file that needs conversion
+    bool is_mus = (memcmp(data, MUSMAGIC, 4) == 0);
+    bool is_midi = (memcmp(data, "MThd", 4) == 0);
 
-        rwop = SDL_IOFromConstMem(mus2mid_buffer, midlength);
+    SDL_Log("I_RegisterSong: data[0-3]=%02x%02x%02x%02x, is_mus=%d, is_midi=%d",
+            bdata[0], bdata[1], bdata[2], bdata[3], is_mus, is_midi);
+
+    // midlength is hoisted here so the FluidSynth fallback can reuse it
+    int err;
+    Uint32 midlength = 0;
+
+    if (is_mus)
+    {
+        // Debug: show MUS header values (little-endian parsing)
+        Uint16 score_len = bdata[4] | (bdata[5] << 8);
+        Uint16 score_start = bdata[6] | (bdata[7] << 8);
+        Uint16 channels = bdata[8] | (bdata[9] << 8);
+        // Also try big-endian parsing
+        Uint16 score_len_be = (bdata[4] << 8) | bdata[5];
+        Uint16 score_start_be = (bdata[6] << 8) | bdata[7];
+        SDL_Log("I_RegisterSong: MUS header: len=%d, scoreLen_LE=%d, scoreStart_LE=%d, channels_LE=%d",
+                len, score_len, score_start, channels);
+        SDL_Log("I_RegisterSong: MUS header (BE): scoreLen_BE=%d, scoreStart_BE=%d",
+                score_len_be, score_start_be);
+
+        // Try big-endian parsing if scoreStart seems wrong
+        if (score_start > len) {
+            SDL_Log("I_RegisterSong: scoreStart > len, trying big-endian MUS");
+            // Create a byte-swapped copy
+            byte mus_be[16 + 65536]; // header + max MUS size
+            memcpy(mus_be, bdata, len);
+            // Byte-swap the Uint16 fields after the 4-byte header
+            for (int i = 4; i < len && i < 16; i += 2) {
+                byte t = mus_be[i];
+                mus_be[i] = mus_be[i+1];
+                mus_be[i+1] = t;
+            }
+            err = qmus2mid(mus_be, mus2mid_buffer, 96, 64, 0, len, MIDBUFFERSIZE, &midlength);
+            if (err == 0) {
+                SDL_Log("I_RegisterSong: Big-endian MUS conversion succeeded, midilen=%d", midlength);
+                rwop = SDL_IOFromConstMem(mus2mid_buffer, midlength);
+            } else {
+                SDL_Log("I_RegisterSong: Big-endian MUS conversion failed: error %d", err);
+                nomusic = true;
+                return 0;
+            }
+        } else {
+            // Try with current parsing
+            if ((err = qmus2mid(bdata, mus2mid_buffer, 96, 64, 0, len, MIDBUFFERSIZE, &midlength)) != 0)
+            {
+                SDL_Log("I_RegisterSong: MUS to MIDI conversion failed: error %d", err);
+                CONS_Printf("Cannot convert MUS to MIDI: error %d.\n", err);
+                return 0;
+            }
+            SDL_Log("I_RegisterSong: MUS converted to MIDI, length=%d", midlength);
+
+        // Debug: show first 70 bytes of MIDI output to see track 0
+        SDL_Log("I_RegisterSong: MIDI bytes 0-67:");
+        for (int i = 0; i < 68 && i < (int)midlength; i++) {
+            SDL_Log("  [%d] = 0x%02x", i, mus2mid_buffer[i]);
+        }
+            rwop = SDL_IOFromConstMem(mus2mid_buffer, midlength);
+        }
+    }
+    else if (is_midi)
+    {
+        SDL_Log("I_RegisterSong: Data is already MIDI format");
+        rwop = SDL_IOFromConstMem(data, len);
     }
     else
     {
+        SDL_Log("I_RegisterSong: Unknown music format, trying as raw MIDI");
         rwop = SDL_IOFromConstMem(data, len);
     }
 
     if (!rwop)
     {
+        SDL_Log("I_RegisterSong: Failed to create SDL_IOStream: %s", SDL_GetError());
         CONS_Printf("Couldn't create SDL_IOStream for music: %s\n", SDL_GetError());
         return 0;
     }
 
     // Load audio using SDL3_mixer
+    SDL_Log("I_RegisterSong: Loading audio with MIX_LoadAudio_IO, music_mixer=%p", (void*)music_mixer);
     music_audio = MIX_LoadAudio_IO(music_mixer, rwop, true, true); // predecode=true, closeio=true
     if (!music_audio)
     {
-        CONS_Printf("Couldn't load music lump: %s\n", SDL_GetError());
-        return 0;
+        // SDL3_mixer doesn't support MIDI format (no MIDI decoder available)
+        // MUS files are converted to MIDI but require a SoundFont to play
+        // Try FluidSynth as a fallback for MIDI playback
+        SDL_Log("I_RegisterSong: SDL3_mixer cannot play MIDI, trying FluidSynth...");
+
+#ifdef HAVE_FLUIDSYNTH
+        if (fluidsynth_ready && fluidsynth)
+        {
+            SDL_Log("I_RegisterSong: FluidSynth is ready, attempting MIDI playback");
+            // Determine MIDI data and length
+            byte *mididata = nullptr;
+            int midilen = 0;
+
+            if (is_mus)
+            {
+                // MIDI already in mus2mid_buffer from the conversion above
+                mididata = mus2mid_buffer;
+                midilen = (int)midlength;
+                SDL_Log("I_RegisterSong: Reusing MUS->MIDI from mus2mid_buffer, midilen=%d", midilen);
+            }
+            else if (is_midi)
+            {
+                SDL_Log("I_RegisterSong: Data is MIDI, passing directly to FluidSynth");
+                mididata = bdata;
+                midilen = len;
+            }
+            else
+            {
+                SDL_Log("I_RegisterSong: Data is unknown format, trying as raw MIDI");
+                mididata = bdata;
+                midilen = len;
+            }
+
+            // Debug: write MIDI data to file for inspection
+            {
+                static int dbg_count = 0;
+                char fname[64];
+                snprintf(fname, sizeof(fname), "C:/doomlegacy-windows/debug_midi_%d.bin", dbg_count++);
+                FILE *f = fopen(fname, "wb");
+                if (f) {
+                    fwrite(mididata, 1, midilen, f);
+                    fclose(f);
+                    SDL_Log("I_RegisterSong: Wrote MIDI debug file: %s (%d bytes)", fname, midilen);
+                } else {
+                    SDL_Log("I_RegisterSong: Failed to write MIDI debug file: %s", fname);
+                }
+            }
+
+            // Add MIDI to FluidSynth player - the player uses FluidSynth's audio driver
+            // But first, fix track lengths in the MIDI data since qmus2mid may have incorrect lengths
+            SDL_Log("I_RegisterSong: Pre-track-fix: mididata=%p, midilen=%d", (void*)mididata, midilen);
+            int fixed_len = midilen;
+            byte *fixed_mididata = (byte*)SDL_malloc(midilen);
+            if (fixed_mididata)
+            {
+                memcpy(fixed_mididata, mididata, midilen);
+                SDL_Log("I_RegisterSong: Allocated fixed_mididata=%p", (void*)fixed_mididata);
+                // Find all MTrk chunks and recalculate their lengths
+                // MIDI structure: MThd(14) + MTrk chunks...
+                size_t off = 14;
+                int track_num = 0;
+                while (off + 8 < (size_t)midilen)
+                {
+                    if (memcmp(fixed_mididata + off, "MTrk", 4) == 0)
+                    {
+                        Uint32 declared_len = (fixed_mididata[off+4] << 24) | (fixed_mididata[off+5] << 16) |
+                                             (fixed_mididata[off+6] << 8) | fixed_mididata[off+7];
+                        SDL_Log("I_RegisterSong: Track %d at off=%zu, declared_len=%u", track_num, off, declared_len);
+                        // Scan for end-of-track meta event (FF 2F 00) within the declared length
+                        // Simply scan byte by byte looking for FF 2F 00
+                        size_t scan_end = off + 8 + declared_len;
+                        size_t actual_len = declared_len;
+                        for (size_t scan_off = off + 8; scan_off < scan_end - 2; scan_off++)
+                        {
+                            if (fixed_mididata[scan_off] == 0xFF && fixed_mididata[scan_off+1] == 0x2F &&
+                                fixed_mididata[scan_off+2] == 0x00)
+                            {
+                                // Found end-of-track: FF 2F 00
+                                actual_len = (scan_off - off - 8) + 3; // +3 for the FF 2F 00 itself
+                                SDL_Log("I_RegisterSong:   Found FF2F00 at scan_off=%zu, actual_len=%zu", scan_off, actual_len);
+                                break;
+                            }
+                        }
+                        if (actual_len != declared_len)
+                        {
+                            SDL_Log("I_RegisterSong: Fixing track %d length: declared=%u, actual=%zu",
+                                    track_num, declared_len, actual_len);
+                            fixed_mididata[off+4] = (actual_len >> 24) & 0xFF;
+                            fixed_mididata[off+5] = (actual_len >> 16) & 0xFF;
+                            fixed_mididata[off+6] = (actual_len >> 8) & 0xFF;
+                            fixed_mididata[off+7] = actual_len & 0xFF;
+                        }
+                        else
+                        {
+                            SDL_Log("I_RegisterSong: Track %d length OK (no fix needed)", track_num);
+                        }
+                        off += 8 + declared_len;
+                        track_num++;
+                    }
+                    else
+                    {
+                        off++;
+                    }
+                }
+                mididata = fixed_mididata;
+                fixed_len = midilen;
+                SDL_Log("I_RegisterSong: Using fixed_mididata for FluidSynth");
+            }
+            else
+            {
+                SDL_Log("I_RegisterSong: SDL_malloc failed, using original mididata");
+            }
+
+            fluid_player_t *player = new_fluid_player(fluidsynth);
+            if (!player)
+            {
+                SDL_Log("I_RegisterSong: Failed to create FluidSynth player");
+                nomusic = true;
+                return 0;
+            }
+
+            int add_result = fluid_player_add_mem(player, mididata, midilen);
+            if (fixed_mididata)
+            {
+                SDL_free(fixed_mididata);
+                fixed_mididata = nullptr;
+            }
+            if (add_result != FLUID_OK)
+            {
+                SDL_Log("I_RegisterSong: Failed to add MIDI to FluidSynth player");
+                delete_fluid_player(player);
+                nomusic = true;
+                return 0;
+            }
+
+            // Store player for later use in I_PlaySong
+            fluid_player = player;
+            use_fluid_pcm = true;
+            SDL_Log("I_RegisterSong: FluidSynth player created and MIDI loaded");
+            return 1;
+        }
+        else
+#endif
+        {
+            SDL_Log("I_RegisterSong: FluidSynth not available, music disabled");
+            nomusic = true;
+            return 0;
+        }
     }
+    SDL_Log("I_RegisterSong: Audio loaded successfully!");
 
 #endif
 
@@ -1298,14 +2056,14 @@ int I_RegisterSong(void *data, int len)
 
 void I_SetMusicVolume(int volume)
 {
-    // In OpenAL mode, still use SDL_mixer for music
+    // Both MIDI (FluidSynth) and OGG/other formats play through music_track,
+    // so one gain call covers both.
 #ifndef NO_MIXER
     if (nomusic)
         return;
 
     if (music_track)
     {
-        // volume is 0-127, convert to gain (0.0-1.0+)
         float gain = (volume * 2) / 127.0f;
         MIX_SetTrackGain(music_track, gain);
     }
