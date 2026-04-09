@@ -176,7 +176,7 @@ jobs:
         python3 -c "
         import json, sys
         data = json.load(open('checksec_result.json'))
-        b = list(data['data'].values())[0]
+        b = list(data.values())[0]
         ok = True
         if b.get('canary') != 'yes':
             print('FAIL: Stack canary missing', file=sys.stderr); ok = False
