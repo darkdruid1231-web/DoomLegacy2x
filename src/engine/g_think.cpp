@@ -95,7 +95,7 @@ int Thinker::Serialize(Thinker *p, LArchive &a)
 
 Thinker *Thinker::Unserialize(LArchive &a)
 {
-    unsigned id;
+    unsigned id = 0;
     a << id;
 
     void *v = NULL;
@@ -104,7 +104,7 @@ Thinker *Thinker::Unserialize(LArchive &a)
             v); // already unserialized, just return the appropriate pointer
 
     // not unserialized yet, so let's do it now:
-    unsigned type;
+    unsigned type = 0;
     a << type;
     TypeInfo *t = TypeInfo::Find(type);
     if (!t)

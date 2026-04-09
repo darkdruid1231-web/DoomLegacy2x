@@ -373,7 +373,7 @@ void SF_Tip()
     tempstr[0] = '\0';
 
     for (i = 0; i < t_argc; i++)
-        sprintf(tempstr, "%s%s", tempstr, stringvalue(t_argv[i]));
+        strcat(tempstr, stringvalue(t_argv[i]));
 
     trigger_player->SetMessage(tempstr, 1, PlayerInfo::M_HUD, 150);
     Z_Free(tempstr);
@@ -402,7 +402,7 @@ void SF_TimedTip()
     tempstr[0] = '\0';
 
     for (i = 1; i < t_argc; i++)
-        sprintf(tempstr, "%s%s", tempstr, stringvalue(t_argv[i]));
+        strcat(tempstr, stringvalue(t_argv[i]));
 
     trigger_player->SetMessage(tempstr, 1, PlayerInfo::M_HUD, tiptime);
     Z_Free(tempstr);
@@ -431,7 +431,7 @@ void SF_PlayerTip()
     tempstr[0] = '\0';
 
     for (i = 1; i < t_argc; i++)
-        sprintf(tempstr, "%s%s", tempstr, stringvalue(t_argv[i]));
+        strcat(tempstr, stringvalue(t_argv[i]));
 
     p->SetMessage(tempstr, 1, PlayerInfo::M_HUD, 150);
     Z_Free(tempstr);
@@ -452,7 +452,7 @@ void SF_Message()
     tempstr[0] = '\0';
 
     for (i = 0; i < t_argc; i++)
-        sprintf(tempstr, "%s%s", tempstr, stringvalue(t_argv[i]));
+        strcat(tempstr, stringvalue(t_argv[i]));
 
     trigger_player->SetMessage(tempstr, 1, PlayerInfo::M_HUD, 150);
     Z_Free(tempstr);
@@ -494,7 +494,7 @@ void SF_PlayerMsg()
     tempstr[0] = '\0';
 
     for (i = 1; i < t_argc; i++)
-        sprintf(tempstr, "%s%s", tempstr, stringvalue(t_argv[i]));
+        strcat(tempstr, stringvalue(t_argv[i]));
 
     p->SetMessage(tempstr, 1);
     Z_Free(tempstr);
@@ -1992,7 +1992,7 @@ void SF_RunCommand()
     tempstr[0] = '\0';
 
     for (i = 0; i < t_argc; i++)
-        sprintf(tempstr, "%s%s", tempstr, stringvalue(t_argv[i]));
+        strcat(tempstr, stringvalue(t_argv[i]));
 
     COM.AppendText(tempstr);
     Z_Free(tempstr);

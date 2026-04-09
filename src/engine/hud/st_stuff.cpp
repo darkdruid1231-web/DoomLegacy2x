@@ -198,7 +198,7 @@ static Material *PatchRTFCTOP;
 static Material *PatchARMCLEAR;
 
 static Material *Patch_InvBar[13];
-static Material *PatchARTI[NUMARTIFACTS];
+static Material *PatchARTI[NUMARTIFACTS + 1];
 static Material *Patch_ChainSlider[5];
 
 // Heretic numbers:

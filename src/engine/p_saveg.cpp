@@ -98,7 +98,7 @@ enum consistency_marker_t
     }
 #define RE_PTR(p, array)                                                                           \
     {                                                                                              \
-        int temp;                                                                                  \
+        int temp = 0;                                                                              \
         a << temp;                                                                                 \
         p = (temp == -1) ? NULL : &array[temp];                                                    \
     }
@@ -109,7 +109,7 @@ enum consistency_marker_t
 
 int acs_t::Marshal(LArchive &a)
 {
-    int temp;
+    int temp = 0;
     if (a.IsStoring())
     {
         a << def->number;
@@ -137,7 +137,7 @@ int acs_t::Marshal(LArchive &a)
 
 int sectoreffect_t::Marshal(LArchive &a)
 {
-    int temp;
+    int temp = 0;
     if (a.IsStoring())
     {
         if (!sector)
@@ -363,7 +363,7 @@ int presentation_t::Serialize(presentation_t *p, LArchive &a)
 presentation_t *presentation_t::Unserialize(LArchive &a)
 {
     presentation_t *p;
-    int temp;
+    int temp = 0;
     a << temp; // read the type id
 
     switch (temp)
@@ -390,7 +390,7 @@ presentation_t *presentation_t::Unserialize(LArchive &a)
 
 int spritepres_t::Marshal(LArchive &a)
 {
-    int temp;
+    int temp = 0;
     if (a.IsStoring())
     {
         a << (temp = PID_SPRITE); // type id
@@ -416,7 +416,7 @@ int spritepres_t::Marshal(LArchive &a)
 
 int modelpres_t::Marshal(LArchive &a)
 {
-    int temp;
+    int temp = 0;
     if (a.IsStoring())
     {
         a << (temp = PID_MODEL); // type id
@@ -522,11 +522,11 @@ int DActor::Marshal(LArchive &a)
         MD_OWNER = 0x8000000,
     };
 
-    int temp;
-    short stemp;
+    int temp = 0;
+    short stemp = 0;
     int i;
 
-    unsigned diff;
+    unsigned diff = 0;
 
     if (a.IsStoring())
     {
@@ -1000,7 +1000,7 @@ int script_t::Serialize(LArchive &a)
 
 int script_t::Unserialize(LArchive &a)
 {
-    int i, n;
+    int i, n = 0;
 
     // free all the variables in the script first
     for (i = 0; i < VARIABLESLOTS; i++)
@@ -1099,7 +1099,7 @@ int Map::Serialize(LArchive &a)
         // it.
 
         int statsec = 0, statline = 0;
-        byte diff, diff2;
+        byte diff = 0, diff2 = 0;
 
         struct
         {
@@ -1447,9 +1447,9 @@ int Map::Serialize(LArchive &a)
 
 int Map::Unserialize(LArchive &a)
 {
-    unsigned temp;
-    short stemp;
-    int i, n;
+    unsigned temp = 0;
+    short stemp = 0;
+    int i, n = 0;
 
     if (!a.Marker(MARK_MAP))
         return -1;
@@ -1475,7 +1475,7 @@ int Map::Unserialize(LArchive &a)
 
     line_t *li;
     side_t *si;
-    byte diff, diff2;
+    byte diff = 0, diff2 = 0;
 
     // load changes in geometry
     while (1)
@@ -1594,7 +1594,7 @@ int Map::Unserialize(LArchive &a)
         if (n != polyobjs[i].id)
             I_Error("Invalid polyobj tag!\n");
 
-        angle_t ang;
+        angle_t ang = 0;
         a << ang;
         polyobjs[i].Rotate(ang);
         fixed_t x, y;
@@ -1630,7 +1630,7 @@ int Map::Unserialize(LArchive &a)
         // create a new runningscript
         runningscript_t *rs = new runningscript_t();
 
-        int scriptnum;
+        int scriptnum = 0;
         a << scriptnum;
 
         // levelscript?
@@ -1724,7 +1724,7 @@ int Episode::Serialize(LArchive &a)
 
 int Episode::Unserialize(LArchive &a)
 {
-    int n;
+    int n = 0;
     a << name << namepic << maplump;
     a << entrypoint << active;
     a << n;
@@ -1757,7 +1757,7 @@ int MapCluster::Unserialize(LArchive &a)
     a << time << partime;
     a << entertext << exittext << finalepic << finalemusic << episode;
 
-    int n, temp;
+    int n = 0, temp = 0;
     a << n;
     for (int i = 0; i < n; i++)
     {
@@ -1828,7 +1828,7 @@ int MapInfo::Serialize(LArchive &a)
 
 int MapInfo::Unserialize(LArchive &a)
 {
-    int temp;
+    int temp = 0;
     a << temp;
     state = mapstate_e(temp);
     a << found;
@@ -1857,7 +1857,7 @@ int MapInfo::Unserialize(LArchive &a)
     if (temp == 2)
     {
         // extract the hubsave file
-        int length;
+        int length = 0;
         a << length;
         byte *buffer = (byte *)Z_Malloc(length, PU_STATIC, NULL);
         a.Read(buffer, length);
@@ -1933,7 +1933,7 @@ int PlayerInfo::Serialize(LArchive &a)
 
 int PlayerInfo::Unserialize(LArchive &a)
 {
-    int i, n;
+    int i, n = 0;
     a << number << team << name;
     a << client_hash; // so we can recognize the clients after loading
 
@@ -1946,7 +1946,7 @@ int PlayerInfo::Unserialize(LArchive &a)
     a << n;
     for (i = 0; i < n; i++)
     {
-        int t1, t2;
+        int t1 = 0, t2 = 0;
         a << t1 << t2;
         Frags.insert(pair<int, int>(t1, t2));
     }
@@ -2118,7 +2118,7 @@ int GameInfo::Serialize(LArchive &a)
 
 int GameInfo::Unserialize(LArchive &a)
 {
-    int i, n;
+    int i, n = 0;
     // treat all enums as ints
     a << demoversion;
     a << n;
@@ -2215,7 +2215,7 @@ int GameInfo::Unserialize(LArchive &a)
     a << n;
     for (i = 0; i < n; i++)
     {
-        int num;
+        int num = 0;
         a << num;
         if (num == -1)
             LocalPlayers[i].info = NULL;

@@ -755,9 +755,10 @@ void Map::PO_Init()
     NumPolyobjs = polyanchor.size();
     CONS_Printf("%d polyobjs.\n", NumPolyobjs);
 
-    // allocate the polyobjects
+    // allocate and construct the polyobjects (uses placement new since Z_Malloc is the allocator)
     polyobjs = static_cast<polyobj_t *>(Z_Malloc(NumPolyobjs * sizeof(polyobj_t), PU_LEVEL, 0));
-    memset(polyobjs, 0, NumPolyobjs * sizeof(polyobj_t));
+    for (int pi = 0; pi < NumPolyobjs; pi++)
+        new (&polyobjs[pi]) polyobj_t();
 
     // generate the polyobj models, one per anchor point
     for (int i = 0; i < NumPolyobjs; i++)
@@ -842,7 +843,7 @@ void Map::PO_Init()
                 continue;
             }
 
-            unsigned n = line->args[1]; // alkaa 1:stä!!
+            unsigned n = line->args[1]; // alkaa 1:stï¿½!!
 
             if (n == 0)
             {

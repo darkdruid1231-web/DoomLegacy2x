@@ -139,7 +139,8 @@ class ShaderProg : public cacheitem_t
 
 #else // GL_VERSION_2_0
 
-// Inert dummy implementation
+// Inert dummy implementation (intentionally same name as real class; only one version compiled per TU)
+// cppcheck-suppress ctuOneDefinitionRuleViolation
 class Shader : public cacheitem_t
 {
   public:
@@ -148,7 +149,8 @@ class Shader : public cacheitem_t
     }
 };
 
-// Inert dummy implementation
+// Inert dummy implementation (intentionally same name as real class; only one version compiled per TU)
+// cppcheck-suppress ctuOneDefinitionRuleViolation
 class ShaderProg : public cacheitem_t
 {
   public:

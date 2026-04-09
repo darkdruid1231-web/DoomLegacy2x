@@ -125,13 +125,7 @@ stderr.txt
 stdout.txt
 common/tools/tools.dep
 bash.exe.stackdump
-legacy/trunk/thirdparty/zdbsp/Unused/nodebuild.cpp-nogl
-legacy/trunk/thirdparty/zdbsp/Unused/nodebuild.h-nogl
-legacy/trunk/thirdparty/zdbsp/Unused/rejectbuilder.cpp
-legacy/trunk/thirdparty/zdbsp/Unused/rejectbuilder.cpp-nogl
-legacy/trunk/thirdparty/zdbsp/Unused/rejectbuilder.cpp-slow
-legacy/trunk/thirdparty/zdbsp/Unused/rejectbuilder.h
-legacy/trunk/thirdparty/zdbsp/Unused/rejectbuilder.h-nogl
-legacy/trunk/thirdparty/zdbsp/Unused/rejectbuilder.h-slow
-legacy/trunk/thirdparty/zdbsp/Unused/vis.cpp
-legacy/trunk/thirdparty/zdbsp/Unused/visflow.cpp
+legacy/trunk/thirdparty/zdbsp/Unused/
+src/SDL3_mixer-3.2.0/
+src/build_sdl3/
+src/release/

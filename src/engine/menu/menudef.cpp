@@ -108,7 +108,7 @@ struct Tokeniser
     Token Next()
     {
         SkipWhitespaceAndComments();
-        Token t;
+        Token t = {};
         if (!*pos) { t.type = Token::T_EOF; return t; }
 
         char c = *pos;

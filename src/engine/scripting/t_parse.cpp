@@ -682,7 +682,10 @@ svalue_t evaluate_expression(int start, int stop)
         char tempstr[1024] = "";
 
         for (i = start; i <= stop; i++)
-            sprintf(tempstr, "%s %s", tempstr, tokens[i].v);
+        {
+            strcat(tempstr, " ");
+            strcat(tempstr, tokens[i].v);
+        }
 
         script_error("couldnt evaluate expression: %s\n", tempstr);
         return nullvar;
