@@ -841,7 +841,7 @@ TEST_F(BspCompilerTest, OffsetOriginRoom)
     //   v0 +----+ v1
     //   Offset: x=-1024, y=-1024
 
-    int offset = -1024 << 16;
+    int offset = (int32_t)((uint32_t)-1024 << 16);
     std::vector<ZDBSPInputVertex> vertices = {
         {offset, offset},
         {offset + (256 << 16), offset},
