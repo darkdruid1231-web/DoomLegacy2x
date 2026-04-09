@@ -26,11 +26,17 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-            cmake g++ \
+            cmake ninja-build pkg-config g++ \
             libsdl2-dev libsdl2-mixer-dev \
+            libglew-dev \
             libpng-dev libjpeg-dev \
-            libenet-dev libglu1-mesa-dev \
-            flex lemon
+            zlib1g-dev \
+            libopenal-dev \
+            libvorbis-dev libflac-dev libmpg123-dev libopus-dev libopusfile-dev \
+            libfreetype-dev \
+            libenet-dev \
+            libwavpack-dev \
+            flex bison lemon
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
