@@ -82,19 +82,18 @@ add_test(NAME vector COMMAND test_vector)
 # ---------------------------------------------------------------------------
 # test_console — console variable (CV_*) flag constants.
 #
-# test_console_stubs.cpp provides CONS_Printf (preventing console.cpp.o from
-# being pulled out of libutil.a) plus stubs for the remaining symbols that
-# command.cpp.o needs directly (game, LocalPlayers, devparm, I_Error,
-# LNetInterface::SendNetVar).  The stubs file must be compiled into the
-# executable (not a separate library) so its .o precedes libutil.a on the
-# linker command line.
+# test_console only needs CV_OnOff/YesNo/Unsigned at runtime; all other
+# references (sizeof, enum flag values) are compile-time.  Those three arrays
+# are defined in test_console_stubs.cpp so the test links against util_base
+# only, avoiding the command.cpp → z_zone → m_misc → wad → dehacked
+# dependency chain that would require ~200 engine stubs.
 # ---------------------------------------------------------------------------
 add_executable(test_console
     unit/test_console.cpp
     unit/test_console_stubs.cpp
 )
 target_include_directories(test_console PRIVATE ${SDL2_INCLUDE_DIRS})
-target_link_libraries(test_console util)
+target_link_libraries(test_console util_base)
 target_compile_definitions(test_console PRIVATE SDL_MAIN_HANDLED)
 add_test(NAME console COMMAND test_console)
 
