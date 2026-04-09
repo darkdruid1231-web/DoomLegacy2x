@@ -257,7 +257,7 @@ int FileCache::AddFile(const char *fname, bool silent)
         }
         else
         {
-            CONS_Printf(" FileCache::AddFile: Unknown file signature '%4c'\n", magic);
+            CONS_Printf(" FileCache::AddFile: Unknown file signature '%.4s'\n", magic);
             fclose(str);
             return -1;
         }

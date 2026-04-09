@@ -344,7 +344,7 @@ bool Parser::ParseCmd(const parsercmd_t *commands, char *base)
 
     if (commands->name == NULL)
     {
-        CONS_Printf("Unknown command '%s' before char %d!\n", cmd, s - ms);
+        CONS_Printf("Unknown command '%s' before char %d!\n", cmd, (int)(s - ms));
         return false; // not found
     }
 

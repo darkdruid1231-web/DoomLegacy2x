@@ -488,7 +488,7 @@ string string_to_upper(const char *c)
     if (len == 0)
         return result;
 
-    newc = new char[len];
+    newc = new char[len + 1];
     strcpy(newc, c);
     strupr(newc);
     result = newc;

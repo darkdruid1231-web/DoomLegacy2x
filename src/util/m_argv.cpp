@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "command.h"
 #include "doomdef.h"
@@ -81,36 +82,35 @@ char *M_GetNextParm()
 void M_PushSpecialParameters()
 {
     int i;
-    char s[256];
     bool onetime = false;
 
     for (i = 1; i < myargc; i++)
     {
         if (myargv[i][0] == '+')
         {
-            strcpy(s, &myargv[i][1]);
+            std::string s(&myargv[i][1]);
             i++;
 
             // get the parameter of the command too
             for (; i < myargc && myargv[i][0] != '+' && myargv[i][0] != '-'; i++)
             {
-                strcat(s, " ");
+                s += " ";
                 if (!onetime)
                 {
-                    strcat(s, "\"");
+                    s += "\"";
                     onetime = true;
                 }
-                strcat(s, myargv[i]);
+                s += myargv[i];
             }
             if (onetime)
             {
-                strcat(s, "\"");
+                s += "\"";
                 onetime = false;
             }
-            strcat(s, "\n");
+            s += "\n";
 
             // push it
-            COM.AppendText(s);
+            COM.AppendText(s.c_str());
             i--;
         }
     }

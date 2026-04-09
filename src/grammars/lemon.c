@@ -2278,7 +2278,7 @@ to follow the previous rule.");
     case WAITING_FOR_DESTRUCTOR_SYMBOL:
       if( !isalpha(x[0]) ){
         ErrorMsg(psp->filename,psp->tokenlineno,
-          "Symbol name missing after %destructor keyword");
+          "Symbol name missing after %%destructor keyword");
         psp->errorcnt++;
         psp->state = RESYNC_AFTER_DECL_ERROR;
       }else{
@@ -2291,7 +2291,7 @@ to follow the previous rule.");
     case WAITING_FOR_DATATYPE_SYMBOL:
       if( !isalpha(x[0]) ){
         ErrorMsg(psp->filename,psp->tokenlineno,
-          "Symbol name missing after %destructor keyword");
+          "Symbol name missing after %%destructor keyword");
         psp->errorcnt++;
         psp->state = RESYNC_AFTER_DECL_ERROR;
       }else{

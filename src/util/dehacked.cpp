@@ -724,7 +724,7 @@ void dehacked_t::Read_Sound(int num)
 
     if (num >= NUMSFX || num < 0)
     {
-        error("Sound %d doesn't exist\n");
+        error("Sound %d doesn't exist\n", num);
         return;
     }
 

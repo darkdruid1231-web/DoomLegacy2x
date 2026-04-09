@@ -257,8 +257,9 @@ void command_buffer_t::COM_TokenizeString(byte *text)
 
         if (com_argc < MAX_ARGS)
         {
-            com_argv[com_argc] = (char *)ZZ_Alloc(strlen(com_token) + 1);
-            strcpy(com_argv[com_argc], com_token);
+            size_t token_len = strlen(com_token);
+            com_argv[com_argc] = (char *)ZZ_Alloc(token_len + 1);
+            memcpy(com_argv[com_argc], com_token, token_len + 1);
             com_argc++;
         }
     }
