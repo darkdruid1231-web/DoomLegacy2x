@@ -344,21 +344,21 @@ TEST(FixedT, negativeAddition)
 {
     fixed_t a(-5), b(3);
     fixed_t c = a + b;
-    EXPECT_EQ(c.value(), -2 << fixed_t::FBITS);
+    EXPECT_EQ(c.value(), (int32_t)((uint32_t)-2 << fixed_t::FBITS));
 }
 
 TEST(FixedT, negativeMultiplication)
 {
     fixed_t a(-4), b(2);
     fixed_t c = a * b;
-    EXPECT_EQ(c.value(), -8 << fixed_t::FBITS);
+    EXPECT_EQ(c.value(), (int32_t)((uint32_t)-8 << fixed_t::FBITS));
 }
 
 TEST(FixedT, negativeDivision)
 {
     fixed_t a(-20), b(4);
     fixed_t c = a / b;
-    EXPECT_EQ(c.value(), -5 << fixed_t::FBITS);
+    EXPECT_EQ(c.value(), (int32_t)((uint32_t)-5 << fixed_t::FBITS));
 }
 
 //============================================================================
