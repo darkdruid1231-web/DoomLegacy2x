@@ -55,8 +55,8 @@ jobs:
     - name: Build (CodeQL traces the compiler)
       run: |
         cd src/build-codeql
-        cmake --build . --target test_fixed_t test_fixed_catch2 \
-              test_vector test_console test_actor test_save_load_unit \
+        cmake --build . --target test_fixed_t test_fixed_t_gtest \
+              test_vector test_console test_actor test_mapinfo \
               --parallel
 
     - name: Perform CodeQL Analysis
