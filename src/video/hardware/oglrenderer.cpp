@@ -102,8 +102,7 @@ static void Command_GrDrawStats_f();
 // Initialize value=1 so features are active before Reg() is called.
 consvar_t cv_grstaticlighting = {"gr_staticlighting", "On", CV_SAVE, CV_OnOff, NULL, 1};
 consvar_t cv_grshadows        = {"gr_shadows",        "On", CV_SAVE, CV_OnOff, NULL, 1};
-consvar_t cv_grcoronas        = {"gr_coronas",        "On", CV_SAVE, CV_OnOff, NULL, 1};
-consvar_t cv_grcoronasize     = {"gr_coronasize",    "1",   CV_SAVE, NULL, NULL, 1};
+// cv_grcoronas / cv_grcoronasize defined in oglhelpers.cpp
 consvar_t cv_grdebugwall      = {"gr_debugwall",     "0",   CV_SAVE, NULL, NULL, 1};
 consvar_t cv_grbatchquads     = {"gr_batchquads",    "Off", CV_SAVE, CV_OnOff, NULL, 1};
 consvar_t cv_monball_light    = {"monball_light",     "On", CV_SAVE, CV_OnOff, NULL, 1};
