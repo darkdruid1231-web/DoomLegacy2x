@@ -494,7 +494,7 @@ void test_negative_addition()
     TEST("negative_addition");
     fixed_t a(-5), b(3);
     fixed_t c = a + b;
-    CHECK(c.value() == (-2 << fixed_t::FBITS), "-5 + 3 should be -2");
+    CHECK(c.value() == (int32_t)((uint32_t)-2 << fixed_t::FBITS), "-5 + 3 should be -2");
     PASS();
 }
 
@@ -503,7 +503,7 @@ void test_negative_multiplication()
     TEST("negative_multiplication");
     fixed_t a(-4), b(2);
     fixed_t c = a * b;
-    CHECK(c.value() == (-8 << fixed_t::FBITS), "-4 * 2 should be -8");
+    CHECK(c.value() == (int32_t)((uint32_t)-8 << fixed_t::FBITS), "-4 * 2 should be -8");
     PASS();
 }
 
@@ -512,7 +512,7 @@ void test_negative_division()
     TEST("negative_division");
     fixed_t a(-20), b(4);
     fixed_t c = a / b;
-    CHECK(c.value() == (-5 << fixed_t::FBITS), "-20 / 4 should be -5");
+    CHECK(c.value() == (int32_t)((uint32_t)-5 << fixed_t::FBITS), "-20 / 4 should be -5");
     PASS();
 }
 
