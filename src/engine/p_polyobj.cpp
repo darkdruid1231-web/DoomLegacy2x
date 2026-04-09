@@ -505,6 +505,7 @@ bool polyobj_t::Build()
     // TEST Generate new segs, one per line to make things easy. TODO what about old ones? rendered
     // or not? in BSP?
     segs = static_cast<seg_t *>(Z_Malloc(n_lines * sizeof(seg_t), PU_LEVEL, 0));
+    // cppcheck-suppress memsetClassFloat -- IEEE 754 guarantees all-zero bits == 0.0 on all supported platforms
     memset(segs, 0, n_lines * sizeof(seg_t)); // basic initialization to zero
     for (int k = 0; k < n_lines; k++)
     {

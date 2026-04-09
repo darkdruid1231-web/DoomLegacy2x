@@ -140,6 +140,7 @@ void Map::LoadSegs(int lump)
 {
     numsegs = fc.LumpLength(lump) / sizeof(mapseg_t);
     segs = (seg_t *)Z_Malloc(numsegs * sizeof(seg_t), PU_LEVEL, NULL);
+    // cppcheck-suppress memsetClassFloat -- IEEE 754 guarantees all-zero bits == 0.0 on all supported platforms
     memset(segs, 0, numsegs * sizeof(seg_t)); // clear everything
     byte *data = (byte *)fc.CacheLumpNum(lump, PU_STATIC);
 
@@ -190,6 +191,7 @@ void Map::LoadSectors1(int lump)
     // allocate and zero the sectors
     numsectors = fc.LumpLength(lump) / sizeof(mapsector_t);
     sectors = (sector_t *)Z_Malloc(numsectors * sizeof(sector_t), PU_LEVEL, 0);
+    // cppcheck-suppress memsetClassFloat -- IEEE 754 guarantees all-zero bits == 0.0 on all supported platforms
     memset(sectors, 0, numsectors * sizeof(sector_t));
 }
 
@@ -1385,6 +1387,7 @@ void Map::LoadGLSegs(const int lump, const int glversion)
         Z_Free(segs);
 
     segs = (seg_t *)Z_Malloc(numsegs * sizeof(seg_t), PU_LEVEL, 0);
+    // cppcheck-suppress memsetClassFloat -- IEEE 754 guarantees all-zero bits == 0.0 on all supported platforms
     memset(segs, 0, numsegs * sizeof(seg_t)); // clear all fields to zero
     byte *data = (byte *)fc.CacheLumpNum(lump, PU_STATIC);
 

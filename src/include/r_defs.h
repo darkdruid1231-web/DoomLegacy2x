@@ -599,7 +599,7 @@ struct node_t : public divline_t
     bbox_t bbox[2];
 
     Uint32 children[2];        ///< indices of children nodes
-#define NF_SUBSECTOR (1 << 31) ///< Indicates a BSP leaf => child == subsector.
+#define NF_SUBSECTOR (1u << 31) ///< Indicates a BSP leaf => child == subsector.
 };
 
 /// \brief Runtime mapthing

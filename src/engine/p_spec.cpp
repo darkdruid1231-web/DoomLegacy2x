@@ -747,7 +747,7 @@ int Map::SpawnSectorSpecial(int sp, sector_t *sec)
             i = sec->FindMinSurroundingLight(sec->lightlevel);
             if (i < sec->lightlevel)
                 lfx = new lightfx_t(
-                    this, sec, lightfx_t::Glow, sec->lightlevel, i, -glowspeed << 6, -1);
+                    this, sec, lightfx_t::Glow, sec->lightlevel, i, -(glowspeed << 6), -1);
             break;
 
         case DOOM_Light_SyncFast:

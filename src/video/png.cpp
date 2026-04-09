@@ -23,6 +23,7 @@
 #ifndef __APPLE_CC__
 #include <malloc.h>
 #endif
+#include <vector>
 #include <png.h>
 
 #include "doomdef.h"
@@ -190,7 +191,7 @@ bool PNGTexture::ReadData(bool read_image, bool sw_rend)
         */
 
         // read image data
-        byte **row_pointers = static_cast<byte **>(alloca(h * sizeof(byte *)));
+        std::vector<byte *> row_pointers(h);
 
         if (sw_rend)
         {
@@ -207,7 +208,7 @@ bool PNGTexture::ReadData(bool read_image, bool sw_rend)
             for (i = 0, j = 0; i < h; i++, j += w)
                 row_pointers[i] = reinterpret_cast<byte *>(rgb_buf + j);
 
-            png_read_image(png_p, row_pointers);
+            png_read_image(png_p, row_pointers.data());
             png_destroy_read_struct(&png_p, &info_p, NULL);
             // discard any end chunks (comments etc.)
             Z_Free(tmpdata); // free the raw data
@@ -247,7 +248,7 @@ bool PNGTexture::ReadData(bool read_image, bool sw_rend)
             for (i = 0, j = 0; i < h; i++, j += w * sizeof(RGBA_t))
                 row_pointers[i] = &pixels[j];
 
-            png_read_image(png_p, row_pointers);
+            png_read_image(png_p, row_pointers.data());
             png_destroy_read_struct(&png_p, &info_p, NULL);
             // discard any end chunks (comments etc.)
             Z_Free(tmpdata); // free the raw data
@@ -332,11 +333,11 @@ bool WritePNGScreenshot(FILE *fp, byte *lfb, int width, int height, RGB_t *pal)
 
     png_set_text(png_p, info_p, text, 2);
 
-    byte **row_pointers = static_cast<byte **>(alloca(height * sizeof(byte *)));
+    std::vector<byte *> row_pointers(height);
     for (i = 0, j = 0; i < height; i++, j += width)
         row_pointers[i] = &lfb[j];
 
-    png_set_rows(png_p, info_p, row_pointers);
+    png_set_rows(png_p, info_p, row_pointers.data());
     png_write_png(png_p, info_p, PNG_TRANSFORM_IDENTITY, NULL);
 
     png_write_end(png_p, info_p);

@@ -232,9 +232,11 @@ bool JPEGTexture::ReadData(bool read_image, bool sw_rend)
                 Z_Malloc(height * width, PU_TEXTURE, (void **)(&pixels));
 
 #ifdef USE_LIBJPEG_QUANTIZATION
+                // cppcheck-suppress allocaCalled -- row_stride is one scan line (bounded by image width), stack safe
                 byte *buffer = static_cast<byte *>(alloca(row_stride));
                 byte **row_pointer = &buffer;
 #else
+                // cppcheck-suppress allocaCalled -- row_stride is one scan line (bounded by image width), stack safe
                 RGB_t *buffer = static_cast<RGB_t *>(alloca(row_stride));
                 byte **row_pointer = reinterpret_cast<byte **>(&buffer);
 #endif

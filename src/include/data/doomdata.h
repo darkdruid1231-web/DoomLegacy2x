@@ -39,7 +39,7 @@ const Uint32 NULL_INDEX_32 = 0xFFFFFFFF; // or -1. Used for GLsegs
 #define GL5_HEADER "gNd5"
 
 #define VERT_IS_GL_V2 (1 << 15)
-#define VERT_IS_GL_V5 (1 << 31)
+#define VERT_IS_GL_V5 (1u << 31)
 
 #define CHILD_IS_SUBSECTOR_OLD (1 << 15) // old leaf node flag for BSP
 
