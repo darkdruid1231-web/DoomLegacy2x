@@ -39,11 +39,11 @@
 
 
 // Console variables for async loading
-static CV_PossibleValue_t CV_OnOff[] = { {0, "Off"}, {1, "On"}, {0, NULL} };
+static CV_PossibleValue_t cv_async_onoff_values[] = { {0, "Off"}, {1, "On"}, {0, NULL} };
 static CV_PossibleValue_t CV_AsyncMaxPending[] = { {4, "MIN"}, {64, "MAX"}, {0, NULL} };
 
 // Global console variables - declared in header for access
-consvar_t cv_async_loading = { "async_loading", "1", CV_SAVE, CV_OnOff, NULL, 1 };
+consvar_t cv_async_loading = { "async_loading", "1", CV_SAVE, cv_async_onoff_values, NULL, 1 };
 consvar_t cv_async_maxpending = { "async_maxpending", "32", CV_SAVE, CV_AsyncMaxPending, NULL, 32 };
 
 //=========================================================================

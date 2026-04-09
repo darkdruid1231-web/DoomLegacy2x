@@ -66,7 +66,7 @@ class fixed_t
     }
     inline fixed_t(int a)
     {
-        val = a << FBITS;
+        val = (int32_t)((uint32_t)a << FBITS);
     }
     /// Construct from a raw 16.16 value that has already been shifted (no additional shift applied)
     inline fixed_t(int a, bool rawShifted)
