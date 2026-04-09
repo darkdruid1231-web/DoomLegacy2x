@@ -236,7 +236,7 @@ bool MapInfo::HubSave()
     CONS_Printf("Making a hubsave...");
 
     char fname[256];
-    sprintf(fname, hubsavename, mapnumber);
+    snprintf(fname, sizeof(fname), "%s%02d.sav", hubsavename, mapnumber);
     savename = fname;
 
     LArchive a;

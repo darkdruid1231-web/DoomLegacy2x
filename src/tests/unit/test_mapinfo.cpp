@@ -96,7 +96,7 @@ void test_mapinfo_has_state()
     TEST("mapinfo_has_state");
     // Just check the type exists by using offsetof
     size_t offset = offsetof(MapInfo, state);
-    CHECK(offset >= 0, "state member should exist");
+    CHECK(offset < sizeof(MapInfo),"state member should exist");
     PASS();
 }
 
@@ -104,7 +104,7 @@ void test_mapinfo_has_lumpname()
 {
     TEST("mapinfo_has_lumpname");
     size_t offset = offsetof(MapInfo, lumpname);
-    CHECK(offset >= 0, "lumpname member should exist");
+    CHECK(offset < sizeof(MapInfo),"lumpname member should exist");
     PASS();
 }
 
@@ -112,7 +112,7 @@ void test_mapinfo_has_nicename()
 {
     TEST("mapinfo_has_nicename");
     size_t offset = offsetof(MapInfo, nicename);
-    CHECK(offset >= 0, "nicename member should exist");
+    CHECK(offset < sizeof(MapInfo),"nicename member should exist");
     PASS();
 }
 
@@ -120,7 +120,7 @@ void test_mapinfo_has_cluster()
 {
     TEST("mapinfo_has_cluster");
     size_t offset = offsetof(MapInfo, cluster);
-    CHECK(offset >= 0, "cluster member should exist");
+    CHECK(offset < sizeof(MapInfo),"cluster member should exist");
     PASS();
 }
 
@@ -128,7 +128,7 @@ void test_mapinfo_has_mapnumber()
 {
     TEST("mapinfo_has_mapnumber");
     size_t offset = offsetof(MapInfo, mapnumber);
-    CHECK(offset >= 0, "mapnumber member should exist");
+    CHECK(offset < sizeof(MapInfo),"mapnumber member should exist");
     PASS();
 }
 
@@ -136,7 +136,7 @@ void test_mapinfo_has_author()
 {
     TEST("mapinfo_has_author");
     size_t offset = offsetof(MapInfo, author);
-    CHECK(offset >= 0, "author member should exist");
+    CHECK(offset < sizeof(MapInfo),"author member should exist");
     PASS();
 }
 
@@ -144,7 +144,7 @@ void test_mapinfo_has_description()
 {
     TEST("mapinfo_has_description");
     size_t offset = offsetof(MapInfo, description);
-    CHECK(offset >= 0, "description member should exist");
+    CHECK(offset < sizeof(MapInfo),"description member should exist");
     PASS();
 }
 
@@ -152,7 +152,7 @@ void test_mapinfo_has_partime()
 {
     TEST("mapinfo_has_partime");
     size_t offset = offsetof(MapInfo, partime);
-    CHECK(offset >= 0, "partime member should exist");
+    CHECK(offset < sizeof(MapInfo),"partime member should exist");
     PASS();
 }
 
@@ -160,7 +160,7 @@ void test_mapinfo_has_gravity()
 {
     TEST("mapinfo_has_gravity");
     size_t offset = offsetof(MapInfo, gravity);
-    CHECK(offset >= 0, "gravity member should exist");
+    CHECK(offset < sizeof(MapInfo),"gravity member should exist");
     PASS();
 }
 
@@ -168,7 +168,7 @@ void test_mapinfo_has_sky1()
 {
     TEST("mapinfo_has_sky1");
     size_t offset = offsetof(MapInfo, sky1);
-    CHECK(offset >= 0, "sky1 member should exist");
+    CHECK(offset < sizeof(MapInfo),"sky1 member should exist");
     PASS();
 }
 
@@ -176,7 +176,7 @@ void test_mapinfo_has_interpic()
 {
     TEST("mapinfo_has_interpic");
     size_t offset = offsetof(MapInfo, interpic);
-    CHECK(offset >= 0, "interpic member should exist");
+    CHECK(offset < sizeof(MapInfo),"interpic member should exist");
     PASS();
 }
 
@@ -184,7 +184,7 @@ void test_mapinfo_has_warptrans()
 {
     TEST("mapinfo_has_warptrans");
     size_t offset = offsetof(MapInfo, warptrans);
-    CHECK(offset >= 0, "warptrans member should exist");
+    CHECK(offset < sizeof(MapInfo),"warptrans member should exist");
     PASS();
 }
 
@@ -192,7 +192,7 @@ void test_mapinfo_has_nextlevel()
 {
     TEST("mapinfo_has_nextlevel");
     size_t offset = offsetof(MapInfo, nextlevel);
-    CHECK(offset >= 0, "nextlevel member should exist");
+    CHECK(offset < sizeof(MapInfo),"nextlevel member should exist");
     PASS();
 }
 
@@ -200,7 +200,7 @@ void test_mapinfo_has_secretlevel()
 {
     TEST("mapinfo_has_secretlevel");
     size_t offset = offsetof(MapInfo, secretlevel);
-    CHECK(offset >= 0, "secretlevel member should exist");
+    CHECK(offset < sizeof(MapInfo),"secretlevel member should exist");
     PASS();
 }
 

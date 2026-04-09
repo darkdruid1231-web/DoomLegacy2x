@@ -616,9 +616,9 @@ void D_SetPaths()
             sprintf(configfile, "%s/" CONFIGFILENAME, legacyhome.c_str());
     }
 
-    // savegame name templates
-    sprintf(savegamename, "%s/%s", legacyhome.c_str(), "savegame_%d.sav");
-    sprintf(hubsavename, "%s/%s", legacyhome.c_str(), "hubsave_%02d.sav");
+    // savegame path prefixes (not format strings; use snprintf("%s%d.sav") at each site)
+    snprintf(savegamename, sizeof(savegamename), "%s/savegame_", legacyhome.c_str());
+    snprintf(hubsavename, sizeof(hubsavename), "%s/hubsave_", legacyhome.c_str());
 }
 
 //

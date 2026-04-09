@@ -249,7 +249,7 @@ void command_buffer_t::COM_TokenizeString(byte *text)
             return;
 
         if (com_argc == 1)
-            com_args = reinterpret_cast<char *>(text);
+            com_args = reinterpret_cast<char *>(text); // aliases into the heap-allocated command buffer; consumed before caller returns
 
         text = COM_Parse(text);
         if (!text)
@@ -837,7 +837,7 @@ bool consvar_t::Reg()
         }
 
         next = cvar_list;
-        cvar_list = this;
+        cvar_list = this; // consvar_t objects are always file-scoped globals; never stack-allocated
     }
     else
     {

@@ -2243,7 +2243,7 @@ void GameInfo::LoadGame(int slot)
     char savename[255];
     byte *savebuffer;
 
-    sprintf(savename, savegamename, slot);
+    snprintf(savename, sizeof(savename), "%s%d.sav", savegamename, slot);
 
     int length = FIL_ReadFile(savename, &savebuffer);
     if (!length)
@@ -2308,7 +2308,7 @@ void GameInfo::SaveGame(int savegameslot, const char *description)
     unsigned length = a.Compress(&buffer, 1); // take out the compressed data
 
     char filename[256];
-    sprintf(filename, savegamename, savegameslot);
+    snprintf(filename, sizeof(filename), "%s%d.sav", savegamename, savegameslot);
 
     CONS_Printf("Savegame: %d bytes\n", length);
     FIL_WriteFile(filename, buffer, length);

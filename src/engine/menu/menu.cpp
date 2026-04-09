@@ -1364,7 +1364,7 @@ void M_ReadSaveStrings()
 
     for (int i = 0; i < 6; i++)
     {
-        sprintf(name, savegamename, i);
+        snprintf(name, sizeof(name), "%s%d.sav", savegamename, i);
 
         int handle = open(name, O_RDONLY | 0, 0666);
         if (handle == -1)

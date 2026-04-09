@@ -139,6 +139,7 @@ void M_FindResponseFile()
             char *firstargv;
 
             // READ THE RESPONSE FILE INTO MEMORY
+            // Path comes from command-line @responsefile argument — intentional user-controlled path
             handle = fopen(&myargv[i][1], "rb");
             if (handle == NULL)
                 I_Error("\nResponse file %s not found !", &myargv[i][1]);

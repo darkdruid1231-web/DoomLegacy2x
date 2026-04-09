@@ -119,11 +119,17 @@ void Parser::RemoveComments(char c, bool linestart)
     {
         // only interpret it as a comment if it is in the beginning of a line
         // (for DeHackEd and the stupid ID # thing!)
-        for (char *p = s; p < me; p++)
+        char *p = s;
+        while (p < me)
         {
             if (p[0] == '\n' && p[1] == c)
-                for (p++; p < me && *p != '\n'; p++)
-                    *p = ' ';
+            {
+                p++;
+                while (p < me && *p != '\n')
+                    *p++ = ' ';
+            }
+            else
+                p++;
         }
         return;
     }
@@ -369,6 +375,7 @@ bool Parser::ParseCmd(const parsercmd_t *commands, char *base)
             break;
 
         case P_ITEM_INT_INT:
+            i = 0;
             k = sscanf(s, "%d %d", &i, &j);
             *(int *)var = i;
             if (k == 2)
@@ -510,7 +517,7 @@ char *strlwr(char *s)
 
 char *strnupr(char *s, int n)
 {
-    for (int i = 0; s[i] && i < n; i++)
+    for (int i = 0; i < n && s[i]; i++)
         s[i] = toupper(s[i]);
 
     return s;

@@ -70,6 +70,15 @@ template <typename T> class vec_t
     /// component extraction (also for assignment)
     // inline T& operator[](unsigned n) { return c[n]; }
 
+    /// copy assignment (matches copy constructor above)
+    inline T_this &operator=(const T_this &v)
+    {
+        x = v.x;
+        y = v.y;
+        z = v.z;
+        return *this;
+    }
+
     /// assignment
     template <typename U> inline T_this &Set(const U &nx, const U &ny, const U &nz)
     {

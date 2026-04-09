@@ -62,7 +62,7 @@
 
 bool FIL_WriteFile(const char *name, void *source, int length)
 {
-    int handle = open(name, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0666);
+    int handle = open(name, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0644);
 
     if (handle == -1)
         return false;
@@ -464,15 +464,11 @@ char *Z_StrDup(const char *in)
     return out;
 }
 
-// s1=s2+s3+s1
+// s1=s2+s3+s1  (caller is responsible for s1 being large enough for the result)
 void strcatbf(char *s1, char *s2, char *s3)
 {
-    char tmp[1024];
-
-    strcpy(tmp, s1);
-    strcpy(s1, s2);
-    strcat(s1, s3);
-    strcat(s1, tmp);
+    string result = string(s2) + s3 + s1;
+    memcpy(s1, result.c_str(), result.size() + 1);
 }
 
 string string_to_upper(const char *c)

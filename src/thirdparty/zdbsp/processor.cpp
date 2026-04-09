@@ -601,6 +601,7 @@ void FProcessor::Write (FWadWriter &out)
 			}
 
 			delete[] Level.Vertices;
+			Level.Vertices = NULL;
 			builder->GetVertices (Level.Vertices, Level.NumVertices);
 
 			if (ConformNodes)

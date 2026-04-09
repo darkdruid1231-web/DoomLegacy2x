@@ -47,7 +47,12 @@ struct bbox_t
     void Set(fixed_t x, fixed_t y, fixed_t r);
     void Move(fixed_t x, fixed_t y);
 
-    inline bbox_t operator=(const bbox_t &other)
+    inline bbox_t(const bbox_t &other)
+    {
+        for (int i = 0; i < 4; i++)
+            box[i] = other.box[i];
+    }
+    inline bbox_t &operator=(const bbox_t &other)
     {
         for (int i = 0; i < 4; i++)
             box[i] = other.box[i];
