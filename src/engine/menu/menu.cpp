@@ -3759,6 +3759,7 @@ menuitem_t::menuitem_t(short f, const char *p, const char *t, Menu *sm, byte a)
         I_Error("Bad submenu: %s!\n", text);
 }
 
+// cppcheck-suppress nullPointerRedundantCheck -- func is a function pointer; !func guards against null callback
 menuitem_t::menuitem_t(short f, const char *p, const char *t, menufunc_t r, byte a)
     : flags(f), pic(p), text(t), alphaKey(a), func(r)
 {

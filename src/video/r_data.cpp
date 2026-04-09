@@ -597,6 +597,7 @@ patch_t *PatchTexture::GeneratePatch()
         // [segabor] necessary endianness conversion for p
         // [smite] should not be necessary, because the other fields are never used
 
+        // cppcheck-suppress selfAssignment -- LONG/SHORT are no-ops on little-endian; byte-swap on big-endian
         for (int i = 0; i < width; i++)
             p->columnofs[i] = LONG(p->columnofs[i]);
 
@@ -702,7 +703,7 @@ patch_t *DoomTexture::GeneratePatch()
         texturememory += blocksize;
         fc.ReadLump(tp->patchlump, patch_data);
 
-        p->width = SHORT(p->width); // endianness...
+        p->width = SHORT(p->width); // endianness... cppcheck-suppress selfAssignment
 
         // FIXME should use patch width here? texture may be wider!
         if (width > p->width)
@@ -715,6 +716,7 @@ patch_t *DoomTexture::GeneratePatch()
 
         // use the patch's column lookup (columnofs is reserved for the raw bitmap version!)
         // do not skip post_t info by default
+        // cppcheck-suppress selfAssignment -- LONG is a no-op on little-endian; byte-swap on big-endian
         for (int i = 0; i < width; i++)
             p->columnofs[i] = LONG(p->columnofs[i]);
 
@@ -830,9 +832,9 @@ Material::Material(const char *name, Texture *t, float xs, float ys, material_cl
     tex[0].xscale = xs;
     tex[0].yscale = ys;
 
-    // t is used by this material, so
-    t->AddRef(); // NOTE: we don't currently use links for Textures, this functionality is subsumed
-                 // in material_cache_t::Get
+    // t is used by this material, so (guard mirrors destructor's if(tex[i].t) check)
+    if (t) t->AddRef(); // NOTE: we don't currently use links for Textures, this functionality is subsumed
+                        // in material_cache_t::Get
 
     InitializeMaterial();
 }
@@ -1892,6 +1894,7 @@ int material_cache_t::ReadTextures()
                 // Read the first 'patch' inside the block.
                 src[0] = '\0';
                 int inner = 1;
+                // cppcheck-suppress oppositeInnerCondition -- skip_ws_comments() advances p; inner>0 and p<end are independent conditions
                 while (p < end && inner > 0) {
                     skip_ws_comments();
                     if (p >= end) break;

@@ -194,7 +194,7 @@ void Rend::R_DrawWallSplats()
 	angle2=-clipangle;
 #else
         // BP: out of the viewangletox lut, TODO clip it to the screen
-        if (angle1 > FINEANGLES / 2 || angle2 > FINEANGLES / 2)
+        if (angle1 >= FINEANGLES / 2 || angle2 >= FINEANGLES / 2)
             continue;
 #endif
         int x1 = viewangletox[angle1];

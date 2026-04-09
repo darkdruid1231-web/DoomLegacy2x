@@ -207,7 +207,7 @@ bool MD3_t::Load(const string &filename)
     // make a correct-endian copy of header (saves some pointer dereferences during rendering...)
     MD3_header *h = reinterpret_cast<MD3_header *>(data);
     memcpy(&header, h, 4 + 4 + 64); // first three fields
-    header.version = LONG(header.version);
+    header.version = LONG(header.version); // cppcheck-suppress selfAssignment -- byte-swap on big-endian
 
     if (header.magic[0] != 'I' || header.magic[1] != 'D' || header.magic[2] != 'P' ||
         header.magic[3] != '3' || header.version != 15)

@@ -201,9 +201,11 @@ void A_PotteryExplode(DActor *actor)
     for (int i = (P_Random() & 3) + 3; i; i--)
     {
         mo = actor->mp->SpawnDActor(actor->pos, MT_POTTERYBIT1);
-        mo->SetState(mo->info->spawnstate + (P_Random() % 5));
         if (mo)
+        {
+            mo->SetState(mo->info->spawnstate + (P_Random() % 5));
             mo->vel = vec_t<fixed_t>(Random(3.75, 9), RandomS() * 4, RandomS() * 4);
+        }
     }
 
     if (mo)
@@ -283,17 +285,17 @@ void A_CorpseExplode(DActor *actor)
     for (i = (P_Random() & 3) + 3; i; i--)
     {
         mo = actor->mp->SpawnDActor(actor->pos, MT_CORPSEBIT);
-        mo->SetState(mo->info->spawnstate + (P_Random() % 3));
         if (mo)
         {
+            mo->SetState(mo->info->spawnstate + (P_Random() % 3));
             mo->vel = vec_t<fixed_t>(((P_Random() & 7) + 5) * 0.75f, RandomS() * 4, RandomS() * 4);
         }
     }
     // Spawn a skull
     mo = actor->mp->SpawnDActor(actor->pos, MT_CORPSEBIT);
-    mo->SetState(S_CORPSEBIT_4);
     if (mo)
     {
+        mo->SetState(S_CORPSEBIT_4);
         mo->vel = vec_t<fixed_t>(((P_Random() & 7) + 5) * 0.75f, RandomS() * 4, RandomS() * 4);
         S_StartSound(mo, SFX_FIRED_DEATH);
     }
@@ -1057,9 +1059,11 @@ void A_SoAExplode(DActor *actor)
         vec_t<fixed_t> temp(Random(-8, 8), Random(-8, 8), Random() * actor->height);
         temp += actor->pos;
         mo = actor->mp->SpawnDActor(temp, MT_ZARMORCHUNK);
-        mo->SetState(mo->info->spawnstate + i);
         if (mo)
+        {
+            mo->SetState(mo->info->spawnstate + i);
             mo->vel = vec_t<fixed_t>((P_Random() & 7) + 5, RandomS() * 4, RandomS() * 4);
+        }
     }
 
     if (actor->args[0])

@@ -144,6 +144,7 @@ void M_FindResponseFile()
             if (handle == NULL)
                 I_Error("\nResponse file %s not found !", &myargv[i][1]);
 
+            // cppcheck-suppress nullPointerRedundantCheck -- I_Error does not return
             CONS_Printf("Found response file %s!\n", &myargv[i][1]);
             fseek(handle, 0, SEEK_END);
             size = ftell(handle);

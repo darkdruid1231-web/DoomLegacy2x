@@ -328,7 +328,8 @@ bool Wad3::Open(const char *fname)
     wad3dir_t *p = directory = (wad3dir_t *)Z_Malloc(numitems * sizeof(wad3dir_t), PU_STATIC, NULL);
     fread(directory, sizeof(wad3dir_t), numitems, stream);
 
-    // endianness conversion for directory
+    // endianness conversion for directory (LONG is a no-op on little-endian; byte-swap on big-endian)
+    // cppcheck-suppress selfAssignment
     for (int i = 0; i < numitems; i++, p++)
     {
         p->offset = LONG(p->offset);
@@ -458,7 +459,8 @@ bool Pak::Open(const char *fname)
     pakdir_t *p = directory = (pakdir_t *)Z_Malloc(numitems * sizeof(pakdir_t), PU_STATIC, NULL);
     fread(directory, sizeof(pakdir_t), numitems, stream);
 
-    // endianness conversion for directory
+    // endianness conversion for directory (LONG is a no-op on little-endian; byte-swap on big-endian)
+    // cppcheck-suppress selfAssignment
     for (int i = 0; i < numitems; i++, p++)
     {
         p->offset = LONG(p->offset);

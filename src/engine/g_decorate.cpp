@@ -436,8 +436,10 @@ bool ActorInfo::UpdateSequences()
             // check redirection
 #define MAX_REDIRECTS 10 // allow max. 10 redirects
             int k;
-            for (k = 0; !labels[j].num_states && k < MAX_REDIRECTS; k++)
+            for (k = 0; k < MAX_REDIRECTS; k++)
             {
+                if (labels[j].num_states)
+                    break;
                 // follow redirect
                 j = labels[j].jumplabelnum;
                 if (j < 0)
@@ -513,7 +515,7 @@ void ActorInfo::PrintDECORATEclass()
     printf("  reactiontime %d\n", reactiontime);
     printf("  painchance %d\n", painchance);
     printf("  speed %g\n", speed);
-    printf("  damage %d\n", damage);
+    printf("  damage %u\n", damage);
     printf("  radius %g\n", radius.Float());
     printf("  height %g\n", height.Float());
     printf("  mass %g\n", mass);

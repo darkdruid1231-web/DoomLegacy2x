@@ -313,6 +313,7 @@ void Actor::unpackUpdate(GhostConnection *connection, BitStream *stream)
 
         // if (!m->me) I_Error("Got a ghosted Actor for an inactive map %d!", temp);
 
+        // cppcheck-suppress nullPointerRedundantCheck -- I_Error does not return
         if (!m->me)
             if (!m->Activate(NULL)) // clientside map activation
                 I_Error("Crap!\n");

@@ -1063,9 +1063,6 @@ void DActor::Die(Actor *inflictor, Actor *source, int dtype)
     if ((type == MT_BARREL || type == MT_POD) && source)
         owner = source;
 
-    if (!inflictor)
-        inflictor = source;
-
     // special deaths based on damage type (burning, freezing...)
     if (dtype)
     {

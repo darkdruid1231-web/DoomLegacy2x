@@ -151,6 +151,7 @@ void HWBsp::Traverse(int bspnum, Poly *poly, Uint32 *leafnode, bbox_t &bbox)
                 num_planepolys++;
             }
             // AddSubsector(0, poly);
+            return; // bspnum==-1 has no valid subsector index; avoid OOB access below
         }
         else
         {

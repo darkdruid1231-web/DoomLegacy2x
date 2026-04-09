@@ -315,6 +315,8 @@ void R_AddVisibleFloorSplats(subsector_t *subsec)
 #endif
 
     pSplat = subsec->splats;
+    if (!pSplat)
+        return;
     // the splat is not visible from below
     // FIXME: depending on some flag in pSplat->flags, some splats may be visible from 2 sides
     // (above/below)

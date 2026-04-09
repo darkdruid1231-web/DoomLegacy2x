@@ -158,13 +158,11 @@ vector<ticcmd_t> oldcmd;
 inline Sint8 READCHAR(byte *p)
 {
     Sint8 t = *(reinterpret_cast<Sint8 *>(p));
-    p++;
     return t;
 }
 inline Sint16 READSHORT(byte *p)
 {
     Sint16 t = *(reinterpret_cast<Sint16 *>(p));
-    p += 2;
     return t;
 }
 

@@ -379,6 +379,7 @@ const char *FileCache::FindNameForNum(int lump)
 
     if (file >= vfiles.size())
         I_Error("FileCache::FindNameForNum: %i >= numvfiles(%i)\n", file, vfiles.size());
+    // cppcheck-suppress containerOutOfBounds -- I_Error does not return
     if (item >= vfiles[file]->numitems)
         // I_Error("FileCache::FindNameForNum: %i >= numitems", item);
         return NULL;
@@ -394,9 +395,11 @@ int FileCache::LumpLength(int lump)
 
     if (file >= vfiles.size())
         I_Error("FileCache::LumpLength: %i >= numvfiles(%i)\n", file, vfiles.size());
+    // cppcheck-suppress containerOutOfBounds -- I_Error does not return
     if (item >= vfiles[file]->numitems)
         I_Error("FileCache::LumpLength: %i >= numitems", item);
 
+    // cppcheck-suppress containerOutOfBounds -- I_Error does not return
     return vfiles[file]->GetItemSize(item);
 }
 
@@ -413,9 +416,11 @@ int FileCache::ReadLumpHeader(int lump, void *dest, unsigned size, unsigned offs
 
     if (file >= vfiles.size())
         I_Error("FileCache::ReadLumpHeader: %i >= numvfiles(%i)\n", file, vfiles.size());
+    // cppcheck-suppress containerOutOfBounds -- I_Error does not return
     if (item >= vfiles[file]->numitems)
         I_Error("FileCache::ReadLumpHeader: %i >= numitems", item);
 
+    // cppcheck-suppress containerOutOfBounds -- I_Error does not return
     return vfiles[file]->ReadItem(item, dest, size, offset);
 }
 
@@ -427,6 +432,7 @@ void *FileCache::CacheLumpNum(int lump, int tag, bool add_NUL)
 
     if (file >= vfiles.size())
         I_Error("FileCache::CacheLumpNum: %i >= numvfiles(%i)\n", file, vfiles.size());
+    // cppcheck-suppress containerOutOfBounds -- I_Error does not return
     if (item >= vfiles[file]->numitems)
         I_Error("FileCache::CacheLumpNum: %i >= numitems", item);
 

@@ -449,6 +449,7 @@ static void D_IdentifyVersion()
         if (!found_path)
             I_Error("IWAD %s not found!\n", s);
 
+        // cppcheck-suppress nullPointer -- I_Error does not return
         D_AddFile(found_path);
 
         // point to start of filename only

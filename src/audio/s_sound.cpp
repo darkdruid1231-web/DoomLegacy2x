@@ -268,10 +268,14 @@ class soundcache_t : public cache_t<sounditem_t>
         {
             // assume Doom SFX
             doomsfx_t *ds = reinterpret_cast<doomsfx_t *>(raw);
-            // endianness conversion
+            // endianness conversion (SHORT is a no-op on little-endian; byte-swap on big-endian)
+            // cppcheck-suppress selfAssignment
             ds->magic = SHORT(ds->magic);
+            // cppcheck-suppress selfAssignment
             ds->rate = SHORT(ds->rate);
+            // cppcheck-suppress selfAssignment
             ds->samples = SHORT(ds->samples);
+            // cppcheck-suppress selfAssignment
             ds->zero = SHORT(ds->zero);
 
             // CONS_Printf(" Sound '%s', s = %d\n", p, ds->samples);

@@ -373,6 +373,7 @@ bool DActor::P_Move()
         I_Error("Weird movedir!");
 #endif
 
+    // cppcheck-suppress arrayIndexOutOfBoundsCond -- movedir == DI_NODIR(8) already returned above
     fixed_t tryx = pos.x + info->speed * xspeed[movedir];
     fixed_t tryy = pos.y + info->speed * yspeed[movedir];
 
@@ -458,6 +459,7 @@ void DActor::P_NewChaseDir()
     int olddir = movedir;
     dirtype_t turnaround = opposite[olddir];
 
+    // cppcheck-suppress nullPointerRedundantCheck -- I_Error does not return
     deltax = target->pos.x - pos.x;
     deltay = target->pos.y - pos.y;
 

@@ -1149,6 +1149,7 @@ void A_GauntletAttack(PlayerPawn *p, pspdef_t *psp)
 
     // turn to face target
     angle = R_PointToAngle2(p->pos, targ->pos);
+    // cppcheck-suppress oppositeInnerCondition -- unsigned angle arithmetic: wrapping is intentional
     if (angle - p->yaw > ANG180)
     {
         if (angle - p->yaw < -ANG90 / 20)

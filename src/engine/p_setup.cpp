@@ -847,6 +847,7 @@ blockmap_t::blockmap_t(int lump)
     Uint16 *blockmap_index = blockmap_lump + 4; // the offsets array
 
     // Endianness: everything in blockmap is expressed in 2-byte shorts
+    // cppcheck-suppress selfAssignment -- SHORT is a no-op on little-endian; byte-swap on big-endian
     for (int i = 0; i < size; i++)
         blockmap_lump[i] = SHORT(blockmap_lump[i]);
 
@@ -1361,10 +1362,6 @@ int Map::LoadGLVertexes(const int lump)
         out->y.setvalue(LONG(in->y));
     }
 
-    // Set Map object members for object-oriented access
-    this->numglvertexes = numglvertexes;
-    this->glvertexes = glvertexes;
-
     Z_Free(data);
 
     return glversion;
@@ -1625,9 +1622,6 @@ void Map::LoadGLVis(const int lump)
         glvis = static_cast<byte *>(fc.CacheLumpNum(lump, PU_STATIC));
         CONS_Printf(" Loaded %d bytes of glVIS data.\n", vissize);
     }
-
-    // Set Map object GL member for object-oriented access
-    this->glvis = glvis;
 
     if (!glvis && rendermode == render_opengl)
         CONS_Printf(" Automap will not work until you run glvis on this file.\n");
@@ -2079,7 +2073,7 @@ bool ConvertMapToHexen(int lumpnum)
         if (!(dflags & MTF_NOT_IN_DM))
             ht[i].flags |= MTF_GDEATHMATCH;
 
-        ht[i].flags = SHORT(ht[i].flags); // and back to little-endian
+        ht[i].flags = SHORT(ht[i].flags); // cppcheck-suppress selfAssignment -- byte-swap on big-endian
     }
 
     Z_Free(data);

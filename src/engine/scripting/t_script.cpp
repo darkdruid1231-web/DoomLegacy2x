@@ -527,6 +527,7 @@ void SF_StartScript()
     if (!script)
     {
         script_error("script %i not defined\n", snum);
+        return;
     }
 
     runningscript_t *runscr = new runningscript_t;

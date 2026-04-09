@@ -355,6 +355,7 @@ bool Map::DeathMatchRespawn(PlayerInfo *p)
     int i, j;
 
     // TODO  create a random n-permutation and use it!
+    // cppcheck-suppress zerodivcond -- I_Error does not return
     j = i = P_Random() % n;
     do
     {
