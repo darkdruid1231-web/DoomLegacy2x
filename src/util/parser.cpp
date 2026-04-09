@@ -135,19 +135,29 @@ void Parser::RemoveComments(char c, bool linestart)
     }
 
     if (c == '/')
-        for (char *p = s; p + 1 < me; p++)
+    {
+        char *p = s;
+        while (p + 1 < me)
         {
             if (p[0] == '/' && p[1] == '/')
-                for (; p < me && *p != '\n'; p++)
-                    *p = ' ';
+                while (p < me && *p != '\n')
+                    *p++ = ' ';
+            else
+                p++;
         }
+    }
     else
-        for (char *p = s; p < me; p++)
+    {
+        char *p = s;
+        while (p < me)
         {
             if (p[0] == c)
-                for (; p < me && *p != '\n'; p++)
-                    *p = ' ';
+                while (p < me && *p != '\n')
+                    *p++ = ' ';
+            else
+                p++;
         }
+    }
 }
 
 // replace 'from' chars with 'to' chars

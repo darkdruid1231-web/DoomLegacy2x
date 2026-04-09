@@ -385,13 +385,13 @@ bool WritePCXfile(const char *filename, byte *data, int width, int height, byte 
     return i;
 }
 
+bool WritePNGScreenshot(FILE *fp, byte *lfb, int width, int height, RGB_t *pal);
+
 //
 // M_ScreenShot
 //
 void M_ScreenShot()
 {
-    bool WritePNGScreenshot(FILE * fp, byte * lfb, int width, int height, RGB_t *pal);
-
     char lbmname[MAX_CONFIGNAME];
 
     // find a file name to save it to

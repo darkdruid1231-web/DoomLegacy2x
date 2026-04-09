@@ -47,47 +47,6 @@ static int utf8_numbytes(const char *p)
     return n; // multibyte encoding
 }
 
-static int utf8_sync(const char *p)
-{
-    int n = 0;
-    while ((p[n] & 0xc0) == 0x80) // if two high bits are 10, this is not a lead byte
-        n++;
-
-    return n;
-}
-
-/// Converts a single UCS-4 wide char into an UTF-8 string, returns the string length.
-static int ucs4_to_utf8(int c, char *p)
-{
-    if (c < 0x80) // max 7 bits
-    {
-        p[0] = c;
-        return 1;
-    }
-    else if (c < 0x800) // max 11 bits
-    {
-        p[0] = 0xc0 | (c >> 6);
-        p[1] = 0x80 | (c & 0x3f);
-        return 2;
-    }
-    else if (c < 0x10000) // max 16 bits
-    {
-        p[0] = 0xe0 | (c >> 12);
-        p[1] = 0x80 | ((c >> 6) & 0x3f);
-        p[2] = 0x80 | (c & 0x3f);
-        return 3;
-    }
-    else if (c < 0x200000) // max 21 bits
-    {
-        p[0] = 0xf0 | (c >> 18);
-        p[1] = 0x80 | ((c >> 12) & 0x3f);
-        p[2] = 0x80 | ((c >> 6) & 0x3f);
-        p[3] = 0x80 | (c & 0x3f);
-        return 4;
-    }
-
-    return 0; // fail
-}
 
 /// Converts a single UCS-4 wide char into an UTF-8 string, returns the string length.
 static int ucs4_to_utf8(int c, string &out)
@@ -1044,7 +1003,7 @@ void CONS_Printf(const char *fmt, ...)
     char txt[BUF_SIZE];
 
     va_start(ap, fmt);
-    int nchars = vsnprintf(txt, BUF_SIZE, fmt, ap);
+    vsnprintf(txt, BUF_SIZE, fmt, ap);
     va_end(ap);
 
     I_OutputMsg("%s", txt); // send copies of console messages to stdout for debugging

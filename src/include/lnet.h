@@ -68,7 +68,6 @@ class BitStream
             return;
 
         const uint8_t *src = static_cast<const uint8_t *>(data);
-        size_t bytes = (bits + 7) / 8;
 
         // Expand buffer if needed
         while (bitPosition + bits > bufferSize)
