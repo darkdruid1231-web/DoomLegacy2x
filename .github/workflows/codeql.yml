@@ -1,4 +1,4 @@
-name: CodeQL Analysis (DISABLED)
+name: CodeQL Analysis
 
 on:
   push:
@@ -8,9 +8,6 @@ on:
   schedule:
     # Weekly deep scan — Sunday 3 AM UTC
     - cron: '0 3 * * 0'
-
-# DISABLED - manually enable when ready
-if: false
 
 jobs:
   codeql:

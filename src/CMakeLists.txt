@@ -49,6 +49,18 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Suppress warnings for legacy code
 add_compile_options(-fpermissive -w)
 
+# Stack hardening: insert canaries on functions with buffers; abort on overflow
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(-fstack-protector-strong)
+    # _FORTIFY_SOURCE=2 requires optimisation; skip in Debug to avoid spurious warnings
+    if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_compile_options(-D_FORTIFY_SOURCE=2)
+    endif()
+    if(UNIX AND NOT APPLE)
+        add_link_options(-Wl,-z,relro -Wl,-z,now)
+    endif()
+endif()
+
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 if(WIN32)

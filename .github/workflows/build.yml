@@ -169,6 +169,26 @@ jobs:
       if: always()
       run: sccache --show-stats
 
+    - name: Audit binary hardening (checksec)
+      run: |
+        sudo apt-get install -y checksec
+        checksec --file=src/build-linux/doomlegacy --format=json | tee checksec_result.json
+        python3 -c "
+        import json, sys
+        data = json.load(open('checksec_result.json'))
+        b = list(data['data'].values())[0]
+        ok = True
+        if b.get('canary') != 'yes':
+            print('FAIL: Stack canary missing', file=sys.stderr); ok = False
+        if b.get('nx') != 'yes':
+            print('FAIL: NX bit missing', file=sys.stderr); ok = False
+        if b.get('relro') not in ('full', 'partial'):
+            print('FAIL: RELRO missing', file=sys.stderr); ok = False
+        if ok:
+            print('All hardening checks passed:', b)
+        sys.exit(0 if ok else 1)
+        "
+
     - name: Build legacy.wad
       run: |
         mkdir -p src/release-linux
@@ -259,3 +279,51 @@ jobs:
           src/doomlegacy-portable.tar.gz
         retention-days: 30
         if-no-files-found: error
+
+  sanitizer-check:
+    name: ASan + UBSan (Linux)
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          cmake ninja-build pkg-config \
+          gcc g++ \
+          libsdl2-dev libsdl2-mixer-dev \
+          libglew-dev \
+          libpng-dev libjpeg-dev \
+          zlib1g-dev \
+          libopenal-dev \
+          libvorbis-dev libflac-dev libmpg123-dev libopus-dev libopusfile-dev \
+          libfreetype-dev \
+          libenet-dev \
+          libwavpack-dev \
+          flex bison lemon
+
+    - name: Configure CMake (ASan + UBSan)
+      run: |
+        mkdir -p src/build-sanitizer
+        cd src/build-sanitizer
+        cmake -G Ninja \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_C_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" \
+          -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" \
+          -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined" \
+          ..
+
+    - name: Build
+      run: |
+        cd src/build-sanitizer
+        ninja -j$(nproc)
+
+    - name: Run tests (ASan + UBSan)
+      run: |
+        cd src/build-sanitizer
+        ctest --output-on-failure
+      env:
+        ASAN_OPTIONS: halt_on_error=1:abort_on_error=1
+        UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
