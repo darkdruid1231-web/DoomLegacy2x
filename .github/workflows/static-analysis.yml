@@ -1,0 +1,127 @@
+name: Static Analysis
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Weekly scan — Monday 4 AM UTC
+    - cron: '0 4 * * 1'
+
+jobs:
+  cppcheck:
+    name: Cppcheck
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
+
+    - name: Install Cppcheck
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cppcheck
+
+    - name: Run Cppcheck
+      # continue-on-error: the legacy codebase will have findings on first run.
+      # Review the uploaded report, suppress false positives with // cppcheck-suppress,
+      # then remove continue-on-error to make this job blocking.
+      continue-on-error: true
+      run: |
+        cppcheck \
+          --enable=warning,performance,portability \
+          --error-exitcode=1 \
+          --inline-suppr \
+          --suppress=missingInclude \
+          --suppress=missingIncludeSystem \
+          -I src/include \
+          -I src/include/core \
+          -I src/include/game \
+          src/engine \
+          src/video \
+          src/audio \
+          src/net \
+          src/util \
+          src/lnet \
+          2>&1 | tee cppcheck-report.txt
+
+    - name: Upload Cppcheck report
+      if: always()
+      uses: actions/upload-artifact@v5
+      with:
+        name: cppcheck-report
+        path: cppcheck-report.txt
+        retention-days: 30
+        if-no-files-found: warn
+
+  infer:
+    name: Infer (Meta)
+    runs-on: ubuntu-latest
+    env:
+      INFER_VERSION: "1.2.0"
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
+
+    - name: Cache Infer binary
+      id: cache-infer
+      uses: actions/cache@v5
+      with:
+        path: ~/infer
+        key: infer-${{ env.INFER_VERSION }}
+
+    - name: Download and install Infer
+      if: steps.cache-infer.outputs.cache-hit != 'true'
+      run: |
+        wget -q \
+          "https://github.com/facebook/infer/releases/download/v${INFER_VERSION}/infer-linux-x86_64-v${INFER_VERSION}.tar.xz" \
+          -O /tmp/infer.tar.xz
+        tar -xJf /tmp/infer.tar.xz -C ~/
+        mv ~/infer-linux-x86_64-v${INFER_VERSION} ~/infer
+
+    - name: Add Infer to PATH
+      run: echo "$HOME/infer/bin" >> $GITHUB_PATH
+
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          cmake ninja-build pkg-config gcc g++ \
+          libsdl2-dev libsdl2-mixer-dev libglew-dev \
+          libpng-dev libjpeg-dev zlib1g-dev libopenal-dev \
+          libvorbis-dev libflac-dev libmpg123-dev libopus-dev libopusfile-dev \
+          libfreetype-dev libenet-dev libwavpack-dev \
+          flex bison lemon
+
+    - name: Configure CMake
+      run: |
+        mkdir -p src/build-infer
+        cd src/build-infer
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug ..
+
+    - name: Run Infer
+      # continue-on-error: same rationale as Cppcheck — observe first, then gate.
+      continue-on-error: true
+      run: |
+        cd src/build-infer
+        infer run -- ninja -j$(nproc)
+
+    - name: Print Infer summary
+      if: always()
+      run: |
+        report="src/build-infer/infer-out/report.txt"
+        if [ -f "$report" ]; then
+          echo "=== Infer report ==="
+          cat "$report"
+        else
+          echo "No Infer report generated (no issues or build did not complete)."
+        fi
+
+    - name: Upload Infer report
+      if: always()
+      uses: actions/upload-artifact@v5
+      with:
+        name: infer-report
+        path: src/build-infer/infer-out/
+        retention-days: 30
+        if-no-files-found: warn
